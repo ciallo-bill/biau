@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Ozon ERP system cover</title>
+  <desc id="desc">Dashboard style cover showing ERP modules, API, database, Redis queue and browser extension.</desc>
+  <rect width="1200" height="675" fill="#eef6fb"/>
+  <rect x="64" y="58" width="1072" height="559" rx="28" fill="#ffffff" stroke="#c9ddeb"/>
+  <rect x="64" y="58" width="236" height="559" rx="28" fill="#0d2530"/>
+  <text x="112" y="126" fill="#ffffff" font-family="Segoe UI,Arial,sans-serif" font-size="34" font-weight="700">Ozon ERP</text>
+  <text x="112" y="165" fill="#99c7d5" font-family="Segoe UI,Arial,sans-serif" font-size="18">commerce operations</text>
+  <g fill="#183d4b">
+    <rect x="104" y="228" width="156" height="42" rx="10"/>
+    <rect x="104" y="292" width="156" height="42" rx="10"/>
+    <rect x="104" y="356" width="156" height="42" rx="10"/>
+    <rect x="104" y="420" width="156" height="42" rx="10"/>
+  </g>
+  <g fill="#d9f3ef" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="600">
+    <text x="126" y="255">Products</text>
+    <text x="126" y="319">Orders</text>
+    <text x="126" y="383">Jobs</text>
+    <text x="126" y="447">Audit</text>
+  </g>
+  <text x="350" y="124" fill="#071827" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="800">Vue Admin + Node API + Queue</text>
+  <text x="350" y="162" fill="#627287" font-family="Segoe UI,Arial,sans-serif" font-size="18">Prisma / PostgreSQL / Redis / BullMQ / Chrome Extension</text>
+  <g stroke="#9fc5d8" stroke-width="4" fill="none">
+    <path d="M470 310h164"/>
+    <path d="M760 310h164"/>
+    <path d="M634 386l-92 80"/>
+    <path d="M760 386l92 80"/>
+  </g>
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <rect x="368" y="238" width="210" height="144" rx="18" fill="#e9f8f6" stroke="#00a99d"/>
+    <text x="402" y="292" fill="#071827" font-size="26" font-weight="800">Web</text>
+    <text x="402" y="326" fill="#52707f" font-size="17">Vue 3 dashboard</text>
+    <rect x="634" y="238" width="210" height="144" rx="18" fill="#edf5ff" stroke="#0078d4"/>
+    <text x="668" y="292" fill="#071827" font-size="26" font-weight="800">API</text>
+    <text x="668" y="326" fill="#52707f" font-size="17">Express service</text>
+    <rect x="900" y="238" width="184" height="144" rx="18" fill="#fff5ec" stroke="#ff7a59"/>
+    <text x="934" y="292" fill="#071827" font-size="26" font-weight="800">Ozon</text>
+    <text x="934" y="326" fill="#52707f" font-size="17">Seller API</text>
+    <rect x="398" y="468" width="198" height="96" rx="18" fill="#f7fbfe" stroke="#b7ccdc"/>
+    <text x="432" y="512" fill="#071827" font-size="24" font-weight="800">PostgreSQL</text>
+    <text x="432" y="540" fill="#627287" font-size="16">Prisma models</text>
+    <rect x="790" y="468" width="198" height="96" rx="18" fill="#f7fbfe" stroke="#b7ccdc"/>
+    <text x="824" y="512" fill="#071827" font-size="24" font-weight="800">BullMQ</text>
+    <text x="824" y="540" fill="#627287" font-size="16">Redis worker</text>
+  </g>
+</svg>
