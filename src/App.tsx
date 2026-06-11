@@ -6,8 +6,8 @@ import './App.css'
 
 const { Title, Text, Paragraph } = Typography
 
-type ViewKey = 'home' | 'projects' | 'cases' | 'caseDetail' | 'blog'
-type NavViewKey = Exclude<ViewKey, 'caseDetail'>
+type ViewKey = 'home' | 'projects' | 'projectDetail' | 'cases' | 'caseDetail' | 'blog'
+type NavViewKey = Exclude<ViewKey, 'projectDetail' | 'caseDetail'>
 type ProjectGroupKey = 'ai' | 'fullstack' | 'games'
 type SiteTheme = 'light' | 'dark'
 
@@ -18,11 +18,10 @@ const navItems: Array<{ key: NavViewKey; label: string; icon: React.ReactNode }>
   { key: 'blog', label: '博客', icon: <IconArticle /> },
 ]
 
-const routeByView: Record<ViewKey, string> = {
+const routeByView: Record<NavViewKey, string> = {
   home: '/',
   projects: '/projects',
   cases: '/cases',
-  caseDetail: '/cases/legal-rag',
   blog: '/blogs',
 }
 
@@ -33,7 +32,21 @@ const viewByRoute = new Map<string, ViewKey>([
 
 function getViewFromPath(pathname: string): ViewKey {
   const normalizedPath = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname
+  if (/^\/projects\/[^/]+$/.test(normalizedPath)) return 'projectDetail'
+  if (/^\/cases\/[^/]+$/.test(normalizedPath)) return 'caseDetail'
   return viewByRoute.get(normalizedPath) ?? 'home'
+}
+
+function getProjectIdFromPath(pathname: string): string | null {
+  const normalizedPath = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname
+  const match = normalizedPath.match(/^\/projects\/([^/]+)$/)
+  return match?.[1] ?? null
+}
+
+function getCaseIdFromPath(pathname: string): string | null {
+  const normalizedPath = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname
+  const match = normalizedPath.match(/^\/cases\/([^/]+)$/)
+  return match?.[1] ?? null
 }
 
 const heroSlides = [
@@ -72,20 +85,131 @@ function getGroupKeyByProjectId(projectId: string): ProjectGroupKey {
 
 const homeCaseProjectIds = ['legal-rag', 'pet-workspace', 'ozon-erp', 'blog-semi', 'game-first-tetris', 'xunqiu']
 
+type CaseStudy = {
+  id: string
+  projectId: string
+  title: string
+  eyebrow: string
+  status: string
+  summary: string
+  outcome: string
+  challenge: string
+  solution: string
+  results: string[]
+  evidence: string[]
+  architecture: Array<{ title: string; detail: string }>
+  talkingPoints: string[]
+}
+
+const caseStudies: CaseStudy[] = [
+  {
+    id: 'legal-rag',
+    projectId: 'legal-rag',
+    title: '法律智能机器人与合同审查 RAG 应用',
+    eyebrow: 'AI 应用 / 合同审查',
+    status: '重点案例',
+    summary: '把合同导入、条款切分、语义检索、引用溯源和风险审查串成一个可演示的 RAG MVP。',
+    outcome: '可解释的合同审查闭环',
+    challenge: '法律场景不能只给模型结论，需要让回答和审查结果能追溯到原文条款，同时保证没有真实模型 key 和数据库时也能稳定演示。',
+    solution: '项目采用 Vue 3 工作台 + Express API + shared types 的 monorepo 结构，抽象 embedding provider 和 vector store，用 Mock Embedding 与内存向量库跑通导入、检索、问答、审查和 citations。',
+    results: ['文档 SHA-256 去重，避免重复入库影响检索质量', 'section-aware chunk 保留条款来源和 chunk index', 'RAG 问答返回 answer + citations，支持人工复核', '合同审查输出风险等级、问题说明、修改建议和是否需要人工复核'],
+    evidence: ['知识库导入页面', '引用溯源问答页面', '合同风险审查工作台'],
+    architecture: [
+      { title: 'Vue 工作台', detail: '知识库、智能问答、合同审查三条演示流程。' },
+      { title: 'Express API', detail: '暴露文档导入、chunk 查询、RAG 问答和合同审查接口。' },
+      { title: 'RAG 管线', detail: '清洗、切分、embedding、召回、阈值过滤、轻量 rerank、引用返回。' },
+      { title: '可替换边界', detail: 'Mock provider 与 MemoryVectorStore 后续可替换 OpenAI embeddings、pgvector、PDF/DOCX parser 和 BullMQ。' },
+    ],
+    talkingPoints: ['项目重点是把 AI 能力落到可解释业务流程，而不是简单聊天。', 'MVP 用 mock embedding 保证本地可演示，同时保留生产替换边界。', '引用溯源和结构化 schema 是降低法律场景幻觉风险的关键。'],
+  },
+  {
+    id: 'ozon-erp',
+    projectId: 'ozon-erp',
+    title: 'Ozon 电商 ERP 业务系统',
+    eyebrow: '全栈开发 / 电商运营',
+    status: '整理中',
+    summary: '围绕店铺授权、商品同步、采集铺货、审批动作、任务队列和审计日志组织的后台系统。',
+    outcome: '多端协作的电商运营后台',
+    challenge: '电商运营链路横跨后台、API、数据库、任务队列和浏览器插件；真实写入还需要安全开关、审批记录和可回滚的交付流程。',
+    solution: '项目采用 Vue 管理后台、Express API、Prisma/PostgreSQL、Redis/BullMQ Worker、WXT/MV3 插件和 shared types，写操作通过 PendingAction 与审计日志沉淀可追踪链路。',
+    results: ['后台覆盖商品、订单、店铺、工具和设置等模块', '插件支持采集商品并进入草稿/铺货流程', '同步和写入任务可在直写与队列模式之间切换', '交付文档覆盖本地 Docker、数据库迁移和容器云部署'],
+    evidence: ['管理后台视图目录', 'Prisma 数据模型', 'Chrome MV3 插件入口', '部署与交付文档'],
+    architecture: [
+      { title: '管理后台', detail: 'Vue/Vite 承载商品、订单、店铺、审批中心和工具页面。' },
+      { title: '服务端 API', detail: 'Express + Prisma 处理业务校验、数据持久化和 Ozon API 适配。' },
+      { title: '异步任务', detail: 'Redis/BullMQ Worker 用于同步、采集、导入导出等长流程。' },
+      { title: '浏览器插件', detail: 'WXT/MV3 插件承接采集铺货与平台侧辅助能力。' },
+    ],
+    talkingPoints: ['这个项目适合展示全栈业务系统的模块拆分和交付能力。', '真实写入默认需要显式开关，适合讲安全边界和操作审计。', '插件、Worker、API、后台之间的协作是核心工程亮点。'],
+  },
+  {
+    id: 'pet-workspace',
+    projectId: 'pet-workspace',
+    title: 'Pet Workspace AI 生成与审核管线',
+    eyebrow: 'AI 应用 / 生成管线',
+    status: '补充中',
+    summary: '围绕 AI 宠物生成、Worker 编排、QA Gate、人审发布、Android 联调和 App API 契约组织的项目工作区。',
+    outcome: 'AI 生成资产进入 App 的工程闭环',
+    challenge: '生成类项目容易停留在单次出图，真正落到应用里需要任务状态、素材验证、人工审核、发布记录和移动端消费协议。',
+    solution: '工作区按 app-facing 的 gamer 与服务端 fantasy-pet-rule 分边界，生成管线负责 worker orchestration、server-side QA gates 和 public app API contract，Android 侧验证桌宠/社区集成。',
+    results: ['生成任务、审核、发布拆成可追踪阶段', '服务端工具覆盖任务包、审核决策、运行摘要和资产校验', 'Android 桌宠实验验证悬浮窗、前台服务和本地证明链', '本地 HidenCloud 替代环境用于稳定联调社区 API'],
+    evidence: ['fantasy-pet-rule 工具链', 'gamer app-facing 集成目录', 'Android 浮窗宠物 MVP', '生成产物与审核截图'],
+    architecture: [
+      { title: 'App 边界', detail: 'gamer 承载社区 API、管理审核 UI、App shared packages 和集成测试。' },
+      { title: '生成服务', detail: 'fantasy-pet-rule 承载 worker 编排、生成管线和服务端 QA gates。' },
+      { title: '审核发布', detail: '生成结果经过质量检查、人审决策和发布记录后再进入 App 展示。' },
+      { title: '移动端验证', detail: 'Android 浮窗宠物和社区 API 用于验证 App 侧消费体验。' },
+    ],
+    talkingPoints: ['项目亮点是 AI 生成工程化，而不是单次素材生成。', '通过 QA Gate 和人审发布，把不稳定生成结果变成可控流程。', 'App API 契约让生成服务与移动端解耦。'],
+  },
+  {
+    id: 'godot-showcase',
+    projectId: 'game-first-tetris',
+    title: 'Godot Web 游戏展示体系',
+    eyebrow: '游戏项目 / 互动体验',
+    status: '补充中',
+    summary: '把 Tetris、Spacewar、InteSpace、Raiden Prototype、Space War 等 Godot 项目整理成可试玩、可说明、可回归的展示体系。',
+    outcome: '多款互动项目的统一展示规范',
+    challenge: '游戏项目如果只放源码很难被快速理解，需要让访问者看到玩法循环、操作方式、版本阶段、截图证据和 Web 试玩入口。',
+    solution: '项目统一按 Godot 工程、场景、脚本、文档、导出预设和验证日志组织，页面侧按玩法类型拆成可浏览的项目详情，并保留外部试玩跳转。',
+    results: ['Tetris 已具备经典模式、Rogue 原型、触屏桥接和多尺寸回归', 'Spacewar 展示版包含主菜单、设置、Help、暂停、结果页和会话总结', 'Raiden Prototype 形成双关垂直切片、Boss、章节过场和公开 Demo 准备文档', 'Space War 保留复古横向射击、Sector/Boss、程序化音效和发布文档'],
+    evidence: ['Godot project.godot 与 export_presets', 'scenes/scripts/assets 目录结构', 'README 与阶段文档', '验证日志与发布包目录'],
+    architecture: [
+      { title: 'Godot 工程', detail: '每个游戏保留 project.godot、scenes、scripts、assets 和 docs。' },
+      { title: '玩法闭环', detail: '围绕主菜单、战斗/操作、暂停、结算、重开和帮助入口组织体验。' },
+      { title: 'Web 展示', detail: '通过 Web 导出或站点跳转，把游戏作为可体验项目而非静态说明。' },
+      { title: '回归验证', detail: '使用固定尺寸、headless、自检脚本或人工回归记录沉淀质量。' },
+    ],
+    talkingPoints: ['游戏项目更适合讲“从原型到可展示版本”的过程。', 'Godot 项目结构、导出预设和回归日志能体现工程化习惯。', '案例页讲统一展示规范，项目详情页分别讲每个游戏的玩法和实现。'],
+  },
+]
+
+function getCaseStudyForProject(projectId: string) {
+  return caseStudies.find((caseStudy) => caseStudy.projectId === projectId)
+}
+
 function App() {
   const [activeView, setActiveView] = useState<ViewKey>(() => getViewFromPath(window.location.pathname))
-  const [selectedId, setSelectedId] = useState(projects[0].id)
+  const [selectedId, setSelectedId] = useState(() => getProjectIdFromPath(window.location.pathname) ?? projects[0].id)
+  const [selectedCaseId, setSelectedCaseId] = useState(() => getCaseIdFromPath(window.location.pathname) ?? caseStudies[0].id)
   const [siteTheme, setSiteTheme] = useState<SiteTheme>('light')
 
   const selectedProject = projects.find((project) => project.id === selectedId) ?? projects[0]
+  const selectedCase = caseStudies.find((caseStudy) => caseStudy.id === selectedCaseId) ?? caseStudies[0]
 
   useEffect(() => {
-    const handlePopState = () => setActiveView(getViewFromPath(window.location.pathname))
+    const handlePopState = () => {
+      const nextProjectId = getProjectIdFromPath(window.location.pathname)
+      const nextCaseId = getCaseIdFromPath(window.location.pathname)
+      if (nextProjectId) setSelectedId(nextProjectId)
+      if (nextCaseId) setSelectedCaseId(nextCaseId)
+      setActiveView(getViewFromPath(window.location.pathname))
+    }
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
-  const navigate = (view: ViewKey) => {
+  const navigate = (view: NavViewKey) => {
     const nextPath = routeByView[view]
     if (window.location.pathname !== nextPath) {
       window.history.pushState(null, '', nextPath)
@@ -99,7 +223,25 @@ function App() {
     navigate('projects')
   }
 
-  const openLegalCase = () => navigate('caseDetail')
+  const openProjectDetail = (project: Project) => {
+    const nextPath = `/projects/${project.id}`
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState(null, '', nextPath)
+    }
+    setSelectedId(project.id)
+    setActiveView('projectDetail')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const openCaseDetail = (caseStudy: CaseStudy) => {
+    const nextPath = `/cases/${caseStudy.id}`
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState(null, '', nextPath)
+    }
+    setSelectedCaseId(caseStudy.id)
+    setActiveView('caseDetail')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <div className={`site-shell site-theme-${siteTheme} ${activeView === 'blog' ? 'is-blog-page' : ''}`}>
@@ -111,7 +253,7 @@ function App() {
 
         <nav className="site-nav" aria-label="主导航">
           {navItems.map((item) => (
-            <button key={item.key} className={(activeView === item.key || (activeView === 'caseDetail' && item.key === 'cases')) ? 'is-active' : ''} type="button" onClick={() => navigate(item.key)}>
+            <button key={item.key} className={(activeView === item.key || (activeView === 'caseDetail' && item.key === 'cases') || (activeView === 'projectDetail' && item.key === 'projects')) ? 'is-active' : ''} type="button" onClick={() => navigate(item.key)}>
               {item.icon}
               {item.label}
             </button>
@@ -122,10 +264,11 @@ function App() {
       </header>
 
       <main className="site-main">
-        {activeView === 'home' ? <HomeView onOpenCase={openLegalCase} onOpenProject={openProject} /> : null}
-        {activeView === 'projects' ? <ProjectsView onOpenCase={openLegalCase} selectedProject={selectedProject} onSelectProject={setSelectedId} /> : null}
-        {activeView === 'cases' ? <CasesView onOpenCase={openLegalCase} onOpenProject={openProject} /> : null}
-        {activeView === 'caseDetail' ? <LegalRagCaseView onBack={() => navigate('cases')} onOpenProject={() => openProject(projects.find((project) => project.id === 'legal-rag') ?? projects[0])} /> : null}
+        {activeView === 'home' ? <HomeView onOpenCase={openCaseDetail} onOpenProject={openProject} /> : null}
+        {activeView === 'projects' ? <ProjectsView onOpenCase={openCaseDetail} onOpenProjectDetail={openProjectDetail} selectedProject={selectedProject} onSelectProject={setSelectedId} /> : null}
+        {activeView === 'projectDetail' ? <ProjectFullDetailView onBack={() => navigate('projects')} onOpenCase={openCaseDetail} project={selectedProject} /> : null}
+        {activeView === 'cases' ? <CasesView onOpenCase={openCaseDetail} onOpenProjectDetail={openProjectDetail} /> : null}
+        {activeView === 'caseDetail' ? <CaseDetailView caseStudy={selectedCase} onBack={() => navigate('cases')} onOpenProject={(project) => openProjectDetail(project)} /> : null}
         {activeView === 'blog' ? <BlogView theme={siteTheme} /> : null}
       </main>
 
@@ -149,7 +292,7 @@ function ThemeToggle({ onChange, theme }: { onChange: (theme: SiteTheme) => void
   )
 }
 
-function HomeView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOpenProject: (project: Project) => void }) {
+function HomeView({ onOpenCase, onOpenProject }: { onOpenCase: (caseStudy: CaseStudy) => void; onOpenProject: (project: Project) => void }) {
   const [activeSlide, setActiveSlide] = useState(0)
   const [activeHomeGroup, setActiveHomeGroup] = useState<ProjectGroupKey>('ai')
   const slide = heroSlides[activeSlide]
@@ -280,7 +423,11 @@ function HomeView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOpe
               <div className="case-matrix-meta">
                 {project.stack.slice(0, 4).map((item) => <span key={item}>{item}</span>)}
               </div>
-              <Button theme="light" type="primary" onClick={() => { if (project.id === 'legal-rag') onOpenCase(); else onOpenProject(project) }}>查看案例</Button>
+              <Button theme="light" type="primary" onClick={() => {
+                const projectCase = getCaseStudyForProject(project.id)
+                if (projectCase) onOpenCase(projectCase)
+                else onOpenProject(project)
+              }}>查看案例</Button>
             </article>
           ))}
         </div>
@@ -289,7 +436,7 @@ function HomeView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOpe
   )
 }
 
-function ProjectsView({ onOpenCase, onSelectProject, selectedProject }: { onOpenCase: () => void; onSelectProject: (id: string) => void; selectedProject: Project }) {
+function ProjectsView({ onOpenCase, onOpenProjectDetail, onSelectProject, selectedProject }: { onOpenCase: (caseStudy: CaseStudy) => void; onOpenProjectDetail: (project: Project) => void; onSelectProject: (id: string) => void; selectedProject: Project }) {
   const [activeGroup, setActiveGroup] = useState<ProjectGroupKey>(() => getGroupKeyByProjectId(selectedProject.id))
   const currentGroup = projectGroups.find((group) => group.key === activeGroup) ?? projectGroups[0]
   const groupedProjects = useMemo(
@@ -346,77 +493,91 @@ function ProjectsView({ onOpenCase, onSelectProject, selectedProject }: { onOpen
             </div>
           </div>
 
-          <ProjectDetail project={detailProject} />
+          <ProjectDetail project={detailProject} onOpenCase={onOpenCase} onOpenProjectDetail={() => onOpenProjectDetail(detailProject)} />
         </div>
 
         <div className="project-thumb-strip" aria-label={`${currentGroup.title}项目列表`}>
-          {groupedProjects.map((project) => (
-            <button key={project.id} className={detailProject.id === project.id ? 'project-thumb-card is-active' : 'project-thumb-card'} type="button" onClick={() => onSelectProject(project.id)}>
-              <span>{categoryLabels[project.category]}</span>
-              <strong>{project.title}</strong>
-              <em>{project.summary}</em>
-            </button>
-          ))}
+          {groupedProjects.map((project) => {
+            const projectCase = getCaseStudyForProject(project.id)
+
+            return (
+              <article key={project.id} className={detailProject.id === project.id ? 'project-thumb-card is-active' : 'project-thumb-card'}>
+                <span>{categoryLabels[project.category]}</span>
+                <strong>{project.title}</strong>
+                <em>{project.summary}</em>
+                <Space wrap>
+                  <Button size="small" theme="light" type="primary" onClick={() => onSelectProject(project.id)}>预览</Button>
+                  <Button size="small" theme="solid" type="primary" onClick={() => onOpenProjectDetail(project)}>项目详情</Button>
+                  {projectCase ? <Button size="small" onClick={() => onOpenCase(projectCase)}>案例</Button> : null}
+                </Space>
+              </article>
+            )
+          })}
         </div>
 
-        <ProjectNarrative project={detailProject} onOpenCase={onOpenCase} />
+        <ProjectNarrative project={detailProject} onOpenCase={() => {
+          const projectCase = getCaseStudyForProject(detailProject.id)
+          if (projectCase) onOpenCase(projectCase)
+        }} onOpenProjectDetail={() => onOpenProjectDetail(detailProject)} />
       </section>
     </div>
   )
 }
 
-function CasesView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOpenProject: (project: Project) => void }) {
-  const resourceItems = [
-    { title: 'Legal RAG 合同审查案例', tag: 'AI 应用', status: '重点案例', projectId: 'legal-rag', description: '从法律合同审查场景切入，展示 RAG 流程、引用溯源、风险归因和面试讲解口径。', outcome: '可解释的合同审查 MVP' },
-    { title: 'Ozon 电商 ERP 案例', tag: '全栈开发', status: '整理中', projectId: 'ozon-erp', description: '适合沉淀后台模块、API、Worker、插件、数据库和部署说明。', outcome: '业务系统交付说明' },
-    { title: 'Pet Workspace AI 管线案例', tag: 'AI 应用', status: '补充中', projectId: 'pet-workspace', description: '适合展示生成管线、审核流程、人审发布和 App API 契约。', outcome: 'AI 生成闭环案例' },
-    { title: 'Godot Web 游戏展示案例', tag: '游戏项目', status: '补充中', projectId: 'game-first-tetris', description: '适合统一游戏封面、试玩入口、操作说明和 Web 导出说明。', outcome: '互动项目展示规范' },
-  ]
-  const featuredItem = resourceItems[0]
-  const featuredProject = projects.find((entry) => entry.id === featuredItem.projectId) ?? projects[0]
-  const secondaryItems = resourceItems.slice(1)
+function getTagColor(label: string) {
+  if (label.includes('AI')) return 'cyan'
+  if (label.includes('全栈')) return 'blue'
+  if (label.includes('游戏')) return 'purple'
+  return 'grey'
+}
+
+function CasesView({ onOpenCase, onOpenProjectDetail }: { onOpenCase: (caseStudy: CaseStudy) => void; onOpenProjectDetail: (project: Project) => void }) {
+  const featuredCase = caseStudies[0]
+  const featuredProject = projects.find((entry) => entry.id === featuredCase.projectId) ?? projects[0]
+  const secondaryCases = caseStudies.slice(1)
 
   return (
     <div className="resource-page">
       <section className="resource-hero">
         <Text type="tertiary">Cases</Text>
         <Title heading={1}>案例中心</Title>
-        <Paragraph>案例页负责讲清楚一个项目为什么值得看：业务场景、交付成果、截图证据、技术解释和面试讲述入口；完整项目介绍则放在项目页下方。</Paragraph>
+        <Paragraph>参考成熟官网的 Customer Stories 结构，案例页只讲业务场景、解决方案、交付结果和证据材料；工程细节统一跳转到独立项目详情页。</Paragraph>
       </section>
 
       <section className="case-matrix-board">
         <div className="case-board-head">
           <div>
             <span className="section-pill">Case Library</span>
-            <Title heading={2}>从项目到可讲述案例</Title>
-            <Paragraph>这里不堆完整项目说明，而是提炼“场景、证据、结果、讲法”。访问者可以先看案例，再跳到项目页查看工程信息。</Paragraph>
+            <Title heading={2}>按落地故事组织案例</Title>
+            <Paragraph>每个案例都遵循 Challenge / Solution / Results：先讲为什么做，再讲怎么交付，最后给截图、架构和面试讲述入口。</Paragraph>
           </div>
           <div className="case-board-stats" aria-label="案例统计">
-            <span>业务场景</span>
-            <span>交付成果</span>
-            <span>面试口径</span>
+            <span>场景</span>
+            <span>方案</span>
+            <span>结果</span>
+            <span>证据</span>
           </div>
         </div>
 
         <div className="case-showcase-layout">
           <article className="case-featured-card">
             <div className="case-featured-media">
-              <img src={featuredProject.image} alt={featuredItem.title} loading="lazy" />
+              {featuredProject.image ? <img src={featuredProject.image} alt={featuredCase.title} loading="lazy" /> : <span>{categoryLabels[featuredProject.category]}</span>}
             </div>
             <div className="case-featured-body">
               <div className="case-card-tags">
-                <Tag color="cyan">{featuredItem.tag}</Tag>
-                <Tag color="green">{featuredItem.status}</Tag>
+                <Tag color={getTagColor(featuredCase.eyebrow)}>{featuredCase.eyebrow}</Tag>
+                <Tag color="green">{featuredCase.status}</Tag>
               </div>
-              <Title heading={3}>{featuredItem.title}</Title>
-              <Paragraph>{featuredItem.description}</Paragraph>
+              <Title heading={3}>{featuredCase.title}</Title>
+              <Paragraph>{featuredCase.summary}</Paragraph>
               <div className="case-outcome-box">
                 <Text type="tertiary">案例成果</Text>
-                <strong>{featuredItem.outcome}</strong>
+                <strong>{featuredCase.outcome}</strong>
               </div>
               <Space wrap>
-                <Button theme="solid" type="primary" onClick={onOpenCase}>查看完整案例</Button>
-                <Button onClick={() => onOpenProject(featuredProject)}>项目完整介绍</Button>
+                <Button theme="solid" type="primary" onClick={() => onOpenCase(featuredCase)}>查看案例详情</Button>
+                <Button onClick={() => onOpenProjectDetail(featuredProject)}>项目完整介绍</Button>
               </Space>
             </div>
           </article>
@@ -440,19 +601,22 @@ function CasesView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOp
         </div>
 
         <div className="case-secondary-grid">
-          {secondaryItems.map((item) => {
-            const project = projects.find((entry) => entry.id === item.projectId) ?? projects[0]
+          {secondaryCases.map((caseStudy) => {
+            const project = projects.find((entry) => entry.id === caseStudy.projectId) ?? projects[0]
 
             return (
-              <article key={item.title} className="case-secondary-card">
+              <article key={caseStudy.id} className="case-secondary-card">
                 <div>
-                  <Tag color={item.tag === 'AI 应用' ? 'cyan' : item.tag === '全栈开发' ? 'blue' : 'grey'}>{item.tag}</Tag>
-                  <Tag color={item.status === '整理中' ? 'blue' : item.status === '补充中' ? 'orange' : 'grey'}>{item.status}</Tag>
+                  <Tag color={getTagColor(caseStudy.eyebrow)}>{caseStudy.eyebrow}</Tag>
+                  <Tag color={caseStudy.status === '整理中' ? 'blue' : caseStudy.status === '补充中' ? 'orange' : 'grey'}>{caseStudy.status}</Tag>
                 </div>
-                <Title heading={4}>{item.title}</Title>
-                <Paragraph>{item.description}</Paragraph>
-                <span>{item.outcome}</span>
-                <Button theme="light" type="primary" onClick={() => onOpenProject(project)}>查看项目介绍</Button>
+                <Title heading={4}>{caseStudy.title}</Title>
+                <Paragraph>{caseStudy.summary}</Paragraph>
+                <span>{caseStudy.outcome}</span>
+                <Space wrap>
+                  <Button theme="solid" type="primary" onClick={() => onOpenCase(caseStudy)}>查看案例详情</Button>
+                  <Button theme="light" type="primary" onClick={() => onOpenProjectDetail(project)}>项目详情</Button>
+                </Space>
               </article>
             )
           })}
@@ -477,22 +641,23 @@ function CasesView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOp
   )
 }
 
-function ProjectNarrative({ onOpenCase, project }: { onOpenCase: () => void; project: Project }) {
+function ProjectNarrative({ onOpenCase, onOpenProjectDetail, project }: { onOpenCase: () => void; onOpenProjectDetail: () => void; project: Project }) {
   const isLegalRag = project.id === 'legal-rag'
+  const projectCase = getCaseStudyForProject(project.id)
   const narrative = isLegalRag
     ? {
         title: '项目完整介绍',
         paragraphs: [
-          '这个项目是一个面向合同审查的 RAG 全栈 MVP。项目目标不是做通用聊天机器人，而是把法律合同审查拆成“导入合同、切分条款、检索上下文、生成审查结论、给出引用来源”的业务闭环。',
-          '项目展示重点包括文档知识库、引用溯源问答、合同风险列表和修改建议。项目页保留工程信息、技术栈和实现范围；案例页则进一步讲清楚业务场景、截图证据和面试讲解口径。',
+          '这个项目是一个面向合同审查的 RAG 全栈 MVP。项目页保留摘要和展示入口，完整技术栈、实现方式、功能模块和工程拆解放到独立项目详情页。',
+          '案例页则进一步讲清楚业务场景、截图证据和面试讲解口径，避免和项目详情页重复。',
         ],
         outcome: '完整闭环：文档导入 + RAG 问答 + 合同审查 + citations',
       }
     : {
         title: '项目完整介绍',
         paragraphs: [
-          `${project.title} 当前用于展示 ${project.role} 方向的工程能力。项目页保留项目背景、技术栈、交付范围、关键亮点和后续可扩展方向。`,
-          '后续如果该项目需要对外讲述，会在案例页补充业务场景、运行截图、架构图和复盘内容，避免项目页和案例页重复。',
+          `${project.title} 当前用于展示 ${project.role} 方向的工程能力。项目页这里保留摘要和入口，完整技术栈、实现方式和功能模块放到独立项目详情页。`,
+          '如果项目需要对外讲述，再在案例页补充业务场景、运行截图、架构图和复盘内容。',
         ],
         outcome: project.highlights.join(' / '),
       }
@@ -511,48 +676,367 @@ function ProjectNarrative({ onOpenCase, project }: { onOpenCase: () => void; pro
           <Text type="tertiary">核心成果</Text>
           <strong>{narrative.outcome}</strong>
         </div>
-        {isLegalRag ? <Button theme="solid" type="primary" onClick={onOpenCase}>查看 Legal RAG 完整案例</Button> : null}
+        <Space wrap>
+          <Button theme="solid" type="primary" onClick={onOpenProjectDetail}>打开项目详情页</Button>
+          {projectCase ? <Button onClick={onOpenCase}>查看对应案例</Button> : null}
+        </Space>
       </div>
     </section>
   )
 }
 
-function LegalRagCaseView({ onBack, onOpenProject }: { onBack: () => void; onOpenProject: () => void }) {
+type ProjectDetailContent = {
+  subtitle: string
+  overview: string
+  modules: Array<{ title: string; detail: string }>
+  implementation: string[]
+  nextSteps: string[]
+}
+
+function getProjectDetailContent(project: Project): ProjectDetailContent {
+  if (project.id === 'legal-rag') {
+    return {
+      subtitle: 'RAG 合同审查全栈 MVP',
+      overview: '项目围绕法律合同审查建立完整业务闭环：导入合同文本，按条款切分，检索相关上下文，生成问答或审查结论，并用 citations 绑定来源片段，让 AI 输出可解释、可复核。',
+      modules: [
+        { title: '知识库导入', detail: '导入合同文本并组织为可检索材料，为后续问答和审查提供上下文。' },
+        { title: '条款切分', detail: '将长合同拆成适合检索和引用的 chunk，保留条款语义和来源信息。' },
+        { title: 'RAG 问答', detail: '根据用户问题召回相关条款，生成回答并展示引用来源。' },
+        { title: '合同风险审查', detail: '围绕付款、交付、责任、解除等风险点输出等级、建议和引用。' },
+      ],
+      implementation: [
+        '前端用 Vue 3 实现合同审查工作台、知识库页面和问答页面。',
+        '后端用 Express + TypeScript 暴露文档、检索、问答和审查接口。',
+        'MVP 阶段使用 Mock Embedding 保证演示稳定，后续可替换真实向量数据库。',
+        '输出层将 answer、risk item、source chunk 和 citations 组织为前端可直接渲染的数据结构。',
+      ],
+      nextSteps: ['接入真实 Embedding 与向量数据库', '增加合同版本对比', '导出审查报告', '补充用户权限和审计日志'],
+    }
+  }
+
+  if (project.id === 'ozon-erp') {
+    return {
+      subtitle: '电商 ERP 全栈业务系统',
+      overview: '项目面向小团队电商运营场景，组合 Vue 管理后台、Express API、Prisma/PostgreSQL、Redis/BullMQ Worker、WXT/MV3 浏览器插件和 shared types，覆盖店铺授权、商品同步、采集铺货、审批动作和审计日志。',
+      modules: [
+        { title: '管理后台', detail: 'apps/web 承载商品、订单、店铺、工具、设置、审批中心和任务中心等高频操作页面。' },
+        { title: 'API 与数据模型', detail: 'apps/api 使用 Express + Prisma 组织业务接口、数据库模型、Ozon API 适配和鉴权逻辑。' },
+        { title: 'Worker 与队列', detail: 'Redis/BullMQ 用于承接同步、采集、导入导出等长流程，避免所有动作阻塞在前端请求中。' },
+        { title: '浏览器插件', detail: 'apps/extension 使用 WXT/MV3 承接平台侧采集、铺货入口和版本检查能力。' },
+      ],
+      implementation: [
+        '使用 monorepo 组织 web、api、extension、shared，前后端共享类型和利润/平台字段计算逻辑。',
+        '真实写入通过显式开关控制，并通过 PendingAction、JobQueue、审计日志沉淀可追踪链路。',
+        '部署文档覆盖本地 Docker、数据库迁移、容器云运行、插件版本发布和接手检查清单。',
+        '线上展示已排除真实店铺凭证、SFTP 信息、数据库连接、默认账号和生产端口等敏感内容。',
+      ],
+      nextSteps: ['补充脱敏后台截图', '整理 Prisma ER 图', '沉淀插件采集链路案例', '补充队列失败重试与审计说明'],
+    }
+  }
+
+  if (project.id === 'pet-workspace') {
+    return {
+      subtitle: 'AI 宠物生成与审核管线',
+      overview: 'Pet Workspace 不是单个仓库，而是 AI 宠物相关项目工作区：gamer 负责 App-facing 能力，fantasy-pet-rule 负责生成管线、Worker 编排、QA Gate 和公开 API 契约，Android 与本地 HidenCloud 替代环境负责联调验证。',
+      modules: [
+        { title: 'App-facing 工作区', detail: 'gamer 承载社区 API、管理审核 UI、共享包和 App 集成测试。' },
+        { title: '生成服务管线', detail: 'fantasy-pet-rule 组织生成任务、服务端 QA gates、任务包、审核决策和产物索引。' },
+        { title: 'Android 验证', detail: 'floating-pet-android 验证悬浮窗权限、前台服务、位置恢复、本地证明和事件哈希链。' },
+        { title: '联调环境', detail: 'gamer-hidencloud-local 使用本地 Docker 替代不稳定云端服务，并代理生成 API。' },
+      ],
+      implementation: [
+        '用任务状态和产物 manifest 管理生成过程，避免一次性出图流程无法追踪。',
+        '通过 QA Gate、人审决策和发布记录，把生成资产进入 App 的路径拆成可审计阶段。',
+        'Android 端验证悬浮窗、通知、前台服务和真实设备/模拟器验收流程。',
+        '线上展示只保留工程结构和流程，不暴露云端 API、任务 JSON、模型缓存或候选素材中的敏感信息。',
+      ],
+      nextSteps: ['补充审核后台截图', '整理生成任务状态图', '补充 App API 契约说明', '增加典型生成案例复盘'],
+    }
+  }
+
+  if (project.id === 'xunqiu') {
+    return {
+      subtitle: '移动端业务系统整理与 64 位重构',
+      overview: 'Xunqiu 是一个多端历史项目集合，包含 Android、iOS、Java Spring 服务端、康复服务端、发布包和迁移文档。当前展示重点放在 64 位 Android 新客户端、服务端接口复用、移动端模块梳理和发布验收流程。',
+      modules: [
+        { title: 'Android 64 位客户端', detail: '新客户端复用既有服务端接口，逐步替换旧 32 位工程，并拆分为 MainActivity 与多个原生页面模块。' },
+        { title: '移动端功能模块', detail: '覆盖登录、首页、动态、社区、赛程、赛事、商品、个人页和短视频播放/发布。' },
+        { title: 'Java 服务端', detail: '历史服务端为 Maven WAR + Spring MVC/Security + MySQL/Redis，包含 App API、后台管理和 H5 页面。' },
+        { title: '发布验收', detail: 'docs 中沉淀 Android 打包、阶段 APK、真机/模拟器验证、视频流和上传链路检查。' },
+      ],
+      implementation: [
+        '新 Android 客户端采用更现代的 Gradle/JDK/SDK 构建链路，重点解决 64 位兼容和旧模块迁移。',
+        '页面层按 screen/Home、Tweet、Community、Schedule、Championship、Goods、Profile、Video 等模块组织。',
+        '接口层封装 ApiClient、AuthSession、LoginResult 等基础能力，逐步把历史功能恢复为可维护页面。',
+        '线上展示只保留技术结构和功能范围，不公开服务器 IP、数据库配置、测试账号、签名文件或发布包哈希。',
+      ],
+      nextSteps: ['补充脱敏移动端截图', '整理服务端接口地图', '梳理 32 位到 64 位迁移故事', '沉淀发布验收案例'],
+    }
+  }
+
+  if (project.id === 'game-first-tetris') {
+    return {
+      subtitle: 'Godot 4 Tetris 可试玩原型',
+      overview: '项目基于 Godot 4，保留经典俄罗斯方块主线和 Rogue 原型实验线，已经形成主菜单、经典模式、Rogue 三选一、局间承接、暂停、Help、响应式布局和触屏输入桥接。',
+      modules: [
+        { title: '经典模式', detail: '标准俄罗斯方块主循环，包含移动、旋转、软降、硬降、Hold、消行、得分和重开。' },
+        { title: 'Rogue 原型', detail: '开局和局内固定触发三选一强化，并保留最小局间带入。' },
+        { title: '触屏输入', detail: 'TouchInputBridge 与 TouchControls 将触屏按钮映射到动作层，区分瞬时动作和持续状态。' },
+        { title: '多端回归', detail: '固定检查 360x640、393x852、412x915、960x640、1024x768、1280x720 等尺寸。' },
+      ],
+      implementation: [
+        '输入层先按动作类型拆分，再由键盘或触屏来源统一驱动游戏行为。',
+        '紧凑布局下触屏控件会隐藏/释放阻断状态，避免暂停、Help、Rogue 选择和游戏结束时残留输入。',
+        '文档中保留分支阶段、截图回归结论和人工回归摘要，方便说明迭代过程。',
+        '公开展示只描述玩法和验证流程，不公开本地绝对工具路径或一次性 artifacts。',
+      ],
+      nextSteps: ['补充 Web 试玩封面', '整理触屏控件演进记录', '统一游戏项目详情页截图', '补充发布导出说明'],
+    }
+  }
+
+  if (project.id === 'raiden-prototype') {
+    return {
+      subtitle: 'Godot 4 纵版射击展示候选版',
+      overview: 'Raiden Prototype 是短局街机射击垂直切片，用来验证双关章节、火力成长、资源决策、Boss 收束、章节过场和公开 Demo 准备流程。',
+      modules: [
+        { title: '双关章节', detail: 'Chapter Run 串联 Stage 01、结果页、ChapterBriefing、Stage 02、ChapterEnding 和 ChapterOutro。' },
+        { title: '战斗系统', detail: '包含玩家移动、自动射击、受伤、死亡、敌群编排、掉落升级和炸弹清屏。' },
+        { title: 'Boss 与环境', detail: '第二关接入风暴十字封线、Boss 相位切换、overdrive 和最后安全窗口提示。' },
+        { title: '发布准备', detail: 'tools 中保留展示验证、Demo 就绪检查、试玩包和公开 Demo 候选资料夹准备脚本。' },
+      ],
+      implementation: [
+        'Godot scenes/ui 与 scenes/game 分离菜单、结果页、章节过场和战斗场景。',
+        'scripts/autoload 管理全局运行状态、章节状态和结算数据。',
+        'scripts/entities 与 scripts/game 拆分玩家、敌人、掉落、关卡数据、Boss、特效和环境互动。',
+        '通过 headless autoplay 与章节验证命令沉淀稳定展示候选版质量。',
+      ],
+      nextSteps: ['补充公开 Demo 截图', '整理试玩反馈表入口', '补素材授权清单摘要', '补外部试玩说明'],
+    }
+  }
+
+  if (project.id === 'game-next-spacewar' || project.id === 'intespace' || project.id === 'space-war') {
+    return {
+      subtitle: project.role,
+      overview: `${project.title} 是 Godot 互动体验项目，重点展示主菜单、战斗流程、暂停/帮助、结果页、Web 或桌面展示构建，以及围绕玩法闭环的阶段文档。`,
+      modules: [
+        { title: '玩法闭环', detail: '围绕首页、战斗、升级或关卡推进、结算、重开和帮助入口组织玩家体验。' },
+        { title: 'Godot 工程', detail: '保留 project.godot、scenes、scripts、assets、docs 和 export_presets 等标准工程结构。' },
+        { title: '展示构建', detail: '通过 README、导出预设、验证日志或发布包说明展示项目阶段。' },
+        { title: '验证记录', detail: '使用 headless、自检脚本、人工回归或阶段日志记录版本稳定性。' },
+      ],
+      implementation: [
+        `项目技术栈以 ${project.stack.join('、')} 为主，重点关注玩法体验和可展示构建。`,
+        '场景层承载菜单、战斗和结果页；脚本层拆分实体、关卡、UI 和全局状态。',
+        '文档层记录项目方向、阶段进度、验证方式和下一步试玩计划。',
+        '线上展示不复制本地日志全文，只沉淀可公开的玩法、结构和验证结论。',
+      ],
+      nextSteps: ['补充代表性截图', '整理 Web 试玩入口', '统一操作说明', '沉淀一页游戏项目复盘'],
+    }
+  }
+
+  if (project.category === 'ai') {
+    return {
+      subtitle: project.role,
+      overview: `${project.title} 是面向 AI 应用工程化的项目，用来展示从任务流、生成或审核管线、人工复核到前端展示的完整链路。详情页重点说明功能模块、数据流和后续可产品化的边界。`,
+      modules: [
+        { title: '任务入口', detail: '将用户输入、素材、规则或业务参数组织成可追踪任务，保证后续步骤有稳定上下文。' },
+        { title: '生成与处理管线', detail: '围绕队列、状态机、生成任务和质量检查组织核心流程，降低单点失败对演示的影响。' },
+        { title: '审核闭环', detail: '沉淀自动审核、人审发布和结果回写机制，让 AI 输出能进入可控的业务流程。' },
+        { title: '应用展示层', detail: '通过工作台或 App-facing API 展示最终结果，并保留后续接入真实模型服务的接口边界。' },
+      ],
+      implementation: [
+        `核心技术栈围绕 ${project.stack.join('、')} 组织，优先保证任务流和展示链路稳定。`,
+        '将生成、审核、发布拆成独立阶段，便于定位失败节点，也方便面试时讲清楚工程取舍。',
+        '使用结构化数据描述任务状态、审核结果和前端展示字段，避免页面与模型输出强耦合。',
+        '后续可替换真实模型、增加队列持久化、补充权限和审计能力。',
+      ],
+      nextSteps: ['补充真实运行截图', '整理任务状态流转图', '接入真实模型或服务端队列', '沉淀一篇 AI 工程化复盘'],
+    }
+  }
+
+  if (project.category === 'business') {
+    return {
+      subtitle: project.role,
+      overview: `${project.title} 是业务系统方向的完整项目，适合展示管理后台、API 服务、数据库模型、异步任务和浏览器插件等多端协作能力。详情页会把业务模块和工程实现拆开讲清楚。`,
+      modules: [
+        { title: '管理后台', detail: '承载商品、订单、审批、日志等高频业务操作，优先保证信息密度和操作效率。' },
+        { title: '服务端 API', detail: '统一处理业务校验、数据读写、权限边界和前端交互契约。' },
+        { title: '数据与任务', detail: '用数据库模型和异步任务承接同步、采集、导入导出等长流程。' },
+        { title: '扩展端能力', detail: '通过浏览器插件或 Worker 补齐平台侧采集、铺货、同步等能力。' },
+      ],
+      implementation: [
+        `使用 ${project.stack.join('、')} 搭建前后端和任务处理链路。`,
+        '后台页面按业务域拆分，API 按资源和动作组织，降低模块之间的耦合。',
+        '通过 Prisma、队列或 Worker 把同步和采集类任务从主请求链路中拆出去。',
+        '用审计日志和审批中心沉淀业务可追踪性，方便后续变成正式交付说明。',
+      ],
+      nextSteps: ['补充数据库 ER 图', '补关键后台页面截图', '整理部署拓扑', '补充测试与异常处理说明'],
+    }
+  }
+
+  if (project.category === 'interactive') {
+    return {
+      subtitle: project.role,
+      overview: `${project.title} 是 Web 互动和游戏展示项目，重点展示玩法原型、Web 导出、试玩入口和视觉包装。详情页用于说明核心玩法、交互反馈和上线展示方式。`,
+      modules: [
+        { title: '玩法循环', detail: '明确玩家输入、目标、反馈和失败条件，让项目具备可试玩的最小闭环。' },
+        { title: '关卡与节奏', detail: '通过敌人、速度、得分或阶段变化制造推进感，避免只是静态 Demo。' },
+        { title: 'Web 试玩入口', detail: '将 Godot 或 Web 构建结果接入站点展示，保证访问者能快速进入体验。' },
+        { title: '展示包装', detail: '补充封面、操作说明、截图和项目说明，让游戏项目能被正式介绍。' },
+      ],
+      implementation: [
+        `核心栈为 ${project.stack.join('、')}，重点处理 Web 导出、资源加载和浏览器运行体验。`,
+        '玩法逻辑按输入、状态、碰撞、得分和重开流程拆分，方便快速迭代。',
+        '展示站点负责承载项目封面、说明和跳转入口，游戏本体保持独立工程边界。',
+        '后续可补充移动端适配、音效、关卡数据和试玩埋点。',
+      ],
+      nextSteps: ['统一游戏封面和截图', '补操作说明', '整理 Web 导出流程', '增加试玩数据和版本记录'],
+    }
+  }
+
+  if (project.category === 'platform') {
+    return {
+      subtitle: project.role,
+      overview: `${project.title} 是站点和内容平台方向的项目，负责承载项目展示、案例沉淀、博客内容和部署入口。详情页重点说明信息架构、路由组织、内容数据和发布流程。`,
+      modules: [
+        { title: '信息架构', detail: '把首页、项目、案例、博客拆成不同职责，减少所有内容挤在单页的问题。' },
+        { title: '项目数据', detail: '用结构化项目数据驱动卡片、分类、详情页和案例跳转。' },
+        { title: '视觉系统', detail: '结合 Semi 组件和定制样式，形成更接近正式官网的展示质感。' },
+        { title: '部署发布', detail: '通过静态构建和 Cloudflare Pages 自动发布，降低后续维护成本。' },
+      ],
+      implementation: [
+        `使用 ${project.stack.join('、')} 组织页面、路由、主题和组件样式。`,
+        '路由层区分项目详情页和案例详情页，保证不同内容有独立 URL。',
+        '视觉层使用大版心、浅暗主题、矩阵卡片和项目截图，提升官网式展示感。',
+        '部署层保持 GitHub 推送自动触发 Cloudflare Pages 构建。',
+      ],
+      nextSteps: ['补充更多博客文章', '增加项目详情图文内容', '接入搜索或标签过滤', '沉淀更新日志'],
+    }
+  }
+
+  return {
+    subtitle: project.role,
+    overview: `${project.title} 用于展示 ${project.role} 方向的工程能力。详情页用于集中说明技术栈、功能模块、实现方式和后续补齐计划。`,
+    modules: project.highlights.map((item) => ({ title: item, detail: `围绕“${item}”整理对应功能边界、页面入口和工程实现。` })),
+    implementation: [
+      `技术栈包含 ${project.stack.join('、')}，后续会按实际工程继续补充细节。`,
+      '先保留项目定位、功能边界和展示入口，再逐步补齐截图、架构图和部署说明。',
+      '项目详情页负责讲工程实现，案例页负责讲业务场景和对外表达。',
+      '后续根据项目成熟度继续补充真实数据、异常处理和测试说明。',
+    ],
+    nextSteps: ['补充真实运行截图', '整理架构图和数据流', '补充部署说明', '沉淀项目复盘文章'],
+  }
+}
+
+function ProjectFullDetailView({ onBack, onOpenCase, project }: { onBack: () => void; onOpenCase: (caseStudy: CaseStudy) => void; project: Project }) {
+  const projectCase = getCaseStudyForProject(project.id)
+  const detail = getProjectDetailContent(project)
+
+  return (
+    <div className="project-detail-page">
+      <section className="project-detail-hero">
+        <div className="project-detail-copy">
+          <Text type="tertiary">Project Detail</Text>
+          <Title heading={1}>{project.title}</Title>
+          <Paragraph>{detail.overview}</Paragraph>
+          <Space wrap>
+            <Button theme="solid" type="primary" onClick={onBack}>返回项目系统</Button>
+            {projectCase ? <Button onClick={() => onOpenCase(projectCase)}>查看对应案例</Button> : null}
+          </Space>
+        </div>
+        <div className="project-detail-media">
+          <div className="panel-window-bar" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          {project.image ? <img src={project.image} alt={project.title} /> : <span>{categoryLabels[project.category]}</span>}
+        </div>
+      </section>
+
+      <section className="project-detail-summary">
+        <div>
+          <Text type="tertiary">项目定位</Text>
+          <strong>{detail.subtitle}</strong>
+        </div>
+        <div>
+          <Text type="tertiary">技术栈</Text>
+          <strong>{project.stack.join(' / ')}</strong>
+        </div>
+        <div>
+          <Text type="tertiary">交付范围</Text>
+          <strong>{project.role}</strong>
+        </div>
+      </section>
+
+      <section className="project-detail-section">
+        <div className="project-detail-section-head">
+          <span className="section-pill">Modules</span>
+          <Title heading={2}>功能模块</Title>
+        </div>
+        <div className="project-module-grid">
+          {detail.modules.map((item) => (
+            <article key={item.title}>
+              <Title heading={3}>{item.title}</Title>
+              <Paragraph>{item.detail}</Paragraph>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="project-detail-section project-implementation-section">
+        <div className="project-detail-section-head">
+          <span className="section-pill">Implementation</span>
+          <Title heading={2}>实现方式</Title>
+        </div>
+        <div className="project-implementation-list">
+          {detail.implementation.map((item) => <p key={item}>{item}</p>)}
+        </div>
+      </section>
+
+      <section className="project-detail-section">
+        <div className="project-detail-section-head">
+          <span className="section-pill">Roadmap</span>
+          <Title heading={2}>后续扩展</Title>
+        </div>
+        <div className="project-roadmap-grid">
+          {detail.nextSteps.map((item, index) => (
+            <div key={item}>
+              <strong>{String(index + 1).padStart(2, '0')}</strong>
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseStudy; onBack: () => void; onOpenProject: (project: Project) => void }) {
+  const project = projects.find((entry) => entry.id === caseStudy.projectId) ?? projects[0]
   const caseStats = [
-    { label: '核心流程', value: '4', detail: '导入 / 切分 / 检索 / 审查' },
-    { label: '展示截图', value: '3', detail: '知识库、问答、合同审查' },
-    { label: '技术关键词', value: 'RAG', detail: '引用溯源与风险归因' },
+    { label: '案例类型', value: caseStudy.eyebrow.split('/')[0].trim(), detail: caseStudy.status },
+    { label: '交付成果', value: caseStudy.results.length.toString(), detail: caseStudy.outcome },
+    { label: '证据材料', value: caseStudy.evidence.length.toString(), detail: '截图 / 文档 / 目录结构' },
   ]
-  const workflow = ['文档导入', '条款切分', '向量检索', 'RAG 问答', '合同风险审查']
-  const caseImages = [
-    { title: '合同审查工作台', image: '/images/projects/showcase/legal-rag-reviewed.png', detail: '按风险类型展示付款条款、交付标准、解除条款等审查结果。' },
-    { title: '知识库导入', image: '/images/projects/showcase/legal-rag-knowledge.png', detail: '沉淀合同文本、条款切片和可追踪的知识库材料。' },
-    { title: '引用溯源问答', image: '/images/projects/showcase/legal-rag-qa.png', detail: '回答法律问题时给出来源片段，便于解释和复核。' },
-  ]
-  const architecture = [
-    { title: '前端工作台', detail: '用 Vue 3 构建文档导入、知识库问答和合同审查界面。' },
-    { title: 'Node API', detail: 'Express 提供文档、问答、审查和引用结果接口。' },
-    { title: 'RAG 管线', detail: '围绕 chunk、检索、回答生成和 citations 组织最小可演示闭环。' },
-    { title: '风险输出', detail: '将合同问题整理成风险等级、触发条款、修改建议和来源引用。' },
-  ]
-  const talkingPoints = [
-    '这个项目的重点不是简单聊天，而是把合同审查拆成可解释的业务流程。',
-    '我把 RAG 输出和引用来源绑定起来，面试时可以讲清楚为什么答案可信。',
-    'MVP 阶段使用 Mock Embedding 降低外部依赖，先保证产品流程、接口边界和展示体验完整。',
-    '后续可以替换真实向量数据库、接入权限体系，并加入合同版本对比和审查报告导出。',
-  ]
+  const workflow = caseStudy.results.map((item) => item.split('，')[0]).slice(0, 5)
+  const caseImages = caseStudy.id === 'legal-rag'
+    ? [
+        { title: '合同审查工作台', image: '/images/projects/showcase/legal-rag-reviewed.png', detail: '按风险类型展示付款条款、交付标准、解除条款等审查结果。' },
+        { title: '知识库导入', image: '/images/projects/showcase/legal-rag-knowledge.png', detail: '沉淀合同文本、条款切片和可追踪的知识库材料。' },
+        { title: '引用溯源问答', image: '/images/projects/showcase/legal-rag-qa.png', detail: '回答法律问题时给出来源片段，便于解释和复核。' },
+      ]
+    : []
 
   return (
     <div className="case-detail-page">
       <section className="case-detail-hero">
         <div className="case-detail-copy">
-          <Text type="tertiary">Legal RAG Case Study</Text>
-          <Title heading={1}>法律智能机器人与合同审查 RAG 应用</Title>
-          <Paragraph>
-            一个面向合同审查场景的全栈 MVP：从文档导入、条款切分、RAG 问答到风险审查，把 AI 能力落到可解释、可复核、可演示的法律业务流程里。
-          </Paragraph>
+          <Text type="tertiary">{caseStudy.eyebrow}</Text>
+          <Title heading={1}>{caseStudy.title}</Title>
+          <Paragraph>{caseStudy.summary}</Paragraph>
           <Space wrap>
-            <Button theme="solid" type="primary" onClick={onOpenProject}>查看项目展示</Button>
+            <Button theme="solid" type="primary" onClick={() => onOpenProject(project)}>查看项目详情</Button>
             <Button onClick={onBack}>返回案例中心</Button>
           </Space>
         </div>
@@ -563,7 +1047,7 @@ function LegalRagCaseView({ onBack, onOpenProject }: { onBack: () => void; onOpe
             <span />
             <span />
           </div>
-          <img src="/images/projects/showcase/legal-rag-reviewed.png" alt="Legal RAG 合同审查工作台" />
+          {project.image ? <img src={project.image} alt={caseStudy.title} /> : <span>{categoryLabels[project.category]}</span>}
         </div>
       </section>
 
@@ -579,21 +1063,21 @@ function LegalRagCaseView({ onBack, onOpenProject }: { onBack: () => void; onOpe
 
       <section className="case-detail-section case-problem-section">
         <div>
-          <span className="section-pill">Problem</span>
-          <Title heading={2}>要解决什么问题</Title>
+          <span className="section-pill">Challenge / Solution</span>
+          <Title heading={2}>为什么这个案例值得展示</Title>
         </div>
         <div className="case-problem-grid">
           <article>
-            <strong>合同文本长，人工审查慢</strong>
-            <p>合同中风险点分散在不同条款里，人工逐条查找和整理修改建议效率低。</p>
+            <strong>业务问题</strong>
+            <p>{caseStudy.challenge}</p>
           </article>
           <article>
-            <strong>AI 答案需要可追溯</strong>
-            <p>法律类场景不能只给结论，还需要说明答案来自哪些原文片段，便于复核。</p>
+            <strong>解决方式</strong>
+            <p>{caseStudy.solution}</p>
           </article>
           <article>
-            <strong>面试展示需要完整闭环</strong>
-            <p>项目需要能讲清楚业务流程、技术架构、数据流和后续扩展，而不是只展示一个聊天框。</p>
+            <strong>交付结果</strong>
+            <p>{caseStudy.outcome}：{caseStudy.results.join('；')}。</p>
           </article>
         </div>
       </section>
@@ -601,7 +1085,7 @@ function LegalRagCaseView({ onBack, onOpenProject }: { onBack: () => void; onOpe
       <section className="case-detail-section">
         <div className="case-section-head">
           <span className="section-pill">Workflow</span>
-          <Title heading={2}>RAG 审查流程</Title>
+          <Title heading={2}>案例路径</Title>
         </div>
         <div className="case-workflow">
           {workflow.map((item, index) => (
@@ -619,7 +1103,7 @@ function LegalRagCaseView({ onBack, onOpenProject }: { onBack: () => void; onOpe
           <Title heading={2}>实现结构</Title>
         </div>
         <div className="case-architecture-grid">
-          {architecture.map((item) => (
+          {caseStudy.architecture.map((item) => (
             <article key={item.title}>
               <Title heading={3}>{item.title}</Title>
               <Paragraph>{item.detail}</Paragraph>
@@ -631,15 +1115,23 @@ function LegalRagCaseView({ onBack, onOpenProject }: { onBack: () => void; onOpe
       <section className="case-detail-section">
         <div className="case-section-head">
           <span className="section-pill">Evidence</span>
-          <Title heading={2}>运行截图</Title>
+          <Title heading={2}>证据材料</Title>
         </div>
         <div className="case-image-grid">
-          {caseImages.map((item) => (
+          {caseImages.length > 0 ? caseImages.map((item) => (
             <article key={item.title}>
               <img src={item.image} alt={item.title} loading="lazy" />
               <div>
                 <Title heading={3}>{item.title}</Title>
                 <Paragraph>{item.detail}</Paragraph>
+              </div>
+            </article>
+          )) : caseStudy.evidence.map((item, index) => (
+            <article key={item} className="case-evidence-note">
+              <div>
+                <strong>{String(index + 1).padStart(2, '0')}</strong>
+                <Title heading={3}>{item}</Title>
+                <Paragraph>该证据来自项目目录中的公开文档、源码结构或运行材料，线上展示已脱敏处理。</Paragraph>
               </div>
             </article>
           ))}
@@ -652,7 +1144,7 @@ function LegalRagCaseView({ onBack, onOpenProject }: { onBack: () => void; onOpe
           <Title heading={2}>面试讲解口径</Title>
         </div>
         <div className="case-talking-list">
-          {talkingPoints.map((item) => <p key={item}>{item}</p>)}
+          {caseStudy.talkingPoints.map((item) => <p key={item}>{item}</p>)}
         </div>
       </section>
     </div>
@@ -743,7 +1235,9 @@ function HomeProjectCard({ onOpen, project }: { onOpen: () => void; project: Pro
   )
 }
 
-function ProjectDetail({ project }: { project: Project }) {
+function ProjectDetail({ onOpenCase, onOpenProjectDetail, project }: { onOpenCase: (caseStudy: CaseStudy) => void; onOpenProjectDetail: () => void; project: Project }) {
+  const projectCase = getCaseStudyForProject(project.id)
+
   return (
     <aside className="project-stage-detail">
       <Space wrap>
@@ -755,13 +1249,15 @@ function ProjectDetail({ project }: { project: Project }) {
 
       <div className="meta-grid">
         <div><Text type="tertiary">交付范围</Text><strong>{project.role}</strong></div>
-        <div><Text type="tertiary">本地路径</Text><code>{project.path}</code></div>
+        <div><Text type="tertiary">工程材料</Text><strong>源码、文档、截图和构建记录已脱敏整理</strong></div>
       </div>
 
       <div className="stack-list">{project.stack.map((item) => <span key={item}>{item}</span>)}</div>
       <ul className="highlight-list">{project.highlights.map((item) => <li key={item}>{item}</li>)}</ul>
 
       <Space wrap>
+        <Button theme="solid" type="primary" onClick={onOpenProjectDetail}>查看项目详情页</Button>
+        {projectCase ? <Button theme="light" type="primary" onClick={() => onOpenCase(projectCase)}>查看案例详情</Button> : null}
         {project.links.map((link) => (
           <Button key={`${project.id}-${link.label}`} icon={link.type === 'external' ? <IconExternalOpen /> : <IconBriefcase />} onClick={() => { if (link.type === 'external') window.open(link.href, '_blank', 'noopener,noreferrer') }}>
             {link.label}

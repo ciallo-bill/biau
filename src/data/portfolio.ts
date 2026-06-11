@@ -8,14 +8,13 @@ export interface Project {
   category: ProjectCategory
   status: ProjectStatus
   role: string
-  path: string
   image?: string
   stack: string[]
   highlights: string[]
   links: {
     label: string
     href: string
-    type: 'internal' | 'workspace' | 'external'
+    type: 'internal' | 'external'
   }[]
 }
 
@@ -43,12 +42,10 @@ export const projects: Project[] = [
     category: 'ai',
     status: 'main',
     role: '全栈 MVP / RAG 流程 / 合同审查工作台',
-    path: 'D:\\workspace4Codex\\legal-rag',
     image: '/images/projects/showcase/legal-rag-reviewed.png',
     stack: ['Vue 3', 'Express', 'TypeScript', 'RAG', 'Mock Embedding'],
     highlights: ['知识库导入', 'RAG 问答', '合同风险审查', '引用 citations'],
     links: [
-      { label: '工程目录', href: 'D:\\workspace4Codex\\legal-rag', type: 'workspace' },
       { label: '本页查看', href: '#legal-rag', type: 'internal' },
     ],
   },
@@ -59,12 +56,10 @@ export const projects: Project[] = [
     category: 'ai',
     status: 'main',
     role: '生成管线 / QA gate / App API 契约 / Android 联调',
-    path: 'D:\\workspace4Codex\\pet',
     image: '/images/projects/showcase/fantasy-pet-flow.png',
     stack: ['Agent', 'Worker', 'QA Gate', 'Android', 'Docker'],
     highlights: ['任务状态机', '生成审核', '人审发布', 'App-facing API'],
     links: [
-      { label: '工程目录', href: 'D:\\workspace4Codex\\pet', type: 'workspace' },
       { label: '本页查看', href: '#pet-workspace', type: 'internal' },
     ],
   },
@@ -75,12 +70,10 @@ export const projects: Project[] = [
     category: 'business',
     status: 'main',
     role: '业务系统 / 管理后台 / API / Worker / 浏览器插件',
-    path: 'D:\\workspace4Codex\\erp',
     image: '/images/projects/showcase/erp-cover.svg',
     stack: ['Vue 3', 'Express', 'Prisma', 'PostgreSQL', 'BullMQ', 'WXT'],
     highlights: ['商品与订单同步', '采集铺货', '审批中心', '审计日志'],
     links: [
-      { label: '工程目录', href: 'D:\\workspace4Codex\\erp', type: 'workspace' },
       { label: '本页查看', href: '#ozon-erp', type: 'internal' },
     ],
   },
@@ -91,10 +84,9 @@ export const projects: Project[] = [
     category: 'platform',
     status: 'live',
     role: 'Astro 博客 / 内容审计 / Cloudflare Pages 部署',
-    path: 'D:\\workspace4Codex\\blog',
     stack: ['Astro', 'Content Collections', 'Cloudflare Pages'],
     highlights: ['游戏项目展示', '开发日志', '内容审计', '静态部署'],
-    links: [{ label: '旧站目录', href: 'D:\\workspace4Codex\\blog', type: 'workspace' }],
+    links: [],
   },
   {
     id: 'blog-semi',
@@ -103,7 +95,6 @@ export const projects: Project[] = [
     category: 'platform',
     status: 'ongoing',
     role: '博客信息架构 / React 前端 / Semi 组件体系',
-    path: 'D:\\workspace4Codex\\blog-semi',
     stack: ['React', 'Vite', 'TypeScript', 'Semi Design'],
     highlights: ['多视图博客系统', '项目目录', '案例展示', '后续部署'],
     links: [{ label: '当前站点', href: '#blog-semi', type: 'internal' }],
@@ -115,10 +106,9 @@ export const projects: Project[] = [
     category: 'interactive',
     status: 'live',
     role: 'Godot / Web 游戏 / 试玩入口',
-    path: 'D:\\workspace4Codex\\game-first-tetris',
     stack: ['Godot', 'Web Export', 'Game Prototype'],
     highlights: ['方块玩法', 'Web 试玩', '游戏项目展示'],
-    links: [{ label: '查看页面', href: 'http://127.0.0.1:4173/games/first-tetris', type: 'external' }],
+    links: [{ label: '查看页面', href: '/games/first-tetris', type: 'external' }],
   },
   {
     id: 'game-next-spacewar',
@@ -127,10 +117,9 @@ export const projects: Project[] = [
     category: 'interactive',
     status: 'live',
     role: 'Godot / Spacewar / Web 试玩',
-    path: 'D:\\workspace4Codex\\game-next-spacewar',
     stack: ['Godot', 'Spacewar', 'Web Export'],
     highlights: ['太空射击', '敌人节奏', '关卡推进'],
-    links: [{ label: '查看页面', href: 'http://127.0.0.1:4173/games/next-spacewar', type: 'external' }],
+    links: [{ label: '查看页面', href: '/games/next-spacewar', type: 'external' }],
   },
   {
     id: 'intespace',
@@ -139,10 +128,9 @@ export const projects: Project[] = [
     category: 'interactive',
     status: 'live',
     role: 'Godot / 空间互动 / 展示页面',
-    path: 'D:\\workspace4Codex\\intespace',
     stack: ['Godot', 'Gameplay', 'Web'],
     highlights: ['空间移动', '战斗反馈', '视觉包装'],
-    links: [{ label: '查看页面', href: 'http://127.0.0.1:4173/games/intespace', type: 'external' }],
+    links: [{ label: '查看页面', href: '/games/intespace', type: 'external' }],
   },
   {
     id: 'raiden-prototype',
@@ -151,10 +139,9 @@ export const projects: Project[] = [
     category: 'interactive',
     status: 'live',
     role: 'Godot / STG / 原型验证',
-    path: 'D:\\workspace4Codex\\raiden-prototype',
     stack: ['Godot', 'STG', 'Prototype'],
     highlights: ['弹幕节奏', '关卡推进', '试玩页面'],
-    links: [{ label: '查看页面', href: 'http://127.0.0.1:4173/games/raiden', type: 'external' }],
+    links: [{ label: '查看页面', href: '/games/raiden', type: 'external' }],
   },
   {
     id: 'space-war',
@@ -163,10 +150,9 @@ export const projects: Project[] = [
     category: 'interactive',
     status: 'live',
     role: 'Godot / Combat / Web 展示',
-    path: 'D:\\workspace4Codex\\space-war',
     stack: ['Godot', 'Combat', 'Web'],
     highlights: ['战斗系统', 'Web 试玩', '项目沉淀'],
-    links: [{ label: '查看页面', href: 'http://127.0.0.1:4173/games/space-war', type: 'external' }],
+    links: [{ label: '查看页面', href: '/games/space-war', type: 'external' }],
   },
   {
     id: 'xunqiu',
@@ -175,10 +161,9 @@ export const projects: Project[] = [
     category: 'mobile',
     status: 'pending',
     role: 'Android / 服务端资料 / 交付包整理',
-    path: 'D:\\workspace4Codex\\xunqiu',
     stack: ['Android', 'Server', 'Release'],
     highlights: ['移动端工程', '服务端资料', '发布包整理'],
-    links: [{ label: '工程目录', href: 'D:\\workspace4Codex\\xunqiu', type: 'workspace' }],
+    links: [],
   },
 ]
 
