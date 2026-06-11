@@ -32,7 +32,8 @@ const viewByRoute = new Map<string, ViewKey>([
 ])
 
 function getViewFromPath(pathname: string): ViewKey {
-  return viewByRoute.get(pathname) ?? 'home'
+  const normalizedPath = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname
+  return viewByRoute.get(normalizedPath) ?? 'home'
 }
 
 const heroSlides = [
@@ -122,7 +123,7 @@ function App() {
 
       <main className="site-main">
         {activeView === 'home' ? <HomeView onOpenCase={openLegalCase} onOpenProject={openProject} /> : null}
-        {activeView === 'projects' ? <ProjectsView selectedProject={selectedProject} onSelectProject={setSelectedId} /> : null}
+        {activeView === 'projects' ? <ProjectsView onOpenCase={openLegalCase} selectedProject={selectedProject} onSelectProject={setSelectedId} /> : null}
         {activeView === 'cases' ? <CasesView onOpenCase={openLegalCase} onOpenProject={openProject} /> : null}
         {activeView === 'caseDetail' ? <LegalRagCaseView onBack={() => navigate('cases')} onOpenProject={() => openProject(projects.find((project) => project.id === 'legal-rag') ?? projects[0])} /> : null}
         {activeView === 'blog' ? <BlogView theme={siteTheme} /> : null}
@@ -288,7 +289,7 @@ function HomeView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOpe
   )
 }
 
-function ProjectsView({ onSelectProject, selectedProject }: { onSelectProject: (id: string) => void; selectedProject: Project }) {
+function ProjectsView({ onOpenCase, onSelectProject, selectedProject }: { onOpenCase: () => void; onSelectProject: (id: string) => void; selectedProject: Project }) {
   const [activeGroup, setActiveGroup] = useState<ProjectGroupKey>(() => getGroupKeyByProjectId(selectedProject.id))
   const currentGroup = projectGroups.find((group) => group.key === activeGroup) ?? projectGroups[0]
   const groupedProjects = useMemo(
@@ -357,6 +358,8 @@ function ProjectsView({ onSelectProject, selectedProject }: { onSelectProject: (
             </button>
           ))}
         </div>
+
+        <ProjectNarrative project={detailProject} onOpenCase={onOpenCase} />
       </section>
     </div>
   )
@@ -364,57 +367,92 @@ function ProjectsView({ onSelectProject, selectedProject }: { onSelectProject: (
 
 function CasesView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOpenProject: (project: Project) => void }) {
   const resourceItems = [
-    { title: 'Legal RAG 合同审查案例', tag: 'AI 应用', status: '重点案例', projectId: 'legal-rag', description: '展示 RAG 流程、合同审查、引用溯源、截图和面试讲解口径。' },
-    { title: 'Ozon 电商 ERP 案例', tag: '全栈开发', status: '重点案例', projectId: 'ozon-erp', description: '展示后台模块、API、Worker、插件、数据库和部署说明。' },
-    { title: 'Pet Workspace AI 管线案例', tag: 'AI 应用', status: '补充中', projectId: 'pet-workspace', description: '展示生成管线、审核流程、人审发布和 App API 契约。' },
-    { title: 'Godot Web 游戏展示案例', tag: '游戏项目', status: '补充中', projectId: 'game-first-tetris', description: '统一游戏封面、试玩入口、操作说明和 Web 导出说明。' },
+    { title: 'Legal RAG 合同审查案例', tag: 'AI 应用', status: '重点案例', projectId: 'legal-rag', description: '从法律合同审查场景切入，展示 RAG 流程、引用溯源、风险归因和面试讲解口径。', outcome: '可解释的合同审查 MVP' },
+    { title: 'Ozon 电商 ERP 案例', tag: '全栈开发', status: '整理中', projectId: 'ozon-erp', description: '适合沉淀后台模块、API、Worker、插件、数据库和部署说明。', outcome: '业务系统交付说明' },
+    { title: 'Pet Workspace AI 管线案例', tag: 'AI 应用', status: '补充中', projectId: 'pet-workspace', description: '适合展示生成管线、审核流程、人审发布和 App API 契约。', outcome: 'AI 生成闭环案例' },
+    { title: 'Godot Web 游戏展示案例', tag: '游戏项目', status: '补充中', projectId: 'game-first-tetris', description: '适合统一游戏封面、试玩入口、操作说明和 Web 导出说明。', outcome: '互动项目展示规范' },
   ]
+  const featuredItem = resourceItems[0]
+  const featuredProject = projects.find((entry) => entry.id === featuredItem.projectId) ?? projects[0]
+  const secondaryItems = resourceItems.slice(1)
 
   return (
     <div className="resource-page">
       <section className="resource-hero">
         <Text type="tertiary">Cases</Text>
         <Title heading={1}>案例中心</Title>
-        <Paragraph>案例页不再像资源列表，而是用矩阵方式展示重点交付：先看代表案例，再进入关联项目、截图、架构图和项目复盘。</Paragraph>
+        <Paragraph>案例页负责讲清楚一个项目为什么值得看：业务场景、交付成果、截图证据、技术解释和面试讲述入口；完整项目介绍则放在项目页下方。</Paragraph>
       </section>
 
       <section className="case-matrix-board">
         <div className="case-board-head">
           <div>
-            <span className="section-pill">Case Matrix</span>
-            <Title heading={2}>重点案例矩阵</Title>
-            <Paragraph>从 AI 应用、全栈系统和游戏展示中抽取最适合对外说明的案例，后续每张卡片都可以扩展为独立详情页。</Paragraph>
+            <span className="section-pill">Case Library</span>
+            <Title heading={2}>从项目到可讲述案例</Title>
+            <Paragraph>这里不堆完整项目说明，而是提炼“场景、证据、结果、讲法”。访问者可以先看案例，再跳到项目页查看工程信息。</Paragraph>
           </div>
           <div className="case-board-stats" aria-label="案例统计">
-            <span>AI 应用 2</span>
-            <span>全栈开发 1</span>
-            <span>游戏项目 1</span>
+            <span>业务场景</span>
+            <span>交付成果</span>
+            <span>面试口径</span>
           </div>
         </div>
 
-        <div className="case-library-grid">
-          {resourceItems.map((item, index) => {
+        <div className="case-showcase-layout">
+          <article className="case-featured-card">
+            <div className="case-featured-media">
+              <img src={featuredProject.image} alt={featuredItem.title} loading="lazy" />
+            </div>
+            <div className="case-featured-body">
+              <div className="case-card-tags">
+                <Tag color="cyan">{featuredItem.tag}</Tag>
+                <Tag color="green">{featuredItem.status}</Tag>
+              </div>
+              <Title heading={3}>{featuredItem.title}</Title>
+              <Paragraph>{featuredItem.description}</Paragraph>
+              <div className="case-outcome-box">
+                <Text type="tertiary">案例成果</Text>
+                <strong>{featuredItem.outcome}</strong>
+              </div>
+              <Space wrap>
+                <Button theme="solid" type="primary" onClick={onOpenCase}>查看完整案例</Button>
+                <Button onClick={() => onOpenProject(featuredProject)}>项目完整介绍</Button>
+              </Space>
+            </div>
+          </article>
+
+          <aside className="case-guide-card">
+            <span className="section-pill">What Goes Here</span>
+            <Title heading={3}>案例页推荐放什么</Title>
+            <div>
+              <strong>场景</strong>
+              <p>为什么要做这个项目，解决谁的什么问题。</p>
+            </div>
+            <div>
+              <strong>证据</strong>
+              <p>运行截图、关键流程、输入输出和真实页面。</p>
+            </div>
+            <div>
+              <strong>讲法</strong>
+              <p>面试或对外展示时如何讲业务价值、技术取舍和后续扩展。</p>
+            </div>
+          </aside>
+        </div>
+
+        <div className="case-secondary-grid">
+          {secondaryItems.map((item) => {
             const project = projects.find((entry) => entry.id === item.projectId) ?? projects[0]
 
             return (
-              <article key={item.title} className={index === 0 ? 'case-library-card is-featured' : 'case-library-card'}>
-                <div className="case-card-cover">
-                  {project.image ? <img src={project.image} alt={project.title} loading="lazy" /> : <span>{item.tag}</span>}
+              <article key={item.title} className="case-secondary-card">
+                <div>
+                  <Tag color={item.tag === 'AI 应用' ? 'cyan' : item.tag === '全栈开发' ? 'blue' : 'grey'}>{item.tag}</Tag>
+                  <Tag color={item.status === '整理中' ? 'blue' : item.status === '补充中' ? 'orange' : 'grey'}>{item.status}</Tag>
                 </div>
-                <div className="case-card-body">
-                  <div className="case-card-tags">
-                    <Tag color={item.tag === 'AI 应用' ? 'cyan' : item.tag === '全栈开发' ? 'blue' : 'grey'}>{item.tag}</Tag>
-                    <Tag color={item.status === '重点案例' ? 'green' : item.status === '补充中' ? 'orange' : 'grey'}>{item.status}</Tag>
-                  </div>
-                  <Title heading={index === 0 ? 3 : 4}>{item.title}</Title>
-                  <Paragraph>{item.description}</Paragraph>
-                  <Space wrap>
-                    <Button theme={index === 0 ? 'solid' : 'light'} type="primary" onClick={() => { if (item.projectId === 'legal-rag') onOpenCase(); else onOpenProject(project) }}>
-                      {item.projectId === 'legal-rag' ? '查看完整案例' : '查看关联项目'}
-                    </Button>
-                    {item.projectId === 'legal-rag' ? <Button onClick={() => onOpenProject(project)}>项目展示</Button> : null}
-                  </Space>
-                </div>
+                <Title heading={4}>{item.title}</Title>
+                <Paragraph>{item.description}</Paragraph>
+                <span>{item.outcome}</span>
+                <Button theme="light" type="primary" onClick={() => onOpenProject(project)}>查看项目介绍</Button>
               </article>
             )
           })}
@@ -436,6 +474,46 @@ function CasesView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOp
         </div>
       </section>
     </div>
+  )
+}
+
+function ProjectNarrative({ onOpenCase, project }: { onOpenCase: () => void; project: Project }) {
+  const isLegalRag = project.id === 'legal-rag'
+  const narrative = isLegalRag
+    ? {
+        title: '项目完整介绍',
+        paragraphs: [
+          '这个项目是一个面向合同审查的 RAG 全栈 MVP。项目目标不是做通用聊天机器人，而是把法律合同审查拆成“导入合同、切分条款、检索上下文、生成审查结论、给出引用来源”的业务闭环。',
+          '项目展示重点包括文档知识库、引用溯源问答、合同风险列表和修改建议。项目页保留工程信息、技术栈和实现范围；案例页则进一步讲清楚业务场景、截图证据和面试讲解口径。',
+        ],
+        outcome: '完整闭环：文档导入 + RAG 问答 + 合同审查 + citations',
+      }
+    : {
+        title: '项目完整介绍',
+        paragraphs: [
+          `${project.title} 当前用于展示 ${project.role} 方向的工程能力。项目页保留项目背景、技术栈、交付范围、关键亮点和后续可扩展方向。`,
+          '后续如果该项目需要对外讲述，会在案例页补充业务场景、运行截图、架构图和复盘内容，避免项目页和案例页重复。',
+        ],
+        outcome: project.highlights.join(' / '),
+      }
+
+  return (
+    <section className="project-narrative-panel">
+      <div>
+        <span className="section-pill">Project Brief</span>
+        <Title heading={3}>{narrative.title}</Title>
+      </div>
+      <div className="project-narrative-content">
+        {narrative.paragraphs.map((item) => <Paragraph key={item}>{item}</Paragraph>)}
+      </div>
+      <div className="project-narrative-footer">
+        <div>
+          <Text type="tertiary">核心成果</Text>
+          <strong>{narrative.outcome}</strong>
+        </div>
+        {isLegalRag ? <Button theme="solid" type="primary" onClick={onOpenCase}>查看 Legal RAG 完整案例</Button> : null}
+      </div>
+    </section>
   )
 }
 
