@@ -69,6 +69,49 @@ git push
 
 推送到 GitHub 的 `main` 分支后，Cloudflare Pages 会自动触发构建并更新线上站点。
 
+## 如果 GitHub 已更新但线上还是旧版本
+
+本地确认方式：
+
+```bash
+git log --oneline -3
+git ls-remote origin refs/heads/main
+```
+
+如果两边都能看到最新 commit，但线上页面仍加载旧的 `/assets/index-*.js`，优先检查 Cloudflare Pages 后台：
+
+- `Deployments` 是否出现最新 commit。
+- 最新部署是否成功。
+- `Production branch` 是否仍是 `main`。
+- `Root directory` 是否留空。
+- `Build command` 是否为 `npm run build`。
+- `Build output directory` 是否为 `dist`。
+
+如果没有出现最新部署，可以在 Cloudflare Pages 项目中手动点击 `Retry deployment` 或 `Create deployment`。
+
+## 手动部署备用方案
+
+如果 Git 集成暂时没有触发，可以用 Wrangler 直接上传本地构建产物。首次使用需要在本机登录 Cloudflare：
+
+```bash
+npx wrangler login
+```
+
+确认登录状态：
+
+```bash
+npx wrangler whoami
+```
+
+构建并部署：
+
+```bash
+npm run build
+npx wrangler pages deploy dist --project-name=biau
+```
+
+如果 Cloudflare Pages 项目名不是 `biau`，把 `--project-name` 改成 Pages 后台显示的项目名。
+
 ## hidencloud 适用场景
 
 hidencloud 当前更适合作为桌宠项目的公开 API、社区数据和生成代理层，而不是第一版静态官网的主托管入口。
