@@ -6,11 +6,12 @@ import './App.css'
 
 const { Title, Text, Paragraph } = Typography
 
-type ViewKey = 'home' | 'projects' | 'cases' | 'blog'
+type ViewKey = 'home' | 'projects' | 'cases' | 'caseDetail' | 'blog'
+type NavViewKey = Exclude<ViewKey, 'caseDetail'>
 type ProjectGroupKey = 'ai' | 'fullstack' | 'games'
 type SiteTheme = 'light' | 'dark'
 
-const navItems: Array<{ key: ViewKey; label: string; icon: React.ReactNode }> = [
+const navItems: Array<{ key: NavViewKey; label: string; icon: React.ReactNode }> = [
   { key: 'home', label: '首页', icon: <IconHome /> },
   { key: 'projects', label: '项目', icon: <IconApps /> },
   { key: 'cases', label: '案例', icon: <IconBriefcase /> },
@@ -21,6 +22,7 @@ const routeByView: Record<ViewKey, string> = {
   home: '/',
   projects: '/projects',
   cases: '/cases',
+  caseDetail: '/cases/legal-rag',
   blog: '/blogs',
 }
 
@@ -96,6 +98,8 @@ function App() {
     navigate('projects')
   }
 
+  const openLegalCase = () => navigate('caseDetail')
+
   return (
     <div className={`site-shell site-theme-${siteTheme} ${activeView === 'blog' ? 'is-blog-page' : ''}`}>
       <header className="site-header">
@@ -106,7 +110,7 @@ function App() {
 
         <nav className="site-nav" aria-label="主导航">
           {navItems.map((item) => (
-            <button key={item.key} className={activeView === item.key ? 'is-active' : ''} type="button" onClick={() => navigate(item.key)}>
+            <button key={item.key} className={(activeView === item.key || (activeView === 'caseDetail' && item.key === 'cases')) ? 'is-active' : ''} type="button" onClick={() => navigate(item.key)}>
               {item.icon}
               {item.label}
             </button>
@@ -117,9 +121,10 @@ function App() {
       </header>
 
       <main className="site-main">
-        {activeView === 'home' ? <HomeView onOpenProject={openProject} /> : null}
+        {activeView === 'home' ? <HomeView onOpenCase={openLegalCase} onOpenProject={openProject} /> : null}
         {activeView === 'projects' ? <ProjectsView selectedProject={selectedProject} onSelectProject={setSelectedId} /> : null}
-        {activeView === 'cases' ? <CasesView onOpenProject={openProject} /> : null}
+        {activeView === 'cases' ? <CasesView onOpenCase={openLegalCase} onOpenProject={openProject} /> : null}
+        {activeView === 'caseDetail' ? <LegalRagCaseView onBack={() => navigate('cases')} onOpenProject={() => openProject(projects.find((project) => project.id === 'legal-rag') ?? projects[0])} /> : null}
         {activeView === 'blog' ? <BlogView theme={siteTheme} /> : null}
       </main>
 
@@ -143,7 +148,7 @@ function ThemeToggle({ onChange, theme }: { onChange: (theme: SiteTheme) => void
   )
 }
 
-function HomeView({ onOpenProject }: { onOpenProject: (project: Project) => void }) {
+function HomeView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOpenProject: (project: Project) => void }) {
   const [activeSlide, setActiveSlide] = useState(0)
   const [activeHomeGroup, setActiveHomeGroup] = useState<ProjectGroupKey>('ai')
   const slide = heroSlides[activeSlide]
@@ -274,7 +279,7 @@ function HomeView({ onOpenProject }: { onOpenProject: (project: Project) => void
               <div className="case-matrix-meta">
                 {project.stack.slice(0, 4).map((item) => <span key={item}>{item}</span>)}
               </div>
-              <Button theme="light" type="primary" onClick={() => onOpenProject(project)}>查看案例</Button>
+              <Button theme="light" type="primary" onClick={() => { if (project.id === 'legal-rag') onOpenCase(); else onOpenProject(project) }}>查看案例</Button>
             </article>
           ))}
         </div>
@@ -357,7 +362,7 @@ function ProjectsView({ onSelectProject, selectedProject }: { onSelectProject: (
   )
 }
 
-function CasesView({ onOpenProject }: { onOpenProject: (project: Project) => void }) {
+function CasesView({ onOpenCase, onOpenProject }: { onOpenCase: () => void; onOpenProject: (project: Project) => void }) {
   const resourceItems = [
     { title: 'Legal RAG 合同审查案例', tag: 'AI 应用', status: '重点案例', projectId: 'legal-rag', description: '展示 RAG 流程、合同审查、引用溯源、截图和面试讲解口径。' },
     { title: 'Ozon 电商 ERP 案例', tag: '全栈开发', status: '重点案例', projectId: 'ozon-erp', description: '展示后台模块、API、Worker、插件、数据库和部署说明。' },
@@ -403,7 +408,12 @@ function CasesView({ onOpenProject }: { onOpenProject: (project: Project) => voi
                   </div>
                   <Title heading={index === 0 ? 3 : 4}>{item.title}</Title>
                   <Paragraph>{item.description}</Paragraph>
-                  <Button theme={index === 0 ? 'solid' : 'light'} type="primary" onClick={() => onOpenProject(project)}>查看关联项目</Button>
+                  <Space wrap>
+                    <Button theme={index === 0 ? 'solid' : 'light'} type="primary" onClick={() => { if (item.projectId === 'legal-rag') onOpenCase(); else onOpenProject(project) }}>
+                      {item.projectId === 'legal-rag' ? '查看完整案例' : '查看关联项目'}
+                    </Button>
+                    {item.projectId === 'legal-rag' ? <Button onClick={() => onOpenProject(project)}>项目展示</Button> : null}
+                  </Space>
                 </div>
               </article>
             )
@@ -423,6 +433,148 @@ function CasesView({ onOpenProject }: { onOpenProject: (project: Project) => voi
             <strong>03</strong>
             <span>沉淀博客复盘和演示入口</span>
           </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function LegalRagCaseView({ onBack, onOpenProject }: { onBack: () => void; onOpenProject: () => void }) {
+  const caseStats = [
+    { label: '核心流程', value: '4', detail: '导入 / 切分 / 检索 / 审查' },
+    { label: '展示截图', value: '3', detail: '知识库、问答、合同审查' },
+    { label: '技术关键词', value: 'RAG', detail: '引用溯源与风险归因' },
+  ]
+  const workflow = ['文档导入', '条款切分', '向量检索', 'RAG 问答', '合同风险审查']
+  const caseImages = [
+    { title: '合同审查工作台', image: '/images/projects/showcase/legal-rag-reviewed.png', detail: '按风险类型展示付款条款、交付标准、解除条款等审查结果。' },
+    { title: '知识库导入', image: '/images/projects/showcase/legal-rag-knowledge.png', detail: '沉淀合同文本、条款切片和可追踪的知识库材料。' },
+    { title: '引用溯源问答', image: '/images/projects/showcase/legal-rag-qa.png', detail: '回答法律问题时给出来源片段，便于解释和复核。' },
+  ]
+  const architecture = [
+    { title: '前端工作台', detail: '用 Vue 3 构建文档导入、知识库问答和合同审查界面。' },
+    { title: 'Node API', detail: 'Express 提供文档、问答、审查和引用结果接口。' },
+    { title: 'RAG 管线', detail: '围绕 chunk、检索、回答生成和 citations 组织最小可演示闭环。' },
+    { title: '风险输出', detail: '将合同问题整理成风险等级、触发条款、修改建议和来源引用。' },
+  ]
+  const talkingPoints = [
+    '这个项目的重点不是简单聊天，而是把合同审查拆成可解释的业务流程。',
+    '我把 RAG 输出和引用来源绑定起来，面试时可以讲清楚为什么答案可信。',
+    'MVP 阶段使用 Mock Embedding 降低外部依赖，先保证产品流程、接口边界和展示体验完整。',
+    '后续可以替换真实向量数据库、接入权限体系，并加入合同版本对比和审查报告导出。',
+  ]
+
+  return (
+    <div className="case-detail-page">
+      <section className="case-detail-hero">
+        <div className="case-detail-copy">
+          <Text type="tertiary">Legal RAG Case Study</Text>
+          <Title heading={1}>法律智能机器人与合同审查 RAG 应用</Title>
+          <Paragraph>
+            一个面向合同审查场景的全栈 MVP：从文档导入、条款切分、RAG 问答到风险审查，把 AI 能力落到可解释、可复核、可演示的法律业务流程里。
+          </Paragraph>
+          <Space wrap>
+            <Button theme="solid" type="primary" onClick={onOpenProject}>查看项目展示</Button>
+            <Button onClick={onBack}>返回案例中心</Button>
+          </Space>
+        </div>
+
+        <div className="case-detail-hero-panel">
+          <div className="panel-window-bar" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <img src="/images/projects/showcase/legal-rag-reviewed.png" alt="Legal RAG 合同审查工作台" />
+        </div>
+      </section>
+
+      <section className="case-detail-stats" aria-label="案例关键指标">
+        {caseStats.map((item) => (
+          <div key={item.label}>
+            <strong>{item.value}</strong>
+            <span>{item.label}</span>
+            <em>{item.detail}</em>
+          </div>
+        ))}
+      </section>
+
+      <section className="case-detail-section case-problem-section">
+        <div>
+          <span className="section-pill">Problem</span>
+          <Title heading={2}>要解决什么问题</Title>
+        </div>
+        <div className="case-problem-grid">
+          <article>
+            <strong>合同文本长，人工审查慢</strong>
+            <p>合同中风险点分散在不同条款里，人工逐条查找和整理修改建议效率低。</p>
+          </article>
+          <article>
+            <strong>AI 答案需要可追溯</strong>
+            <p>法律类场景不能只给结论，还需要说明答案来自哪些原文片段，便于复核。</p>
+          </article>
+          <article>
+            <strong>面试展示需要完整闭环</strong>
+            <p>项目需要能讲清楚业务流程、技术架构、数据流和后续扩展，而不是只展示一个聊天框。</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="case-detail-section">
+        <div className="case-section-head">
+          <span className="section-pill">Workflow</span>
+          <Title heading={2}>RAG 审查流程</Title>
+        </div>
+        <div className="case-workflow">
+          {workflow.map((item, index) => (
+            <div key={item}>
+              <strong>{String(index + 1).padStart(2, '0')}</strong>
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="case-detail-section case-architecture-section">
+        <div className="case-section-head">
+          <span className="section-pill">Architecture</span>
+          <Title heading={2}>实现结构</Title>
+        </div>
+        <div className="case-architecture-grid">
+          {architecture.map((item) => (
+            <article key={item.title}>
+              <Title heading={3}>{item.title}</Title>
+              <Paragraph>{item.detail}</Paragraph>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="case-detail-section">
+        <div className="case-section-head">
+          <span className="section-pill">Evidence</span>
+          <Title heading={2}>运行截图</Title>
+        </div>
+        <div className="case-image-grid">
+          {caseImages.map((item) => (
+            <article key={item.title}>
+              <img src={item.image} alt={item.title} loading="lazy" />
+              <div>
+                <Title heading={3}>{item.title}</Title>
+                <Paragraph>{item.detail}</Paragraph>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="case-detail-section case-talking-section">
+        <div>
+          <span className="section-pill">Interview</span>
+          <Title heading={2}>面试讲解口径</Title>
+        </div>
+        <div className="case-talking-list">
+          {talkingPoints.map((item) => <p key={item}>{item}</p>)}
         </div>
       </section>
     </div>
