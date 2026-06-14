@@ -282,7 +282,7 @@ const caseStudies: CaseStudy[] = [
     outcome: '多款互动项目的统一展示规范',
     challenge: '游戏项目如果只放源码很难被快速理解，需要让访问者看到玩法循环、操作方式、版本阶段、截图证据和 Web 试玩入口。',
     solution: '项目统一按 Godot 工程、场景、脚本、文档、导出预设和验证日志组织，页面侧按玩法类型拆成可浏览的项目详情，并保留外部试玩跳转。',
-    results: ['Tetris 已具备经典模式、Rogue 原型、触屏桥接和多尺寸回归', 'Spacewar 展示版包含主菜单、设置、Help、暂停、结果页和会话总结', 'Raiden Prototype 形成双关垂直切片、Boss、章节过场和公开 Demo 准备文档', 'Space War 保留复古横向射击、Sector/Boss、程序化音效和发布文档'],
+    results: ['Tetris 已具备经典模式、Rogue 原型、触屏桥接和多尺寸回归', 'Spacewar 展示版包含主菜单、设置、Help、暂停、结果页和会话总结', 'Raiden Prototype 形成双关垂直切片、Boss、章节过场和公开演示准备文档', 'Space War 保留复古横向射击、Sector/Boss、程序化音效和发布文档'],
     evidence: ['Godot project.godot 与 export_presets', 'scenes/scripts/assets 目录结构', 'README 与阶段文档', '验证日志与发布包目录'],
     architecture: [
       { title: 'Godot 工程', detail: '每个游戏保留 project.godot、scenes、scripts、assets 和 docs。' },
@@ -895,7 +895,7 @@ function getProjectStructure(project: Project): Array<{ title: string; detail: s
       { title: 'player / bullet', detail: '玩家移动、射击、命中反馈和基础战斗输入。' },
       { title: 'enemy_target / obstacle', detail: '敌人目标、障碍物和短局压力来源。' },
       { title: 'main_menu / run_result', detail: '主菜单、设置、帮助、暂停返回、结果页和 session summary。' },
-      { title: 'showcase 文档', detail: '记录展示版本、首次按键提示、PR 准备和后续 Web 导出计划。' },
+      { title: 'showcase 文档', detail: '记录展示版本、首次按键提示、发布资料准备和后续 Web 导出计划。' },
     ],
     intespace: [
       { title: 'weapon_tree / upgrade panel', detail: '武器树路线构筑和局内升级选择，是 Roguelite 系统的核心。' },
@@ -907,7 +907,7 @@ function getProjectStructure(project: Project): Array<{ title: string; detail: s
       { title: 'scenes/ui', detail: 'MainMenu、ResultsScreen、ChapterBriefing、ChapterEnding、ChapterOutro 等展示页面。' },
       { title: 'scripts/game', detail: '关卡数据、Boss 相位、风暴环境、星空、特效和 SFX/BGM。' },
       { title: 'scripts/entities', detail: '玩家、敌机、掉落物、子弹和战斗实体职责拆分。' },
-      { title: 'tools / docs', detail: '保留 headless/autoplay 验证、Demo 检查清单和公开展示准备资料。' },
+      { title: 'tools / docs', detail: '保留 headless/autoplay 验证、公开演示检查清单和公开展示准备资料。' },
     ],
     'space-war': [
       { title: 'scenes/game / ui / entities', detail: '拆分主菜单、战斗场景、结果页、玩家、敌人、Boss 和道具。' },
@@ -982,7 +982,7 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         { title: '后台模块地图', detail: '商品、订单、店铺、导入草稿、审批中心和任务中心能够共同说明运营后台的完整边界。' },
         { title: 'Prisma 数据模型', detail: '以店铺、商品、订单、审批动作、审计日志和任务队列等模型展示业务数据组织方式。' },
         { title: '插件与 Worker 协作', detail: 'WXT/MV3 插件负责采集入口，BullMQ/Redis Worker 承接同步与长任务，形成多端协同证据。' },
-        { title: '交付文档', detail: '部署、迁移、备份、插件发布和接手清单可证明项目不只是页面 Demo，而是可交付系统。' },
+        { title: '交付文档', detail: '部署、迁移、备份、插件发布和接手清单可证明项目不只是页面演示，而是可交付系统。' },
       ],
       nextSteps: ['补充脱敏后台截图', '整理 Prisma ER 图', '沉淀插件采集链路案例', '补充队列失败重试和审计说明'],
     }
@@ -1054,7 +1054,13 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         '输入层先按动作类型拆分，再由键盘或触屏来源统一驱动游戏行为。',
         '紧凑布局下触屏控件会隐藏/释放阻断状态，避免暂停、Help、Rogue 选择和游戏结束时残留输入。',
         '文档中保留分支阶段、截图回归结论和人工回归摘要，方便说明迭代过程。',
-        '公开展示只描述玩法和验证流程，不公开本地绝对工具路径或一次性 artifacts。',
+        '公开展示只描述玩法和验证流程，不公开本地绝对工具路径或临时验证产物。',
+      ],
+      evidence: [
+        { title: '经典模式闭环', detail: 'README 已记录移动、旋转、硬降、Hold、消行、得分、暂停和重开等核心流程，适合证明基础玩法稳定。' },
+        { title: 'Rogue 原型节点', detail: '开局与局内三选一强化、最小局间带入和出生保护说明项目不只是复刻规则，也保留了系统实验线。' },
+        { title: '触屏输入桥接', detail: 'TouchInputBridge 与 TouchControls 把触屏按钮映射到动作层，保留键盘和触屏来源统一驱动的工程边界。' },
+        { title: '多尺寸回归清单', detail: '固定检查 360x640、393x852、412x915、960x640、1024x768、1280x720 等尺寸，用于说明移动端适配状态。' },
       ],
       nextSteps: ['补充 Web 试玩封面', '整理触屏控件演进记录', '统一游戏项目详情页截图', '补充发布导出说明'],
     }
@@ -1063,12 +1069,12 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
   if (project.id === 'raiden-prototype') {
     return {
       subtitle: 'Godot 4 纵版射击展示候选版',
-      overview: 'Raiden Prototype 是短局街机纵版射击垂直切片，用来验证双关章节、火力成长、资源决策、Boss 收束、章节过场、双语界面、headless/autoplay 验证和公开 Demo 准备流程。',
+      overview: 'Raiden Prototype 是短局街机纵版射击垂直切片，用来验证双关章节、火力成长、资源决策、Boss 收束、章节过场、双语界面、headless/autoplay 验证和公开演示准备流程。',
       modules: [
         { title: '双关章节', detail: 'Chapter Run 串联 Stage 01、结果页、ChapterBriefing、Stage 02、ChapterEnding 和 ChapterOutro。' },
         { title: '战斗系统', detail: '包含玩家移动、自动射击、受伤、死亡、敌群编排、掉落升级和炸弹清屏。' },
         { title: 'Boss 与环境', detail: '第二关接入风暴十字封线、Boss 相位切换、overdrive 和最后安全窗口提示。' },
-        { title: '发布准备', detail: 'tools 中保留展示验证、Demo 就绪检查、试玩包和公开 Demo 候选资料夹准备脚本。' },
+        { title: '发布准备', detail: 'tools 中保留展示验证、公开演示就绪检查、试玩包和公开演示候选资料夹准备脚本。' },
       ],
       implementation: [
         'Godot scenes/ui 与 scenes/game 分离菜单、结果页、章节过场和战斗场景。',
@@ -1076,7 +1082,13 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         'scripts/entities 与 scripts/game 拆分玩家、敌人、掉落、关卡数据、Boss、特效和环境互动。',
         '通过 headless autoplay 与章节验证命令沉淀稳定展示候选版质量。',
       ],
-      nextSteps: ['补充公开 Demo 截图', '整理试玩反馈表入口', '补素材授权清单摘要', '补外部试玩说明'],
+      evidence: [
+        { title: 'RC-0.4 展示基线', detail: 'README 将当前版本定位为稳定展示候选版，推荐入口为 Chapter Run，适合对外说明当前可玩范围。' },
+        { title: '双关章节链路', detail: 'Stage 01、ChapterBriefing、Stage 02、ChapterEnding、ChapterOutro 形成完整章节体验，不只是单关演示。' },
+        { title: 'Boss 与风暴机关', detail: '第二关 Boss 相位、overdrive、风暴十字封线和最后安全窗口构成可讲述的关底高潮。' },
+        { title: '展示验证工具', detail: 'tools 中保留展示验证、演示就绪检查、试玩资料包等脚本和清单，用于说明发布准备度。' },
+      ],
+      nextSteps: ['补充公开演示截图', '整理试玩反馈表入口', '补素材授权清单摘要', '补外部试玩说明'],
     }
   }
 
@@ -1093,8 +1105,14 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
       implementation: [
         'Godot 4.6.1 工程按 player、bullet、enemy_target、obstacle、main_menu、run_result 等脚本拆分核心职责。',
         '页面状态从菜单、帮助、暂停、战斗到结果页形成闭环，减少玩家进入试玩后的迷失感。',
-        '当前阶段偏向 M14 review / PR prep，重点把展示说明、版本标记和可复盘路径补齐。',
+        '当前阶段偏向 M14 评审与发布资料准备，重点把展示说明、版本标记和可复盘路径补齐。',
         '线上展示不复制本地日志全文，只沉淀可公开的玩法、结构和验证结论。',
+      ],
+      evidence: [
+        { title: '完整展示外壳', detail: '主菜单、设置、About、Help、首次按键提示和暂停返回共同证明项目已从战斗原型走向展示构建。' },
+        { title: '结果页与会话总结', detail: '独立结果页和 session summary 让每次试玩都有明确完成状态、失败反馈和复盘路径。' },
+        { title: 'Godot 工程边界', detail: 'player、bullet、enemy_target、obstacle、main_menu、run_result 等脚本拆分，便于说明核心职责。' },
+        { title: '发布准备文档', detail: 'README、roadmap、task-board 和 test-checklist 共同支撑“展示版收口”的公开讲解口径。' },
       ],
       nextSteps: ['补充主菜单和结果页截图', '接入 Web 试玩包', '整理首次试玩操作说明', '沉淀 Spacewar 系列演进复盘'],
     }
@@ -1108,15 +1126,21 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         { title: '武器树系统', detail: 'weapon_tree 与升级面板负责局内路线选择，当前 v1 结构已冻结，适合展示系统设计和迭代收口。' },
         { title: '战斗模式', detail: 'survival_mode、boss_trial、chapter_one 等脚本承载自动射击、生存压力、Boss 和章节推进。' },
         { title: '局外成长', detail: '主菜单、meta progression、HUD 和 codex 负责把单局结果带回成长层，形成下一局动机。' },
-        { title: '多端路线', detail: '项目方向是移动端优先，再接 Web demo 和 Windows 版本，文档中保留大量阶段日志和集成试玩准备。' },
+        { title: '多端路线', detail: '项目方向是移动端优先，再接 Web 试玩版和 Windows 版本，文档中保留大量阶段日志和集成试玩准备。' },
       ],
       implementation: [
         'Godot 工程将 game_session、audio_director 等全局状态与战斗脚本、UI 脚本分层，便于持续扩展玩法模式。',
         '系统文档从方向路线图、武器冻结审计到集成试玩准备都有记录，适合讲清楚从原型到可测版本的过程。',
-        '玩法上强调“局内构筑 + 局外成长”，比单纯射击 Demo 更适合作为游戏系统设计案例。',
+        '玩法上强调“局内构筑 + 局外成长”，比单纯射击演示更适合作为游戏系统设计案例。',
         '公开展示只抽取玩法结构、模块职责和验证结论，不暴露本地构建产物、工具路径或中间素材。',
       ],
-      nextSteps: ['补充武器树可视化', '接入 Web demo', '整理移动端操作说明', '沉淀集成试玩反馈'],
+      evidence: [
+        { title: '武器系统冻结审计', detail: 'docs 中的 weapon v1 定义、冻结清单和审计文档用于证明武器树结构已经进入可评审状态。' },
+        { title: '完整 Session 主线', detail: '首页、战斗、升级、结算、成长、下一局被明确作为当前收口主线，支撑 Roguelite 闭环展示。' },
+        { title: '移动端优先定位', detail: 'README 说明首发优先手机，其次 Web 试玩版和 Windows 版，页面展示可围绕竖屏体验组织。' },
+        { title: '统一试玩准备', detail: '当前阶段导航和 integrated playtest preparation 文档说明项目正在从系统堆叠转向完整流程验证。' },
+      ],
+      nextSteps: ['补充武器树可视化', '接入 Web 试玩版', '整理移动端操作说明', '沉淀集成试玩反馈'],
     }
   }
 
@@ -1135,6 +1159,12 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         'stage_schedule、stage_catalog、run_balance 和 game_session 共同管理关卡节奏、敌人配置、运行数据和高分。',
         'Windows 导出和发布文档已经验证，后续接入本站时更像“完整小游戏展示”，不是纯概念原型。',
         '公开展示只保留玩法结构、导出状态和可分享截图，不暴露本地发布目录或构建脚本细节。',
+      ],
+      evidence: [
+        { title: '完整发布版本', detail: '项目文档将当前状态定义为完整可玩、可展示、可维护，并保留 v1.1.1 发布说明与维护 backlog。' },
+        { title: '关卡与 Boss 闭环', detail: 'Sector、敌人波次、最终 Boss、暂停、结算和高分记录共同证明项目已经具备完整单局体验。' },
+        { title: '测试与试玩资料', detail: 'docs 中的测试计划、试玩报告、最终 runbook 和 release checklist 可作为可公开的质量证据。' },
+        { title: '发布与分发材料', detail: 'distribution guide、release notes、final summary 和 postmortem 说明项目已经完成从开发到发布的收口。' },
       ],
       nextSteps: ['接入 Web 试玩入口', '补充发布截图矩阵', '整理 Sector/Boss 设计说明', '沉淀复古射击复盘文章'],
     }
@@ -1173,7 +1203,7 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
       implementation: [
         '当前实现以 src/App.tsx 组织路由状态、项目/案例/游戏/博客详情视图，src/data/portfolio.ts 管理公开项目数据。',
         '详情页统一项目详情、案例详情、试玩展示、博客文章四类页面模型，按钮按项目、案例和游戏关系互相跳转。',
-        '样式层用全局 token 控制背景、版心、字号、卡片和暗色主题，后续可以继续拆组件而不改变页面结构。',
+        '样式层用全局样式变量控制背景、版心、字号、卡片和暗色主题，后续可以继续拆组件而不改变页面结构。',
         '公开站点只保存脱敏后的项目描述、截图和部署说明，不把本地路径、账号、密钥、真实服务配置写入前端数据。',
       ],
       nextSteps: ['拆分 App.tsx 为页面组件', '补充内容搜索和标签过滤', '接入更多博客文章', '增加部署状态和版本记录'],
@@ -1226,7 +1256,7 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
       overview: `${project.title} 是 Web 互动和游戏展示项目，重点展示玩法原型、Web 导出、试玩入口和视觉包装。详情页用于说明核心玩法、交互反馈和上线展示方式。`,
       modules: [
         { title: '玩法循环', detail: '明确玩家输入、目标、反馈和失败条件，让项目具备可试玩的最小闭环。' },
-        { title: '关卡与节奏', detail: '通过敌人、速度、得分或阶段变化制造推进感，避免只是静态 Demo。' },
+        { title: '关卡与节奏', detail: '通过敌人、速度、得分或阶段变化制造推进感，避免只是静态演示。' },
         { title: 'Web 试玩入口', detail: '将 Godot 或 Web 构建结果接入站点展示，保证访问者能快速进入体验。' },
         { title: '展示包装', detail: '补充封面、操作说明、截图和项目说明，让游戏项目能被正式介绍。' },
       ],
@@ -1429,7 +1459,7 @@ function getGameShowcaseContent(project: Project): GameShowcaseContent {
     },
     'game-next-spacewar': {
       tagline: 'Spacewar 系列的展示构建，重点把主菜单、帮助、暂停、结果页和单局复盘接成一条完整试玩路径。',
-      stage: '当前处于 M14 review / PR prep 口径，适合作为下一版 Spacewar 展示页，后续接入 Web 导出文件。',
+      stage: '当前处于 M14 评审与发布资料准备阶段，适合作为下一版 Spacewar 展示页，后续接入 Web 导出文件。',
       gameplay: ['飞船移动、射击、规避和命中反馈', '敌人目标、障碍物和短局压力组织战斗节奏', '主菜单、设置、About、Help、首次按键提示和暂停返回', '结果页与 session summary 让试玩过程可复盘'],
       systems: [
         { title: '战斗循环', detail: 'player、bullet、enemy_target 和 obstacle 共同承担输入、发射、命中、规避和结算。' },
@@ -1441,9 +1471,9 @@ function getGameShowcaseContent(project: Project): GameShowcaseContent {
     intespace: {
       tagline: '竖屏自动射击 Roguelite，围绕武器树、局内升级和局外成长收口完整运行链路。',
       stage: '武器系统 v1 已进入结构冻结阶段，当前重点是“首页 -> 战斗 -> 升级 -> 结算 -> 成长 -> 下一局”的集成试玩。',
-      gameplay: ['竖屏移动、自动射击、生存压力和 Boss 试炼', '武器树路线构筑与局内升级选择', '结果页、局外成长和下一局动机构成 Roguelite 闭环', '移动端优先，再扩展 Web demo 与 Windows 展示版本'],
+      gameplay: ['竖屏移动、自动射击、生存压力和 Boss 试炼', '武器树路线构筑与局内升级选择', '结果页、局外成长和下一局动机构成 Roguelite 闭环', '移动端优先，再扩展 Web 试玩版与 Windows 展示版本'],
       systems: [
-        { title: '武器树', detail: 'weapon_tree 和升级面板承载路线构筑，是项目区别于普通射击 Demo 的核心。' },
+        { title: '武器树', detail: 'weapon_tree 和升级面板承载路线构筑，是项目区别于普通射击演示的核心。' },
         { title: '运行模式', detail: 'survival_mode、boss_trial 和 chapter_one 负责生存、Boss 与章节节奏。' },
         { title: '成长闭环', detail: 'game_session、HUD、主菜单和 meta progression 把单局结果带回局外成长。' },
       ],
@@ -1451,14 +1481,14 @@ function getGameShowcaseContent(project: Project): GameShowcaseContent {
     },
     'raiden-prototype': {
       tagline: '短局街机纵版射击垂直切片，适合展示关卡、Boss 和火力成长。',
-      stage: '已经具备公开 Demo 准备口径，后续把试玩包接入本站。',
+      stage: '已经具备公开演示准备口径，后续把试玩包接入本站。',
       gameplay: ['双关章节与章节过场', '火力成长、资源决策和敌机压迫', 'Boss 收束形成阶段目标', '短局体验便于线上演示和展示讲解'],
       systems: [
         { title: '章节结构', detail: 'Chapter Run 将推进、过场、Boss 和结算组织成可讲述流程。' },
         { title: '火力成长', detail: '通过局内资源和火力变化提升单局反馈密度。' },
-        { title: 'Demo 准备', detail: '页面侧预留试玩、截图和版本说明入口，便于逐步公开。' },
+        { title: '公开演示准备', detail: '页面侧预留试玩、截图和版本说明入口，便于逐步公开。' },
       ],
-      integration: ['接入公开 Demo', '补 Boss 截图', '整理操作说明', '增加版本状态'],
+      integration: ['接入公开演示', '补 Boss 截图', '整理操作说明', '增加版本状态'],
     },
     'space-war': {
       tagline: '复古横向太空射击完整版本，保留 Sector/Boss、道具、结果页、高分和独立发布文档。',
@@ -1587,6 +1617,12 @@ function getCaseEvidenceDetail(caseId: string, evidence: string): string {
       '服务端接口复用边界': '说明旧服务能力通过封装层接入新客户端，公开内容不包含真实服务地址和凭据。',
       '阶段迁移与验收文档': '用于证明历史项目接手、64 位兼容、阶段构建和验证过程可复现。',
       '脱敏运行截图待补充': '后续只补公开可展示的客户端页面，不包含账号、服务器、签名或发布包敏感信息。',
+    },
+    'godot-showcase': {
+      'Godot project.godot 与 export_presets': '用于说明每个游戏都保留独立工程入口、导出预设和可迁移的运行边界。',
+      'scenes/scripts/assets 目录结构': '通过场景、脚本和资源目录展示玩法、UI、实体和表现层的职责拆分。',
+      'README 与阶段文档': 'README、roadmap、task-board、release notes 和试玩文档共同支撑项目阶段说明。',
+      '验证日志与发布包目录': '只展示脱敏后的验证结论和发布材料类型，不公开本地构建路径、临时日志全文或分发包细节。',
     },
   }
 
