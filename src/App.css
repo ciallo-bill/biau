@@ -3251,6 +3251,12 @@ textarea {
   gap: 16px;
 }
 
+.project-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
 .project-structure-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -3280,6 +3286,30 @@ textarea {
   gap: 10px;
 }
 
+.project-evidence-grid article {
+  min-height: 220px;
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  padding: 22px;
+  border: 1px solid #dbe8f8;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(0, 82, 255, 0.08), transparent 15rem),
+    #fff;
+}
+
+.project-evidence-grid article > strong {
+  color: var(--site-accent);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.project-evidence-grid article > div {
+  display: grid;
+  gap: 10px;
+}
+
 .project-structure-grid h3 {
   margin: 0;
   color: var(--site-text);
@@ -3287,11 +3317,19 @@ textarea {
   line-height: 1.22;
 }
 
-.project-structure-grid p {
+.project-structure-grid p,
+.project-evidence-grid p {
   margin: 0;
   color: var(--site-muted);
   font-size: 1rem;
   line-height: 1.82;
+}
+
+.project-evidence-grid h3 {
+  margin: 0;
+  color: var(--site-text);
+  font-size: var(--detail-card-title-size);
+  line-height: 1.22;
 }
 
 .project-module-grid article,
@@ -3371,6 +3409,7 @@ textarea {
 .site-theme-dark .project-detail-summary strong,
 .site-theme-dark .project-detail-section h2,
 .site-theme-dark .project-structure-grid h3,
+.site-theme-dark .project-evidence-grid h3,
 .site-theme-dark .project-module-grid h3,
 .site-theme-dark .project-roadmap-grid span,
 .site-theme-dark .detail-route-badge strong {
@@ -3379,6 +3418,7 @@ textarea {
 
 .site-theme-dark .project-detail-copy p,
 .site-theme-dark .project-structure-grid p,
+.site-theme-dark .project-evidence-grid p,
 .site-theme-dark .project-module-grid p,
 .site-theme-dark .project-implementation-list p {
   color: rgba(255, 255, 255, 0.7);
@@ -3388,6 +3428,7 @@ textarea {
 .site-theme-dark .project-detail-summary div,
 .site-theme-dark .project-detail-section,
 .site-theme-dark .project-structure-grid article,
+.site-theme-dark .project-evidence-grid article,
 .site-theme-dark .project-module-grid article,
 .site-theme-dark .project-implementation-list p,
 .site-theme-dark .project-roadmap-grid div,
@@ -3404,6 +3445,12 @@ textarea {
 .site-theme-dark .project-structure-grid article {
   background:
     linear-gradient(180deg, rgba(15, 23, 42, 0.84), rgba(15, 23, 42, 0.68));
+}
+
+.site-theme-dark .project-evidence-grid article {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(0, 82, 255, 0.18), transparent 15rem),
+    rgba(15, 23, 42, 0.78);
 }
 
 .game-showcase-page {
@@ -3653,6 +3700,7 @@ textarea {
   }
 
   .project-module-grid,
+  .project-evidence-grid,
   .project-roadmap-grid,
   .gameplay-list,
   .game-system-grid {
@@ -4073,6 +4121,7 @@ textarea {
   }
 
   .project-structure-grid,
+  .project-evidence-grid,
   .project-module-grid,
   .project-roadmap-grid,
   .gameplay-list {
@@ -4240,6 +4289,7 @@ textarea {
 
   .project-detail-summary,
   .project-structure-grid,
+  .project-evidence-grid,
   .project-module-grid,
   .project-roadmap-grid {
     grid-template-columns: 1fr;

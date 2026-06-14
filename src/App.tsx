@@ -855,6 +855,7 @@ type ProjectDetailContent = {
   overview: string
   modules: Array<{ title: string; detail: string }>
   implementation: string[]
+  evidence?: Array<{ title: string; detail: string }>
   nextSteps: string[]
 }
 
@@ -951,6 +952,12 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         '检索链路拆成 import、chunk、embed、retrieve、rerank、answer 多个阶段，方便定位召回不足、引用缺失或答案漂移问题。',
         '合同审查输出保持结构化 JSON 和 Markdown 两种形态，页面可以直接渲染风险清单，后续也能扩展为报告导出。',
       ],
+      evidence: [
+        { title: '合同审查工作台', detail: '公开截图展示风险等级、问题说明、修改建议和引用来源，说明审查结果不是孤立结论。' },
+        { title: '知识库与切片记录', detail: '导入流程保留文档指纹、章节信息和 chunk 元数据，可解释每一次问答命中的上下文。' },
+        { title: 'RAG API 契约', detail: 'answer、citations、risk item 等结构通过 shared types 固化，便于前后端同步演示和后续替换真实模型。' },
+        { title: '可替换实现边界', detail: 'Mock Embedding 与内存向量库用于稳定演示，生产化时可切换真实 embedding、pgvector 和队列导入。' },
+      ],
       nextSteps: ['接入真实 Embedding 与 pgvector', '增加 PDF/DOCX 解析', '导出合同审查报告', '补充权限、审计和队列化导入'],
     }
   }
@@ -970,6 +977,12 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         '真实写入通过环境开关控制，高风险动作进入 PendingAction，异步任务进入 JobQueue，并通过审计日志沉淀可追踪链路。',
         '文档覆盖数据库备份迁移、容器环境部署、插件版本发布、Ozon 字段对齐、佣金覆盖和接手检查清单。',
         '公开展示只保留业务模块、工程结构和脱敏流程，不展示真实店铺凭证、数据库连接、账号口令、服务器地址或生产端口。',
+      ],
+      evidence: [
+        { title: '后台模块地图', detail: '商品、订单、店铺、导入草稿、审批中心和任务中心能够共同说明运营后台的完整边界。' },
+        { title: 'Prisma 数据模型', detail: '以店铺、商品、订单、审批动作、审计日志和任务队列等模型展示业务数据组织方式。' },
+        { title: '插件与 Worker 协作', detail: 'WXT/MV3 插件负责采集入口，BullMQ/Redis Worker 承接同步与长任务，形成多端协同证据。' },
+        { title: '交付文档', detail: '部署、迁移、备份、插件发布和接手清单可证明项目不只是页面 Demo，而是可交付系统。' },
       ],
       nextSteps: ['补充脱敏后台截图', '整理 Prisma ER 图', '沉淀插件采集链路案例', '补充队列失败重试和审计说明'],
     }
@@ -991,6 +1004,12 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         'Android 端验证悬浮窗、通知、前台服务、权限恢复和真实设备/模拟器验收流程。',
         '线上展示只保留工程结构和流程，不暴露云端 API、任务 JSON、模型缓存或候选素材中的敏感信息。',
       ],
+      evidence: [
+        { title: 'pipeline-v2 契约', detail: '生成任务、阶段状态、产物索引和 App API 通过契约说明串联，便于解释生成资产如何进入应用。' },
+        { title: 'QA Gate 与人审记录', detail: '服务端质量检查、人审决策和发布记录把不可控生成结果拆成可复核流程。' },
+        { title: 'Android 联调验证', detail: '悬浮窗、前台服务、权限恢复和本地证明链用于证明移动端消费体验可以落地。' },
+        { title: '工作区边界', detail: 'gamer、fantasy-pet-rule、floating-pet-android 分别承担 App-facing、生成管线和移动验证职责。' },
+      ],
       nextSteps: ['补充审核后台截图', '整理生成任务状态图', '补充 App API 契约说明', '增加典型生成案例复盘'],
     }
   }
@@ -1010,6 +1029,12 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         '页面层按 screen/Home、Tweet、Community、Schedule、Championship、Goods、Profile、Video 等模块组织。',
         '接口层封装 ApiClient、AuthSession、LoginResult 等基础能力，逐步把历史功能恢复为可维护页面。',
         '线上展示只保留技术结构和功能范围，不公开服务器 IP、数据库配置、测试账号、签名文件或发布包哈希。',
+      ],
+      evidence: [
+        { title: '64 位客户端模块地图', detail: '新客户端按首页、动态、社区、赛程、赛事、商品、个人中心和视频模块拆分，适合说明迁移范围。' },
+        { title: '接口复用边界', detail: '登录态、ApiClient 和结果模型把旧服务端能力封装成可控调用层，公开展示不暴露真实地址。' },
+        { title: '迁移与验收文档', detail: '项目清单、64 位重构计划、阶段构建和验证记录共同证明接手过程可复现。' },
+        { title: '发布风险控制', detail: '展示侧只描述构建链路、页面恢复和验收方式，隐藏测试账号、签名文件、发布包哈希等敏感内容。' },
       ],
       nextSteps: ['补充脱敏移动端截图', '整理服务端接口地图', '梳理 32 位到 64 位迁移故事', '沉淀发布验收案例'],
     }
@@ -1254,6 +1279,10 @@ function ProjectFullDetailView({ onBack, onOpenCase, onOpenGameDetail, project }
   const gameSlug = getGameSlugByProjectId(project.id)
   const detail = getProjectDetailContent(project)
   const structure = getProjectStructure(project)
+  const evidence = detail.evidence ?? project.highlights.slice(0, 4).map((item) => ({
+    title: item,
+    detail: `围绕“${item}”继续补充可公开截图、文档记录或运行材料，所有展示内容都会先做脱敏处理。`,
+  }))
 
   return (
     <div className="project-detail-page">
@@ -1299,9 +1328,9 @@ function ProjectFullDetailView({ onBack, onOpenCase, onOpenGameDetail, project }
 
       <section className="project-detail-section project-structure-section">
         <div className="project-detail-section-head">
-          <span className="section-pill">目录边界</span>
-          <Title heading={2}>工程目录与职责</Title>
-          <Paragraph>这一部分按照项目目录和实际模块拆解，帮助区分“项目列表摘要”和“详情页技术说明”。</Paragraph>
+          <span className="section-pill">技术架构</span>
+          <Title heading={2}>技术架构</Title>
+          <Paragraph>这一部分按照工程目录、模块职责和替换边界拆解，帮助区分“项目列表摘要”和“详情页技术说明”。</Paragraph>
         </div>
         <div className="project-structure-grid">
           {structure.map((item, index) => (
@@ -1338,6 +1367,24 @@ function ProjectFullDetailView({ onBack, onOpenCase, onOpenGameDetail, project }
         </div>
         <div className="project-implementation-list">
           {detail.implementation.map((item) => <p key={item}>{item}</p>)}
+        </div>
+      </section>
+
+      <section className="project-detail-section">
+        <div className="project-detail-section-head">
+          <span className="section-pill">展示证据</span>
+          <Title heading={2}>展示证据</Title>
+        </div>
+        <div className="project-evidence-grid">
+          {evidence.map((item, index) => (
+            <article key={item.title}>
+              <strong>{String(index + 1).padStart(2, '0')}</strong>
+              <div>
+                <Title heading={3}>{item.title}</Title>
+                <Paragraph>{item.detail}</Paragraph>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -1516,6 +1563,36 @@ function GameShowcaseView({ onBack, onOpenProjectDetail, project }: { onBack: ()
   )
 }
 
+function getCaseEvidenceDetail(caseId: string, evidence: string): string {
+  const details: Record<string, Record<string, string>> = {
+    'legal-rag': {
+      '知识库导入页面': '展示合同文本如何进入知识库、如何保留来源与条款切片，证明问答上下文可追踪。',
+      '引用溯源问答页面': '展示回答和 citations 同屏返回，方便业务人员从结论回到原文片段复核。',
+      '合同风险审查工作台': '展示风险等级、问题说明、修改建议和人工复核标记，支撑可解释合同审查闭环。',
+    },
+    'ozon-erp': {
+      '管理后台视图目录': '用于说明商品、订单、店铺、审批中心和任务中心等运营模块已经按职责拆分。',
+      'Prisma 数据模型': '用于展示核心业务对象、审批动作、审计日志和任务队列的关系，已去除连接信息。',
+      'Chrome MV3 插件入口': '证明平台侧采集和后台铺货不是孤立页面，而是通过插件与 API 串联。',
+      '部署与交付文档': '覆盖迁移、备份、容器部署和交接检查，说明系统具备交付和接手资料。',
+    },
+    'pet-workspace': {
+      'fantasy-pet-rule 工具链': '展示生成任务、Worker 编排、QA Gate、审核决策和产物索引的服务端管线。',
+      'gamer app-facing 集成目录': '说明社区 API、审核后台、共享包和 App 集成测试在应用侧的职责边界。',
+      'Android 浮窗宠物 MVP': '用于证明生成资产最终进入移动端消费场景，而不是只停留在服务端流程。',
+      '生成产物与审核截图': '只保留脱敏后的流程证据，避免暴露真实任务 JSON、云端地址或候选素材来源。',
+    },
+    xunqiu: {
+      '64 位客户端模块地图': '展示新客户端按首页、动态、社区、赛程、商品、个人中心和视频等模块恢复。',
+      '服务端接口复用边界': '说明旧服务能力通过封装层接入新客户端，公开内容不包含真实服务地址和凭据。',
+      '阶段迁移与验收文档': '用于证明历史项目接手、64 位兼容、阶段构建和验证过程可复现。',
+      '脱敏运行截图待补充': '后续只补公开可展示的客户端页面，不包含账号、服务器、签名或发布包敏感信息。',
+    },
+  }
+
+  return details[caseId]?.[evidence] ?? '该证据来自项目目录中的公开文档、源码结构或运行材料，线上展示已脱敏处理。'
+}
+
 function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseStudy; onBack: () => void; onOpenProject: (project: Project) => void }) {
   const project = projects.find((entry) => entry.id === caseStudy.projectId) ?? projects[0]
   const caseStats = [
@@ -1639,7 +1716,7 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
               <div>
                 <strong>{String(index + 1).padStart(2, '0')}</strong>
                 <Title heading={3}>{item}</Title>
-                <Paragraph>该证据来自项目目录中的公开文档、源码结构或运行材料，线上展示已脱敏处理。</Paragraph>
+                <Paragraph>{getCaseEvidenceDetail(caseStudy.id, item)}</Paragraph>
               </div>
             </article>
           ))}
