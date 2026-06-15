@@ -2,24 +2,28 @@
 
 Date: 2026-06-15
 Repo: /home/zhang/workspace/blog-semi
-Task: Add Godot game showcase diagrams
+Task: Add Tetris real runtime screenshots
 
 ## Diff Summary
 
-- Added four public-safe SVG diagrams for Tetris, Next Spacewar, InteSpace, and Raiden Prototype.
-- Added those diagrams as visual assets for the matching interactive projects in src/data/portfolio.ts.
-- Expanded the Godot showcase case detail page from Space War-only evidence to a five-project evidence matrix.
-- Updated docs/showcase-assets.md so the inventory reflects the new game coverage and remaining real-screenshot gap.
+- Added two real Tetris runtime screenshots generated from the actual Godot project:
+  - public/images/projects/showcase/tetris-classic-desktop.png
+  - public/images/projects/showcase/tetris-mobile-menu.png
+- Updated src/data/portfolio.ts so the Tetris project uses the real desktop runtime screenshot as its visual asset.
+- Updated src/App.tsx so /cases/godot-showcase includes Tetris desktop runtime and mobile menu evidence alongside the structure diagram.
+- Updated docs/showcase-assets.md to distinguish Tetris real screenshots from the remaining Godot structure diagrams.
 - Updated .agent-work/current-task.md for this implementation slice.
 
-## New Public Assets
+## Screenshot Generation Evidence
 
-```text
-public/images/projects/showcase/godot-tetris-structure.svg
-public/images/projects/showcase/godot-next-spacewar-showcase.svg
-public/images/projects/showcase/godot-intespace-loop.svg
-public/images/projects/showcase/godot-raiden-vertical-slice.svg
-```
+- Source project: D:/workspace4Codex/game-first-tetris, copied to /tmp/godot-capture/game-first-tetris.
+- Runtime: Godot 4.6.1 stable Linux binary installed under ~/tools/godot.
+- Script: scripts/tools/screenshot_regression_runner.gd from the project.
+- Output: 36 PNG screenshots under /tmp/godot-capture/game-first-tetris/artifacts/screenshot_regression.
+- Selected public images:
+  - tetris-classic-desktop.png: 1280 x 720, 45 KB, classic mode desktop runtime.
+  - tetris-mobile-menu.png: 393 x 852, 44 KB, Android-size vertical main menu runtime.
+- No source project files under ~/workspace/reference-projects or D:/workspace4Codex/game-first-tetris were modified.
 
 ## Local Browser QA
 
@@ -28,37 +32,27 @@ Base URL: http://127.0.0.1:5175
 | Route | Viewport | Result | Evidence |
 | --- | --- | --- | --- |
 | /projects | 1440x900 and 390x844 | pass | Page loads with h1 项目系统, no console errors, no horizontal overflow. |
-| /cases/godot-showcase | 1440x900 and 390x844 | pass | Page loads with h1 Godot Web 游戏展示体系; 7 images load with non-zero natural dimensions; no console errors or horizontal overflow. |
-| /games/first-tetris | 1440x900 and 390x844 | pass | Tetris route loads its new SVG image; no console errors or horizontal overflow. |
-| /games/next-spacewar | 1440x900 and 390x844 | pass | Next Spacewar route loads its new SVG image; no console errors or horizontal overflow. |
-| /games/intespace | 1440x900 and 390x844 | pass | InteSpace route loads its new SVG image; no console errors or horizontal overflow. |
-| /games/raiden | 1440x900 and 390x844 | pass | Raiden route loads its new SVG image; no console errors or horizontal overflow. |
+| /projects/game-first-tetris | 1440x900 and 390x844 | pass | Tetris detail loads tetris-classic-desktop.png at 1280x720, no console errors, no horizontal overflow. |
+| /games/first-tetris | 1440x900 and 390x844 | pass | Game route loads tetris-classic-desktop.png at 1280x720, no console errors, no horizontal overflow. |
+| /cases/godot-showcase | 1440x900 and 390x844 | pass | Case route loads 9 images, including tetris-classic-desktop.png, tetris-mobile-menu.png, and godot-tetris-structure.svg; no console errors, no horizontal overflow. |
 
 ## Commands Run
 
 | Command | Result | Notes |
 | --- | --- | --- |
+| Godot screenshot regression script | partial-pass | Script generated the expected screenshot set but did not exit before the 180s command timeout; the leftover process was stopped after confirming output. |
+| file public/images/projects/showcase/tetris-*.png | pass | Confirmed 1280x720 and 393x852 PNG dimensions. |
 | npm run lint | pass | ESLint completed without errors in WSL. |
 | npm run build | pass | TypeScript and Vite build completed in WSL. Existing lottie-web direct eval warning remains from dependency code. |
-| sensitive/public wording scan | reviewed | Hits are active audit records, CSS numeric false positives, or SVG coordinates; no real account, endpoint, credential, database URL, host, or public interview/portfolio wording was introduced. |
+| sensitive/public wording scan | reviewed | Hits are previous audit notes, CSS numeric false positives, or SVG coordinates; no real account, endpoint, credential, database URL, host, or public interview/portfolio wording was introduced. |
 
 ## Public-Safety Review
 
-- The four new SVGs are explicitly structure/path diagrams, not real runtime screenshots.
-- No project source directories under ~/workspace/reference-projects were modified.
-- No real IPs, domains, accounts, credentials, database URLs, signing paths, local validation paths, deployment records, package hashes, raw logs, task JSON, or release package details were copied into public content.
-- The remaining asset gap is real gameplay/result screenshots for the non-Space War Godot projects, which should be added later only after review and desensitization.
+- The selected screenshots show only game UI, gameplay state, and generic menu text.
+- No local paths, accounts, tokens, IPs, domains, logs, release package names, or generated .import metadata were published.
+- Full screenshot regression output remains local under /tmp and was not copied into the site.
+- Tetris now has real runtime evidence; Next Spacewar, InteSpace, and Raiden still need real runtime screenshots in later slices.
 
 ## Ship Decision
 
-Committed and pushed: 081871d Add-Godot-showcase-diagrams.
-
-## Deployment QA
-
-- Direct asset check: /images/projects/showcase/godot-tetris-structure.svg returns 200 with content-type image/svg+xml and content-length 3914 from Cloudflare production.
-- Production browser QA at https://biau.playlab.eu.cc:
-  - /cases/godot-showcase loads with h1 Godot Web 游戏展示体系, 7 images, no console errors.
-  - /games/first-tetris loads with h1 俄罗斯方块原型｜Tetris and 1 new Godot image, no console errors.
-  - /games/next-spacewar loads with h1 太空战机｜展示构建 and 1 new Godot image, no console errors.
-  - /games/intespace loads with h1 竖屏肉鸽射击｜intespace and 1 new Godot image, no console errors.
-  - /games/raiden loads with h1 纵版弹幕射击｜垂直切片 and 1 new Godot image, no console errors.
+Ready to commit and push after final git status review.

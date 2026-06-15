@@ -1695,6 +1695,8 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
       { title: '验收链路', image: '/images/projects/showcase/xunqiu-verification-chain.svg', detail: '展示构建、模拟器/真机、模块行为和发布清单组成的可复现验收闭环。' },
     ],
     'godot-showcase': [
+      { title: 'Tetris 桌面运行截图', image: '/images/projects/showcase/tetris-classic-desktop.png', detail: '由 Godot 4.6.1 在临时副本中运行截图回归脚本生成，展示经典模式的真实桌面运行状态。' },
+      { title: 'Tetris 移动端入口', image: '/images/projects/showcase/tetris-mobile-menu.png', detail: '由同一轮截图回归生成，展示 393x852 竖屏尺寸下的主菜单和模式入口。' },
       { title: 'Tetris 结构图', image: '/images/projects/showcase/godot-tetris-structure.svg', detail: '展示经典规则、Rogue 原型、触屏桥接和多尺寸回归组成的公开安全项目结构。' },
       { title: 'Next Spacewar 展示路径', image: '/images/projects/showcase/godot-next-spacewar-showcase.svg', detail: '展示主菜单、帮助、战斗、暂停、结果页和 session summary 串成的试玩路径。' },
       { title: 'InteSpace 系统闭环', image: '/images/projects/showcase/godot-intespace-loop.svg', detail: '展示武器树、自动射击、Boss 试炼、结算和局外成长组成的 Roguelite 闭环。' },

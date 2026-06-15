@@ -106,7 +106,7 @@ export const projects: Project[] = [
     category: 'interactive',
     status: 'live',
     role: 'Godot 引擎 / Web 试玩 / 触屏适配',
-    image: '/images/projects/showcase/godot-tetris-structure.svg',
+    image: '/images/projects/showcase/tetris-classic-desktop.png',
     stack: ['Godot 4', 'Web 导出', '游戏原型'],
     highlights: ['经典模式', '肉鸽原型', '触屏输入', '截图回归'],
     links: [{ label: '查看页面', href: '/games/first-tetris', type: 'external' }],

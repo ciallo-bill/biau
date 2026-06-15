@@ -20,7 +20,7 @@
 | Ozon ERP | ERP 封面图、运营链路图、数据审批模型图、后台模块视图 | 脱敏真实后台截图 | 后续补一张去除店铺、订单、商品和连接信息的真实后台截图 |
 | xunqiu | 64 位客户端模块地图、迁移流程图、验收链路图 | 64 位客户端脱敏运行截图 | 只采集新客户端脱敏截图，不复用含真实数据旧素材 |
 | Space War | 主菜单、玩法画面、结算页 | Web 试玩入口截图 | 已接入项目卡与 Godot 案例页 |
-| 其他 Godot 项目 | Tetris 结构图、Next Spacewar 展示路径图、InteSpace 系统闭环图、Raiden 垂直切片图 | 各项目真实运行截图、结果页截图 | 当前先使用公开安全结构图补足项目覆盖，后续按项目逐个补真实运行图 |
+| 其他 Godot 项目 | Tetris 桌面运行截图、Tetris 移动端主菜单截图、Tetris 结构图、Next Spacewar 展示路径图、InteSpace 系统闭环图、Raiden 垂直切片图 | Next Spacewar、InteSpace、Raiden 的真实运行截图和结果页截图 | Tetris 截图来自 Godot 4.6.1 临时副本截图回归；其他项目后续按项目逐个补真实运行图 |
 | blog-semi | 站点本身可在线截图 | 首页、项目页、博客页的版本化截图 | 每次大改后保留桌面和移动端截图 |
 
 ## 已上线文件
@@ -48,6 +48,8 @@ public/images/projects/showcase/godot-tetris-structure.svg
 public/images/projects/showcase/godot-next-spacewar-showcase.svg
 public/images/projects/showcase/godot-intespace-loop.svg
 public/images/projects/showcase/godot-raiden-vertical-slice.svg
+public/images/projects/showcase/tetris-classic-desktop.png
+public/images/projects/showcase/tetris-mobile-menu.png
 ```
 
 ## 不直接公开的素材
