@@ -8,45 +8,42 @@ Builder: Codex
 
 ## Goal
 
-Continue showcase asset coverage inside WSL by adding a desensitized Ozon ERP admin-console/module view and using it on the Ozon ERP case detail page.
+Run a full online showcase audit after the latest Legal RAG, Pet Workspace, Ozon ERP, and xunqiu evidence updates.
 
 ## Scope
 
-- Create a public-safe Ozon ERP admin-console diagram covering product center, order sync, collected drafts, approval center, job queue, and audit log.
-- Add the admin-console diagram to `/cases/ozon-erp` as an additional evidence image.
-- Preserve existing Ozon ERP cover, workflow, data-model diagrams, and other case image mappings.
-- Update `docs/showcase-assets.md` to reflect the Ozon ERP admin-console coverage.
-- Verify route rendering, image loading, lint, build, and sensitive wording scan in WSL.
+- Verify Cloudflare production routes for home, project list, case list, blog list, key project details, key case details, blog details, and game detail pages.
+- Check desktop and mobile rendering for console errors, horizontal overflow, broken images, blank pages, and route title mismatches.
+- Run public wording checks for `面试` / `作品集` and sensitive terms over source/docs/public artifacts.
+- Record durable QA evidence in `.agent-work/verification.md`.
 
 ## Non-goals
 
-- Do not copy real store names, order IDs, product names, prices, cookies, platform credentials, database URLs, hostnames, ports, backup hashes, bundle paths, or deployment records.
+- Do not redesign pages unless the audit finds a concrete issue.
 - Do not modify `~/workspace/reference-projects`.
-- Do not add new projects.
-- Do not redesign the whole case-detail layout.
-- Do not push before verification.
+- Do not add new projects or new showcase assets in this audit slice.
+- Do not push before verification evidence is recorded.
 
 ## Allowed Paths
 
-- `src/App.tsx`
-- `docs/showcase-assets.md`
-- `public/images/projects/showcase/ozon-erp-admin-console.svg`
-- `.agent-work/*`
+- `.agent-work/current-task.md`
+- `.agent-work/verification.md`
 
 ## Acceptance Criteria
 
-- [x] `/cases/ozon-erp` shows the existing three evidence images plus the new admin-console diagram.
-- [x] The new Ozon ERP diagram is public-safe and path-free.
-- [x] Existing case image routes still work.
-- [x] No horizontal overflow appears on desktop/mobile checks.
-- [x] Public text does not introduce `面试` / `作品集` wording or sensitive credentials/endpoints.
-- [x] `npm run lint` and `npm run build` pass in WSL.
+- [x] Production routes load with expected titles on desktop and mobile.
+- [x] Production pages show no browser console errors or warnings in the audited routes.
+- [x] Production pages have no horizontal overflow at 1440x900 and 390x844.
+- [x] All production images present on audited routes load with non-zero natural dimensions.
+- [x] Source/docs/public scan does not show public `面试` / `作品集` wording or real sensitive values.
+- [x] WSL local and `origin/main` are aligned after recording the audit.
 
 ## Verification Plan
 
-- Browser-check `/cases/ozon-erp` at desktop and mobile widths.
-- Run a quick image regression for existing case image routes.
-- Run `npm run lint`.
-- Run `npm run build`.
-- Run a sensitive/public wording scan over `src`, `docs`, `public`, and active `.agent-work` files.
-- Commit only after the evidence is clean.
+- Use Chrome browser automation against `https://biau.playlab.eu.cc`.
+- Visit base routes: `/`, `/projects`, `/cases`, `/blogs`.
+- Visit key project routes: `/projects/legal-rag`, `/projects/ozon-erp`, `/projects/pet-workspace`, `/projects/xunqiu`, `/projects/blog-semi`, `/projects/space-war`.
+- Visit key case routes: `/cases/legal-rag`, `/cases/ozon-erp`, `/cases/pet-workspace`, `/cases/xunqiu`, `/cases/godot-showcase`.
+- Visit blog routes: `/blogs/legal-rag-review`, `/blogs/ozon-erp-architecture`, `/blogs/pet-workspace-pipeline`, `/blogs/xunqiu-android64-rebuild`, `/blogs/game-showcase-standard`.
+- Visit game routes: `/games/first-tetris`, `/games/next-spacewar`, `/games/intespace`, `/games/raiden`, `/games/space-war`.
+- Run `git status`, sensitive wording scan, and commit the audit record if clean.
