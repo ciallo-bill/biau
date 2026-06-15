@@ -17,7 +17,7 @@
 | --- | --- | --- | --- |
 | Legal RAG | 合同审查工作台、知识库导入、引用溯源问答 | 可补 RAG 流程图 | 追加“导入-切分-召回-回答-审查”流程图 |
 | Pet Workspace | 生成管线图、生成产物图、App API 契约图 | 审核后台截图 | 后续补一张脱敏审核后台或人审决策流截图 |
-| Ozon ERP | ERP 封面图 | 脱敏后台截图、Prisma ER 图、插件链路图 | 先补后台模块截图，再补 ER 图 |
+| Ozon ERP | ERP 封面图、运营链路图、数据审批模型图 | 脱敏后台截图 | 后续补一张去除店铺与订单信息的后台模块截图 |
 | xunqiu | 暂无公开站点图片 | 64 位客户端截图、模块地图、迁移流程图 | 只采集新客户端脱敏截图，不复用含真实数据旧素材 |
 | Space War | 主菜单、玩法画面、结算页 | Web 试玩入口截图 | 已接入项目卡与 Godot 案例页 |
 | 其他 Godot 项目 | 文字证据已补齐 | 各项目封面、玩法截图、结果页截图 | 后续按项目逐个补真实运行图 |
@@ -33,6 +33,8 @@ public/images/projects/showcase/fantasy-pet-flow.png
 public/images/projects/showcase/fantasy-pet-artifact.png
 public/images/projects/showcase/fantasy-pet-api-contract.svg
 public/images/projects/showcase/erp-cover.svg
+public/images/projects/showcase/ozon-erp-workflow.svg
+public/images/projects/showcase/ozon-erp-data-model.svg
 public/images/projects/showcase/space-war-menu.png
 public/images/projects/showcase/space-war-gameplay.png
 public/images/projects/showcase/space-war-result.png

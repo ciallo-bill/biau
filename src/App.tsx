@@ -1675,6 +1675,11 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
       { title: '知识库导入', image: '/images/projects/showcase/legal-rag-knowledge.png', detail: '沉淀合同文本、条款切片和可追踪的知识库材料。' },
       { title: '引用溯源问答', image: '/images/projects/showcase/legal-rag-qa.png', detail: '回答法律问题时给出来源片段，便于解释和复核。' },
     ],
+    'ozon-erp': [
+      { title: 'ERP 运营总览', image: '/images/projects/showcase/erp-cover.svg', detail: '概括管理后台、API、数据库、Worker 和浏览器插件组成的全栈业务系统。' },
+      { title: '运营链路', image: '/images/projects/showcase/ozon-erp-workflow.svg', detail: '展示后台操作、插件采集、API 校验、Worker 队列、安全写入和 Ozon 适配边界。' },
+      { title: '数据与审批模型', image: '/images/projects/showcase/ozon-erp-data-model.svg', detail: '展示店铺、商品、订单、采集草稿、PendingAction、审计日志和任务队列的关系。' },
+    ],
     'pet-workspace': [
       { title: '生成管线边界', image: '/images/projects/showcase/fantasy-pet-flow.png', detail: '展示 App 侧、生成规则服务、Worker、质量门禁和人工审核之间的职责边界。' },
       { title: '生成产物样例', image: '/images/projects/showcase/fantasy-pet-artifact.png', detail: '展示候选产物进入审核前的公开形态，保留结果观感，不暴露真实任务包或模型配置。' },

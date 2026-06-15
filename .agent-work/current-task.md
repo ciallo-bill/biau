@@ -8,20 +8,19 @@ Builder: Codex
 
 ## Goal
 
-Continue the public showcase asset work inside WSL by adding a desensitized Pet Workspace App API contract diagram and using it on the Pet case detail page.
+Continue showcase asset coverage inside WSL by adding desensitized Ozon ERP evidence diagrams and using them on the Ozon case detail page.
 
 ## Scope
 
-- Create a public-safe `fantasy-pet-api-contract.svg` diagram.
-- Use only concept-level architecture labels from the Pet reference docs.
-- Add Pet Workspace image evidence to `/cases/pet-workspace`.
-- Preserve the existing Legal RAG and Godot showcase image mappings.
-- Update `docs/showcase-assets.md` to reflect the new Pet asset coverage.
-- Verify the route, image loading, lint, build, and sensitive wording scan.
+- Create public-safe Ozon ERP workflow and data-model diagrams.
+- Add Ozon ERP image evidence to `/cases/ozon-erp`.
+- Preserve existing Legal RAG, Pet Workspace, and Godot showcase image mappings.
+- Update `docs/showcase-assets.md` to reflect the new Ozon asset coverage.
+- Verify route rendering, image loading, lint, build, and sensitive wording scan in WSL.
 
 ## Non-goals
 
-- Do not copy real run JSON, generated assets, logs, cloud endpoints, local paths, provider config, tokens, or admin-only endpoint names.
+- Do not copy real store names, accounts, cookies, Ozon credentials, database URLs, hostnames, ports, backup hashes, bundle paths, or deployment records.
 - Do not modify `~/workspace/reference-projects`.
 - Do not add new projects.
 - Do not redesign the whole case-detail layout.
@@ -31,22 +30,24 @@ Continue the public showcase asset work inside WSL by adding a desensitized Pet 
 
 - `src/App.tsx`
 - `docs/showcase-assets.md`
-- `public/images/projects/showcase/fantasy-pet-api-contract.svg`
+- `public/images/projects/showcase/ozon-erp-workflow.svg`
+- `public/images/projects/showcase/ozon-erp-data-model.svg`
 - `.agent-work/*`
 
 ## Acceptance Criteria
 
-- [x] `/cases/pet-workspace` shows three Pet evidence images.
-- [x] The new API contract diagram is public-safe and path-free.
-- [x] Existing `/cases/legal-rag` and `/cases/godot-showcase` evidence images still work.
+- [x] `/cases/ozon-erp` shows three Ozon evidence images.
+- [x] The two new Ozon diagrams are public-safe and path-free.
+- [x] Existing `/cases/legal-rag`, `/cases/pet-workspace`, and `/cases/godot-showcase` evidence images still work.
 - [x] No horizontal overflow appears on desktop/mobile checks.
 - [x] Public text does not introduce `面试` / `作品集` wording or sensitive credentials/endpoints.
 - [x] `npm run lint` and `npm run build` pass in WSL.
 
 ## Verification Plan
 
-- Browser-check `/cases/pet-workspace` at desktop and mobile widths.
+- Browser-check `/cases/ozon-erp` at desktop and mobile widths.
+- Run a quick image regression for the existing case image routes.
 - Run `npm run lint`.
 - Run `npm run build`.
-- Run a sensitive/public wording scan over `src`, `docs`, and `public`.
+- Run a sensitive/public wording scan over `src`, `docs`, `public`, and active `.agent-work` files.
 - Commit only after the evidence is clean.
