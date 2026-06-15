@@ -51,4 +51,14 @@ Base URL: http://127.0.0.1:5175
 
 ## Ship Decision
 
-Ready to commit and push after final git status review.
+Committed and pushed: 081871d Add-Godot-showcase-diagrams.
+
+## Deployment QA
+
+- Direct asset check: /images/projects/showcase/godot-tetris-structure.svg returns 200 with content-type image/svg+xml and content-length 3914 from Cloudflare production.
+- Production browser QA at https://biau.playlab.eu.cc:
+  - /cases/godot-showcase loads with h1 Godot Web 游戏展示体系, 7 images, no console errors.
+  - /games/first-tetris loads with h1 俄罗斯方块原型｜Tetris and 1 new Godot image, no console errors.
+  - /games/next-spacewar loads with h1 太空战机｜展示构建 and 1 new Godot image, no console errors.
+  - /games/intespace loads with h1 竖屏肉鸽射击｜intespace and 1 new Godot image, no console errors.
+  - /games/raiden loads with h1 纵版弹幕射击｜垂直切片 and 1 new Godot image, no console errors.
