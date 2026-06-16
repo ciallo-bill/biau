@@ -57,4 +57,17 @@ System Chrome was used through Playwright.
 
 ## Deployment QA
 
-Pending commit, push, and Cloudflare deployment.
+Source commit:
+
+- `a55dfb9 Remove unused draft portfolio data`
+
+Cloudflare deployment was confirmed by rendering `https://biau.playlab.eu.cc/projects` and checking that status labels still appeared while `待补图`, `待整理`, and `undefined` were absent.
+
+| Route | Viewport | Result |
+| --- | --- | --- |
+| `/` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no `待补图`/`待整理`/`undefined` hits. |
+| `/projects` | 1440x900 | pass: 200, project status labels still render, no console errors, no failed requests, no horizontal overflow, no `待补图`/`待整理`/`undefined` hits. |
+| `/projects/legal-rag` | 1440x900 | pass: 200, detail status label still renders, no console errors, no failed requests, no horizontal overflow, no `待补图`/`待整理`/`undefined` hits. |
+| `/` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no `待补图`/`待整理`/`undefined` hits. |
+| `/projects` | 390x844 | pass: 200, project status labels still render, no console errors, no failed requests, no horizontal overflow, no `待补图`/`待整理`/`undefined` hits. |
+| `/projects/legal-rag` | 390x844 | pass: 200, detail status label still renders, no console errors, no failed requests, no horizontal overflow, no `待补图`/`待整理`/`undefined` hits. |

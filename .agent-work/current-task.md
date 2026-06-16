@@ -45,7 +45,7 @@ Remove unused draft article data and unused `pending` project status so future p
 - [x] `npm run lint` passes.
 - [x] `npm run build` passes.
 - [x] Browser QA confirms project cards still render.
-- [ ] Changes are committed, pushed, and production QA is recorded.
+- [x] Changes are committed, pushed, and production QA is recorded.
 
 ## Verification Plan
 
