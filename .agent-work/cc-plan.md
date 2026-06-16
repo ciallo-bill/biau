@@ -1,28 +1,20 @@
-# Builder Plan: Raiden Runtime Screenshots
+# Builder Plan: Raiden Closed-Loop Screenshots
 
 Date: 2026-06-16
-Task: Add real runtime screenshots for Raiden Prototype and connect them to the public showcase site.
+Task: Add Raiden result and chapter-summary screenshots to the Godot showcase.
 
 ## Builder Findings
 
-- Raiden Prototype is a Godot 4.6.1 portrait vertical shooter with a public demo menu, Stage 01 growth loop, Stage 02 storm sequence, boss pressure, results screens, and chapter wrap-up scenes.
-- The source project includes a capture checklist recommending menu, Stage 01 gameplay, Stage 02 storm, boss, and results/chapter summary screenshots.
-- This slice should cover the strongest stable evidence first: main menu, Stage 01 gameplay, and Stage 02 storm sequence.
+- Raiden already has real menu, Stage 01, and Stage 02 screenshots.
+- The remaining Raiden evidence gap is the result/summary layer: proof that the UI can present a completed route and chapter wrap-up.
+- The result and chapter outro scenes are driven by `RunState`, so a public-safe state can be seeded in a temporary capture copy without modifying the source project or publishing raw run data.
 
 ## Proposed Scope
 
-1. Generate screenshots from the actual project through a temporary capture copy.
-2. Publish only reviewed PNGs under `public/images/projects/showcase/raiden-*.png`.
-3. Use the main-menu screenshot as the Raiden project visual.
-4. Add Raiden runtime evidence to `/cases/godot-showcase` while preserving the existing vertical-slice diagram.
-5. Update `docs/showcase-assets.md`, `.agent-work/current-task.md`, and `.agent-work/verification.md`.
-
-## Risks And Constraints
-
-- Do not modify `D:/workspace4Codex/raiden-prototype`.
-- Do not modify `~/workspace/reference-projects`.
-- Do not publish raw logs, local paths, export packages, `.import` metadata, release package names, hashes, accounts, IPs, tokens, or generated validation output.
-- Result-page and chapter-summary screenshots remain later optional gaps unless captured reliably.
+1. Seed a public-safe chapter-complete state in the temporary capture copy.
+2. Capture `raiden-results-summary.png` and `raiden-chapter-outro.png` from the actual Godot UI.
+3. Add both screenshots to `/cases/godot-showcase`.
+4. Update `docs/showcase-assets.md`, `.agent-work/current-task.md`, and `.agent-work/verification.md`.
 
 ## Verification
 
@@ -30,4 +22,4 @@ Task: Add real runtime screenshots for Raiden Prototype and connect them to the 
 - Run `npm run lint`.
 - Run `npm run build`.
 - Run the public-safety wording scan.
-- Browser-check `/projects/raiden-prototype`, `/games/raiden`, and `/cases/godot-showcase` at desktop and mobile widths.
+- Browser-check `/cases/godot-showcase` at desktop and mobile widths.

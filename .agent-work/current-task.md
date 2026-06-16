@@ -8,27 +8,26 @@ Builder: Codex fallback
 
 ## Goal
 
-Add real runtime screenshots for Raiden Prototype and connect them to the public showcase site.
+Add Raiden Prototype result and chapter-summary screenshots to strengthen the Godot showcase closed-loop evidence.
 
 ## Scope
 
-- Use the complete Windows source project only through a temporary capture copy.
-- Publish reviewed, public-safe runtime screenshots for the main menu, Stage 01 gameplay, and Stage 02 storm sequence.
-- Use a real runtime screenshot as the Raiden project visual.
-- Add Raiden runtime evidence to /cases/godot-showcase while preserving the existing vertical-slice diagram.
+- Use the Raiden temporary capture copy only.
+- Construct a public-safe chapter-complete state in the temporary copy, then capture real UI screenshots for the result screen and chapter outro.
+- Add those screenshots to /cases/godot-showcase.
 - Update docs/showcase-assets.md and verification notes.
 
 ## Non-goals
 
 - Do not modify ~/workspace/reference-projects.
 - Do not modify D:/workspace4Codex/raiden-prototype.
-- Do not publish Godot export packages, raw logs, .import metadata, local paths, build artifacts, package hashes, accounts, IPs, tokens, or release package details.
-- Do not claim result-page or chapter-summary screenshots are covered yet.
+- Do not publish raw logs, .import metadata, local paths, build artifacts, package hashes, accounts, IPs, tokens, or release package details.
+- Do not claim the result screenshots are real player telemetry; describe them as public-safe state UI captures.
 
 ## Allowed Paths
 
-- public/images/projects/showcase/raiden-*.png
-- src/data/portfolio.ts
+- public/images/projects/showcase/raiden-results-summary.png
+- public/images/projects/showcase/raiden-chapter-outro.png
 - src/App.tsx
 - docs/showcase-assets.md
 - .agent-work/current-task.md
@@ -38,14 +37,13 @@ Add real runtime screenshots for Raiden Prototype and connect them to the public
 
 ## Acceptance Criteria
 
-- [x] Raiden screenshots are generated from the actual Godot project in a temporary copy.
+- [x] Result/summary screenshots are generated from the actual Godot UI in a temporary copy.
 - [x] Selected screenshots are public-safe and added to public/images/projects/showcase.
-- [x] Raiden project card/detail uses a real runtime screenshot.
-- [x] /cases/godot-showcase includes Raiden runtime evidence alongside the existing structure diagram.
+- [x] /cases/godot-showcase includes Raiden result and chapter-summary evidence alongside existing runtime screenshots.
 - [x] docs/showcase-assets.md distinguishes covered and remaining Godot screenshot gaps.
 - [x] npm run lint and npm run build pass in WSL.
 - [x] Sensitive/public wording scan is reviewed.
-- [x] Browser QA confirms local routes load images without console errors or horizontal overflow.
+- [x] Browser QA confirms local /cases/godot-showcase loads the new images without console errors or horizontal overflow.
 
 ## Verification Plan
 
@@ -53,5 +51,5 @@ Add real runtime screenshots for Raiden Prototype and connect them to the public
 - Run npm run lint.
 - Run npm run build.
 - Run sensitive/public wording scan.
-- Browser-check /projects/raiden-prototype, /games/raiden, and /cases/godot-showcase at desktop and mobile widths.
+- Browser-check /cases/godot-showcase at desktop and mobile widths.
 - Commit and push after verification passes.

@@ -1707,6 +1707,8 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
       { title: 'Raiden 主菜单', image: '/images/projects/showcase/raiden-main-menu.png', detail: '由 Godot 4.6.1 Windows 运行时在临时副本中生成，展示公开 Demo 准备版入口、双关章节路线和首次试玩提示。' },
       { title: 'Raiden Stage 01 战斗', image: '/images/projects/showcase/raiden-stage-01-gameplay.png', detail: '展示开场关卡的敌群编排、持续射击、火力成长 HUD 和炸弹资源，证明基础射击循环已经可运行。' },
       { title: 'Raiden Stage 02 风暴机关', image: '/images/projects/showcase/raiden-stage-02-storm.png', detail: '展示第二关风暴封线、弹幕压力、火力等级和资源状态，证明双关垂直切片具备差异化高潮段。' },
+      { title: 'Raiden 结果复盘', image: '/images/projects/showcase/raiden-results-summary.png', detail: '由临时副本构造公开安全的章节完成状态后截取真实结果页 UI，展示评级、双关分段复盘和火力路线闭环。' },
+      { title: 'Raiden 章节总结', image: '/images/projects/showcase/raiden-chapter-outro.png', detail: '展示章节总结、双关路线、总分、章节击破和后续指令，用来说明切片已经具备完整展示收束。' },
       { title: 'Raiden 垂直切片', image: '/images/projects/showcase/godot-raiden-vertical-slice.svg', detail: '展示双关章节、火力成长、Boss 相位和公开演示准备组成的纵版射击切片。' },
       { title: 'Space War 运行画面', image: '/images/projects/showcase/space-war-gameplay.png', detail: '展示横向推进、HUD、Sector 目标和即时操作反馈，是当前已有真实运行截图。' },
       { title: 'Space War 结算路径', image: '/images/projects/showcase/space-war-result.png', detail: '展示任务完成、得分、高分记录、重开和返回主菜单的完整闭环。' },
