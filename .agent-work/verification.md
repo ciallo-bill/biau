@@ -45,7 +45,15 @@ Task: Add Ozon ERP public-safe admin runtime screenshot
 
 ## Remaining Steps
 
-- Commit and push this slice.
-- After Cloudflare Pages deploys, verify:
-  - Direct PNG asset returns 200.
-  - Production `/cases/ozon-erp` loads the new evidence card on desktop and mobile.
+## Ship Decision
+
+Committed and pushed: 16aa82a Add Ozon ERP runtime screenshot.
+
+## Deployment QA
+
+- Direct asset check:
+  - /images/projects/showcase/ozon-erp-admin-runtime.png returns 200 with content length 97319.
+- Production browser QA at https://biau.playlab.eu.cc:
+  - /cases/ozon-erp loads with h1 Ozon 电商 ERP 业务系统 and the 后台运行截图 evidence card.
+  - ozon-erp-admin-runtime.png decodes successfully at 1440x900.
+  - Desktop and mobile both pass with no console errors, no failed requests, no horizontal overflow, and no sensitive/non-product wording.
