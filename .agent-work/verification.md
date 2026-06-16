@@ -2,73 +2,50 @@
 
 Date: 2026-06-16
 Repo: /home/zhang/workspace/blog-semi
-Task: Add Legal RAG report-export/model-replacement boundary evidence
+Task: Add Ozon ERP public-safe admin runtime screenshot
 
 ## Diff Summary
 
-- Created one SVG boundary diagram:
-  - public/images/projects/showcase/legal-rag-report-boundary.svg
-- Updated src/App.tsx so /cases/legal-rag includes the new boundary evidence card.
-- Updated docs/showcase-assets.md to mark Legal RAG gap as covered and add the new SVG to the asset list.
-- Updated .agent-work/current-task.md and .agent-work/verification.md.
+- Added one Ozon ERP admin runtime screenshot:
+  - public/images/projects/showcase/ozon-erp-admin-runtime.png
+- Updated `src/App.tsx` so `/cases/ozon-erp` includes the new evidence card.
+- Updated `docs/showcase-assets.md` to mark the Ozon ERP runtime screenshot gap as covered.
+- Archived the previous Legal RAG workflow artifacts.
+- Updated current workflow artifacts for the Ozon ERP slice.
 
-## Visual Asset Details
+## Capture Evidence
 
-- File: legal-rag-report-boundary.svg
-- Size: ~7.5 KB
-- Viewport: 1200 x 800
-- Structure:
-  - Left side (green solid border): Current MVP boundary
-    - Document import, manual/section-aware chunking, mock embedding, memory vector index, retrieval/rerank, citations, contract review display, browser print preview
-  - Right side (orange dashed border): Production extension path
-    - Real embedding service, pgvector, server-side PDF/DOCX export module, queue-based imports/exports, real model credentials and rate-limit strategy
-- Wording:
-  - Uses "当前 MVP 边界" and "生产扩展路径"
-  - Clearly states browser print preview (浏览器打印预览) as current report output method
-  - Marks server-side export, real model API, pgvector, and queue processing as future integration boundaries
-  - Does not claim production PDF/DOCX export or real model provider integration already exists
+- Source project was copied into a temporary capture directory before running.
+- Reference/source paths were kept read-only:
+  - `/home/zhang/workspace/reference-projects/erp`
+  - `/mnt/d/workspace4Codex/erp`
+- Only the ERP Vue frontend was run from the temporary copy.
+- No real API, PostgreSQL, Redis, Ozon API, extension release flow, or deployment script was started.
+- Browser automation injected a fake local login user and intercepted API calls with desensitized data.
+- The selected screenshot shows the real Vue ERP online-products admin page with demo product rows, status tabs, filters, and batch-operation controls.
 
 ## Commands Run
 
 | Command | Result | Notes |
 | --- | --- | --- |
+| npm ci --ignore-scripts in temporary ERP copy | pass | Installed capture-only dependencies without running project scripts. |
+| Vite ERP frontend from temporary copy | pass | Used only for screenshot capture. |
+| file public/images/projects/showcase/ozon-erp-admin-runtime.png | pass | PNG image data, 1440 x 900, RGB. |
+| sensitive/public wording scan | reviewed | Public source/docs changes do not contain real credentials, endpoints, local paths, server hosts, database URLs, accounts, or non-product positioning wording. |
 | npm run lint | pass | ESLint completed without errors in WSL. |
-| npm run build | pass | TypeScript and Vite build completed in 495ms. Existing lottie-web direct eval warning remains from dependency code. |
-| sensitive/public wording scan | reviewed | No API keys, tokens, endpoints, IPs, local paths, database URLs, real contract content, legal advice, or customer data found. Public copy now uses abstract integration labels instead of concrete provider names. |
-| Browser QA with system Chrome | pass | /cases/legal-rag checked at 1440x900 and 390x844 against the local dev server. The new SVG decodes, the card title is present, no console errors, no failed requests, no horizontal overflow, and no non-product positioning wording. |
+| npm run build | pass | TypeScript and Vite build completed. Existing lottie-web direct eval warning remains from dependency code. |
+| Browser QA with system Chrome | pass | `/cases/ozon-erp` checked at 1440x900 and 390x844 against the local dev server. The new PNG decodes at 1440x900, no console errors, no failed requests, no horizontal overflow, and no sensitive/non-product wording. |
 
 ## Public-Safety Review
 
-- The SVG uses abstract labels for future integration points without exposing concrete credentials, endpoints, or configuration details.
-- Color coding (green for current, orange for future) provides clear visual distinction.
-- Browser print preview is explicitly identified as the current MVP report output mechanism.
-- No claims about production deployment of server-side export, real embedding models, or vector databases.
-- The diagram is framed as a boundary and extension-path explanation, not a completed production architecture.
+- Screenshot uses demo product names, demo offer IDs, demo SKUs, and demo shop names.
+- Screenshot does not show real shops, orders, product IDs, accounts, server hosts, tokens, database URLs, Ozon credentials, local validation paths, or deployment accounts.
+- The capture page was the real frontend runtime, but all data was injected/intercepted for public-safe demonstration.
+- The Ozon ERP gap is now closed in `docs/showcase-assets.md`.
 
-## Local Browser QA
+## Remaining Steps
 
-Base URL: http://127.0.0.1:5175
-
-| Route | Viewport | Result | Evidence |
-| --- | --- | --- | --- |
-| /cases/legal-rag | 1440x900 | pass | Page h1 is Legal RAG case detail. The boundary card title is present, legal-rag-report-boundary.svg decodes, no console errors, no failed requests, no horizontal overflow, and no 面试/作品集 wording. |
-| /cases/legal-rag | 390x844 | pass | The same boundary card and SVG load on mobile with no console errors, failed requests, or horizontal overflow. |
-
-## Ship Decision
-
-Committed and pushed: 1aca24c Add Legal RAG boundary diagram.
-
-## Deployment QA
-
-- Direct asset check:
-  - /images/projects/showcase/legal-rag-report-boundary.svg returns 200 with content length above 10 KB.
-- Production browser QA at https://biau.playlab.eu.cc:
-  - /cases/legal-rag loads with h1 Legal RAG case detail and the boundary card title.
-  - legal-rag-report-boundary.svg decodes successfully.
-  - Desktop and mobile both pass with no console errors, no failed requests, no horizontal overflow, and no non-product positioning wording.
-
-## Notes
-
-- Legal RAG now has five evidence assets: contract review workbench, knowledge import, citation QA, RAG flow diagram, and report/model boundary diagram.
-- The showcase-assets.md gap for Legal RAG is marked as closed.
-- The new SVG asset is added to the file list in showcase-assets.md.
+- Commit and push this slice.
+- After Cloudflare Pages deploys, verify:
+  - Direct PNG asset returns 200.
+  - Production `/cases/ozon-erp` loads the new evidence card on desktop and mobile.

@@ -17,7 +17,7 @@
 | --- | --- | --- | --- |
 | Legal RAG | 合同审查工作台、知识库导入、引用溯源问答、RAG 流程闭环图、报告输出与模型集成边界图 | 无 | 已补全报告导出和模型集成边界说明 |
 | Pet Workspace | 生成管线图、生成产物图、App API 契约图、人审决策流图 | 脱敏审核后台真实截图 | 后续补一张不含任务来源和云端配置的审核后台截图 |
-| Ozon ERP | ERP 封面图、运营链路图、数据审批模型图、后台模块视图 | 脱敏真实后台截图 | 后续补一张去除店铺、订单、商品和连接信息的真实后台截图 |
+| Ozon ERP | ERP 封面图、运营链路图、数据审批模型图、后台模块视图、后台运行截图 | 无 | 已补充由真实 ERP 前端临时副本生成的脱敏运行截图 |
 | xunqiu | 64 位客户端模块地图、迁移流程图、验收链路图 | 64 位客户端脱敏运行截图 | 只采集新客户端脱敏截图，不复用含真实数据旧素材 |
 | Space War | 主菜单、玩法画面、结算页 | Web 试玩入口截图 | 已接入项目卡与 Godot 案例页 |
 | 其他 Godot 项目 | Tetris 桌面运行截图、Tetris 移动端主菜单截图、Tetris 结构图、Next Spacewar 主菜单、Next Spacewar 战斗 HUD、Next Spacewar 结果复盘、Next Spacewar 展示路径图、InteSpace 玩家中枢、InteSpace 战斗 HUD、InteSpace 结果总结、InteSpace 系统闭环图、Raiden 主菜单、Raiden Stage 01 战斗、Raiden Stage 02 风暴机关、Raiden 结果复盘、Raiden 章节总结、Raiden 垂直切片图 | 暂无明显 Godot 结果页截图缺口 | Tetris 截图来自 Godot 4.6.1 临时副本截图回归；Next Spacewar、InteSpace 和 Raiden 截图来自 Godot 4.6.1 Windows 运行时临时副本；Next Spacewar 和 InteSpace 结果复盘使用临时副本构造公开安全单局完成状态后截取真实 UI；Raiden 结果复盘使用临时副本构造公开安全章节完成状态后截取真实 UI |
@@ -39,6 +39,7 @@ public/images/projects/showcase/erp-cover.svg
 public/images/projects/showcase/ozon-erp-workflow.svg
 public/images/projects/showcase/ozon-erp-data-model.svg
 public/images/projects/showcase/ozon-erp-admin-console.svg
+public/images/projects/showcase/ozon-erp-admin-runtime.png
 public/images/projects/showcase/xunqiu-module-map.svg
 public/images/projects/showcase/xunqiu-migration-flow.svg
 public/images/projects/showcase/xunqiu-verification-chain.svg

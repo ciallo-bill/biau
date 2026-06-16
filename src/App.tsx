@@ -1683,6 +1683,7 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
       { title: '运营链路', image: '/images/projects/showcase/ozon-erp-workflow.svg', detail: '展示后台操作、插件采集、API 校验、Worker 队列、安全写入和 Ozon 适配边界。' },
       { title: '数据与审批模型', image: '/images/projects/showcase/ozon-erp-data-model.svg', detail: '展示店铺、商品、订单、采集草稿、PendingAction、审计日志和任务队列的关系。' },
       { title: '后台模块视图', image: '/images/projects/showcase/ozon-erp-admin-console.svg', detail: '展示商品中心、订单同步、采集草稿、审批中心、任务队列和审计日志的脱敏后台布局。' },
+      { title: '后台运行截图', image: '/images/projects/showcase/ozon-erp-admin-runtime.png', detail: '由 ERP 前端临时副本运行并拦截 API 为脱敏演示数据后截取，展示在线商品、状态统计、筛选和批量操作的真实后台界面。' },
     ],
     'pet-workspace': [
       { title: '生成管线边界', image: '/images/projects/showcase/fantasy-pet-flow.png', detail: '展示 App 侧、生成规则服务、Worker、质量门禁和人工审核之间的职责边界。' },
