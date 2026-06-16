@@ -49,4 +49,17 @@ Task: Add Space War showcase entry screenshot
 
 ## Remaining Steps
 
-- Commit and push after verification passes.
+## Ship Decision
+
+Committed and pushed: 930388b Add Space War showcase entry evidence.
+
+## Deployment QA
+
+- Direct asset check:
+  - `/images/projects/showcase/space-war-web-showcase.png` returns 200 with content length 273609.
+- Production browser QA at `https://biau.playlab.eu.cc`:
+  - `/games/space-war` renders h1 `复古横版射击｜space-war` on desktop and mobile.
+  - `/cases/godot-showcase` renders h1 `Godot Web 游戏展示体系` on desktop and mobile.
+  - The `Space War 试玩展示入口` evidence card is present on `/cases/godot-showcase`.
+  - `space-war-web-showcase.png` decodes successfully at 1440x2216 on desktop and mobile.
+  - Desktop and mobile checks show no console errors, no failed requests, no horizontal overflow, and no sensitive/private wording hits.
