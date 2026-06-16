@@ -64,4 +64,22 @@ Task: Add blog-semi site versioned screenshots
 
 ## Remaining Steps
 
-- Commit and push after verification passes.
+## Ship Decision
+
+Committed and pushed: 3f49227 Add blog semi versioned screenshots.
+
+## Deployment QA
+
+- Direct asset checks:
+  - All six `blog-semi-*.png` assets return 200 from `https://biau.playlab.eu.cc/images/projects/showcase/`.
+  - Content lengths match the generated files:
+    - `blog-semi-home-desktop.png`: 997069
+    - `blog-semi-home-mobile.png`: 649877
+    - `blog-semi-projects-desktop.png`: 622178
+    - `blog-semi-projects-mobile.png`: 372594
+    - `blog-semi-blogs-desktop.png`: 443493
+    - `blog-semi-blogs-mobile.png`: 314543
+- Production route QA at `https://biau.playlab.eu.cc`:
+  - Desktop checks for `/`, `/projects`, and `/blogs` render the expected h1 content with no console errors, no failed requests, and no horizontal overflow.
+  - Mobile checks for `/`, `/projects`, and `/blogs` render the expected h1 content with no console errors, no failed requests, no horizontal overflow, and no sensitive wording hits.
+  - One mobile `/projects` run read before JS finished and returned empty body; retry with explicit body-text wait passed.
