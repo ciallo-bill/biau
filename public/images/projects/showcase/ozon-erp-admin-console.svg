@@ -107,5 +107,5 @@
   <text x="1170" y="596" class="chip-text">可追踪</text>
 
   <rect x="346" y="666" width="964" height="44" rx="16" fill="#f3f7fb" stroke="#dbe4f0" stroke-width="1.5"/>
-  <text x="382" y="694" class="small">公开安全口径：所有数值和状态均为脱敏占位，不包含真实店铺、订单、商品、凭据、连接信息或生产环境记录。</text>
+  <text x="382" y="694" class="small">公开安全口径：所有数值和状态均为脱敏示意数据，不包含真实店铺、订单、商品、凭据、连接信息或生产环境记录。</text>
 </svg>
