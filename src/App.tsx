@@ -1690,6 +1690,7 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
       { title: '生成产物样例', image: '/images/projects/showcase/fantasy-pet-artifact.png', detail: '展示候选产物进入审核前的公开形态，保留结果观感，不暴露真实任务包或模型配置。' },
       { title: 'App API 契约', image: '/images/projects/showcase/fantasy-pet-api-contract.svg', detail: '展示创建任务、状态查询、候选索引、人审发布和打包下载的 app-safe 数据流。' },
       { title: '人审决策流', image: '/images/projects/showcase/fantasy-pet-review-flow.svg', detail: '展示候选产物经过质量门禁、人审决策、发布记录和 App API 消费的闭环。' },
+      { title: '审核后台运行截图', image: '/images/projects/showcase/fantasy-pet-admin-review-runtime.png', detail: '由 admin-review 临时运行环境读取脱敏 GA 候选数据后截取，展示候选预览、动作检查、反馈表单和返工队列指标。' },
     ],
     xunqiu: [
       { title: '64 位客户端模块地图', image: '/images/projects/showcase/xunqiu-module-map.svg', detail: '展示新客户端页面模块、公共能力和接口复用层的关系，不暴露真实服务地址。' },
