@@ -1718,6 +1718,7 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
       { title: 'Raiden 垂直切片', image: '/images/projects/showcase/godot-raiden-vertical-slice.svg', detail: '展示双关章节、火力成长、Boss 相位和公开演示准备组成的纵版射击切片。' },
       { title: 'Space War 运行画面', image: '/images/projects/showcase/space-war-gameplay.png', detail: '展示横向推进、HUD、Sector 目标和即时操作反馈，是当前已有真实运行截图。' },
       { title: 'Space War 结算路径', image: '/images/projects/showcase/space-war-result.png', detail: '展示任务完成、得分、高分记录、重开和返回主菜单的完整闭环。' },
+      { title: 'Space War 试玩展示入口', image: '/images/projects/showcase/space-war-web-showcase.png', detail: '展示站内 /games/space-war 独立游戏展示页，说明当前 Web 试玩接入计划、玩法体验和发布材料边界。' },
     ],
   }
   const caseImages = caseImagesById[caseStudy.id] ?? []

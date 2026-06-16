@@ -1,34 +1,32 @@
 # Codex Review
 
 Date: 2026-06-16
-Task: blog-semi versioned screenshots
+Task: Space War showcase entry screenshot
 
 ## Builder Plan Review
 
-Claude Code provider `a` was selected with `cc-provider use a` before planning. The first short smoke test returned `OK-A`, confirming the channel was usable.
+Provider `a` was attempted first for the read-only plan and was given a 10-minute timeout, but it produced an empty `.agent-work/cc-plan.md` and left `claude-real` running. The stuck process was stopped. Provider `d` was then used to avoid blocking this slice.
 
-The full planning command exceeded the shell timeout, but `.agent-work/cc-plan.md` was fully written before the process was terminated. For future provider `a` plan/review calls, reserve a longer timeout window because this provider is configured with `effort=max`.
+For future Claude Code calls, use provider order `a -> b -> c -> d`, with `d` as fallback rather than jumping directly from `a` to `d`.
+
+The useful plan finding is correct: the reference `space-war` project does not currently expose a stable Godot Web export in the mounted reference repo, so this slice should not claim to publish a real playable Web build. The safe target is the site-level Space War showcase/playtest entry route.
 
 ## Controller Decision
 
-Proceed with the screenshot-only slice.
+Proceed with a screenshot-only slice:
 
-Approved constraints:
-
-- Capture only public site content from the local dev server.
-- Use the existing routes `/`, `/projects`, and `/blogs`.
-- Use desktop `1440x900` and mobile `390x844`.
-- Save page-content screenshots only, not browser chrome, address bars, taskbars, devtools, cookies, or private browser state.
-- Keep the site default language/theme state.
-- Update only the versioned screenshot assets, `docs/showcase-assets.md`, and workflow records.
+- Capture the public `/games/space-war` route from the local dev server.
+- Save the screenshot as `public/images/projects/showcase/space-war-web-showcase.png`.
+- Add the screenshot to the `godot-showcase` evidence matrix so visitors can discover the Space War showcase entry from the case page.
+- Update `docs/showcase-assets.md` so the Space War gap is no longer open.
 
 Rejected paths:
 
-- Redesigning pages or changing copy in this slice.
-- Adding unrelated project screenshots.
-- Capturing logged-in/admin/third-party pages.
-- Publishing local filesystem paths, ports in browser UI, tokens, credentials, or private state.
+- Do not build or publish a new Godot Web export.
+- Do not copy `.pck`, `.wasm`, release packages, local build paths, or private validation paths into the public site.
+- Do not redesign the game showcase page.
+- Do not touch reference project files.
 
 ## Public-Safety Review
 
-The target routes are public static site routes. The screenshot process must still verify no console errors, failed requests, horizontal page overflow, or sensitive wording are present after capture.
+The screenshot target is a public site route. It must still be checked for console errors, failed requests, horizontal overflow, local path wording, and sensitive/private wording before shipping.

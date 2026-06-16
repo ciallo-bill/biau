@@ -1,72 +1,65 @@
-分析完成。以下是只读实施计划。
+好的，我已读取当前任务和相关文件。现在输出只读分析计划：
 
-## blog-semi 站点版本化截图实施计划
+## Space War 任务只读分析结果
 
-### 一、要截哪些路由
+### 1. 真实 Web export 状态
+- **需要确认**：`/home/zhang/workspace/reference-projects/space-war` 是否存在 Godot Web 导出包
+- **已知**：从 `App.tsx` 看，`/games/space-war` 路由已存在，但尚未确认是否接入真实 Web 构建产物
+- **计划**：需要运行 `ls` 检查 `reference-projects/space-war` 目录，重点查找 `.html`/`.wasm`/`.pck` 等 Web 导出标志文件
 
-站点用客户端 `pushState` 路由(`src/App.tsx:22-27`),不是真正的多页应用。直接访问对应路径即可命中初始视图:
+### 2. 应该截图的站内路由
+- **首选**：`/games/space-war` — 独立游戏展示页，符合任务"site-level Web playtest/showcase entry"描述
+- **备选**：如果 `/games/space-war` 渲染异常，可截 `/projects`（选中 space-war 项目的状态）
+- **不可行**：不能截 `/cases/godot-showcase`，因为它是游戏项目集合案例，不是 Space War 专属入口
 
-| 视图 | 路由 | 注意 |
-| --- | --- | --- |
-| 首页 | `/` | `home` 视图,含 hero 轮播 + 项目分类 + 案例矩阵 |
-| 项目页 | `/projects` | `projects` 视图,默认进入 AI 分类展示台 |
-| 博客页 | `/blogs` | 路由是 `/blogs`(复数),不是 `/blog`;`viewByRoute` 映射到 `blog` 视图 |
+### 3. 文件命名
+- **建议**：`public/images/projects/showcase/space-war-web-showcase.png`
+- **理由**：任务文档中明确列出此路径，与现有 `space-war-menu.png`/`space-war-gameplay.png`/`space-war-result.png` 保持命名一致性
+- **备选**：如果首选名称语义不清，可用 `space-war-game-page.png` 或 `space-war-showcase-entry.png`
 
-只截这三个顶层视图,不进入任何 `*Detail` 详情页(任务非目标)。
+### 4. 是否需要接入证据矩阵
+- **需要**：`docs/showcase-assets.md` 第 22 行已将 Space War 列入 Godot 项目覆盖表，但"缺口"列为"Web 试玩入口截图"
+- **行动**：截图后更新该表，将"Web 试玩入口截图"从缺口移到"已上线素材"，并在已上线文件清单中追加新截图路径
+- **位置**：`App.tsx` 中 `GameShowcaseView` 和 `caseImagesById['godot-showcase']` 可能也需要补充新截图，但需先确认是否已有 Space War 专属展示
 
-### 二、尺寸与文件命名
+### 5. 安全风险
+- ✅ **无敏感路径风险**：截图目标是站内公开路由 `/games/space-war`，不涉及 `reference-projects` 或 `/mnt/d/workspace4Codex` 的私有路径
+- ✅ **无构建产物泄漏**：不发布 `.pck`/`.wasm` 文件路径，只截浏览器渲染后的页面
+- ✅ **无真实数据**：Space War 是游戏项目，不涉及用户凭据、服务地址或业务数据
+- ⚠️ **需验证**：截图前需确认 `/games/space-war` 页面是否包含本地路径、临时文件路径或"under construction"提示
 
-固定两档,与 `current-task.md` 的 Allowed Paths 完全一致,不要改名:
-
-- 桌面 `1440x900`,移动 `390x844`
-- 输出目录:`public/images/projects/showcase/`
-
-```
-blog-semi-home-desktop.png      blog-semi-home-mobile.png
-blog-semi-projects-desktop.png  blog-semi-projects-mobile.png
-blog-semi-blogs-desktop.png     blog-semi-blogs-mobile.png
-```
-
-CSS 断点为 `1180px / 980px / 760px`(`src/App.css`),所以 1440 命中完整桌面布局、390 命中最窄移动布局,两档能覆盖响应式两端。
-
-### 三、截图执行方式
-
-1. 本地起 `npm run dev`(Vite,默认 `5173`)。
-2. 用 playwright MCP:`browser_resize` 设视口 → `browser_navigate` 到目标路由 → 等内容稳定(hero 图、项目预览图为 `loading="lazy"`,需滚动或等加载)→ `browser_take_screenshot` 存到目标文件名。
-3. 建议用 `fullPage: true` 截整页,确保案例矩阵、项目缩略图带等下方内容都进入证据;若只要首屏需明确说明。
-4. 暗色/语言状态保持默认(`light` + `zh`,见 `src/App.tsx:338-339`),与站点当前主内容一致。
-
-### 四、公开安全风险(重点核查)
-
-- 本任务截的是站点自身公开内容,正文已脱敏,风险低于此前 ERP/xunqiu 任务。
-- 仍需确认:截图里不要出现浏览器地址栏中的 `localhost:5173` 私有端口、本地路径、devtools、个人书签栏。playwright 截的是页面内容区,默认不含浏览器 chrome,符合要求。
-- hero 轮播第一张是 `legal-rag-reviewed.png`,确认载入的是已脱敏的既有素材,不引入新敏感图。
-- 控制台不应有报错或失败请求(验收标准第 9 条),截图前先看 `browser_console_messages` / `browser_network_requests`。
-
-### 五、验证命令
-
-按 CLAUDE.md 顺序:
-
+### 6. 验证命令
 ```bash
+# 1. 确认 reference-projects/space-war 是否有 Web export
+ls -lh /home/zhang/workspace/reference-projects/space-war/*.{html,wasm,pck} 2>/dev/null
+
+# 2. 启动本地开发服务器
+npm run dev  # 在后台运行，监听端口通常为 5173
+
+# 3. 使用 Playwright MCP 或系统 Chrome 截图 /games/space-war
+# (具体命令由 Builder 执行)
+
+# 4. 验证截图文件
+file public/images/projects/showcase/space-war-web-showcase.png
+identify public/images/projects/showcase/space-war-web-showcase.png  # 如果有 ImageMagick
+
+# 5. 运行 lint 和 build
 npm run lint
 npm run build
+
+# 6. 浏览器手动验证（如果修改了 App.tsx）
+# 打开 http://localhost:5173/games/space-war（桌面宽度）
+# 打开 http://localhost:5173/games/space-war（移动端宽度 393px）
 ```
 
-加上:
-- PNG 解码与尺寸核验(确认 1440x900 / 390x844,文件能 decode)。
-- 浏览器 QA:`/`、`/projects`、`/blogs` 在两档视口下加载,无 console error、无失败请求、无横向溢出(`.project-thumb-strip` 用了 `overflow-x: auto`,`src/App.css:124`,移动端要确认是预期内的内部滚动而非整页溢出)。
-- 改了 `docs/showcase-assets.md` 后,跑一次敏感/公开措辞扫描。
+---
 
-### 六、不要做的事
+## 关键决策点
 
-- 不重设计首页、项目页、案例页、博客页,不改页面文案。
-- 不动 `../reference-projects`。
-- 不引入真实用户数据、凭据、本地路径、cookie、token、部署密钥。
-- 不截管理后台或已登录的第三方页面。
-- 不顺手补其他项目的素材缺口(超出本切片范围)。
-- 文件名严格按 Allowed Paths,不自创命名或额外尺寸。
-- 在 `docs/showcase-assets.md` 里只把 blog-semi 那一行的「版本化截图」缺口标为已覆盖,并在「已上线文件」追加这 6 个路径,不改其他行。
+1. **是否有真实 Web export**：需先运行 `ls` 确认；如果不存在，本次只截站内展示页，不构建 Godot Web 包
+2. **截图内容**：`/games/space-war` 页面应展示游戏封面、玩法说明、系统介绍和"试玩入口"按钮（即使按钮暂时不可点击）
+3. **证据矩阵位置**：新截图应出现在 `docs/showcase-assets.md` 的 Space War 行和已上线文件清单中
 
-补充一点:`docs/showcase-assets.md:24` 当前 blog-semi 行缺口写的是「首页、项目页、博客页的版本化截图」,完成后应改为「无」,下一步列保留每次大改后的桌面/移动截图。
+---
 
-需要我继续进入实施(切换出只读模式)吗?
+**下一步**：由 Codex 审查此计划，确认是否需要调整，然后由 Builder 执行 `ls` 确认 Web export 状态。

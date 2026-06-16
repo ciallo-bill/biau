@@ -2,84 +2,51 @@
 
 Date: 2026-06-16
 Repo: /home/zhang/workspace/blog-semi
-Task: Add blog-semi site versioned screenshots
+Task: Add Space War showcase entry screenshot
 
 ## Diff Summary
 
-- Added six full-page public-safe screenshots for the current blog-semi site:
-  - `public/images/projects/showcase/blog-semi-home-desktop.png`
-  - `public/images/projects/showcase/blog-semi-home-mobile.png`
-  - `public/images/projects/showcase/blog-semi-projects-desktop.png`
-  - `public/images/projects/showcase/blog-semi-projects-mobile.png`
-  - `public/images/projects/showcase/blog-semi-blogs-desktop.png`
-  - `public/images/projects/showcase/blog-semi-blogs-mobile.png`
-- Updated `docs/showcase-assets.md` so the blog-semi versioned screenshot gap is covered.
-- Archived the previous xunqiu runtime evidence task.
-- Updated current workflow artifacts for the blog-semi screenshot slice.
+- Added one Space War site-level showcase/playtest entry screenshot:
+  - `public/images/projects/showcase/space-war-web-showcase.png`
+- Added the screenshot to the `godot-showcase` evidence matrix in `src/App.tsx`.
+- Updated `docs/showcase-assets.md` so the Space War screenshot gap is covered.
+- Archived the previous blog-semi versioned screenshots task.
+- Updated current workflow artifacts for the Space War screenshot slice.
+
+## Boundary Check
+
+- The reference `space-war` directory does not expose a stable Godot Web export package in the checked files.
+- This slice therefore does not claim to publish a playable Godot Web build.
+- The screenshot captures the public site-level `/games/space-war` showcase entry, which explains the gameplay, implementation focus, and Web playtest integration plan.
 
 ## Capture Evidence
 
-- Screenshots were captured from the local dev server with system Chrome.
-- The captured routes were `/`, `/projects`, and `/blogs`.
-- Desktop viewport was `1440x900`; mobile viewport was `390x844`.
-- Screenshots use full-page capture, so image heights match actual page height.
-- Only page content was captured; browser chrome, address bar, taskbar, devtools, cookies, and private browser state are not included.
-
-## Screenshot Files
-
-| File | Route | Viewport | PNG dimensions |
-| --- | --- | --- | --- |
-| `blog-semi-home-desktop.png` | `/` | 1440x900 | 1440x3253 |
-| `blog-semi-home-mobile.png` | `/` | 390x844 | 390x6331 |
-| `blog-semi-projects-desktop.png` | `/projects` | 1440x900 | 1440x2089 |
-| `blog-semi-projects-mobile.png` | `/projects` | 390x844 | 390x3699 |
-| `blog-semi-blogs-desktop.png` | `/blogs` | 1440x900 | 1440x1697 |
-| `blog-semi-blogs-mobile.png` | `/blogs` | 390x844 | 390x3170 |
-
-## Route Confirmation
-
-- `/` loads h1 `真实项目展示系统`.
-- `/projects` loads h1 `项目系统`.
-- `/blogs` loads h1 `博客系统`.
+- Screenshot was captured from the local dev server with system Chrome.
+- Captured route: `/games/space-war`.
+- Viewport: `1440x900`.
+- Full-page screenshot dimensions: `1440x2216`.
+- Capture QA found h1 `复古横版射击｜space-war`, sections `玩法体验`, `实现重点`, and `试玩接入计划`.
+- Capture QA found no console errors, no failed requests, no horizontal overflow, and no sensitive wording hits.
 
 ## Commands Run
 
 | Command | Result | Notes |
 | --- | --- | --- |
-| `cc-provider use a` | pass | Switched Claude Code provider to `a`. |
-| `cc -p '请只回复 OK-A...'` | pass | Provider `a` smoke test returned `OK-A`. |
-| `cc -p <read-only plan prompt>` | completed with caveat | Shell timeout elapsed, but `.agent-work/cc-plan.md` was fully written. Future provider `a` calls should use longer timeouts because it is configured with `effort=max`. |
-| Chrome screenshot capture | pass | Captured all six screenshots from local dev server. |
-| `file public/images/projects/showcase/blog-semi-*.png` | pass | All six files decode as PNG. |
-| Browser capture QA | pass | Routes loaded with no console errors, no failed requests, no horizontal overflow, and no sensitive wording hits during capture. |
+| `cc-provider use a` then `cc -p <plan>` | blocked | Provider `a` produced no output after 10 minutes; stuck process was stopped. |
+| `cc-provider use d` then `cc -p <plan>` | pass | Provider `d` produced the read-only plan. Future CC attempts should try `a -> b -> c -> d`. |
+| `find reference-projects/space-war ... '*.html' '*.wasm' '*.pck'` | reviewed | No Web export package was found in the WSL reference project. |
+| Chrome screenshot capture | pass | Captured `/games/space-war` to `space-war-web-showcase.png`. |
+| `file public/images/projects/showcase/space-war-web-showcase.png` | pass | PNG image data, 1440 x 2216, RGB. |
+| sensitive/public wording scan | reviewed | Hits were limited to workflow guardrail text about paths and prohibited secrets; public docs/source do not expose private build artifacts. |
 | `npm run lint` | pass | ESLint completed without errors in WSL. |
 | `npm run build` | pass | TypeScript and Vite build completed. Existing lottie-web direct eval warning remains from dependency code. |
-| Final browser QA | pass | `/`, `/projects`, and `/blogs` passed at 1440x900 and 390x844 with expected h1 text, no console errors, no failed requests, no horizontal overflow, and no sensitive wording hits. |
+| Browser QA | pass | `/games/space-war` and `/cases/godot-showcase` checked at 1440x900 and 390x844. New PNG decodes at 1440x2216 on the case page, with no console errors, failed requests, horizontal overflow, or sensitive wording hits. |
 
 ## Public-Safety Review
 
-- Screenshots are from public site routes and include only page content.
-- Screenshots do not show local address bars, browser UI, operating-system UI, devtools, cookies, tokens, credentials, or private browser state.
-- Sensitive scan during capture found no `keyPassword`, `storePassword`, `sdk.dir`, `测试账号`, API base, server IP, keystore, token, or secret wording in page text.
+- The screenshot is from a public site route and includes only page content.
+- It does not include browser chrome, address bar, taskbar, devtools, cookies, credentials, local build paths, release package paths, or private validation paths.
 
 ## Remaining Steps
 
-## Ship Decision
-
-Committed and pushed: 3f49227 Add blog semi versioned screenshots.
-
-## Deployment QA
-
-- Direct asset checks:
-  - All six `blog-semi-*.png` assets return 200 from `https://biau.playlab.eu.cc/images/projects/showcase/`.
-  - Content lengths match the generated files:
-    - `blog-semi-home-desktop.png`: 997069
-    - `blog-semi-home-mobile.png`: 649877
-    - `blog-semi-projects-desktop.png`: 622178
-    - `blog-semi-projects-mobile.png`: 372594
-    - `blog-semi-blogs-desktop.png`: 443493
-    - `blog-semi-blogs-mobile.png`: 314543
-- Production route QA at `https://biau.playlab.eu.cc`:
-  - Desktop checks for `/`, `/projects`, and `/blogs` render the expected h1 content with no console errors, no failed requests, and no horizontal overflow.
-  - Mobile checks for `/`, `/projects`, and `/blogs` render the expected h1 content with no console errors, no failed requests, no horizontal overflow, and no sensitive wording hits.
-  - One mobile `/projects` run read before JS finished and returned empty body; retry with explicit body-text wait passed.
+- Commit and push after verification passes.
