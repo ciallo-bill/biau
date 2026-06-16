@@ -1,35 +1,65 @@
-# Builder Plan: Next Spacewar Result Screenshot
+# Builder Plan: InteSpace Result/Summary Screenshot
 
 Date: 2026-06-16
-Task: Add Next Spacewar result-page screenshot to the Godot showcase.
+Task: Add InteSpace result/summary screenshot to the Godot showcase.
+Builder: Claude Code via `cc`
 
 ## Builder Status
 
-Claude Code was attempted in non-interactive planning mode, but the local WSL CLI returned `Not logged in · Please run /login`. This slice is therefore continuing as Codex fallback while preserving the same builder/controller artifact structure.
+Claude Code was invoked through the configured `cc` entrypoint and current `d` provider in read-only planning mode.
+
+Claude Code could inspect the blog-semi task context, but reported that it could not directly enumerate `/mnt/d/workspace4Codex/intespace` from its current tool view. Codex must therefore confirm the InteSpace scene/script structure before implementation.
 
 ## Builder Findings
 
-- `game-next-spacewar` already has real menu and gameplay HUD screenshots.
-- The remaining Next Spacewar evidence gap is the result-page layer: proof that the menu, combat loop, pause/help flow and run summary are connected into a full showcase route.
-- The result page is driven by `RunResultState.store_result(...)`, so a public-safe result state can be seeded in a temporary capture copy without modifying the source project or publishing raw gameplay logs.
-- Relevant source files:
-  - `/mnt/d/workspace4Codex/game-next-spacewar/scenes/run_result.tscn`
-  - `/mnt/d/workspace4Codex/game-next-spacewar/scripts/run_result.gd`
-  - `/mnt/d/workspace4Codex/game-next-spacewar/scripts/run_result_state.gd`
-  - `/mnt/d/workspace4Codex/game-next-spacewar/scripts/main.gd`
+- blog-semi already has:
+  - `public/images/projects/showcase/intespace-player-hub.png`
+  - `public/images/projects/showcase/intespace-gameplay-hud.png`
+  - `public/images/projects/showcase/godot-intespace-loop.svg`
+- The remaining gap is an InteSpace result/summary screenshot.
+- Before capture, confirm whether InteSpace has an independent result, summary, game-over, settlement, upgrade result, or run-complete UI scene.
+- If no direct result scene exists, use the closest actual in-game summary UI and describe the remaining limitation honestly.
 
 ## Proposed Scope
 
-1. Use the existing temporary copy at `D:/workspace4Codex/.tmp-godot-capture/game-next-spacewar`.
-2. Add a temporary result capture runner in that copy only.
-3. Seed a public-safe run-complete state and capture the actual `run_result.tscn` UI as `next-spacewar-result-summary.png`.
-4. Add the selected screenshot to `/cases/godot-showcase`.
-5. Update `docs/showcase-assets.md`, `.agent-work/current-task.md`, and `.agent-work/verification.md`.
+1. Confirm InteSpace result/summary UI structure from the source project.
+2. Use a temporary copy only; never modify `/mnt/d/workspace4Codex/intespace`.
+3. Seed a public-safe state only if needed to reach the actual result/summary UI.
+4. Capture a PNG and publish only the selected reviewed image:
+   - `public/images/projects/showcase/intespace-result-summary.png`
+5. Update the Godot case evidence matrix and showcase asset tracking document.
 
-## Verification
+## Public Safety Notes
+
+- Do not publish local paths, raw logs, `.import` metadata, release packages, package hashes, accounts, IPs, tokens, session IDs, device IDs, or real telemetry.
+- If seeded state is used, describe it as a public-safe state UI capture.
+- Do not frame seeded values as real player telemetry.
+
+## Blog-Semi Update Targets
+
+- `src/App.tsx`
+  - Add an `InteSpace 结果总结` evidence card to `caseImagesById['godot-showcase']`.
+- `docs/showcase-assets.md`
+  - Add the new screenshot to the file list.
+  - Mark the InteSpace result-page gap as covered, or record the residual gap if the project only exposes a different summary UI.
+- `.agent-work/current-task.md`
+- `.agent-work/verification.md`
+
+## Verification Plan
 
 - Confirm PNG dimensions and file size.
 - Run `npm run lint`.
 - Run `npm run build`.
-- Run the public-safety wording scan.
-- Browser-check `/cases/godot-showcase` at desktop and mobile widths.
+- Run sensitive/public wording scan.
+- Browser-check `/cases/godot-showcase` at desktop and mobile widths:
+  - image loads and decodes
+  - no console errors
+  - no failed requests
+  - no horizontal overflow
+  - no non-product positioning wording
+
+## Risks
+
+- InteSpace may not have a dedicated result page.
+- Result UI may require gameplay state or save-state setup.
+- Temporary capture scripts may be needed in the temporary copy to reach the UI safely.

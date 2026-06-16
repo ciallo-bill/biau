@@ -1704,6 +1704,7 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
       { title: 'Next Spacewar 展示路径', image: '/images/projects/showcase/godot-next-spacewar-showcase.svg', detail: '展示主菜单、帮助、战斗、暂停、结果页和 session summary 串成的试玩路径。' },
       { title: 'InteSpace 玩家中枢', image: '/images/projects/showcase/intespace-player-hub.png', detail: '由 Godot 4.6.1 Windows 运行时在临时副本中生成，展示竖屏玩家首页、出击入口、成长中心和当前试玩准备状态。' },
       { title: 'InteSpace 战斗 HUD', image: '/images/projects/showcase/intespace-gameplay-hud.png', detail: '展示竖屏自动射击战场、HUD、路线进度、玩家与敌方目标，证明核心战斗循环已经可运行。' },
+      { title: 'InteSpace 结果总结', image: '/images/projects/showcase/intespace-result-summary.png', detail: '由临时副本构造公开安全的单局完成状态后截取真实结果 overlay UI，展示作战完成、战斗总结、对局日志、成长动作和返回主界面的局后闭环。' },
       { title: 'InteSpace 系统闭环', image: '/images/projects/showcase/godot-intespace-loop.svg', detail: '展示武器树、自动射击、Boss 试炼、结算和局外成长组成的 Roguelite 闭环。' },
       { title: 'Raiden 主菜单', image: '/images/projects/showcase/raiden-main-menu.png', detail: '由 Godot 4.6.1 Windows 运行时在临时副本中生成，展示公开 Demo 准备版入口、双关章节路线和首次试玩提示。' },
       { title: 'Raiden Stage 01 战斗', image: '/images/projects/showcase/raiden-stage-01-gameplay.png', detail: '展示开场关卡的敌群编排、持续射击、火力成长 HUD 和炸弹资源，证明基础射击循环已经可运行。' },

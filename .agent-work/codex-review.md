@@ -1,31 +1,36 @@
 # Codex Controller Review
 
 Date: 2026-06-16
-Task: Next Spacewar result-page screenshot
+Task: InteSpace result/summary screenshot
 
 ## Decision
 
-Approved as a narrow closed-loop evidence slice.
+Approved as a narrow Godot evidence slice.
 
-The screenshot should be presented as a real UI capture from a temporary copy with a seeded public-safe run-complete state. It must not be framed as raw player telemetry, production data, or a real uploaded validation log.
+Claude Code produced the read-only plan through `cc`. Codex then confirmed the InteSpace source structure: there is no independent result scene, but `scripts/game/game_root.gd` builds an actual end-of-run overlay through `_build_end_overlay()` and shows it from `_finish_run(victory)`. That overlay is the correct capture target.
 
 ## Required Scope
 
-1. Generate the screenshot from the actual Next Spacewar Godot result UI through a temporary copy.
-2. Publish only the selected, reviewed PNG under `public/images/projects/showcase/next-spacewar-result-summary.png`.
-3. Add result-page evidence to `caseImagesById['godot-showcase']` in `src/App.tsx`.
+1. Use the existing temporary capture copy only:
+   - `D:/workspace4Codex/.tmp-godot-capture/intespace-20260616`
+2. Publish only the selected reviewed PNG:
+   - `public/images/projects/showcase/intespace-result-summary.png`
+3. Add one InteSpace evidence card to `caseImagesById['godot-showcase']` in `src/App.tsx`.
 4. Update `docs/showcase-assets.md`, `.agent-work/current-task.md`, and `.agent-work/verification.md`.
 
-## Screenshot Target
+## Capture Evidence
 
-- `next-spacewar-result-summary.png`: result screen with run-complete title, outcome, destroyed target count, summary text, showcase status, replay/menu controls, and build label.
+- Capture target: actual `game_root.gd` end overlay.
+- Trigger: temporary runner calls the real `_finish_run(true)` in the capture copy.
+- State: public-safe seeded runtime values for time, score, level, kills, damage, healing, revives, experience, upgrades, and meta/protocol progress.
+- Temporary compatibility: the capture copy includes a minimal `get_mode_protocol_post_run_text()` compatibility method so the existing result overlay can render route text without aborting. This is not copied to the source project or public site.
 
 ## Non-goals
 
-- Do not modify `/mnt/d/workspace4Codex/game-next-spacewar`.
+- Do not modify `/mnt/d/workspace4Codex/intespace`.
 - Do not modify `~/workspace/reference-projects`.
 - Do not publish raw logs, temp script output, export packages, `.import` metadata, release package names, hashes, accounts, IPs, tokens, or local validation paths.
-- Do not claim InteSpace result screenshots are covered by this slice.
+- Do not claim the screenshot is raw player telemetry or a production run.
 
 ## Verification Requirements
 
