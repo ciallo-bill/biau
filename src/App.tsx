@@ -820,11 +820,11 @@ function CasesView({ onOpenCase, onOpenProjectDetail }: { onOpenCase: (caseStudy
         <div className="case-route-strip">
           <div>
             <strong>01</strong>
-            <span>补运行截图和核心流程</span>
+            <span>运行截图与核心流程</span>
           </div>
           <div>
             <strong>02</strong>
-            <span>补架构图、技术栈和数据流</span>
+            <span>架构图、技术栈与数据流</span>
           </div>
           <div>
             <strong>03</strong>
@@ -1258,7 +1258,7 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         '使用结构化数据描述任务状态、审核结果和前端展示字段，避免页面与模型输出强耦合。',
         '后续可替换真实模型、增加队列持久化、补充权限和审计能力。',
       ],
-      nextSteps: ['补充真实运行截图', '整理任务状态流转图', '接入真实模型或服务端队列', '沉淀一篇 AI 工程化复盘'],
+      nextSteps: ['补充运行过程截图', '整理任务状态流转图', '接入真实模型或服务端队列', '沉淀一篇 AI 工程化复盘'],
     }
   }
 
@@ -1332,7 +1332,7 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
       '项目详情页负责讲工程实现，案例页负责讲业务场景和对外表达。',
       '后续根据项目成熟度继续补充真实数据、异常处理和测试说明。',
     ],
-    nextSteps: ['补充真实运行截图', '整理架构图和数据流', '补充部署说明', '沉淀项目复盘文章'],
+    nextSteps: ['补充运行过程截图', '整理架构图和数据流', '补充部署说明', '沉淀项目复盘文章'],
   }
 }
 
@@ -1881,10 +1881,10 @@ function BlogView({ onOpenPost, theme }: { onOpenPost: (post: BlogPost) => void;
 
         <article className="blog-featured-layout">
           <div className="blog-featured-main">
-            <Text type="tertiary">示例博客 / 2026-06-11</Text>
+            <Text type="tertiary">项目复盘 / 2026-06-11</Text>
             <Title heading={2}>从项目目录到博客系统：一次展示层重构记录</Title>
             <Paragraph>这次重构的核心不是把页面做得更满，而是把真实项目按照访问者能理解的方式重新组织。首页负责建立第一印象，项目页负责说明能力边界，案例页沉淀展示材料，博客页则记录持续学习和项目复盘。</Paragraph>
-            <Button theme="solid" type="primary" onClick={() => onOpenPost(featuredPost)}>阅读示例文章</Button>
+            <Button theme="solid" type="primary" onClick={() => onOpenPost(featuredPost)}>阅读全文</Button>
           </div>
           <aside className="blog-featured-aside">
             <Text type="tertiary">文章目录</Text>

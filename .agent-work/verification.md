@@ -1,31 +1,36 @@
 # Verification
 
 Date: 2026-06-16
-Task: Public wording and status consistency cleanup
+Task: Public copy production polish
 
 ## Provider / Workflow
 
-- Provider order was followed for CC planning.
-- `a` was attempted first but returned a generic clarification instead of a usable plan.
-- `b` produced a valid read-only plan and was used as builder input.
-- Codex narrowed the plan before implementation in `.agent-work/codex-review.md`.
+- Previous task artifacts were archived.
+- Provider `a` was attempted first for the read-only plan and timed out after 7 minutes with no output.
+- Provider `b` produced the accepted read-only plan.
+- Codex narrowed the plan in `.agent-work/codex-review.md`.
+- Workflow improvement recorded: future CC calls should first run a short `OK` smoke test per provider and only run long prompts on providers that respond quickly.
 
 ## Code Review Summary
 
-- Updated stale case statuses from `补充中` to `整理中` after evidence/screenshots were added.
-- Removed stale public next-step wording such as “补充脱敏后台截图” and “补充脱敏移动端截图”.
-- Rephrased Space War public copy so it says the site-level showcase route exists while the real Godot Web package remains a future integration.
-- Avoided layout, route, project list, and reference-project changes.
+- Blog featured copy changed from `示例博客 / 阅读示例文章` to `项目复盘 / 阅读全文`.
+- Case discovery strip changed from internal backlog wording (`补运行截图`, `补架构图`) to public presentation wording.
+- Generic fallback roadmap wording changed from `补充真实运行截图` to `补充运行过程截图`.
+- Layout, routes, screenshots, project data, and reference project directories were not changed.
 
 ## Scans
 
-- Stale public wording scan over `src/App.tsx`, `src/data/portfolio.ts`, and `docs/showcase-assets.md` returned no public-file matches for:
-  - `补充中`
-  - `补充截图`
-  - `补充脱敏`
-  - `接入 Web 试玩入口`
-  - `后续补充`
+- Targeted scan returned no matches in public `src/App.tsx` / `src/data/portfolio.ts` for:
+  - `示例博客`
+  - `阅读示例文章`
+  - `补运行截图`
+  - `补架构图`
+  - `补充真实运行截图`
   - `面试`
+  - `作品集`
+  - `placeholder`
+  - `占位`
+- Remaining `待补图` / `待整理` matches are in unused `articles` data and `pending` status label inside `src/data/portfolio.ts`; they are not rendered by the current app and were intentionally left for a separate cleanup task.
 - Sensitive/private scan returned only false positives for normal TypeScript identifiers containing `id`; no private paths, local service addresses, credentials, secrets, or tokens were found in changed public files.
 
 ## Commands
@@ -37,34 +42,17 @@ Task: Public wording and status consistency cleanup
 
 ## Local Browser QA
 
-System Chrome was used through Playwright because the bundled Playwright Chromium cache was not installed.
+System Chrome was used through Playwright.
 
 | Route | Viewport | Result |
 | --- | --- | --- |
-| `/projects` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/cases` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/cases/godot-showcase` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/games/space-war` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/projects` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/cases` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/cases/godot-showcase` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/games/space-war` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no bad visible wording or private path hits. |
+| `/cases` | 1440x900 | pass: 200, new case strip copy present, no console errors, no failed requests, no horizontal overflow, no bad visible wording or private path hits. |
+| `/blogs` | 1440x900 | pass: 200, new blog featured copy present, no console errors, no failed requests, no horizontal overflow, no bad visible wording or private path hits. |
+| `/` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no bad visible wording or private path hits. |
+| `/cases` | 390x844 | pass: 200, new case strip copy present, no console errors, no failed requests, no horizontal overflow, no bad visible wording or private path hits. |
+| `/blogs` | 390x844 | pass: 200, new blog featured copy present, no console errors, no failed requests, no horizontal overflow, no bad visible wording or private path hits. |
 
 ## Deployment QA
 
-Source commit:
-
-- `e9fdedd Clean up public showcase wording`
-
-Cloudflare deployment was confirmed by rendering `https://biau.playlab.eu.cc/games/space-war` and checking that the new Space War phrase `真实 Godot Web 包后续单独接入` was present while the old phrase `后续重点是把 Web 试玩入口接入本站` was absent.
-
-| Route | Viewport | Result |
-| --- | --- | --- |
-| `/projects` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/cases` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/cases/godot-showcase` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/games/space-war` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, new Space War wording present. |
-| `/projects` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/cases` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/cases/godot-showcase` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
-| `/games/space-war` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, new Space War wording present. |
+Pending commit, push, and Cloudflare deployment.
