@@ -8,27 +8,26 @@ Builder: Claude Code via `cc`
 
 ## Goal
 
-Polish remaining public-facing copy that still reads like a draft, example page, or internal backlog item, especially on the blog and case discovery surfaces.
+Remove unused draft article data and unused `pending` project status so future public-copy scans do not keep reporting non-rendered backlog wording.
 
 ## Scope
 
-- Review public copy in `src/App.tsx` and `src/data/portfolio.ts`.
-- Replace visible “示例”, “待补图”, “待整理”, and “补...” wording where it weakens the production-style site presentation.
-- Keep legitimate roadmap language when it describes real future engineering work.
-- Keep all content in Simplified Chinese.
+- Confirm `articles` is not imported or rendered.
+- Remove the unused `articles` export from `src/data/portfolio.ts`.
+- Remove unused `pending` from `ProjectStatus` and `statusLabels` if no project uses it.
+- Remove UI color branches that only exist for the removed `pending` status.
 
 ## Non-goals
 
-- Do not redesign layout or component structure.
-- Do not add new projects, cases, posts, or screenshots.
+- Do not change visible project content, layout, routing, screenshots, or styles.
+- Do not add or remove real blog posts.
 - Do not edit reference project directories.
-- Do not remove accurate roadmap items such as real Godot Web package integration.
-- Do not publish private paths, accounts, service addresses, release package paths, or sensitive operational data.
+- Do not change active project statuses.
 
 ## Allowed Paths
 
-- src/App.tsx
 - src/data/portfolio.ts
+- src/App.tsx
 - .agent-work/current-task.md
 - .agent-work/cc-plan.md
 - .agent-work/codex-review.md
@@ -37,22 +36,22 @@ Polish remaining public-facing copy that still reads like a draft, example page,
 ## Acceptance Criteria
 
 - [x] Previous task artifacts are archived.
-- [x] `cc` is asked for a read-only plan using provider order `a -> b -> c -> d`.
+- [x] CC provider selection uses short `OK` smoke tests before long prompts.
+- [x] `cc` produces a read-only plan before implementation.
 - [x] Codex records a narrowed review before implementation.
-- [x] Public blog and discovery surfaces no longer present the main content as “示例”.
-- [x] Public cards/lists avoid internal backlog labels such as “待补图” and “待整理”.
-- [x] Existing real roadmap items remain accurate.
-- [x] Sensitive/public wording scan is reviewed.
+- [x] `articles` export is removed only if it is unused.
+- [x] `pending` project status is removed only if no project uses it.
+- [x] Public-copy scan no longer reports `待补图` / `待整理` from live source files.
 - [x] `npm run lint` passes.
 - [x] `npm run build` passes.
-- [x] Browser QA checks affected routes at desktop and mobile widths.
-- [x] Changes are committed, pushed, and production QA is recorded.
+- [x] Browser QA confirms project cards still render.
+- [ ] Changes are committed, pushed, and production QA is recorded.
 
 ## Verification Plan
 
-- Run targeted `rg` scans for draft/example/internal-backlog wording.
-- Run sensitive/private wording scan over changed public files.
+- Run `rg` to prove `articles` and `pending` are unused before editing.
+- Run targeted scans for `待补图` and `待整理`.
 - Run `npm run lint`.
 - Run `npm run build`.
-- Browser-check `/`, `/cases`, and `/blogs` locally at desktop and mobile widths.
+- Browser-check `/projects` and `/` locally at desktop/mobile widths.
 - After push and Cloudflare deployment, verify production routes and record the result.

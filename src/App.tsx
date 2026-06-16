@@ -673,7 +673,7 @@ function ProjectsView({ onOpenCase, onOpenGameDetail, onOpenProjectDetail, onSel
                   <Text type="tertiary">当前选择</Text>
                   <strong>{detailProject.title}</strong>
                 </div>
-                <Tag color={detailProject.status === 'main' ? 'red' : detailProject.status === 'live' ? 'green' : detailProject.status === 'pending' ? 'grey' : 'orange'}>{statusLabels[detailProject.status]}</Tag>
+                <Tag color={detailProject.status === 'main' ? 'red' : detailProject.status === 'live' ? 'green' : 'orange'}>{statusLabels[detailProject.status]}</Tag>
               </div>
             </div>
           </div>
@@ -1982,7 +1982,7 @@ function ProjectDetail({ onOpenCase, onOpenGameDetail, onOpenProjectDetail, proj
     <aside className="project-stage-detail">
       <Space wrap>
         <Tag color="blue">{categoryLabels[project.category]}</Tag>
-        <Tag color={project.status === 'main' ? 'red' : project.status === 'live' ? 'green' : project.status === 'pending' ? 'grey' : 'orange'}>{statusLabels[project.status]}</Tag>
+        <Tag color={project.status === 'main' ? 'red' : project.status === 'live' ? 'green' : 'orange'}>{statusLabels[project.status]}</Tag>
       </Space>
       <Title heading={2}>{project.title}</Title>
       <Paragraph>{project.summary}</Paragraph>

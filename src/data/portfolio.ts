@@ -1,5 +1,5 @@
 ﻿export type ProjectCategory = 'ai' | 'business' | 'interactive' | 'mobile' | 'platform'
-export type ProjectStatus = 'main' | 'live' | 'mvp' | 'ongoing' | 'pending'
+export type ProjectStatus = 'main' | 'live' | 'mvp' | 'ongoing'
 
 export interface Project {
   id: string
@@ -31,7 +31,6 @@ export const statusLabels: Record<ProjectStatus, string> = {
   live: '已有页面',
   mvp: 'MVP',
   ongoing: '建设中',
-  pending: '待整理',
 }
 
 export const projects: Project[] = [
@@ -178,11 +177,4 @@ export const capabilityTracks = [
   { title: '业务系统', detail: '后台、API、数据库、队列、审计日志', value: 'Ozon 电商 ERP' },
   { title: '互动体验', detail: 'Godot 展示入口、试玩计划、游戏展示页', value: '5 个游戏项目' },
   { title: '博客系统', detail: 'React + Semi、Astro、内容审计、部署准备', value: 'Biau Blog / Playlab' },
-]
-
-export const articles = [
-  { title: 'Legal RAG 项目说明', tag: 'AI 应用', status: '可整理' },
-  { title: 'Ozon 电商 ERP 交付说明', tag: '业务系统', status: '可整理' },
-  { title: 'Pet Workspace 架构边界', tag: 'AI 应用', status: '待补图' },
-  { title: 'Godot Web 游戏展示规范', tag: '互动体验', status: '待整理' },
 ]

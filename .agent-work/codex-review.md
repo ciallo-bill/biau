@@ -1,23 +1,26 @@
 # Codex Review
 
-Provider order was followed for planning.
+Provider selection followed the short smoke-test rule:
 
-- `a` was attempted first and timed out after 7 minutes with no output.
-- `b` produced a valid read-only plan and is accepted as builder input.
-
-## Workflow Adjustment
-
-For future CC calls, do a short `OK` smoke test for each provider before running a long planning prompt. If the smoke test is slow, times out, or returns invalid output, immediately try the next provider in the `a -> b -> c -> d` order. This avoids waiting several minutes on a provider that is already unhealthy.
+- `a`: timed out after 20s with no output.
+- `b`: returned in 14s but ignored the strict `OK` instruction and later produced a generic greeting for the long plan.
+- `c`: timed out after 20s with no output.
+- `d`: returned in 10s with verbose but usable output, then produced the accepted read-only plan.
 
 ## Accepted
 
-- Update the blog featured area so it no longer labels the main article as an example.
-- Update the case discovery strip so it reads like a public presentation path instead of internal backlog tasks.
-- Lightly soften generic “补充真实运行截图” wording where it could imply current assets are not real.
+- Remove the unused `articles` export from `src/data/portfolio.ts`.
+- Remove the unused `pending` value from `ProjectStatus` and `statusLabels`.
+- Remove the two UI color branches that only existed for `pending`.
 
 ## Narrowing
 
-- Do not touch layout, routes, visual structure, or screenshots.
-- Do not edit unused `articles` data in `src/data/portfolio.ts`; it is not rendered and can be cleaned separately if needed.
-- Keep legitimate roadmap language such as real model integration, queues, Godot Web package integration, deployment notes, and future postmortems.
-- Browser QA should use the actual route `/blogs`, not `/blog`.
+- Do not modify visible project content, route structure, styles, screenshots, or active project statuses.
+- Do not change `main`, `live`, `mvp`, or `ongoing` status semantics.
+- Do not remove any real blog posts from `blogPosts`; the unused `articles` export is a separate dead data block.
+
+## Pre-Implementation Facts
+
+- `articles` is exported but not imported or rendered by the current app.
+- No project in `projects` uses `status: 'pending'`.
+- `pending` appears only in the type/label definition and two render-time color branches.
