@@ -1700,6 +1700,7 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
       { title: 'Tetris 结构图', image: '/images/projects/showcase/godot-tetris-structure.svg', detail: '展示经典规则、Rogue 原型、触屏桥接和多尺寸回归组成的公开安全项目结构。' },
       { title: 'Next Spacewar 主菜单', image: '/images/projects/showcase/next-spacewar-menu.png', detail: '由 Godot 4.6.1 Windows 运行时在临时副本中生成，展示中文主菜单、操作入口和 showcase build 标记。' },
       { title: 'Next Spacewar 战斗 HUD', image: '/images/projects/showcase/next-spacewar-gameplay.png', detail: '展示飞船、陨石、HUD 与引导面板，证明战斗循环和信息层已经进入可演示状态。' },
+      { title: 'Next Spacewar 结果复盘', image: '/images/projects/showcase/next-spacewar-result-summary.png', detail: '由临时副本构造公开安全的单局完成状态后截取真实结果页 UI，展示击毁目标、试玩总结、重玩入口和返回菜单闭环。' },
       { title: 'Next Spacewar 展示路径', image: '/images/projects/showcase/godot-next-spacewar-showcase.svg', detail: '展示主菜单、帮助、战斗、暂停、结果页和 session summary 串成的试玩路径。' },
       { title: 'InteSpace 玩家中枢', image: '/images/projects/showcase/intespace-player-hub.png', detail: '由 Godot 4.6.1 Windows 运行时在临时副本中生成，展示竖屏玩家首页、出击入口、成长中心和当前试玩准备状态。' },
       { title: 'InteSpace 战斗 HUD', image: '/images/projects/showcase/intespace-gameplay-hud.png', detail: '展示竖屏自动射击战场、HUD、路线进度、玩家与敌方目标，证明核心战斗循环已经可运行。' },

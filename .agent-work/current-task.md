@@ -8,26 +8,25 @@ Builder: Codex fallback
 
 ## Goal
 
-Add Raiden Prototype result and chapter-summary screenshots to strengthen the Godot showcase closed-loop evidence.
+Add a Next Spacewar result-page screenshot to strengthen the Godot showcase closed-loop evidence.
 
 ## Scope
 
-- Use the Raiden temporary capture copy only.
-- Construct a public-safe chapter-complete state in the temporary copy, then capture real UI screenshots for the result screen and chapter outro.
-- Add those screenshots to /cases/godot-showcase.
+- Use a temporary capture copy of game-next-spacewar only.
+- Seed a public-safe result-page state in the temporary copy, then capture the actual Godot RunResult UI.
+- Add the selected screenshot to /cases/godot-showcase.
 - Update docs/showcase-assets.md and verification notes.
 
 ## Non-goals
 
 - Do not modify ~/workspace/reference-projects.
-- Do not modify D:/workspace4Codex/raiden-prototype.
-- Do not publish raw logs, .import metadata, local paths, build artifacts, package hashes, accounts, IPs, tokens, or release package details.
-- Do not claim the result screenshots are real player telemetry; describe them as public-safe state UI captures.
+- Do not modify D:/workspace4Codex/game-next-spacewar.
+- Do not publish raw logs, .import metadata, local paths, build artifacts, package hashes, accounts, IPs, tokens, release package details, or private configs.
+- Do not claim the result screenshot is real player telemetry; describe it as a public-safe state UI capture.
 
 ## Allowed Paths
 
-- public/images/projects/showcase/raiden-results-summary.png
-- public/images/projects/showcase/raiden-chapter-outro.png
+- public/images/projects/showcase/next-spacewar-result-summary.png
 - src/App.tsx
 - docs/showcase-assets.md
 - .agent-work/current-task.md
@@ -37,17 +36,17 @@ Add Raiden Prototype result and chapter-summary screenshots to strengthen the Go
 
 ## Acceptance Criteria
 
-- [x] Result/summary screenshots are generated from the actual Godot UI in a temporary copy.
-- [x] Selected screenshots are public-safe and added to public/images/projects/showcase.
-- [x] /cases/godot-showcase includes Raiden result and chapter-summary evidence alongside existing runtime screenshots.
-- [x] docs/showcase-assets.md distinguishes covered and remaining Godot screenshot gaps.
+- [x] Result screenshot is generated from the actual Godot UI in a temporary copy.
+- [x] Selected screenshot is public-safe and added to public/images/projects/showcase.
+- [x] /cases/godot-showcase includes Next Spacewar result-page evidence alongside menu and gameplay screenshots.
+- [x] docs/showcase-assets.md marks Next Spacewar result-page coverage and leaves InteSpace result-page as a later gap.
 - [x] npm run lint and npm run build pass in WSL.
 - [x] Sensitive/public wording scan is reviewed.
-- [x] Browser QA confirms local /cases/godot-showcase loads the new images without console errors or horizontal overflow.
+- [x] Browser QA confirms local /cases/godot-showcase loads the new image without console errors or horizontal overflow.
 
 ## Verification Plan
 
-- Confirm copied PNG dimensions and file sizes.
+- Confirm copied PNG dimensions and file size.
 - Run npm run lint.
 - Run npm run build.
 - Run sensitive/public wording scan.

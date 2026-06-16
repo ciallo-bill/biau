@@ -1,36 +1,35 @@
 # Codex Controller Review
 
 Date: 2026-06-16
-Task: Raiden result and chapter-summary screenshots
+Task: Next Spacewar result-page screenshot
 
 ## Decision
 
 Approved as a narrow closed-loop evidence slice.
 
-The screenshots should be presented as real UI captures from a temporary copy with a seeded public-safe chapter-complete state. They must not be framed as raw player telemetry or a real uploaded validation log.
+The screenshot should be presented as a real UI capture from a temporary copy with a seeded public-safe run-complete state. It must not be framed as raw player telemetry, production data, or a real uploaded validation log.
 
 ## Required Scope
 
-1. Generate screenshots from the actual Raiden Godot UI through a temporary copy.
-2. Publish only selected, reviewed PNGs under `public/images/projects/showcase/raiden-*.png`.
-3. Add result and chapter-summary evidence to `caseImagesById['godot-showcase']` in `src/App.tsx`.
+1. Generate the screenshot from the actual Next Spacewar Godot result UI through a temporary copy.
+2. Publish only the selected, reviewed PNG under `public/images/projects/showcase/next-spacewar-result-summary.png`.
+3. Add result-page evidence to `caseImagesById['godot-showcase']` in `src/App.tsx`.
 4. Update `docs/showcase-assets.md`, `.agent-work/current-task.md`, and `.agent-work/verification.md`.
 
-## Screenshot Targets
+## Screenshot Target
 
-- `raiden-results-summary.png`: result screen with grade, stage breakdown, chapter summary, and action buttons.
-- `raiden-chapter-outro.png`: chapter summary screen with route completion, score, kill rate, and next-step framing.
+- `next-spacewar-result-summary.png`: result screen with run-complete title, outcome, destroyed target count, summary text, showcase status, replay/menu controls, and build label.
 
 ## Non-goals
 
-- Do not modify `/mnt/d/workspace4Codex/raiden-prototype`.
+- Do not modify `/mnt/d/workspace4Codex/game-next-spacewar`.
 - Do not modify `~/workspace/reference-projects`.
 - Do not publish raw logs, temp script output, export packages, `.import` metadata, release package names, hashes, accounts, IPs, tokens, or local validation paths.
-- Do not claim Next Spacewar or InteSpace result screenshots are covered by this slice.
+- Do not claim InteSpace result screenshots are covered by this slice.
 
 ## Verification Requirements
 
-- Confirm PNG dimensions and file sizes.
+- Confirm PNG dimensions and file size.
 - Run `npm run lint`.
 - Run `npm run build`.
 - Run sensitive/public wording scan.
