@@ -54,6 +54,19 @@ Base URL: http://127.0.0.1:5175
 | /cases/legal-rag | 1440x900 | pass | Page h1 is Legal RAG case detail. The boundary card title is present, legal-rag-report-boundary.svg decodes, no console errors, no failed requests, no horizontal overflow, and no 面试/作品集 wording. |
 | /cases/legal-rag | 390x844 | pass | The same boundary card and SVG load on mobile with no console errors, failed requests, or horizontal overflow. |
 
+## Ship Decision
+
+Committed and pushed: 1aca24c Add Legal RAG boundary diagram.
+
+## Deployment QA
+
+- Direct asset check:
+  - /images/projects/showcase/legal-rag-report-boundary.svg returns 200 with content length above 10 KB.
+- Production browser QA at https://biau.playlab.eu.cc:
+  - /cases/legal-rag loads with h1 Legal RAG case detail and the boundary card title.
+  - legal-rag-report-boundary.svg decodes successfully.
+  - Desktop and mobile both pass with no console errors, no failed requests, no horizontal overflow, and no non-product positioning wording.
+
 ## Notes
 
 - Legal RAG now has five evidence assets: contract review workbench, knowledge import, citation QA, RAG flow diagram, and report/model boundary diagram.
