@@ -52,4 +52,13 @@ Base URL: http://127.0.0.1:5175
 
 ## Ship Decision
 
-Ready to commit and push.
+Committed and pushed: 03dca4c Add-Raiden-closed-loop-screenshots.
+
+## Deployment QA
+
+- Direct asset check:
+  - /images/projects/showcase/raiden-results-summary.png returns 200 with content-type image/png, size 107778, and PNG dimensions 540x960.
+  - /images/projects/showcase/raiden-chapter-outro.png returns 200 with content-type image/png, size 68886, and PNG dimensions 540x960.
+- Production browser QA at https://biau.playlab.eu.cc:
+  - /cases/godot-showcase loads with h1 Godot Web 游戏展示体系 and both Raiden result/summary PNGs at 540x960.
+  - Desktop and mobile both pass with no console errors, no failed requests, no horizontal overflow, no 面试/作品集 wording.
