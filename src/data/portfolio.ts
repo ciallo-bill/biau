@@ -118,7 +118,7 @@ export const projects: Project[] = [
     category: 'interactive',
     status: 'live',
     role: 'Godot 展示构建 / 战斗循环 / 单局复盘',
-    image: '/images/projects/showcase/godot-next-spacewar-showcase.svg',
+    image: '/images/projects/showcase/next-spacewar-menu.png',
     stack: ['Godot 4.6', '太空射击', 'Web 导出'],
     highlights: ['主菜单', '帮助暂停', '战斗循环', '结果复盘'],
     links: [{ label: '查看页面', href: '/games/next-spacewar', type: 'external' }],
