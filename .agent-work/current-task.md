@@ -8,31 +8,29 @@ Builder: Claude Code via `cc`
 
 ## Goal
 
-Add one public-safe Pet Workspace admin-review runtime screenshot to close the current Pet Workspace showcase gap for a desensitized review-console view.
+Assess and, if safe, add one public-safe xunqiu 64-bit Android client runtime screenshot to close the current xunqiu showcase gap.
 
 ## Scope
 
-- Use `gamer/apps/admin-review` from the Pet Workspace reference project as the real runtime source.
-- Keep `/home/zhang/workspace/reference-projects/pet` and `/mnt/d/workspace4Codex/pet` read-only.
-- Create a temporary `GA_PET_RUN_ROOT` with only demo candidate data and generated placeholder preview/motion images.
-- Run the admin-review server from a temporary copy or directly from read-only source if no files are written to it.
-- Capture one public-safe screenshot:
-  - `public/images/projects/showcase/fantasy-pet-admin-review-runtime.png`
-- Add the screenshot to the Pet Workspace case evidence matrix.
-- Update `docs/showcase-assets.md` and verification notes.
+- Inspect the existing `xunqiu-android64` project for a safe screenshot path.
+- Prefer a real runtime screenshot from the new 64-bit client, not the old app.
+- If a runtime capture requires source changes, use only a temporary copy or a capture-only path; keep reference/source projects read-only.
+- Add the screenshot only if it can avoid real service login, real users, server addresses, accounts, signing details, APK hashes, and release paths.
+- If runtime capture is not safe in this turn, document the blocker and switch to the next safe showcase slice rather than forcing an unsafe screenshot.
 
 ## Non-goals
 
-- Do not start real community API, pet generator worker, cloud services, database, Supabase, Android app, or deployment scripts.
-- Do not publish real task JSON, run paths, model configuration, cloud endpoints, storage keys, local validation paths, generated candidate packages, or private assets.
-- Do not modify reference/source Pet files.
-- Do not redesign the Pet Workspace case page or rewrite unrelated project content.
-- Do not close xunqiu or blog-semi screenshot gaps in this slice.
+- Do not modify `/home/zhang/workspace/reference-projects/xunqiu` or `/mnt/d/workspace4Codex/xunqiu`.
+- Do not publish real test accounts, tokens, server IPs, API base URLs, database config, SQL details, signing passwords, keystore paths, APK hashes, release package paths, or real user/business data.
+- Do not reuse screenshots from the old 32-bit app or historical backend.
+- Do not start production services or log into real xunqiu service accounts.
+- Do not close blog-semi versioned screenshot gaps in this slice unless xunqiu capture is rejected as unsafe.
 
 ## Allowed Paths
 
-- public/images/projects/showcase/fantasy-pet-admin-review-runtime.png
+- public/images/projects/showcase/xunqiu-android64-runtime.png
 - src/App.tsx
+- src/App.css
 - docs/showcase-assets.md
 - .agent-work/current-task.md
 - .agent-work/cc-plan.md
@@ -42,19 +40,20 @@ Add one public-safe Pet Workspace admin-review runtime screenshot to close the c
 ## Acceptance Criteria
 
 - [x] `cc` produces a read-only plan before implementation.
-- [x] One Pet admin-review runtime screenshot is added under `public/images/projects/showcase/`.
-- [x] The screenshot is generated from the real admin-review UI with only demo/desensitized candidate data.
-- [x] `/cases/pet-workspace` includes the new evidence card and the image decodes locally.
-- [x] `docs/showcase-assets.md` marks the Pet Workspace admin-review screenshot gap as covered.
+- [x] A safe capture path is selected or explicitly rejected with evidence.
+- [x] If selected, one xunqiu 64-bit client runtime screenshot is added under `public/images/projects/showcase/`.
+- [x] If selected, `/cases/xunqiu` includes the new evidence card and the image decodes locally.
+- [x] If selected, `docs/showcase-assets.md` marks the xunqiu screenshot gap as covered.
 - [x] Sensitive/public wording scan is reviewed.
-- [x] `npm run lint` and `npm run build` pass in WSL.
-- [x] Browser QA checks `/cases/pet-workspace` at desktop and mobile widths.
+- [x] `npm run lint` and `npm run build` pass in WSL if any site files change.
+- [x] Browser QA checks `/cases/xunqiu` at desktop and mobile widths if any site files change.
 
 ## Verification Plan
 
-- Confirm the screenshot file exists and is a valid PNG.
+- Inspect build/runtime options without publishing sensitive README/build details.
+- If a screenshot is captured, confirm the PNG file exists and is valid.
 - Run sensitive/public wording scan over changed files.
 - Run `npm run lint`.
 - Run `npm run build`.
-- Browser-check `/cases/pet-workspace` locally at desktop and mobile widths.
+- Browser-check `/cases/xunqiu` locally at desktop and mobile widths.
 - Commit and push after verification passes.

@@ -1,44 +1,58 @@
-# Builder Plan: Pet Workspace Admin-Review Runtime Screenshot
+## 只读评估报告
 
-## Goal
+> Controller note: this is the original Claude Code read-only feedback. The reported permission blocker was later corrected in `codex-review.md`; the useful safety constraints were retained.
 
-Add one public-safe Pet Workspace admin-review runtime screenshot for the existing `/cases/pet-workspace` evidence matrix.
+根据当前任务要求，我需要先完成只读分析再决定是否安全补充 xunqiu 64 位 Android 新客户端运行截图。但目前**无法读取 reference-projects 中的 xunqiu-android64 源码**，权限被拒绝。
 
-## Read-Only Findings
+### 已完成只读分析
 
-- `gamer/apps/admin-review` is the correct source for a real review-console screenshot.
-- The app can list GA review candidates from `GA_PET_RUN_ROOT`.
-- A valid demo candidate can be represented with:
-  - `package-manifest.json`
-  - `source/generation/prompt-plan.json`
-  - `previews/preview.png`
-  - `meta/motion_map.json`
-  - optional feedback and rework records
-- The server also proxies community API routes, so capture should mock or intercept those requests instead of starting real backend services.
+1. **已读取文件**：
+   - `.agent-work/current-task.md` — 明确任务边界和安全要求
+   - `docs/showcase-assets.md` — 确认 xunqiu 当前缺口为"64 位客户端脱敏运行截图"
+   - `src/App.tsx` — 确认 xunqiu 案例页已准备接收截图证据卡片
 
-## Approved Implementation Shape
+2. **当前 xunqiu 展示状态**：
+   - 已有 3 张架构/流程图：模块地图、迁移流程、验收链路
+   - 缺口：**64 位客户端脱敏运行截图**（标注"不复用含真实数据旧素材"）
 
-1. Use a temporary copy of the `gamer` workspace.
-2. Install dependencies in the temporary copy with scripts disabled.
-3. Create a temporary GA run root containing only demo candidates and generated placeholder images.
-4. Start only `apps/admin-review/server.js` with the temporary run root.
-5. Use browser automation to intercept unrelated API routes with empty public-safe responses.
-6. Capture the real admin-review GA panel as:
-   - `public/images/projects/showcase/fantasy-pet-admin-review-runtime.png`
-7. Add the screenshot to the Pet Workspace case evidence cards.
-8. Update `docs/showcase-assets.md`.
+### 无法读取的关键文件
 
-## Safety Rules
+尝试读取以下文件均被拒绝：
 
-- Do not modify Pet reference/source projects.
-- Do not start real community API, pet-generator, database, Supabase, Android, cloud services, or deployment scripts.
-- Do not publish real run paths, task payloads, prompts, model settings, storage identifiers, endpoints, candidate packages, logs, or private assets.
-- Use demo names, generated placeholder images, and redacted metadata only.
+- `/home/zhang/workspace/reference-projects/xunqiu/xunqiu-android64/README.md`
+- `/home/zhang/workspace/reference-projects/xunqiu/xunqiu-android64/build.gradle`
+- `/home/zhang/workspace/reference-projects/xunqiu/xunqiu-android64/app/build.gradle`
+- `/home/zhang/workspace/reference-projects/xunqiu/xunqiu-android64/app/src/main/AndroidManifest.xml`
+- `/home/zhang/workspace/reference-projects/xunqiu/xunqiu-android64/app/src/main/java/com/xunqiu/MainActivity.java`
 
-## Verification
+### 风险评估与建议
 
-- Confirm PNG file type and dimensions.
-- Run sensitive/public wording scan over changed public source/docs.
-- Run `npm run lint`.
-- Run `npm run build`.
-- Browser QA `/cases/pet-workspace` at desktop and mobile widths.
+**无法完成只读计划的原因**：
+- 源项目权限被拒，无法分析：
+  - 新客户端是否已有可直接使用的脱敏截图
+  - 构建配置是否包含敏感服务器地址或 API endpoint 配置
+  - 界面模块（screen/*.java）是否会在运行时显示真实用户名、账号、服务器 IP
+  - 登录流程（ApiClient、AuthSession）是否需要真实 token 才能进入主界面
+  - 是否有开发者模式、Mock 数据或离线展示入口
+
+**推荐下一步动作**（三选一）：
+
+1. **授权读取并继续评估**：  
+   用户手动授权读取上述 5 个文件，让我完成安全性分析，判断是否能：
+   - 复用已有脱敏截图
+   - 或在模拟器/临时副本中安全运行不含真实登录的页面截图
+
+2. **改用 SVG 占位图**：  
+   类似其他架构图，补一张"xunqiu-android64-module-runtime.svg"展示页面布局和模块入口，避免真实运行风险。
+
+3. **跳过 xunqiu 截图，转向其他安全切片**：  
+   例如补充 blog-semi 首页/项目页的版本化截图（可在本地直接完成，无敏感信息风险）。
+
+**如果强行推进当前任务的风险**：
+- 可能误用含真实用户、服务器地址、登录凭据或业务数据的旧截图
+- 可能暴露 API base URL、测试账号、keystore 路径、APK hash 或签名密码
+- 违反 CLAUDE.md 和任务要求的"不公开真实服务信息"原则
+
+---
+
+**请选择下一步**：授权读取 5 个文件继续评估 / 改用 SVG 占位 / 跳过 xunqiu 转向其他安全切片？

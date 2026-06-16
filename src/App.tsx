@@ -1696,6 +1696,7 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
       { title: '64 位客户端模块地图', image: '/images/projects/showcase/xunqiu-module-map.svg', detail: '展示新客户端页面模块、公共能力和接口复用层的关系，不暴露真实服务地址。' },
       { title: '迁移流程', image: '/images/projects/showcase/xunqiu-migration-flow.svg', detail: '展示从旧工程参照到新 64 位客户端、分阶段模块恢复和公开验收资料的迁移路径。' },
       { title: '验收链路', image: '/images/projects/showcase/xunqiu-verification-chain.svg', detail: '展示构建、模拟器/真机、模块行为和发布清单组成的可复现验收闭环。' },
+      { title: '64 位客户端欢迎页运行截图', image: '/images/projects/showcase/xunqiu-android64-runtime.png', detail: '由新 64 位客户端临时 debug 构建在模拟器未登录状态下截取，只展示公开欢迎页，不进入真实服务或账号数据。' },
     ],
     'godot-showcase': [
       { title: 'Tetris 桌面运行截图', image: '/images/projects/showcase/tetris-classic-desktop.png', detail: '由 Godot 4.6.1 在临时副本中运行截图回归脚本生成，展示经典模式的真实桌面运行状态。' },
@@ -1817,7 +1818,12 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
         <div className="case-image-grid">
           {caseImages.length > 0 ? caseImages.map((item) => (
             <article key={item.title}>
-              <img src={item.image} alt={item.title} loading="lazy" />
+              <img
+                className={item.image.includes('xunqiu-android64-runtime') ? 'case-image-portrait' : undefined}
+                src={item.image}
+                alt={item.title}
+                loading="lazy"
+              />
               <div>
                 <Title heading={3}>{item.title}</Title>
                 <Paragraph>{item.detail}</Paragraph>

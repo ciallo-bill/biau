@@ -1,40 +1,31 @@
 # Codex Review
 
 Date: 2026-06-16
-Task: Pet Workspace admin-review runtime screenshot
+Task: xunqiu 64-bit client runtime screenshot
 
-## Review Summary
+## Builder Plan Review
 
-The Builder plan correctly identifies `gamer/apps/admin-review` as the runtime source and correctly avoids real community API, pet-generator, cloud services, databases, Android, and deployment scripts.
+Claude Code produced a read-only plan, but its central blocker was incorrect: Codex could read the reference xunqiu files from WSL. The useful part of the plan was the safety framing: do not reuse old app screenshots, do not log in, and do not publish any account, endpoint, signing, server, release, or real business data.
 
-Two details need correction before implementation:
+## Controller Decision
 
-- `admin-review/server.js` defaults to port 4200, not 3010.
-- GA candidate data is read from `GA_PET_RUN_ROOT/<runId>/`, not from `tasks/<taskId>/`. A valid run needs `package-manifest.json` and/or `source/generation/prompt-plan.json`, plus optional `previews/preview.png`, `meta/motion_map.json`, `review-card.md`, and package/evidence files.
+Proceed with a narrow runtime capture only if it stays on the new 64-bit client welcome screen.
 
-## Approved Slice
+Approved constraints:
 
-Implement one narrow slice:
+- Use a temporary copy of `xunqiu-android64`.
+- Keep `/home/zhang/workspace/reference-projects/xunqiu` read-only.
+- Remove release signing usage only inside the temporary copy.
+- Generate temporary placeholder resources only to satisfy compilation; do not publish those placeholders as project assets.
+- Clear app data and capture the unauthenticated welcome page only.
+- Do not tap login or call the real service.
 
-1. Copy the `gamer` workspace into a temporary capture directory.
-2. Run `npm ci --ignore-scripts` only in the temporary copy.
-3. Create a temporary `GA_PET_RUN_ROOT` with demo run directories, generated placeholder preview/motion images, and public-safe metadata.
-4. Start `apps/admin-review/server.js` from the temporary copy with `PORT` and `GA_PET_RUN_ROOT` set.
-5. Use browser automation to mock non-GA community API requests if needed, while letting `/ga-review/candidates` read the real temporary run root.
-6. Capture the real admin-review UI to `public/images/projects/showcase/fantasy-pet-admin-review-runtime.png`.
-7. Add the image as one more `/cases/pet-workspace` evidence card.
-8. Update `docs/showcase-assets.md` to mark the Pet Workspace admin-review screenshot gap as covered.
+Rejected paths:
 
-## Rejected Scope
+- Publishing any historical 32-bit app screenshot.
+- Publishing README/build details that contain accounts, endpoints, signing config, hashes, release paths, or local tool paths.
+- Closing the gap with a fabricated SVG while calling it a runtime screenshot.
 
-- Do not use real run directories or generated task packages.
-- Do not publish real task JSON, prompts, model config, cloud endpoints, storage keys, local paths, candidate packages, or private assets.
-- Do not modify Pet reference/source files.
-- Do not close xunqiu or blog-semi screenshot gaps in this slice.
+## Public-Safety Review
 
-## Required Verification
-
-- PNG decodes and visually represents the real admin-review UI with safe demo data.
-- `npm run lint` and `npm run build` pass in `blog-semi`.
-- Sensitive/public wording scan over changed files passes.
-- Browser QA checks `/cases/pet-workspace` at desktop and mobile widths.
+The selected screenshot shows only the app name, public tagline, intro copy, and login button from the unauthenticated welcome screen. It does not show user data, accounts, tokens, server addresses, API paths, database information, signing material, APK hashes, package release paths, or real business records.

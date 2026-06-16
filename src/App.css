@@ -4016,6 +4016,11 @@ textarea {
   border-bottom: 1px solid #e5edf8;
 }
 
+.case-image-grid img.case-image-portrait {
+  aspect-ratio: 9 / 16;
+  max-height: 560px;
+}
+
 .case-image-grid article:first-child img {
   height: auto;
 }
