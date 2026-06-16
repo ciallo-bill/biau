@@ -35,3 +35,18 @@ WSL system Google Chrome was driven through Chrome DevTools Protocol with local 
 | Browser history | 390x844 | pass: same as desktop. |
 | `/projects/pet-workspace` | 1440x900 | pass: still opens the independent technical detail page. |
 | `/projects/pet-workspace` | 390x844 | pass: same as desktop. |
+
+## Deployment QA
+
+Source commit:
+
+- `aba5fec Persist project page selection in URL`
+
+Cloudflare deployment was confirmed by driving WSL system Google Chrome against `https://biau.playlab.eu.cc`. The first polling attempt happened while the deployment was changing assets and showed transient module-load errors; the second attempt passed with no runtime errors.
+
+| Route / Flow | Viewport | Result |
+| --- | --- | --- |
+| `/projects?project=pet-workspace` | 1440x900 | pass: Pet Workspace is selected and URL remains `/projects?project=pet-workspace`. |
+| Thumbnail selection | 1440x900 | pass: clicking Pet Workspace updates preview and URL to `/projects?project=pet-workspace`. |
+| Browser history | 1440x900 | pass: back restores Legal RAG and URL `/projects?project=legal-rag`. |
+| `/projects/pet-workspace` | 1440x900 | pass: still opens the independent technical detail page. |
