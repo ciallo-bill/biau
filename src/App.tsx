@@ -1701,6 +1701,8 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
       { title: 'Next Spacewar 主菜单', image: '/images/projects/showcase/next-spacewar-menu.png', detail: '由 Godot 4.6.1 Windows 运行时在临时副本中生成，展示中文主菜单、操作入口和 showcase build 标记。' },
       { title: 'Next Spacewar 战斗 HUD', image: '/images/projects/showcase/next-spacewar-gameplay.png', detail: '展示飞船、陨石、HUD 与引导面板，证明战斗循环和信息层已经进入可演示状态。' },
       { title: 'Next Spacewar 展示路径', image: '/images/projects/showcase/godot-next-spacewar-showcase.svg', detail: '展示主菜单、帮助、战斗、暂停、结果页和 session summary 串成的试玩路径。' },
+      { title: 'InteSpace 玩家中枢', image: '/images/projects/showcase/intespace-player-hub.png', detail: '由 Godot 4.6.1 Windows 运行时在临时副本中生成，展示竖屏玩家首页、出击入口、成长中心和当前试玩准备状态。' },
+      { title: 'InteSpace 战斗 HUD', image: '/images/projects/showcase/intespace-gameplay-hud.png', detail: '展示竖屏自动射击战场、HUD、路线进度、玩家与敌方目标，证明核心战斗循环已经可运行。' },
       { title: 'InteSpace 系统闭环', image: '/images/projects/showcase/godot-intespace-loop.svg', detail: '展示武器树、自动射击、Boss 试炼、结算和局外成长组成的 Roguelite 闭环。' },
       { title: 'Raiden 垂直切片', image: '/images/projects/showcase/godot-raiden-vertical-slice.svg', detail: '展示双关章节、火力成长、Boss 相位和公开演示准备组成的纵版射击切片。' },
       { title: 'Space War 运行画面', image: '/images/projects/showcase/space-war-gameplay.png', detail: '展示横向推进、HUD、Sector 目标和即时操作反馈，是当前已有真实运行截图。' },

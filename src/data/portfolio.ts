@@ -130,7 +130,7 @@ export const projects: Project[] = [
     category: 'interactive',
     status: 'live',
     role: 'Godot 引擎 / 肉鸽玩法 / 武器树 / 局外成长',
-    image: '/images/projects/showcase/godot-intespace-loop.svg',
+    image: '/images/projects/showcase/intespace-player-hub.png',
     stack: ['Godot', '肉鸽玩法', '武器树系统', '移动端优先'],
     highlights: ['武器树', '自动射击', '首领试炼', '局外成长'],
     links: [{ label: '查看页面', href: '/games/intespace', type: 'external' }],

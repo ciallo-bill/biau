@@ -1,39 +1,33 @@
-# Plan: xunqiu Business Case
+# CC Builder Plan: InteSpace Runtime Screenshots
 
-## Read-only Findings
+Date: 2026-06-16
+Task: Add real runtime screenshots for InteSpace and connect them to the public showcase site.
 
-- `xunqiu` already exists in `projects[]`, `getProjectStructure()`, and `getProjectDetailContent()`.
-- `caseStudies[]` currently contains Legal RAG, Ozon ERP, Pet Workspace, and Godot showcase, but no `xunqiu` case.
-- `getCaseStudyForProject(project.id)` drives the project page business-case button, so adding one case entry is enough to connect `/projects/xunqiu` to `/cases/xunqiu`.
+## Builder Findings
 
-## Approved Scope
+- InteSpace is a portrait-first Godot project with a player hub, combat HUD, weapon/growth loop, and public-safe visual states suitable for the showcase site.
+- The source project should remain read-only. Screenshot capture must happen through a temporary copy under `D:/workspace4Codex/.tmp-godot-capture/`.
+- The strongest public evidence for this slice is the player hub plus gameplay HUD. A result/loop screenshot is optional only if it can be captured reliably.
 
-Add exactly one `caseStudies[]` entry for the existing xunqiu project.
+## Proposed Scope
 
-## Content Shape
+1. Generate reviewed screenshots from the actual Godot project through a temporary capture copy.
+2. Publish only selected PNGs under `public/images/projects/showcase/intespace-*.png`.
+3. Use the player-hub screenshot as the InteSpace project visual.
+4. Add InteSpace runtime evidence to `/cases/godot-showcase` while keeping the existing system-loop diagram.
+5. Update `docs/showcase-assets.md`, `.agent-work/current-task.md`, and `.agent-work/verification.md`.
 
-- Positioning: mobile business system takeover and Android 64-bit rebuild.
-- Business problem: historical multi-end system, old Android migration, service API reuse, release verification.
-- Solution: new 64-bit Android client skeleton, module-by-module restoration, service API wrapper, staged verification.
-- Results: login/session path, feed/video/schedule/profile modules, no legacy 32-bit native libraries, staged build and emulator verification.
-- Evidence: directory structure, module map, migration docs, release verification notes. Keep evidence abstract.
+## Risks And Constraints
 
-## Desensitization
-
-Do not mention real test accounts, tokens, server IPs, database configuration, SQL content, signing files, APK hashes, package paths, real media URLs, or generated test data.
-
-## Files Expected To Change
-
-- `src/App.tsx`
-- `.agent-work/verification.md`
+- Do not modify `D:/workspace4Codex/intespace`.
+- Do not modify `~/workspace/reference-projects`.
+- Do not publish local paths, raw logs, Godot `.import` metadata, release packages, hashes, accounts, IPs, tokens, or generated validation output.
+- Do not claim Raiden has real runtime screenshots.
 
 ## Verification
 
-- `npm run lint`
-- `npm run build`
-- Sensitive scan for account/IP/token/key/hash/server/path terms in public source.
-
-## Non-actions
-
-- Do not add projects, blog posts, screenshots, media, dependencies, or CSS.
-- Do not modify reference projects.
+- Confirm PNG dimensions and file sizes.
+- Run `npm run lint`.
+- Run `npm run build`.
+- Run the public-safety wording scan.
+- Browser-check `/projects/intespace`, `/games/intespace`, and `/cases/godot-showcase` at desktop and mobile widths.
