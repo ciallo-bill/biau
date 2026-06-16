@@ -1,31 +1,34 @@
 # Codex Review
 
 Date: 2026-06-16
-Task: xunqiu 64-bit client runtime screenshot
+Task: blog-semi versioned screenshots
 
 ## Builder Plan Review
 
-Claude Code produced a read-only plan, but its central blocker was incorrect: Codex could read the reference xunqiu files from WSL. The useful part of the plan was the safety framing: do not reuse old app screenshots, do not log in, and do not publish any account, endpoint, signing, server, release, or real business data.
+Claude Code provider `a` was selected with `cc-provider use a` before planning. The first short smoke test returned `OK-A`, confirming the channel was usable.
+
+The full planning command exceeded the shell timeout, but `.agent-work/cc-plan.md` was fully written before the process was terminated. For future provider `a` plan/review calls, reserve a longer timeout window because this provider is configured with `effort=max`.
 
 ## Controller Decision
 
-Proceed with a narrow runtime capture only if it stays on the new 64-bit client welcome screen.
+Proceed with the screenshot-only slice.
 
 Approved constraints:
 
-- Use a temporary copy of `xunqiu-android64`.
-- Keep `/home/zhang/workspace/reference-projects/xunqiu` read-only.
-- Remove release signing usage only inside the temporary copy.
-- Generate temporary placeholder resources only to satisfy compilation; do not publish those placeholders as project assets.
-- Clear app data and capture the unauthenticated welcome page only.
-- Do not tap login or call the real service.
+- Capture only public site content from the local dev server.
+- Use the existing routes `/`, `/projects`, and `/blogs`.
+- Use desktop `1440x900` and mobile `390x844`.
+- Save page-content screenshots only, not browser chrome, address bars, taskbars, devtools, cookies, or private browser state.
+- Keep the site default language/theme state.
+- Update only the versioned screenshot assets, `docs/showcase-assets.md`, and workflow records.
 
 Rejected paths:
 
-- Publishing any historical 32-bit app screenshot.
-- Publishing README/build details that contain accounts, endpoints, signing config, hashes, release paths, or local tool paths.
-- Closing the gap with a fabricated SVG while calling it a runtime screenshot.
+- Redesigning pages or changing copy in this slice.
+- Adding unrelated project screenshots.
+- Capturing logged-in/admin/third-party pages.
+- Publishing local filesystem paths, ports in browser UI, tokens, credentials, or private state.
 
 ## Public-Safety Review
 
-The selected screenshot shows only the app name, public tagline, intro copy, and login button from the unauthenticated welcome screen. It does not show user data, accounts, tokens, server addresses, API paths, database information, signing material, APK hashes, package release paths, or real business records.
+The target routes are public static site routes. The screenshot process must still verify no console errors, failed requests, horizontal page overflow, or sensitive wording are present after capture.
