@@ -1,32 +1,22 @@
 # Codex Review
 
-Date: 2026-06-16
-Task: Space War showcase entry screenshot
+CC provider `a` did not produce a usable plan for this prompt. Provider `b` produced a valid read-only plan and is accepted as the builder input for this slice.
 
-## Builder Plan Review
+## Accepted
 
-Provider `a` was attempted first for the read-only plan and was given a 10-minute timeout, but it produced an empty `.agent-work/cc-plan.md` and left `claude-real` running. The stuck process was stopped. Provider `d` was then used to avoid blocking this slice.
+- Remove stale public wording where screenshots/evidence now exist.
+- Reuse existing status language instead of adding a new status taxonomy.
+- Keep real future work such as Godot Web package integration, but phrase it as planned work.
+- Include `src/data/portfolio.ts` because Space War project metadata is public-facing.
 
-For future Claude Code calls, use provider order `a -> b -> c -> d`, with `d` as fallback rather than jumping directly from `a` to `d`.
+## Narrowing
 
-The useful plan finding is correct: the reference `space-war` project does not currently expose a stable Godot Web export in the mounted reference repo, so this slice should not claim to publish a real playable Web build. The safe target is the site-level Space War showcase/playtest entry route.
+- Do not redesign pages or touch layout in this slice.
+- Do not add new projects, cases, screenshots, or reference-project changes.
+- Do not claim Space War has a playable Godot Web build online. The current public state is: site-level showcase route exists; real Godot Web package remains a separate future integration.
 
-## Controller Decision
+## Implementation Targets
 
-Proceed with a screenshot-only slice:
-
-- Capture the public `/games/space-war` route from the local dev server.
-- Save the screenshot as `public/images/projects/showcase/space-war-web-showcase.png`.
-- Add the screenshot to the `godot-showcase` evidence matrix so visitors can discover the Space War showcase entry from the case page.
-- Update `docs/showcase-assets.md` so the Space War gap is no longer open.
-
-Rejected paths:
-
-- Do not build or publish a new Godot Web export.
-- Do not copy `.pck`, `.wasm`, release packages, local build paths, or private validation paths into the public site.
-- Do not redesign the game showcase page.
-- Do not touch reference project files.
-
-## Public-Safety Review
-
-The screenshot target is a public site route. It must still be checked for console errors, failed requests, horizontal overflow, local path wording, and sensitive/private wording before shipping.
+- `src/App.tsx`: case statuses, stale nextSteps/integration labels, and visible game wording.
+- `src/data/portfolio.ts`: Space War metadata and broad capability wording where it could imply already-live Web exports.
+- `docs/showcase-assets.md`: only if the scan reveals a stale gap statement.

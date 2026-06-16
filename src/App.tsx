@@ -104,7 +104,7 @@ const heroSlides = [
 const projectGroups: Array<{ key: ProjectGroupKey; title: string; description: string; projectIds: string[] }> = [
   { key: 'ai', title: 'AI 应用', description: 'RAG、Agent、生成审核、人审闭环相关项目。', projectIds: ['legal-rag', 'pet-workspace'] },
   { key: 'fullstack', title: '全栈开发', description: '管理后台、API、数据库、队列、移动端和博客系统。', projectIds: ['ozon-erp', 'blog-semi', 'biau-playlab', 'xunqiu'] },
-  { key: 'games', title: '游戏项目', description: 'Godot Web 导出、试玩入口和互动体验项目。', projectIds: ['game-first-tetris', 'game-next-spacewar', 'intespace', 'raiden-prototype', 'space-war'] },
+  { key: 'games', title: '游戏项目', description: 'Godot 展示入口、试玩计划和互动体验项目。', projectIds: ['game-first-tetris', 'game-next-spacewar', 'intespace', 'raiden-prototype', 'space-war'] },
 ]
 
 function getGroupKeyByProjectId(projectId: string): ProjectGroupKey {
@@ -269,7 +269,7 @@ const caseStudies: CaseStudy[] = [
     projectId: 'pet-workspace',
     title: 'Pet Workspace AI 生成与审核管线',
     eyebrow: 'AI 应用 / 生成管线',
-    status: '补充中',
+    status: '整理中',
     summary: '围绕 AI 宠物生成、Worker 编排、QA Gate、人审发布、Android 联调和 App API 契约组织的项目工作区。',
     outcome: 'AI 生成资产进入 App 的工程闭环',
     challenge: '生成类项目容易停留在单次出图，真正落到应用里需要任务状态、素材验证、人工审核、发布记录和移动端消费协议。',
@@ -289,7 +289,7 @@ const caseStudies: CaseStudy[] = [
     projectId: 'xunqiu',
     title: '寻球移动端业务系统重构案例',
     eyebrow: '移动端 / 历史系统接手',
-    status: '补充中',
+    status: '整理中',
     summary: '围绕历史多端业务系统，梳理服务端接口复用、Android 64 位新客户端、动态/短视频/赛事日程等模块恢复和阶段验收。',
     outcome: '历史移动业务系统的可接手重构路径',
     challenge: '历史项目同时包含旧移动端、服务端接口、后台资料和发布包记录，接手时需要在不暴露私有配置和真实数据的前提下，说明如何拆模块、复用接口、完成 64 位兼容并沉淀验收证据。',
@@ -309,7 +309,7 @@ const caseStudies: CaseStudy[] = [
     projectId: 'game-first-tetris',
     title: 'Godot Web 游戏展示体系',
     eyebrow: '游戏项目 / 互动体验',
-    status: '补充中',
+    status: '整理中',
     summary: '把 Tetris、Spacewar、InteSpace、Raiden Prototype、Space War 等 Godot 项目整理成可试玩、可说明、可回归的展示体系。',
     outcome: '多款互动项目的统一展示规范',
     challenge: '游戏项目如果只放源码很难被快速理解，需要让访问者看到玩法循环、操作方式、版本阶段、截图证据和 Web 试玩入口。',
@@ -803,7 +803,7 @@ function CasesView({ onOpenCase, onOpenProjectDetail }: { onOpenCase: (caseStudy
               <article key={caseStudy.id} className="case-secondary-card">
                 <div>
                   <Tag color={getTagColor(caseStudy.eyebrow)}>{caseStudy.eyebrow}</Tag>
-                  <Tag color={caseStudy.status === '整理中' ? 'blue' : caseStudy.status === '补充中' ? 'orange' : 'grey'}>{caseStudy.status}</Tag>
+                  <Tag color={caseStudy.status === '整理中' ? 'blue' : 'grey'}>{caseStudy.status}</Tag>
                 </div>
                 <Title heading={4}>{caseStudy.title}</Title>
                 <Paragraph>{caseStudy.summary}</Paragraph>
@@ -1016,7 +1016,7 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         { title: '插件与 Worker 协作', detail: 'WXT/MV3 插件负责采集入口，BullMQ/Redis Worker 承接同步与长任务，形成多端协同证据。' },
         { title: '交付文档', detail: '部署、迁移、备份、插件发布和接手清单可证明项目不只是页面演示，而是可交付系统。' },
       ],
-      nextSteps: ['补充脱敏后台截图', '整理 Prisma ER 图', '沉淀插件采集链路案例', '补充队列失败重试和审计说明'],
+      nextSteps: ['整理 Prisma ER 图', '沉淀插件采集链路案例', '补充队列失败重试和审计说明', '完善部署拓扑图'],
     }
   }
 
@@ -1042,7 +1042,7 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         { title: 'Android 联调验证', detail: '悬浮窗、前台服务、权限恢复和本地证明链用于证明移动端消费体验可以落地。' },
         { title: '工作区边界', detail: 'gamer、fantasy-pet-rule、floating-pet-android 分别承担 App-facing、生成管线和移动验证职责。' },
       ],
-      nextSteps: ['补充审核后台截图', '整理生成任务状态图', '补充 App API 契约说明', '增加典型生成案例复盘'],
+      nextSteps: ['整理生成任务状态图', '补充 App API 契约说明', '增加典型生成案例复盘', '沉淀审核发布异常处理'],
     }
   }
 
@@ -1068,7 +1068,7 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         { title: '迁移与验收文档', detail: '项目清单、64 位重构计划、阶段构建和验证记录共同证明接手过程可复现。' },
         { title: '发布风险控制', detail: '展示侧只描述构建链路、页面恢复和验收方式，隐藏访问凭据、签名材料、发布校验信息等敏感内容。' },
       ],
-      nextSteps: ['补充脱敏移动端截图', '整理服务端接口地图', '梳理 32 位到 64 位迁移故事', '沉淀发布验收案例'],
+      nextSteps: ['扩展移动端模块截图矩阵', '整理服务端接口地图', '梳理 32 位到 64 位迁移故事', '沉淀发布验收案例'],
     }
   }
 
@@ -1146,7 +1146,7 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         { title: 'Godot 工程边界', detail: 'player、bullet、enemy_target、obstacle、main_menu、run_result 等脚本拆分，便于说明核心职责。' },
         { title: '发布准备文档', detail: 'README、roadmap、task-board 和 test-checklist 共同支撑“展示版收口”的公开讲解口径。' },
       ],
-      nextSteps: ['补充主菜单和结果页截图', '接入 Web 试玩包', '整理首次试玩操作说明', '沉淀 Spacewar 系列演进复盘'],
+      nextSteps: ['整理主菜单和结果页截图说明', '接入 Web 试玩包', '整理首次试玩操作说明', '沉淀 Spacewar 系列演进复盘'],
     }
   }
 
@@ -1198,7 +1198,7 @@ function getProjectDetailContent(project: Project): ProjectDetailContent {
         { title: '测试与试玩资料', detail: 'docs 中的测试计划、试玩报告、最终 runbook 和 release checklist 可作为可公开的质量证据。' },
         { title: '发布与分发材料', detail: 'distribution guide、release notes、final summary 和 postmortem 说明项目已经完成从开发到发布的收口。' },
       ],
-      nextSteps: ['接入 Web 试玩入口', '补充发布截图矩阵', '整理 Sector/Boss 设计说明', '沉淀复古射击复盘文章'],
+      nextSteps: ['接入真实 Godot Web 包', '整理发布截图矩阵', '整理 Sector/Boss 设计说明', '沉淀复古射击复盘文章'],
     }
   }
 
@@ -1498,7 +1498,7 @@ function getGameShowcaseContent(project: Project): GameShowcaseContent {
         { title: '页面状态', detail: '菜单、帮助、暂停、失败和结果页让项目从“能玩”推进到“能展示”。' },
         { title: '展示包装', detail: 'showcase build 标记、README 和阶段说明用于讲清楚当前版本的可演示范围。' },
       ],
-      integration: ['接入 Web 导出目录', '补充主菜单和结果页截图', '加入试玩前加载状态', '整理关卡节奏说明'],
+      integration: ['接入 Web 导出目录', '整理主菜单和结果页截图说明', '加入试玩前加载状态', '整理关卡节奏说明'],
     },
     intespace: {
       tagline: '竖屏自动射击 Roguelite，围绕武器树、局内升级和局外成长收口完整运行链路。',
@@ -1524,14 +1524,14 @@ function getGameShowcaseContent(project: Project): GameShowcaseContent {
     },
     'space-war': {
       tagline: '复古横向太空射击完整版本，保留 Sector/Boss、道具、结果页、高分和独立发布文档。',
-      stage: '已形成可玩、可导出、可说明的发布质量小项目，后续重点是把 Web 试玩入口接入本站。',
+      stage: '已形成可玩、可导出、可说明的发布质量小项目，当前已接入站内展示页，真实 Godot Web 包后续单独接入。',
       gameplay: ['横向自动推进、移动、射击和敌人压迫', '两个 Sector、四类敌人、三类道具和两个差异化 Boss', '受伤、死亡、暂停、结果页和高分构成完整闭环', '低色 LCD 氛围与程序化音效形成复古识别度'],
       systems: [
         { title: '战斗系统', detail: 'scenes/entities 与 scripts/game 拆分玩家、敌人、碰撞、调度和结算职责。' },
         { title: '阶段推进', detail: 'stage_schedule、stage_catalog 和 run_balance 管理敌人波次、Sector 和 Boss 节奏。' },
         { title: '发布材料', detail: '最终总结、发布清单、分发指南和试玩报告说明项目已经完成可展示闭环。' },
       ],
-      integration: ['接入 Web 包', '整理发布日志', '增加试玩入口', '统一游戏封面'],
+      integration: ['接入真实 Godot Web 包', '整理发布日志', '完善试玩入口说明', '统一游戏封面'],
     },
   }
 
@@ -1540,7 +1540,7 @@ function getGameShowcaseContent(project: Project): GameShowcaseContent {
     stage: '展示页已准备好，等待接入 Web 构建产物。',
     gameplay: project.highlights,
     systems: project.highlights.map((item) => ({ title: item, detail: `围绕“${item}”整理玩法说明、交互反馈和实现记录。` })),
-    integration: ['补充截图', '接入试玩包', '完善操作说明', '沉淀复盘文章'],
+    integration: ['整理展示截图', '接入试玩包', '完善操作说明', '沉淀复盘文章'],
   }
 }
 

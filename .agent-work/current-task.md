@@ -8,29 +8,27 @@ Builder: Claude Code via `cc`
 
 ## Goal
 
-Close the remaining Space War showcase gap by adding one public-safe screenshot of the site-level Web playtest/showcase entry for Space War.
+Clean up stale public-facing status and next-step wording now that several showcase screenshots and evidence entries have been added.
 
 ## Scope
 
-- Confirm whether a real Godot Web export exists.
-- If no Web export exists, do not fabricate one; capture the existing site route that represents the Web showcase/playtest entry.
-- Prefer `/games/space-war` if it renders correctly.
-- Add one screenshot under `public/images/projects/showcase/`.
-- Add the screenshot to the Godot/Space War evidence matrix if that improves discoverability.
-- Update `docs/showcase-assets.md` so the Space War gap is no longer listed as open.
+- Review visible Chinese copy in project, case, and game detail data for stale phrases such as “补充中”, “补充截图”, and “接入 Web 试玩入口”.
+- Update only wording that is now inaccurate because evidence already exists.
+- Keep legitimate future work, especially real Godot Web package integration, but phrase it precisely.
+- Make case statuses more polished and consistent with the current evidence level.
 
 ## Non-goals
 
-- Do not build or publish a new Godot Web export in this slice.
-- Do not modify `/home/zhang/workspace/reference-projects/space-war` or `/mnt/d/workspace4Codex/space-war`.
-- Do not publish local build paths, release package paths, private validation paths, or unrelated release artifacts.
-- Do not redesign the game showcase page.
-- Do not close unrelated game project gaps.
+- Do not redesign page layouts in this slice.
+- Do not add new projects or cases.
+- Do not modify reference project directories.
+- Do not claim a real Godot Web build exists where only a site-level showcase entry exists.
+- Do not publish private paths, accounts, service addresses, release package paths, local validation paths, or sensitive operational data.
 
 ## Allowed Paths
 
-- public/images/projects/showcase/space-war-web-showcase.png
 - src/App.tsx
+- src/data/portfolio.ts
 - docs/showcase-assets.md
 - .agent-work/current-task.md
 - .agent-work/cc-plan.md
@@ -39,24 +37,21 @@ Close the remaining Space War showcase gap by adding one public-safe screenshot 
 
 ## Acceptance Criteria
 
-- [x] Previous blog-semi screenshot task artifacts are archived before this task overwrites `.agent-work` files.
-- [x] `cc` produces a read-only plan before implementation.
-- [x] Codex reviews and narrows the plan.
-- [x] Screenshot is captured from a public-safe site route, preferably `/games/space-war`.
-- [x] Screenshot file exists, decodes as PNG, and shows the intended Space War showcase/playtest entry.
-- [x] The screenshot is discoverable from the relevant evidence matrix.
-- [x] `docs/showcase-assets.md` marks the Space War screenshot gap as covered.
+- [x] Previous task artifacts are archived before new work.
+- [x] `cc` is asked for a read-only plan using provider order `a -> b -> c -> d`.
+- [x] Codex records a narrowed review before implementation.
+- [x] Stale public wording is updated without broad rewrites.
+- [x] Space War wording clearly distinguishes “site showcase entry” from a real playable Godot Web package.
 - [x] Sensitive/public wording scan is reviewed.
-- [x] `npm run lint` and `npm run build` pass.
-- [x] Browser QA checks the affected route at desktop and mobile widths if source files change.
+- [x] `npm run lint` passes.
+- [x] `npm run build` passes.
+- [x] Browser QA checks key affected routes at desktop and mobile widths.
+- [ ] Changes are committed, pushed, and production QA is recorded.
 
 ## Verification Plan
 
-- Inspect reference project for Web export evidence without publishing private paths.
-- Use system Chrome against local dev server for screenshot capture.
-- Confirm PNG dimensions and decode status.
-- Run sensitive/public wording scan over changed files.
+- Run targeted `rg` scans for stale words and sensitive/private terms.
 - Run `npm run lint`.
 - Run `npm run build`.
-- Browser-check `/games/space-war` and `/cases/godot-showcase` locally at desktop and mobile widths if the evidence matrix changes.
-- Commit and push after verification passes.
+- Browser-check `/projects`, `/cases`, `/cases/godot-showcase`, and `/games/space-war` locally at desktop and mobile widths.
+- After push and Cloudflare deployment, verify production routes and record the result in `.agent-work/verification.md`.

@@ -153,9 +153,9 @@ export const projects: Project[] = [
     summary: '复古横向太空射击完整版本，包含多区域关卡、首领战、道具、高分、结果页、程序化音效和发布文档。',
     category: 'interactive',
     status: 'live',
-    role: 'Godot 引擎 / 复古射击 / 发布版 / Web 展示',
+    role: 'Godot 引擎 / 复古射击 / 发布版 / 展示入口',
     image: '/images/projects/showcase/space-war-gameplay.png',
-    stack: ['Godot 4.6', '复古射击', 'Web 导出'],
+    stack: ['Godot 4.6', '复古射击', 'Web 包计划'],
     highlights: ['区域首领', '道具系统', '高分结算', '发布文档'],
     links: [{ label: '查看页面', href: '/games/space-war', type: 'external' }],
   },
@@ -176,7 +176,7 @@ export const projects: Project[] = [
 export const capabilityTracks = [
   { title: 'AI 应用', detail: 'RAG、Agent、引用溯源、审核闭环', value: 'Legal RAG / Pet Workspace' },
   { title: '业务系统', detail: '后台、API、数据库、队列、审计日志', value: 'Ozon 电商 ERP' },
-  { title: '互动体验', detail: 'Godot Web 导出、试玩入口、游戏展示页', value: '5 个游戏项目' },
+  { title: '互动体验', detail: 'Godot 展示入口、试玩计划、游戏展示页', value: '5 个游戏项目' },
   { title: '博客系统', detail: 'React + Semi、Astro、内容审计、部署准备', value: 'Biau Blog / Playlab' },
 ]
 

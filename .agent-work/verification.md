@@ -1,65 +1,55 @@
 # Verification
 
 Date: 2026-06-16
-Repo: /home/zhang/workspace/blog-semi
-Task: Add Space War showcase entry screenshot
+Task: Public wording and status consistency cleanup
 
-## Diff Summary
+## Provider / Workflow
 
-- Added one Space War site-level showcase/playtest entry screenshot:
-  - `public/images/projects/showcase/space-war-web-showcase.png`
-- Added the screenshot to the `godot-showcase` evidence matrix in `src/App.tsx`.
-- Updated `docs/showcase-assets.md` so the Space War screenshot gap is covered.
-- Archived the previous blog-semi versioned screenshots task.
-- Updated current workflow artifacts for the Space War screenshot slice.
+- Provider order was followed for CC planning.
+- `a` was attempted first but returned a generic clarification instead of a usable plan.
+- `b` produced a valid read-only plan and was used as builder input.
+- Codex narrowed the plan before implementation in `.agent-work/codex-review.md`.
 
-## Boundary Check
+## Code Review Summary
 
-- The reference `space-war` directory does not expose a stable Godot Web export package in the checked files.
-- This slice therefore does not claim to publish a playable Godot Web build.
-- The screenshot captures the public site-level `/games/space-war` showcase entry, which explains the gameplay, implementation focus, and Web playtest integration plan.
+- Updated stale case statuses from `补充中` to `整理中` after evidence/screenshots were added.
+- Removed stale public next-step wording such as “补充脱敏后台截图” and “补充脱敏移动端截图”.
+- Rephrased Space War public copy so it says the site-level showcase route exists while the real Godot Web package remains a future integration.
+- Avoided layout, route, project list, and reference-project changes.
 
-## Capture Evidence
+## Scans
 
-- Screenshot was captured from the local dev server with system Chrome.
-- Captured route: `/games/space-war`.
-- Viewport: `1440x900`.
-- Full-page screenshot dimensions: `1440x2216`.
-- Capture QA found h1 `复古横版射击｜space-war`, sections `玩法体验`, `实现重点`, and `试玩接入计划`.
-- Capture QA found no console errors, no failed requests, no horizontal overflow, and no sensitive wording hits.
+- Stale public wording scan over `src/App.tsx`, `src/data/portfolio.ts`, and `docs/showcase-assets.md` returned no public-file matches for:
+  - `补充中`
+  - `补充截图`
+  - `补充脱敏`
+  - `接入 Web 试玩入口`
+  - `后续补充`
+  - `面试`
+- Sensitive/private scan returned only false positives for normal TypeScript identifiers containing `id`; no private paths, local service addresses, credentials, secrets, or tokens were found in changed public files.
 
-## Commands Run
+## Commands
 
 | Command | Result | Notes |
 | --- | --- | --- |
-| `cc-provider use a` then `cc -p <plan>` | blocked | Provider `a` produced no output after 10 minutes; stuck process was stopped. |
-| `cc-provider use d` then `cc -p <plan>` | pass | Provider `d` produced the read-only plan. Future CC attempts should try `a -> b -> c -> d`. |
-| `find reference-projects/space-war ... '*.html' '*.wasm' '*.pck'` | reviewed | No Web export package was found in the WSL reference project. |
-| Chrome screenshot capture | pass | Captured `/games/space-war` to `space-war-web-showcase.png`. |
-| `file public/images/projects/showcase/space-war-web-showcase.png` | pass | PNG image data, 1440 x 2216, RGB. |
-| sensitive/public wording scan | reviewed | Hits were limited to workflow guardrail text about paths and prohibited secrets; public docs/source do not expose private build artifacts. |
-| `npm run lint` | pass | ESLint completed without errors in WSL. |
-| `npm run build` | pass | TypeScript and Vite build completed. Existing lottie-web direct eval warning remains from dependency code. |
-| Browser QA | pass | `/games/space-war` and `/cases/godot-showcase` checked at 1440x900 and 390x844. New PNG decodes at 1440x2216 on the case page, with no console errors, failed requests, horizontal overflow, or sensitive wording hits. |
+| `npm run lint` | pass | ESLint completed successfully. |
+| `npm run build` | pass | Build completed successfully. Existing `lottie-web` direct eval warning remains from dependency code. |
 
-## Public-Safety Review
+## Local Browser QA
 
-- The screenshot is from a public site route and includes only page content.
-- It does not include browser chrome, address bar, taskbar, devtools, cookies, credentials, local build paths, release package paths, or private validation paths.
+System Chrome was used through Playwright because the bundled Playwright Chromium cache was not installed.
 
-## Remaining Steps
-
-## Ship Decision
-
-Committed and pushed: 930388b Add Space War showcase entry evidence.
+| Route | Viewport | Result |
+| --- | --- | --- |
+| `/projects` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/cases` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/cases/godot-showcase` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/games/space-war` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/projects` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/cases` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/cases/godot-showcase` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/games/space-war` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
 
 ## Deployment QA
 
-- Direct asset check:
-  - `/images/projects/showcase/space-war-web-showcase.png` returns 200 with content length 273609.
-- Production browser QA at `https://biau.playlab.eu.cc`:
-  - `/games/space-war` renders h1 `复古横版射击｜space-war` on desktop and mobile.
-  - `/cases/godot-showcase` renders h1 `Godot Web 游戏展示体系` on desktop and mobile.
-  - The `Space War 试玩展示入口` evidence card is present on `/cases/godot-showcase`.
-  - `space-war-web-showcase.png` decodes successfully at 1440x2216 on desktop and mobile.
-  - Desktop and mobile checks show no console errors, no failed requests, no horizontal overflow, and no sensitive/private wording hits.
+Pending commit, push, and Cloudflare deployment.
