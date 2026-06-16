@@ -52,4 +52,19 @@ System Chrome was used through Playwright because the bundled Playwright Chromiu
 
 ## Deployment QA
 
-Pending commit, push, and Cloudflare deployment.
+Source commit:
+
+- `e9fdedd Clean up public showcase wording`
+
+Cloudflare deployment was confirmed by rendering `https://biau.playlab.eu.cc/games/space-war` and checking that the new Space War phrase `真实 Godot Web 包后续单独接入` was present while the old phrase `后续重点是把 Web 试玩入口接入本站` was absent.
+
+| Route | Viewport | Result |
+| --- | --- | --- |
+| `/projects` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/cases` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/cases/godot-showcase` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/games/space-war` | 1440x900 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, new Space War wording present. |
+| `/projects` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/cases` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/cases/godot-showcase` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, no stale/private wording hits. |
+| `/games/space-war` | 390x844 | pass: 200, h1 present, no console errors, no failed requests, no horizontal overflow, new Space War wording present. |
