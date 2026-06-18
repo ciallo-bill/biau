@@ -2,18 +2,17 @@
 
 ## Findings
 
-- `/projects` list state currently does not read query parameters, so a selected preview cannot survive refresh or be shared.
-- `/projects/:id` already means independent technical detail page and should not be reused for list selection state.
-- `ProjectsView` owns a local `activeGroup`; if browser history restores a project from another group, that group also needs to sync with the selected project.
-- Browser back/forward currently cannot restore card selections because thumbnail clicks only update React state.
+- Home case-matrix cards currently reuse a single `查看案例` button label for both real case pages and non-case project previews.
+- `blog-semi` does not have a business case entry in `caseStudies`, so its button currently jumps to project selection even though the label says case.
+- Other projects in the matrix have real case entries and should keep a case-oriented CTA.
 
 ## Recommended Slice
 
-- Use a query parameter for list selection: `/projects?project=<id>`.
-- Keep `/projects/:id` as the independent technical detail route.
-- Validate project ids from the query before using them, falling back to the first project when invalid.
-- Push URL history entries when thumbnail cards or group tabs change the selected project.
-- Update popstate handling so browser back/forward restores the selected preview.
+- Keep the home case matrix.
+- Change the CTA label dynamically:
+  - real case exists -> `查看案例`
+  - no real case exists -> `查看项目`
+- Keep the existing click behavior, only align the label with the actual destination.
 
 ## Files To Touch
 
@@ -22,9 +21,7 @@
 
 ## Verification
 
-- Opening `/projects?project=pet-workspace` selects Pet Workspace.
-- Clicking thumbnail cards updates both preview and URL query.
-- Switching groups updates query to the first project in that group.
-- Browser back/forward restores list selection.
-- `/projects/pet-workspace` still opens the independent project detail page.
+- `blog-semi` card shows `查看项目` and selects the project list view.
+- case-backed cards still show `查看案例` and open `/cases/:id`.
 - Run `npm run lint` and `npm run build`.
+- Browser QA checks the home matrix on desktop and mobile.

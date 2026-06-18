@@ -2,16 +2,15 @@
 
 ## Decision
 
-Accepted CC's query-parameter approach with one additional controller constraint: the query state applies only to the `/projects` list view.
+Accepted the label-only fix.
 
 ## Approved Scope
 
-- Add safe helpers for valid project ids and `/projects?project=<id>` selection.
-- Use query state for project list previews, including navigation and thumbnail/group selection.
-- Keep `/projects/:id`, `/cases/:id`, `/games/:slug`, and blog routes unchanged.
-- Sync the project group tab when a selected project is restored from history.
+- Update only the home case-matrix CTA label to match whether a real case exists.
+- Keep the current click behavior intact.
+- Do not add a `blog-semi` case or remove the matrix entry.
 
 ## Risk Check
 
-- Medium-low risk: route logic is touched, so QA must cover direct query opening, invalid query fallback, thumbnail selection, group switching, browser back/forward, and independent detail routes.
-- No content, styles, dependencies, or reference projects are changed.
+- Very low risk: no route contracts or content structures change.
+- Main QA point: ensure the visual label now matches the actual destination for each card.

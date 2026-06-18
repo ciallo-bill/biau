@@ -640,7 +640,7 @@ function HomeView({ onOpenCase, onOpenProject }: { onOpenCase: (caseStudy: CaseS
                 const projectCase = getCaseStudyForProject(project.id)
                 if (projectCase) onOpenCase(projectCase)
                 else onOpenProject(project)
-              }}>查看案例</Button>
+              }}>{getCaseStudyForProject(project.id) ? '查看案例' : '查看项目'}</Button>
             </article>
           ))}
         </div>

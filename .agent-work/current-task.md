@@ -1,6 +1,6 @@
 # Current Task
 
-Date: 2026-06-16
+Date: 2026-06-17
 Repo: /home/zhang/workspace/blog-semi
 Branch: main
 Controller: Codex
@@ -8,20 +8,19 @@ Builder: Claude Code read-only plan, Codex scoped implementation
 
 ## Goal
 
-Make the `/projects` list-page selected project state restorable from the URL without changing the meaning of independent project detail routes. A selected preview such as Pet Workspace should be shareable and survive refresh as `/projects?project=pet-workspace`.
+Fix the home-page case matrix CTA labels so they match the actual destination. Projects that have a business case should keep a case-oriented CTA; projects without a case should expose a project-oriented CTA instead of pretending to open a case.
 
 ## Scope
 
-- Add a small helper for reading a valid project selection from `window.location.search` on `/projects`.
-- Update list-page selection actions to push/replace `/projects?project=<id>`.
-- Keep `/projects/:id` as the independent technical detail route.
-- Preserve `/cases/:id`, `/games/:slug`, and blog routes.
+- Audit the home-page case matrix CTA text and click behavior.
+- Adjust CTA labels only in the home-page case matrix section.
+- Keep existing case and project routes unchanged.
 
 ## Non-goals
 
-- Do not redesign the projects page.
-- Do not change project/case/blog content.
-- Do not add dependencies.
+- Do not redesign the home page.
+- Do not change case/project detail content.
+- Do not add or remove projects or cases.
 - Do not edit reference project directories.
 - Do not expose secrets, real accounts, IPs, API bases, or local validation paths.
 
@@ -36,10 +35,8 @@ Make the `/projects` list-page selected project state restorable from the URL wi
 ## Acceptance Criteria
 
 - [x] CC produces a read-only plan before implementation.
-- [x] Opening `/projects?project=pet-workspace` selects Pet Workspace in the preview panel.
-- [x] Clicking project thumbnail cards updates the URL query and preview selection.
-- [x] Switching project groups updates the URL query to the first project in the group.
-- [x] `/projects/pet-workspace` still opens the independent technical detail page.
-- [x] Browser back/forward restores project list selection.
+- [x] Home case-matrix cards with a real case use a case-oriented CTA.
+- [x] Home case-matrix cards without a real case use a project-oriented CTA.
+- [x] CTA click destinations still match cases vs projects.
 - [x] `npm run lint` and `npm run build` pass.
-- [x] Browser QA checks desktop and mobile.
+- [x] Browser QA checks home-page matrix behavior on desktop and mobile.
