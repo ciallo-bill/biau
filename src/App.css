@@ -2641,6 +2641,87 @@ textarea {
   font-weight: 900;
 }
 
+.blog-rebuild-panel {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.36fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  padding: clamp(26px, 3vw, 44px);
+  border: 1px solid rgba(0, 82, 255, 0.24);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(0, 82, 255, 0.08), rgba(255, 255, 255, 0.96) 58%),
+    #fff;
+  box-shadow: var(--site-shadow-accent);
+}
+
+.blog-rebuild-copy {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.blog-rebuild-copy h3 {
+  margin: 0;
+  color: var(--site-text);
+  font-size: clamp(2rem, 3.4vw, 4.4rem);
+  line-height: 1.06;
+}
+
+.blog-rebuild-copy p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--site-muted);
+  font-size: 1.02rem;
+  line-height: 1.85;
+}
+
+.blog-rebuild-topics {
+  display: grid;
+  gap: 12px;
+}
+
+.blog-rebuild-topics article {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 18px;
+  border: 1px solid #dbe8f8;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.blog-rebuild-topics article > strong {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #eef5ff;
+  color: var(--site-accent);
+}
+
+.blog-rebuild-topics article > div {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.blog-rebuild-topics h4 {
+  margin: 0;
+  color: var(--site-text);
+  font-size: 1.12rem;
+  line-height: 1.35;
+}
+
+.blog-rebuild-topics p {
+  margin: 0;
+  color: var(--site-muted);
+  line-height: 1.7;
+}
+
 .blog-latest-head {
   display: flex;
   justify-content: space-between;
@@ -3052,8 +3133,10 @@ textarea {
 .site-theme-dark .project-stage-detail,
 .site-theme-dark .project-thumb-card,
 .site-theme-dark .case-library-card,
+.site-theme-dark .blog-rebuild-panel,
 .site-theme-dark .blog-featured-layout,
 .site-theme-dark .blog-latest-card,
+.blog-view-dark .blog-rebuild-panel,
 .blog-view-dark .blog-featured-layout,
 .blog-view-dark .blog-latest-card {
   border-color: rgba(255, 255, 255, 0.14);
@@ -3073,11 +3156,15 @@ textarea {
 .site-theme-dark .case-route-strip span,
 .site-theme-dark .blog-featured-main h2,
 .site-theme-dark .blog-featured-aside strong,
+.site-theme-dark .blog-rebuild-copy h3,
+.site-theme-dark .blog-rebuild-topics h4,
 .site-theme-dark .blog-latest-head h3,
 .site-theme-dark .blog-latest-card h4,
 .blog-view-dark .blog-magazine-head h2,
 .blog-view-dark .blog-featured-main h2,
 .blog-view-dark .blog-featured-aside strong,
+.blog-view-dark .blog-rebuild-copy h3,
+.blog-view-dark .blog-rebuild-topics h4,
 .blog-view-dark .blog-latest-head h3,
 .blog-view-dark .blog-latest-card h4 {
   color: #fff;
@@ -3090,8 +3177,12 @@ textarea {
 .site-theme-dark .project-thumb-card em,
 .site-theme-dark .case-card-body p,
 .site-theme-dark .blog-featured-main p,
+.site-theme-dark .blog-rebuild-copy p,
+.site-theme-dark .blog-rebuild-topics p,
 .site-theme-dark .blog-latest-card p,
 .blog-view-dark .blog-featured-main p,
+.blog-view-dark .blog-rebuild-copy p,
+.blog-view-dark .blog-rebuild-topics p,
 .blog-view-dark .blog-latest-card p {
   color: rgba(255, 255, 255, 0.7);
 }
@@ -3114,6 +3205,18 @@ textarea {
 .blog-view-dark .blog-series-label,
 .blog-view-dark .blog-topic-pills span {
   border-color: rgba(80, 132, 255, 0.28);
+  background: rgba(0, 82, 255, 0.16);
+  color: #9cc2ff;
+}
+
+.site-theme-dark .blog-rebuild-topics article,
+.blog-view-dark .blog-rebuild-topics article {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.site-theme-dark .blog-rebuild-topics article > strong,
+.blog-view-dark .blog-rebuild-topics article > strong {
   background: rgba(0, 82, 255, 0.16);
   color: #9cc2ff;
 }
@@ -3923,6 +4026,7 @@ textarea {
   .case-board-head,
   .blog-magazine-head,
   .project-stage-main,
+  .blog-rebuild-panel,
   .blog-featured-layout {
     grid-template-columns: 1fr;
   }
@@ -3988,6 +4092,7 @@ textarea {
   .case-library-card.is-featured,
   .case-route-strip,
   .case-secondary-grid,
+  .blog-rebuild-panel,
   .blog-latest-grid {
     grid-template-columns: 1fr;
   }

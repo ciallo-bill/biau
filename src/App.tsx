@@ -115,6 +115,15 @@ function isLongFormBlogPost(post: BlogPost): boolean {
 const longFormBlogPosts = blogPosts.filter(isLongFormBlogPost)
 const defaultBlogPost = longFormBlogPosts[0] ?? blogPosts[0]
 
+const blogRebuildTopics = [
+  { title: 'RAG 与知识库', detail: '从检索、切分、引用、评测到合同审查案例，重写成可公开阅读的知识专题。' },
+  { title: 'Agent 与工具调用', detail: '围绕任务执行、状态推进、失败恢复和人审边界，拆成工程化文章。' },
+  { title: 'AI 应用生产化', detail: '补充成本治理、模型路由、监控、安全和交付文档等落地内容。' },
+  { title: '全栈业务系统', detail: '结合 ERP、博客系统和项目展示系统，整理前端、API、数据库和队列实践。' },
+  { title: '项目案例复盘', detail: '把 Legal RAG、Pet、ERP 和游戏项目整理为有图片、有流程、有取舍的案例文章。' },
+  { title: '图示与素材体系', detail: '为每篇文章补充结构图、流程图、界面截图或生成配图，让内容更接近正式技术媒体。' },
+]
+
 const heroSlides = [
   {
     id: 'legal-rag',
@@ -1801,153 +1810,50 @@ function CaseDetailView({ caseStudy, onBack, onOpenProject }: { caseStudy: CaseS
 }
 
 function BlogView({ onOpenPost, theme }: { onOpenPost: (post: BlogPost) => void; theme: SiteTheme }) {
-  const featuredPost = defaultBlogPost
-  const latestPosts = longFormBlogPosts.slice(0, 12)
-  const blogGroups = useMemo(() => {
-    const includesAny = (post: BlogPost, keywords: string[]) => {
-      const content = `${post.title} ${post.detail} ${post.tag} ${post.series ?? ''} ${(post.knowledgePoints ?? []).join(' ')} ${(post.scenarios ?? []).join(' ')}`
-      return keywords.some((keyword) => content.includes(keyword))
-    }
-
-    return [
-      {
-        key: 'all',
-        title: '长文章精选',
-        description: '按发布时间汇总公开技术长文、项目案例和内容系统专题。',
-        posts: longFormBlogPosts,
-      },
-      {
-        key: 'rag',
-        title: 'RAG 与知识库',
-        description: '文档入库、切分、检索、引用、评测和知识库运营。',
-        posts: longFormBlogPosts.filter((post) => includesAny(post, ['RAG', '知识库', '向量', 'Embedding', 'Chunk', '检索', '引用', 'citation', '文档', '索引'])),
-      },
-      {
-        key: 'agent',
-        title: 'Agent 与生成管线',
-        description: '工具调用、状态机、失败恢复、人审和可控生成流程。',
-        posts: longFormBlogPosts.filter((post) => includesAny(post, ['Agent', 'Tool', '工具调用', '状态机', '人审', '生成管线', 'Worker', 'QA'])),
-      },
-      {
-        key: 'delivery',
-        title: '生产化与交付',
-        description: '部署、监控、配置、成本、安全、审计和交付文档。',
-        posts: longFormBlogPosts.filter((post) => includesAny(post, ['生产', '部署', '监控', '配置', '成本', '安全', '审计', '交付', '看板', '故障', '权限'])),
-      },
-      {
-        key: 'fullstack',
-        title: '全栈工程',
-        description: '前端工作台、API 契约、队列、数据库和工程复盘。',
-        posts: longFormBlogPosts.filter((post) => post.tag === '全栈开发' || includesAny(post, ['API', '前端', '数据库', '队列', 'Worker', '错误码', '任务状态'])),
-      },
-      {
-        key: 'projects',
-        title: '项目复盘',
-        description: '围绕 legal-rag、pet、ERP、游戏和移动端项目的复盘文章。',
-        posts: longFormBlogPosts.filter((post) => !post.series || includesAny(post, ['复盘', 'legal-rag', 'Pet', 'ERP', 'Godot', 'Android', '项目'])),
-      },
-    ]
-  }, [])
-  const [activeGroupKey, setActiveGroupKey] = useState(blogGroups[0].key)
-  const activeGroup = blogGroups.find((group) => group.key === activeGroupKey) ?? blogGroups[0]
-  const activeGroupPosts = activeGroup.posts
-
+  void onOpenPost
   return (
     <div className={`blog-view blog-view-${theme}`}>
       <section className="blog-hero">
         <Text type="tertiary">Knowledge Hub</Text>
         <Title heading={1}>技术知识库</Title>
-        <Paragraph>沉淀 AI 应用、RAG、Agent 与全栈工程实践，整理可复用的技术文章、项目复盘和交付经验。</Paragraph>
+        <Paragraph>正在按正式技术博客标准重构内容体系：补充案例、图片、流程图和工程取舍，让每篇文章都围绕一个清晰主题展开。</Paragraph>
       </section>
 
       <section className="blog-magazine">
         <div className="blog-magazine-head">
           <div>
-            <span className="section-pill">专题索引</span>
-            <Title heading={2}>按知识方向进入文章</Title>
+            <span className="section-pill">Editorial System</span>
+            <Title heading={2}>内容正在重构</Title>
           </div>
           <div className="blog-topic-pills" aria-label="博客栏目">
-            <span>{longFormBlogPosts.length} 篇长文章</span>
-            <span>{blogGroups.length} 个专题</span>
-            <span>详情页阅读</span>
+            <span>0 篇公开文章</span>
+            <span>{blogRebuildTopics.length} 个重构方向</span>
+            <span>图文案例版</span>
           </div>
         </div>
 
-        <article className="blog-featured-layout">
-          <div className="blog-featured-main">
-            <Text type="tertiary">{featuredPost.series ?? '精选博客'} / {featuredPost.date}</Text>
-            <Title heading={2}>{featuredPost.title}</Title>
-            <Paragraph>{featuredPost.detail}</Paragraph>
-            <Button theme="solid" type="primary" onClick={() => onOpenPost(featuredPost)}>阅读知识文章</Button>
+        <div className="blog-rebuild-panel">
+          <div className="blog-rebuild-copy">
+            <Text type="tertiary">Publishing Roadmap</Text>
+            <Title heading={3}>新版文章将按专题陆续发布</Title>
+            <Paragraph>每篇文章会围绕一个技术问题展开，包含背景、核心概念、流程拆解、工程取舍、项目案例、配图素材和复盘结论。内容达到可公开阅读标准后，再进入博客列表。</Paragraph>
+            <Space wrap>
+              <Tag color="blue">案例驱动</Tag>
+              <Tag color="cyan">图文结构</Tag>
+              <Tag color="green">工程落地</Tag>
+            </Space>
           </div>
-          <aside className="blog-featured-aside">
-            <Text type="tertiary">核心要点</Text>
-            <strong>{featuredPost.series ?? '知识库'}</strong>
-            {(featuredPost.knowledgePoints ?? featuredPost.sections.map((section) => section.title).slice(0, 3)).map((item) => (
-              <span key={item}>{item}</span>
+          <div className="blog-rebuild-topics" aria-label="重构方向">
+            {blogRebuildTopics.map((topic, index) => (
+              <article key={topic.title}>
+                <strong>{String(index + 1).padStart(2, '0')}</strong>
+                <div>
+                  <Title heading={4}>{topic.title}</Title>
+                  <Paragraph>{topic.detail}</Paragraph>
+                </div>
+              </article>
             ))}
-          </aside>
-        </article>
-
-        <div className="blog-knowledge-board">
-          <aside className="blog-group-rail" aria-label="博客专题">
-            <Text type="tertiary">专题</Text>
-            {blogGroups.map((group) => (
-              <button
-                key={group.key}
-                className={activeGroup.key === group.key ? 'is-active' : ''}
-                type="button"
-                onClick={() => setActiveGroupKey(group.key)}
-              >
-                <strong>{group.title}</strong>
-                <span>{group.posts.length} 篇</span>
-              </button>
-            ))}
-          </aside>
-
-          <div className="blog-group-panel">
-            <div className="blog-latest-head">
-              <div>
-                <Title heading={3}>{activeGroup.title}</Title>
-                <Text type="tertiary">{activeGroup.description}</Text>
-              </div>
-              <Tag color="blue">{activeGroupPosts.length} 篇可见</Tag>
-            </div>
-
-            <div className="blog-curated-list">
-              {activeGroupPosts.map((post, index) => (
-                <article key={`${activeGroup.key}-${post.slug}`} className="blog-curated-row">
-                  <strong>{String(index + 1).padStart(2, '0')}</strong>
-                  <div>
-                    <Text type="tertiary">{post.series ?? post.tag} / {post.readTime}</Text>
-                    <Title heading={4}>{post.title}</Title>
-                    <Paragraph>{post.detail}</Paragraph>
-                  </div>
-                  <Button theme="borderless" type="primary" onClick={() => onOpenPost(post)}>阅读</Button>
-                </article>
-              ))}
-            </div>
           </div>
-        </div>
-
-        <div className="blog-latest-head">
-          <div>
-            <Title heading={3}>最新更新</Title>
-            <Text type="tertiary">近期整理的工程实践、技术拆解与项目复盘。</Text>
-          </div>
-        </div>
-
-        <div className="blog-latest-grid">
-          {latestPosts.map((post) => (
-            <article key={post.title} className="blog-latest-card">
-              <Text type="tertiary">{post.date}</Text>
-              <Tag color={post.tag === 'AI 应用' ? 'cyan' : post.tag === '全栈开发' ? 'blue' : 'grey'}>{post.tag}</Tag>
-              {post.series ? <span className="blog-series-label">{post.series}</span> : null}
-              <Title heading={4}>{post.title}</Title>
-              <Paragraph>{post.detail}</Paragraph>
-              <Button theme="borderless" type="primary" onClick={() => onOpenPost(post)}>阅读全文</Button>
-            </article>
-          ))}
         </div>
       </section>
     </div>
