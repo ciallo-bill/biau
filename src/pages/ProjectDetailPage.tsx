@@ -18,7 +18,7 @@ export function ProjectDetailPage() {
 
   if (!project) {
     return (
-      <div className="page-section">
+      <main className="page-stack detail-page">
         <div className="detail-missing">
           <h1 className="section-title">未找到该项目</h1>
           <p className="section-description">该项目可能已下线或链接有误。</p>
@@ -27,12 +27,12 @@ export function ProjectDetailPage() {
             <span>返回项目集</span>
           </button>
         </div>
-      </div>
+      </main>
     )
   }
 
   return (
-    <article className="page-section detail-page">
+    <article className="page-stack detail-page project-detail-page">
       <Link to="/projects" className="detail-back">
         <IconArrowLeft />
         <span>项目集</span>

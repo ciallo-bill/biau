@@ -10,7 +10,8 @@
     "blog:plan": "node scripts/generate-blog-draft.mjs --list",
     "blog:draft": "node scripts/generate-blog-draft.mjs",
     "blog:check": "node scripts/check-public-blog.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:ui": "node scripts/check-ui.mjs"
   },
   "dependencies": {
     "@douyinfe/semi-icons": "^2.100.0",

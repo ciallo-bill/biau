@@ -72,14 +72,17 @@ export const projects: Project[] = [
   },
   {
     id: 'biau-playlab',
-    title: 'Astro 内容站｜旧版博客系统',
-    summary: '旧版 Astro 静态内容站，承载文章、开发日志、游戏展示、订阅源、站点审计和静态发布资料。',
+    title: 'Biau Playlab｜游戏作品集与系统设计内容站',
+    summary: '基于 Astro 的个人作品集，整合 Godot 游戏原型、Web 试玩、系统设计文章、开发日志和旧博客迁移内容。',
     category: 'platform',
     status: 'live',
-    role: 'Astro 内容站 / 游戏展示 / 内容审计 / 静态部署',
-    stack: ['Astro', '内容集合', 'Cloudflare Pages'],
-    highlights: ['内容集合', '游戏展示', '试玩包托管', '静态部署'],
-    links: [],
+    role: 'Astro 作品集 / Godot 游戏展示 / 系统设计文章 / Cloudflare Pages',
+    stack: ['Astro 5', 'Content Collections', 'Godot Web', 'Cloudflare Pages'],
+    highlights: ['游戏项目案例', 'Web 试玩入口', '系统设计文章', '内容与产物审计'],
+    links: [
+      { label: '线上站点', href: 'https://blog.playlab.eu.cc/', type: 'external' },
+      { label: '源码仓库', href: 'https://github.com/ciallo-bill/blog', type: 'external' },
+    ],
   },
   {
     id: 'blog-semi',

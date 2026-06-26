@@ -76,7 +76,7 @@ export const heroContent = {
       poetry: '《在文字中凝固思考的痕迹》',
       action: 'READ',
       accent: 'signal',
-      link: '/blogs',
+      link: '/blog',
     },
   ] as HeroProject[],
 }

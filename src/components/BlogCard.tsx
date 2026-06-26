@@ -1,7 +1,7 @@
-import type { BlogPost } from '../data/blog'
+import type { BlogPostSummary } from '../data/blog'
 
 interface BlogCardProps {
-  post: BlogPost
+  post: BlogPostSummary
   onReadMore: () => void
 }
 

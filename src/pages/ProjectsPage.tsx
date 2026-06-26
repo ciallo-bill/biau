@@ -20,28 +20,37 @@ export function ProjectsPage() {
     ]
   }, [])
 
+  let projectIndex = 0
+
   return (
-    <div className="page-section">
-      <div className="section-header">
+    <main className="projects-tools-page page-stack">
+      <section className="section-header page-hero">
         <p className="section-subtitle">PROJECT PORTFOLIO</p>
         <h1 className="section-title">项目集</h1>
         <p className="section-description">让技术落进可演示的流程</p>
-      </div>
+      </section>
 
       {projectGroups.map((group) => (
-        <div key={group.key} className="project-group">
-          <h2 className="project-group-title">{group.title}</h2>
-          <div className="projects-grid">
-            {group.projects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                onViewDetails={() => navigate(`/projects/${project.id}`)}
-              />
-            ))}
+        <section key={group.key} className="project-group">
+          <div className="project-group-head">
+            <span>{group.key.toUpperCase()}</span>
+            <h2 className="project-group-title">{group.title}</h2>
           </div>
-        </div>
+          <div className="projects-grid card-grid collapsed-tool-grid">
+            {group.projects.map((project) => {
+              projectIndex += 1
+              return (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  index={projectIndex}
+                  onViewDetails={() => navigate(`/projects/${project.id}`)}
+                />
+              )
+            })}
+          </div>
+        </section>
       ))}
-    </div>
+    </main>
   )
 }

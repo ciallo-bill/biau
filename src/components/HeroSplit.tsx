@@ -16,7 +16,7 @@ export function HeroSplit({ onProjectClick }: HeroSplitProps) {
   return (
     <main className="home-hero">
       <section className="hero-intro">
-        <p className="eyebrow">BIAU PORT</p>
+        <h1 className="eyebrow">BIAU PORT</h1>
 
         <HeroTitleRotator poems={poems} />
 

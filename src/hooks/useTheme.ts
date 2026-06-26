@@ -32,22 +32,19 @@ function readStoredMode(): ThemeMode {
 
 export function useTheme() {
   const [mode, setMode] = useState<ThemeMode>(readStoredMode)
-  const [resolved, setResolved] = useState<ResolvedTheme>(() => resolveTheme(readStoredMode()))
+  const [, setAutoTick] = useState(0)
+  const resolved = resolveTheme(mode)
 
   // 持久化用户选择
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, mode)
-    setResolved(resolveTheme(mode))
   }, [mode])
 
   // auto 模式下定时重算，跨越时间边界时自动切换
   useEffect(() => {
     if (mode !== 'auto') return
     const timer = window.setInterval(() => {
-      setResolved((prev) => {
-        const next = resolveTheme('auto')
-        return prev === next ? prev : next
-      })
+      setAutoTick((tick) => tick + 1)
     }, 60_000)
     return () => window.clearInterval(timer)
   }, [mode])

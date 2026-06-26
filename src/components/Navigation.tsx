@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 type SiteLanguage = 'zh' | 'en'
 type ThemeMode = 'light' | 'dark' | 'auto'
@@ -29,10 +29,15 @@ const navItems: NavItem[] = [
 
 const brandTitle: Record<SiteLanguage, string> = { zh: '笔岸实验室', en: 'BIAU LABS' }
 const allProjectsLabel: Record<SiteLanguage, string> = { zh: '所有项目', en: 'ALL PROJECTS' }
+const backHomeLabel: Record<SiteLanguage, string> = { zh: '回主页', en: 'HOME' }
 
 export function Navigation({ language, themeMode, onCycleTheme, onToggleLanguage }: NavigationProps) {
   const theme = themeMeta[themeMode]
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const isHome = pathname === '/'
+  const primaryActionLabel = isHome ? allProjectsLabel[language] : backHomeLabel[language]
+  const primaryActionTarget = isHome ? '/projects' : '/'
 
   return (
     <nav className="navigation-top">
@@ -72,7 +77,7 @@ export function Navigation({ language, themeMode, onCycleTheme, onToggleLanguage
           ))}
         </ul>
 
-        {/* 右侧：主题切换 + 语言切换 + 所有项目按钮 */}
+        {/* 右侧：主题切换 + 语言切换 + 语境按钮 */}
         <div className="nav-actions">
           <button
             className="nav-theme-toggle"
@@ -89,8 +94,8 @@ export function Navigation({ language, themeMode, onCycleTheme, onToggleLanguage
           >
             {language === 'zh' ? 'EN' : '中'}
           </button>
-          <button className="nav-all-tools" onClick={() => navigate('/projects')}>
-            {allProjectsLabel[language]}
+          <button className="nav-all-tools" onClick={() => navigate(primaryActionTarget)}>
+            {primaryActionLabel}
           </button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { IconArrowLeft } from '@douyinfe/semi-icons'
-import { blogPosts, categoryLabels } from '../data/blog'
+import { blogPosts, categoryLabels } from '../data/blogContent'
 
 export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -18,7 +18,7 @@ export function BlogPostPage() {
 
   if (!post) {
     return (
-      <div className="page-section">
+      <main className="page-stack detail-page">
         <div className="detail-missing">
           <h1 className="section-title">未找到该文章</h1>
           <p className="section-description">该文章可能已下线或链接有误。</p>
@@ -27,12 +27,12 @@ export function BlogPostPage() {
             <span>返回知识库</span>
           </button>
         </div>
-      </div>
+      </main>
     )
   }
 
   return (
-    <article className="page-section detail-page blog-post-page">
+    <article className="page-stack detail-page blog-post-page">
       <Link to="/blog" className="detail-back">
         <IconArrowLeft />
         <span>知识库</span>

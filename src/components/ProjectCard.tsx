@@ -1,14 +1,39 @@
 import { IconArrowRight } from '@douyinfe/semi-icons'
+import type { KeyboardEvent } from 'react'
 import type { Project } from '../data/portfolio'
 
 interface ProjectCardProps {
   project: Project
+  index?: number
   onViewDetails: () => void
 }
 
-export function ProjectCard({ project, onViewDetails }: ProjectCardProps) {
+const categoryAccent: Record<Project['category'], string> = {
+  ai: 'signal',
+  business: 'commerce',
+  interactive: 'image',
+  mobile: 'preview',
+  platform: 'formula',
+}
+
+export function ProjectCard({ project, index, onViewDetails }: ProjectCardProps) {
+  const number = index ? String(index).padStart(2, '0') : undefined
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return
+    event.preventDefault()
+    onViewDetails()
+  }
+
   return (
-    <div className="glass-card project-card hover-lift">
+    <article
+      className={`glass-card project-card feature-card hover-lift ${categoryAccent[project.category]}`}
+      data-project-index={number}
+      data-graph-label={project.title}
+      onClick={onViewDetails}
+      onKeyDown={handleKeyDown}
+      role="link"
+      tabIndex={0}
+    >
       {project.image && (
         <div className="project-image">
           <img src={project.image} alt={project.title} loading="lazy" />
@@ -16,10 +41,11 @@ export function ProjectCard({ project, onViewDetails }: ProjectCardProps) {
       )}
       
       <div className="project-content">
-        <div className="project-header">
-          <h3 className="project-title">{project.title}</h3>
-          <span className="tag">{project.role}</span>
+        <div className="project-header feature-head">
+          <span className="tag badge">{project.role}</span>
         </div>
+
+        <h3 className="project-title">{project.title}</h3>
         
         <p className="project-summary">{project.summary}</p>
         
@@ -33,7 +59,13 @@ export function ProjectCard({ project, onViewDetails }: ProjectCardProps) {
         </div>
         
         <div className="project-footer">
-          <button className="btn" onClick={onViewDetails}>
+          <button
+            className="btn"
+            onClick={(e) => {
+              e.stopPropagation()
+              onViewDetails()
+            }}
+          >
             <span>查看详情</span>
             <IconArrowRight />
           </button>
@@ -56,6 +88,6 @@ export function ProjectCard({ project, onViewDetails }: ProjectCardProps) {
           )}
         </div>
       </div>
-    </div>
+    </article>
   )
 }
