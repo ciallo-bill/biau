@@ -1,13 +1,27 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { IconArrowLeft } from '@douyinfe/semi-icons'
-import { blogPosts, categoryLabels } from '../data/blogContent'
+import { blogPosts, categoryLabels } from '../data/blog'
+import { getBlogPost } from '../data/blogContent'
+import type { BlogPost } from '../data/blogShared'
 
 export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const [loadedPost, setLoadedPost] = useState<{ slug: string; post: BlogPost | null } | null>(null)
 
-  const post = useMemo(() => blogPosts.find((p) => p.slug === slug), [slug])
+  const post = loadedPost && loadedPost.slug === slug ? loadedPost.post : undefined
+
+  useEffect(() => {
+    let cancelled = false
+    void getBlogPost(slug ?? '').then((nextPost) => {
+      if (!cancelled) setLoadedPost({ slug: slug ?? '', post: nextPost ?? null })
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [slug])
 
   const related = useMemo(() => {
     if (!post) return []
@@ -15,6 +29,17 @@ export function BlogPostPage() {
       .filter((p) => p.slug !== post.slug && p.category === post.category)
       .slice(0, 3)
   }, [post])
+
+  if (post === undefined) {
+    return (
+      <main className="page-stack detail-page">
+        <div className="detail-missing">
+          <h1 className="section-title">文章载入中</h1>
+          <p className="section-description">正在打开知识库内容。</p>
+        </div>
+      </main>
+    )
+  }
 
   if (!post) {
     return (

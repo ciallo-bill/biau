@@ -1,6 +1,7 @@
 import { IconArrowRight } from '@douyinfe/semi-icons'
 import type { KeyboardEvent } from 'react'
 import type { Project } from '../data/portfolio'
+import { ResponsiveImage } from './ResponsiveImage'
 
 interface ProjectCardProps {
   project: Project
@@ -33,10 +34,11 @@ export function ProjectCard({ project, index, onViewDetails }: ProjectCardProps)
       onKeyDown={handleKeyDown}
       role="link"
       tabIndex={0}
+      aria-label={`查看项目：${project.title}`}
     >
       {project.image && (
         <div className="project-image">
-          <img src={project.image} alt={project.title} loading="lazy" />
+          <ResponsiveImage src={project.image} alt={project.title} loading="lazy" />
         </div>
       )}
       

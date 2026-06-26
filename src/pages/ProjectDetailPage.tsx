@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { IconArrowLeft, IconLink } from '@douyinfe/semi-icons'
 import { projects, categoryLabels, statusLabels } from '../data/portfolio'
+import { ResponsiveImage } from '../components/ResponsiveImage'
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -50,7 +51,7 @@ export function ProjectDetailPage() {
 
       {project.image && (
         <div className="detail-hero-image">
-          <img src={project.image} alt={project.title} loading="lazy" />
+          <ResponsiveImage src={project.image} alt={project.title} loading="eager" />
         </div>
       )}
 

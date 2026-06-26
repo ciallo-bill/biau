@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url'
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const draftsDir = resolve(repoRoot, 'content-drafts')
 const blogDataPath = resolve(repoRoot, 'src/data/blog.ts')
+const blogPostsDir = resolve(repoRoot, 'src/data/blog-posts')
 const forbiddenTerms = ['面试', '答辩', '简历', '学习打卡', '内部解释', '不再铺满', '求职', '私下', '本地知识库']
 const requiredDraftHeadings = ['## 摘要', '## 为什么这个问题重要', '## 核心概念', '## 工作流程', '## 工程取舍', '## 项目例子', '## 常见误区', '## 复盘结论']
 
@@ -29,6 +30,7 @@ async function checkDrafts() {
   const issues = []
   for (const file of files) {
     const text = await readFile(resolve(draftsDir, file), 'utf8')
+    if (!/^---[\s\S]*status:\s*["']?draft["']?/m.test(text)) continue
     issues.push(...checkText(`content-drafts/${file}`, text, requiredDraftHeadings))
     if (text.length < 1200) issues.push(`content-drafts/${file} 正文偏短，可能仍然像问答或提纲`)
   }
@@ -36,8 +38,18 @@ async function checkDrafts() {
 }
 
 async function checkBlogData() {
-  const text = await readFile(blogDataPath, 'utf8')
-  return checkText('src/data/blog.ts', text, [])
+  const issues = []
+  const summaryText = await readFile(blogDataPath, 'utf8')
+  issues.push(...checkText('src/data/blog.ts', summaryText, []))
+
+  if (!existsSync(blogPostsDir)) return issues
+  const files = (await readdir(blogPostsDir)).filter((file) => file.endsWith('.ts'))
+  for (const file of files) {
+    const text = await readFile(resolve(blogPostsDir, file), 'utf8')
+    issues.push(...checkText(`src/data/blog-posts/${file}`, text, []))
+  }
+
+  return issues
 }
 
 async function main() {

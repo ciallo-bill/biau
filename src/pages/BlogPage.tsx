@@ -63,14 +63,18 @@ export function BlogPage() {
       />
 
       <section className="blog-tools" aria-label="文章检索">
+        <label className="sr-only" htmlFor="blog-search">
+          搜索知识库文章
+        </label>
         <input
+          id="blog-search"
           className="blog-search"
           type="search"
           value={searchQuery}
           onChange={(event) => handleSearchChange(event.target.value)}
           placeholder="搜索文章、项目方法、技术关键词"
         />
-        <p className="blog-result-meta">
+        <p className="blog-result-meta" aria-live="polite">
           {filteredBlogs.length} 篇文章 · 第 {page} / {totalPages} 页
         </p>
       </section>
@@ -93,7 +97,13 @@ export function BlogPage() {
       )}
 
       <nav className="blog-pagination" aria-label="文章分页">
-        <button className="btn" disabled={page === 1} onClick={() => setPage((current) => current - 1)}>
+        <button
+          className="btn"
+          type="button"
+          disabled={page === 1}
+          aria-disabled={page === 1}
+          onClick={() => setPage((current) => current - 1)}
+        >
           上一页
         </button>
         <span>
@@ -101,7 +111,9 @@ export function BlogPage() {
         </span>
         <button
           className="btn"
+          type="button"
           disabled={page === totalPages}
+          aria-disabled={page === totalPages}
           onClick={() => setPage((current) => current + 1)}
         >
           下一页

@@ -85,6 +85,12 @@ const initialCards = await interactionPage.locator('.blog-card').count()
 if (initialCards !== 12) {
   failures.push(`/blog pagination: expected 12 cards on first page, got ${initialCards}`)
 }
+const previousButton = interactionPage.getByRole('button', { name: '上一页' })
+const previousDisabled = await previousButton.isDisabled()
+const previousAriaDisabled = await previousButton.getAttribute('aria-disabled')
+if (!previousDisabled || previousAriaDisabled !== 'true') {
+  failures.push('/blog pagination: previous button should be disabled with aria-disabled on first page')
+}
 await interactionPage.locator('.blog-search').fill('RAG')
 await interactionPage.waitForTimeout(100)
 const searchedCards = await interactionPage.locator('.blog-card').count()
@@ -92,7 +98,47 @@ const resultMeta = await interactionPage.locator('.blog-result-meta').innerText(
 if (searchedCards === 0 || !resultMeta.includes('篇文章')) {
   failures.push('/blog search: expected visible search results and result meta')
 }
+await interactionPage.locator('.blog-search').fill('no-result-for-ui-check')
+await interactionPage.waitForTimeout(100)
+if (!(await interactionPage.locator('.blog-empty').isVisible())) {
+  failures.push('/blog empty state: expected empty state for unmatched search')
+}
 await interactionPage.close()
+
+const keyboardPage = await browser.newPage({ viewport: viewports[0] })
+await keyboardPage.goto(`${base}/projects`, { waitUntil: 'networkidle' })
+for (let index = 0; index < 20; index += 1) {
+  const focusedProject = await keyboardPage.evaluate(() => document.activeElement?.classList.contains('project-card'))
+  if (focusedProject) break
+  await keyboardPage.keyboard.press('Tab')
+}
+const focusedProject = await keyboardPage.evaluate(() => document.activeElement?.classList.contains('project-card'))
+if (!focusedProject) {
+  failures.push('/projects keyboard: expected Tab to reach a project card')
+} else {
+  await keyboardPage.keyboard.press('Enter')
+  await keyboardPage.waitForURL(/\/projects\/[^/]+$/, { timeout: 5000 }).catch(() => {
+    failures.push('/projects keyboard: Enter on focused project card did not navigate to detail page')
+  })
+}
+await keyboardPage.close()
+
+const imagePage = await browser.newPage({ viewport: viewports[1] })
+await imagePage.goto(`${base}/projects/legal-rag`, { waitUntil: 'networkidle' })
+const imageOk = await imagePage.locator('.detail-hero-image img').evaluate((image) => {
+  const img = image instanceof HTMLImageElement ? image : null
+  if (!img || img.naturalWidth === 0 || img.naturalHeight === 0) return false
+  const rect = img.getBoundingClientRect()
+  return rect.left >= -1 && rect.right <= document.documentElement.clientWidth + 1
+})
+const webpSource = await imagePage.locator('.detail-hero-image source[type="image/webp"]').getAttribute('srcset')
+if (!imageOk) {
+  failures.push('/projects/legal-rag image: detail image did not load or overflowed horizontally')
+}
+if (!webpSource?.endsWith('.webp')) {
+  failures.push('/projects/legal-rag image: expected webp source fallback picture')
+}
+await imagePage.close()
 
 await browser.close()
 

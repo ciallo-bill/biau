@@ -11,7 +11,10 @@
     "blog:draft": "node scripts/generate-blog-draft.mjs",
     "blog:check": "node scripts/check-public-blog.mjs",
     "preview": "vite preview",
-    "check:ui": "node scripts/check-ui.mjs"
+    "check:ui": "node scripts/check-ui.mjs",
+    "images:optimize": "node scripts/optimize-images.mjs",
+    "sitemap:generate": "node scripts/generate-sitemap.mjs",
+    "verify": "node scripts/verify.mjs"
   },
   "dependencies": {
     "@douyinfe/semi-icons": "^2.100.0",
@@ -31,6 +34,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
+    "sharp": "^0.35.2",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12"

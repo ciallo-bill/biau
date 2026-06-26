@@ -936,9 +936,13 @@
   background: color-mix(in oklch, var(--panel) 48%, transparent);
 }
 
+.detail-hero-image picture,
 .detail-hero-image img {
   display: block;
   width: 100%;
+}
+
+.detail-hero-image img {
   max-height: 520px;
   object-fit: cover;
 }
