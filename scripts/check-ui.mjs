@@ -164,7 +164,55 @@ if (navIndicator.width < 32 || navIndicator.height < 3 || navIndicator.shadow ==
 }
 await navIndicatorPage.close()
 
+const homeIntroPage = await browser.newPage({ viewport: viewports[0] })
+await homeIntroPage.addInitScript(() => {
+  window.sessionStorage.removeItem('biau-port-harbor-intro:v1')
+  window.__harborIntroEvents = []
+  document.addEventListener(
+    'animationend',
+    (event) => {
+      if (!(event.target instanceof Element)) return
+      if (!String(event.animationName).startsWith('harbor')) return
+      window.__harborIntroEvents.push({
+        name: event.animationName,
+        className: event.target.className,
+        time: Math.round(performance.now()),
+      })
+    },
+    true,
+  )
+})
+await homeIntroPage.goto(`${base}/`, { waitUntil: 'domcontentloaded' })
+await homeIntroPage.waitForSelector('.harbor-intro__vessel', { timeout: 3000 }).catch(() => {
+  failures.push('/ home intro: expected harbor intro vessel to mount on first visit')
+})
+await homeIntroPage
+  .waitForFunction(
+    () => {
+      const events = window.__harborIntroEvents ?? []
+      return events.some((event) => event.name === 'harborIntroVeil') && !document.querySelector('.harbor-intro')
+    },
+    null,
+    { timeout: 10000 },
+  )
+  .catch(() => {
+    failures.push('/ home intro: expected harbor intro to finish and unmount')
+  })
+const harborIntroEvents = await homeIntroPage.evaluate(() => window.__harborIntroEvents ?? [])
+const vesselEndIndex = harborIntroEvents.findIndex((event) => event.name === 'harborVesselDock')
+const markEndIndex = harborIntroEvents.findIndex((event) => event.name === 'harborMarkLand')
+const veilEndIndex = harborIntroEvents.findIndex((event) => event.name === 'harborIntroVeil')
+if (vesselEndIndex < 0 || markEndIndex < 0 || veilEndIndex < 0) {
+  failures.push('/ home intro: expected vessel, mark, and veil animation completion events')
+} else if (veilEndIndex < vesselEndIndex || veilEndIndex < markEndIndex) {
+  failures.push('/ home intro: veil should fade only after vessel and mark finish docking')
+}
+await homeIntroPage.close()
+
 const homeCarouselPage = await browser.newPage({ viewport: viewports[0] })
+await homeCarouselPage.addInitScript(() => {
+  window.sessionStorage.setItem('biau-port-harbor-intro:v1', '1')
+})
 await homeCarouselPage.goto(`${base}/`, { waitUntil: 'networkidle' })
 const carouselViewport = homeCarouselPage.locator('.carousel-viewport')
 const carouselTrack = homeCarouselPage.locator('.carousel-track')
@@ -172,7 +220,20 @@ await carouselViewport.hover({ force: true })
 const initialScrollY = await carouselTrack.evaluate((track) =>
   getComputedStyle(track).getPropertyValue('--carousel-scroll-y').trim()
 )
+const carouselNativeHintCount = await homeCarouselPage
+  .locator('.carousel-card[title], .carousel-card [title], a.carousel-card[href]')
+  .count()
+if (carouselNativeHintCount > 0) {
+  failures.push('/ home carousel: cards should not expose native browser title/url hints')
+}
 await homeCarouselPage.mouse.wheel(0, 260)
+await homeCarouselPage.waitForTimeout(180)
+const quickWheelScrollY = await carouselTrack.evaluate((track) =>
+  getComputedStyle(track).getPropertyValue('--carousel-scroll-y').trim()
+)
+if (!quickWheelScrollY || quickWheelScrollY === initialScrollY) {
+  failures.push('/ home carousel: expected mouse wheel to update carousel position promptly')
+}
 await homeCarouselPage.waitForFunction(
   (initial) => {
     const track = document.querySelector('.carousel-track')
@@ -194,11 +255,46 @@ if (!wheelScrollY || wheelScrollY === initialScrollY) {
 }
 await homeCarouselPage.close()
 
+const homeTitleDragPage = await browser.newPage({ viewport: viewports[0] })
+await homeTitleDragPage.addInitScript(() => {
+  window.sessionStorage.setItem('biau-port-harbor-intro:v1', '1')
+})
+await homeTitleDragPage.goto(`${base}/`, { waitUntil: 'networkidle' })
+const titleRotator = homeTitleDragPage.locator('.hero-title-rotator')
+const titleBeforeDrag = await titleRotator.getAttribute('aria-label')
+const titleBox = await titleRotator.boundingBox()
+if (!titleBox) {
+  failures.push('/ home title drag: expected title rotator to be visible')
+} else {
+  await homeTitleDragPage.mouse.move(titleBox.x + titleBox.width * 0.38, titleBox.y + titleBox.height * 0.48)
+  await homeTitleDragPage.mouse.down()
+  await homeTitleDragPage.mouse.move(titleBox.x + titleBox.width * 0.38 + 170, titleBox.y + titleBox.height * 0.48 - 18, {
+    steps: 10,
+  })
+  await homeTitleDragPage.mouse.up()
+  await homeTitleDragPage
+    .waitForFunction(
+      (previous) => {
+        const title = document.querySelector('.hero-title-rotator')
+        return title?.getAttribute('aria-label') !== previous
+      },
+      titleBeforeDrag,
+      { timeout: 2200 },
+    )
+    .catch(() => {
+      failures.push('/ home title drag: expected drag release to switch hero title')
+    })
+}
+await homeTitleDragPage.close()
+
 const homeCarouselClickPage = await browser.newPage({ viewport: viewports[0] })
+await homeCarouselClickPage.addInitScript(() => {
+  window.sessionStorage.setItem('biau-port-harbor-intro:v1', '1')
+})
 await homeCarouselClickPage.goto(`${base}/`, { waitUntil: 'networkidle' })
 await homeCarouselClickPage.locator('.carousel-viewport').hover({ force: true })
 await homeCarouselClickPage.waitForTimeout(120)
-await homeCarouselClickPage.locator('.carousel-card[href="/projects/legal-rag"]').nth(1).click({ force: true })
+await homeCarouselClickPage.locator('.carousel-card').filter({ hasText: '法律智能机器人' }).nth(1).click({ force: true })
 await homeCarouselClickPage.waitForURL(`${base}/projects/legal-rag`, { timeout: 5000 }).catch(() => {
   failures.push('/ home carousel: expected Legal RAG card click to navigate to project detail')
 })
