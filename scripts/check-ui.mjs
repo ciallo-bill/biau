@@ -105,6 +105,49 @@ if (!(await interactionPage.locator('.blog-empty').isVisible())) {
 }
 await interactionPage.close()
 
+const navFocusPage = await browser.newPage({ viewport: viewports[0] })
+await navFocusPage.goto(`${base}/blog`, { waitUntil: 'networkidle' })
+const expectedNavFocusTargets = new Set(['brand', '首页', '项目', '博客', 'theme', 'language', 'primary'])
+const seenNavFocusTargets = new Map()
+for (let index = 0; index < 16; index += 1) {
+  await navFocusPage.keyboard.press('Tab')
+  const focused = await navFocusPage.evaluate(() => {
+    const active = document.activeElement
+    if (!(active instanceof HTMLElement)) return null
+
+    const styles = getComputedStyle(active)
+    let key = ''
+    if (active.classList.contains('nav-brand-section')) key = 'brand'
+    if (active.classList.contains('nav-link-center')) key = active.textContent?.trim() ?? ''
+    if (active.classList.contains('nav-theme-toggle')) key = 'theme'
+    if (active.classList.contains('nav-lang-toggle')) key = 'language'
+    if (active.classList.contains('nav-all-tools')) key = 'primary'
+    if (!key) return null
+
+    return {
+      key,
+      focusVisible: active.matches(':focus-visible'),
+      hasVisibleRing: styles.boxShadow !== 'none' || styles.outlineStyle !== 'none',
+    }
+  })
+
+  if (focused && !seenNavFocusTargets.has(focused.key)) {
+    seenNavFocusTargets.set(focused.key, focused)
+  }
+
+  if (expectedNavFocusTargets.size === seenNavFocusTargets.size) break
+}
+
+for (const target of expectedNavFocusTargets) {
+  const focused = seenNavFocusTargets.get(target)
+  if (!focused) {
+    failures.push(`/blog nav keyboard: expected Tab to reach ${target}`)
+  } else if (!focused.focusVisible || !focused.hasVisibleRing) {
+    failures.push(`/blog nav keyboard: ${target} focus should have a visible focus ring`)
+  }
+}
+await navFocusPage.close()
+
 const keyboardPage = await browser.newPage({ viewport: viewports[0] })
 await keyboardPage.goto(`${base}/projects`, { waitUntil: 'networkidle' })
 for (let index = 0; index < 20; index += 1) {

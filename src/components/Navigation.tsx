@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 type SiteLanguage = 'zh' | 'en'
 type ThemeMode = 'light' | 'dark' | 'auto'
@@ -43,7 +43,7 @@ export function Navigation({ language, themeMode, onCycleTheme, onToggleLanguage
     <nav className="navigation-top">
       <div className="nav-inner">
         {/* 左侧：Logo + 站点名 */}
-        <div className="nav-brand-section">
+        <Link className="nav-brand-section" to="/" aria-label="回到首页 / Biau Labs">
           <div className="nav-logo">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
               <rect width="32" height="32" rx="8" fill="url(#logo-gradient)"/>
@@ -60,7 +60,7 @@ export function Navigation({ language, themeMode, onCycleTheme, onToggleLanguage
             <div className="brand-subtitle">BIAU LABS</div>
             <div className="brand-title">{brandTitle[language]}</div>
           </div>
-        </div>
+        </Link>
 
         {/* 中间：主导航 */}
         <ul className="nav-items-center">
