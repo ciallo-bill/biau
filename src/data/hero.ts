@@ -1,3 +1,5 @@
+import { OZON_ERP_ENTRY_URL } from './siteLinks'
+
 export type SiteLanguage = 'zh' | 'en'
 
 export type CardAccent = 'signal' | 'commerce' | 'image' | 'preview'
@@ -10,6 +12,7 @@ export interface HeroProject {
   action: string
   accent: CardAccent
   link: string
+  external?: boolean
 }
 
 export interface HeroPoem {
@@ -56,9 +59,10 @@ export const heroContent = {
       title: '电商业务系统',
       description: '后台、API、队列、插件，串起跨境运营全链路',
       poetry: '《在商品流转中织网》',
-      action: 'MANAGE',
+      action: 'OPEN',
       accent: 'image',
-      link: '/projects/ozon-erp',
+      link: OZON_ERP_ENTRY_URL,
+      external: true,
     },
     {
       id: 'biau-playlab-games',

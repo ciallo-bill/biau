@@ -1,5 +1,7 @@
-﻿export type ProjectCategory = 'ai' | 'business' | 'interactive' | 'mobile' | 'platform'
+export type ProjectCategory = 'ai' | 'business' | 'interactive' | 'mobile' | 'platform'
 export type ProjectStatus = 'main' | 'live' | 'mvp' | 'ongoing'
+
+import { OZON_ERP_ENTRY_URL } from './siteLinks'
 
 export interface ProjectLink {
   label: string
@@ -27,6 +29,10 @@ const XUNQIU_SITE_URL = 'https://xunqiu.playlab.eu.cc'
 
 function externalLink(label: string, href: string): ProjectLink {
   return { label, href, type: 'external' }
+}
+
+function internalLink(label: string, href: string): ProjectLink {
+  return { label, href, type: 'internal' }
 }
 
 function gameSiteLink(slug: string): ProjectLink {
@@ -80,14 +86,17 @@ export const projects: Project[] = [
   {
     id: 'ozon-erp',
     title: 'Ozon 电商 ERP',
-    summary: '面向小团队自用的 Ozon ERP，覆盖 Vue 管理后台、Node API、Prisma、BullMQ Worker 和 Chrome 采集插件。',
+    summary: '面向小团队自用的 Ozon ERP，覆盖 Vue 管理后台、Node API、Prisma、Redis/BullMQ Worker 和 Chrome MV3 采集插件。',
     category: 'business',
     status: 'main',
     role: '业务系统 / 管理后台 / API / Worker / 浏览器插件',
     image: '/images/projects/showcase/erp-cover.svg',
-    stack: ['Vue 3', 'Express', 'Prisma', 'PostgreSQL', 'BullMQ', 'WXT'],
-    highlights: ['商品与订单同步', '采集铺货', '审批中心', '审计日志'],
-    links: [],
+    stack: ['Vue 3', 'Express', 'Prisma', 'PostgreSQL', 'Redis', 'BullMQ', 'WXT'],
+    highlights: ['店铺授权', '商品与订单同步', '采集铺货', '审计日志'],
+    links: [
+      externalLink('访问 ERP', OZON_ERP_ENTRY_URL),
+      internalLink('架构文章', '/blog/ozon-erp-architecture'),
+    ],
   },
   {
     id: 'biau-playlab',

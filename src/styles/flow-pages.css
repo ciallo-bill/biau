@@ -1644,12 +1644,31 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   line-height: 1.92;
 }
 
-.xunqiu-current-body {
+.xunqiu-current-body,
+.ozon-erp-current-body {
   gap: var(--space-16);
 }
 
-.xunqiu-current-body .detail-block-wide {
+.xunqiu-current-body .detail-block-wide,
+.ozon-erp-current-body .detail-block-wide {
   grid-column: span 6;
+}
+
+.ozon-erp-entry-block {
+  display: grid;
+  gap: var(--space-16);
+}
+
+.ozon-erp-entry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.detail-page .ozon-erp-primary-link {
+  color: color-mix(in oklch, var(--amber) 90%, var(--ink));
+  background: color-mix(in oklch, var(--amber) 13%, transparent);
+  border-color: color-mix(in oklch, var(--amber) 28%, transparent);
 }
 
 .xunqiu-inline-link {
@@ -2007,7 +2026,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   .detail-block,
   .blog-post-body .detail-block,
   .blog-post-section,
-  .xunqiu-current-body .detail-block-wide {
+  .xunqiu-current-body .detail-block-wide,
+  .ozon-erp-current-body .detail-block-wide {
     grid-column: auto;
   }
 

@@ -1,4 +1,5 @@
 import type { HeroProject } from '../data/hero'
+import { IconExternalOpen } from '@douyinfe/semi-icons'
 
 interface ColoredCardProps {
   project: HeroProject
@@ -14,7 +15,7 @@ export function ColoredCard({ project, index, onClick }: ColoredCardProps) {
       type="button"
       className={`carousel-card ${project.accent}`}
       data-port-index={number}
-      aria-label={`${project.title}：${project.description}`}
+      aria-label={`${project.title}：${project.description}${project.external ? '，外部打开' : ''}`}
       onClick={() => {
         onClick()
       }}
@@ -28,6 +29,7 @@ export function ColoredCard({ project, index, onClick }: ColoredCardProps) {
       </div>
       <em className="carousel-action">
         <span>{project.action}</span>
+        {project.external && <IconExternalOpen aria-hidden />}
       </em>
     </button>
   )
