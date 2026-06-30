@@ -38,3 +38,37 @@ Initialized Trellis project workflow and populated backend/frontend specs from A
 ### Next Steps
 
 - None - task complete
+
+
+## Session 2: Complete AI Assistant MVP
+
+**Date**: 2026-06-30
+**Task**: Complete AI Assistant MVP
+**Branch**: `main`
+
+### Summary
+
+Finished the assistant MVP with public/internal fallback UI, invite redemption, lightweight admin API wiring, backend contract hardening, docs/spec updates, and full verify passing.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `18b181b` | (see git log) |
+| `aa6ecb8` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
