@@ -207,16 +207,124 @@ export const projects: Project[] = [
   {
     id: 'ozon-erp',
     title: 'Ozon 电商 ERP',
-    summary: '面向小团队自用的 Ozon ERP，覆盖 Vue 管理后台、Node API、Prisma、Redis/BullMQ Worker 和 Chrome MV3 采集插件。',
+    summary: '面向小团队 Ozon 店铺运营的业务系统案例，覆盖 Vue 管理后台、Express API、Prisma/PostgreSQL、队列任务和 Chrome MV3 采集插件。',
     category: 'business',
     status: 'main',
-    role: '业务系统 / 管理后台 / API / Worker / 浏览器插件',
+    role: '业务系统 / 管理后台 / API / 数据模型 / 浏览器插件',
     image: '/images/projects/showcase/erp-cover.svg',
-    stack: ['Vue 3', 'Express', 'Prisma', 'PostgreSQL', 'Redis', 'BullMQ', 'WXT'],
-    highlights: ['店铺授权', '商品与订单同步', '采集铺货', '审计日志'],
+    stack: ['Vue 3', 'Vite', 'Express', 'Prisma', 'PostgreSQL', 'Redis', 'BullMQ', 'WXT', 'Chrome MV3'],
+    highlights: ['运营后台', '采集铺货', '受保护写入', '任务与审计闭环'],
     links: [
       externalLink('访问 ERP', OZON_ERP_ENTRY_URL),
       internalLink('架构文章', '/blog/ozon-erp-architecture'),
+    ],
+    detailContent: {
+      overview: [
+        {
+          title: '从商品运营到可追踪的业务系统',
+          body:
+            'Ozon ERP 面向小团队的跨境店铺运营：店铺授权、商品同步、采集铺货、草稿编辑、定价利润、选品规则、导入历史和操作追踪被组织在一个可登录、可部署、可交接的工作区里。它不是单页展示或一次性脚本，而是把后台、API、数据库、插件和任务状态串成长期维护的业务链路。',
+        },
+        {
+          title: '公开主站只承担项目说明',
+          body:
+            'BIAU Port 保留项目案例、架构说明和外部入口；真正的 ERP 管理后台通过独立链接访问。这样访客能理解系统价值和工程边界，业务账号、店铺凭证、数据库、扩展密钥和运行环境配置仍留在 ERP 自己的安全边界内。',
+        },
+      ],
+      workflow: [
+        {
+          title: '管理后台工作流',
+          items: [
+            'Vue/Vite 管理后台包含登录、注册、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等路由。',
+            '店铺侧维护授权状态、区域、币种、商品上限和 Seller 会话；商品侧承接同步、价格、库存、类目、图片、评分和导入回读。',
+            '采集商品进入采集箱或草稿后，可以继续编辑标题、描述、图片、规格、重量、品牌、价格、库存和 Ozon 上架字段，再提交受控写入。',
+          ],
+        },
+        {
+          title: '插件与 Seller 页面协同',
+          items: [
+            'Chrome MV3/WXT 插件负责 Ozon 商品页、Seller 页面和 ERP 后台之间的桥接，提供采集、Seller 上下文读取、跨标签页请求、下载图片和打开 ERP 路由等能力。',
+            '插件请求会经过 ERP API 的认证或扩展密钥边界，不把浏览器侧采集动作直接变成不可追踪的外部平台写入。',
+            '插件版本检查和下载包同步由脚本和 API 支撑，便于在后台提示升级并减少前后端协议错位。',
+          ],
+        },
+      ],
+      architecture: [
+        {
+          title: '工作区分层',
+          body:
+            '代码组织为 workspace：apps/web 承载 Vue 管理后台，apps/api 承载 Express API、Prisma 和任务执行，apps/extension 承载 WXT 浏览器插件，packages/shared 放共享类型和利润/Ozon 计算逻辑。这让前端展示、后端写入、插件采集和共享计算各自有清晰边界。',
+        },
+        {
+          title: 'API 与数据模型',
+          body:
+            'Express 服务注册了 auth、shops、products、selection、settings、ozon、collect、market metrics、commission rates、api.chrome、exchange rates、watermark 和 uploads 等路由。Prisma 模型覆盖用户、店铺、Ozon 凭证、Seller 会话、仓库、同步状态、商品、采集商品、草稿、导入日志、待处理动作、市场指标、佣金映射、任务队列和审计日志。',
+        },
+        {
+          title: '受保护写入边界',
+          body:
+            '商品上架、调价、库存和归档等外部平台写入会先创建 PendingAction 与 JobQueue 记录，再根据配置选择队列/后台执行或显式 inline 执行。当前代码和测试表明，商品写入与一键铺货默认偏向队列或本地后台执行，避免页面或插件长时间等待外部平台任务完成。',
+        },
+        {
+          title: '队列、Worker 与恢复',
+          body:
+            'Redis/BullMQ 是可选队列层：设置 Redis 队列后由独立 Worker 执行 ERP jobs；未启用 Redis 时，服务端仍会调度本地后台任务，并在启动时恢复未完成的商品写入任务。这个设计让单机部署和队列部署都能跑通，但也要求生产环境明确选择运行模式。',
+        },
+      ],
+      quality: [
+        {
+          title: '测试与验收证据',
+          items: [
+            'API 和共享包使用 Vitest；测试覆盖受保护写入、队列/inline 行为、本地恢复、商品导入历史、Seller 回读、非重试错误、Ozon 同步容错、类目本地化、佣金可信度和插件接口映射。',
+            'smoke 脚本验证种子账号、店铺数量和导入日志数量等基础运行状态，交付清单要求跑依赖安装、测试、构建和 Docker 配置检查。',
+            '上线检查报告验证 API health、真实 adapter 状态、插件版本一致性和 Seller 样本覆盖，同时把佣金覆盖不足标记为需要保守展示的风险。',
+          ],
+        },
+        {
+          title: '数据可信度策略',
+          body:
+            '佣金和市场指标不是简单凑字段展示：代码区分官方商品价格接口、人工确认映射、历史观测映射和未可信来源。未确认的佣金保留空值或占位，不为了页面完整度去猜测费率，这一点也体现在 api.chrome 的映射测试里。',
+        },
+        {
+          title: '部署与交接边界',
+          body:
+            '项目有 Docker、本地恢复、独立服务器部署、数据库备份恢复、插件发布和交接清单等材料。公开页面只描述这种工程形态，不公开真实账号、连接串、扩展密钥、部署主机用户或运维后台细节。',
+        },
+      ],
+      limitations: [
+        {
+          title: '当前边界',
+          items: [
+            '真实 Ozon 写入必须由运行环境显式开启并配合正确凭证；测试、培训或演示环境应保持 mock 或关闭真实写入。',
+            '队列模式需要 Worker 同步运行；如果只启动 API 而没有 Worker，部分任务会停留在队列或依赖本地恢复策略。',
+            '佣金覆盖仍需要持续补齐可信来源；未确认类目不能为了好看而硬映射。',
+            '浏览器插件依赖 Seller 页面结构、权限、Cookie 和跨标签页通信，外部页面变化会带来维护成本。',
+            '已知依赖审计提示主要集中在插件开发工具链，生产路径暂不靠强制降级清零，需要跟随上游升级节奏处理。',
+          ],
+        },
+      ],
+      roadmap: [
+        {
+          title: '后续优化方向',
+          items: [
+            '加强运行模式可视化，把 mock/real、queue/inline、Worker 状态、最近恢复任务和外部写入开关放进更清晰的运维面板。',
+            '继续补齐佣金可信映射和 Seller/Ozon 回读覆盖，建立更稳定的人工确认、来源追踪和回归报告流程。',
+            '完善权限、审计查询、操作回滚、失败重试和导入历史诊断，让真实运营动作更容易追责和复盘。',
+            '优化插件配置与发布链路，减少默认配置、扩展密钥和下载包版本管理对人工流程的依赖。',
+            '逐步增强监控、备份演练、日志脱敏、依赖升级和部署自动化，把自用系统推进到更稳的生产运营形态。',
+          ],
+        },
+      ],
+    },
+    assistantContext: [
+      'Ozon ERP 是面向小团队跨境店铺运营的业务系统，包含 Vue/Vite 管理后台、Express API、Prisma/PostgreSQL 数据模型、可选 Redis/BullMQ 队列、WXT/Chrome MV3 浏览器插件和共享计算包。',
+      '管理后台覆盖登录、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等工作流，重点解决店铺授权、商品同步、采集铺货、定价利润和运营追踪。',
+      'Express API 注册 auth、shops、products、selection、settings、ozon、collect、market metrics、commission rates、api.chrome、exchange rates、watermark 和 uploads 等路由。',
+      'Prisma 模型覆盖用户、店铺、Ozon 凭证、Seller 会话、商品、采集商品、草稿、导入日志、PendingAction、JobQueue、AuditLog、市场指标和佣金映射等对象。',
+      '外部平台写入通过 PendingAction 和 JobQueue 收口；当前代码和测试显示商品写入与一键铺货默认偏向队列或本地后台执行，只有显式配置 inline 才同步执行。',
+      '浏览器插件负责 Ozon/Seller 页面采集、Seller 上下文读取、跨标签页请求、ERP 路由打开和图片下载，并通过认证或扩展密钥边界接入 ERP API。',
+      '项目验证证据包括 API/shared Vitest、受保护写入测试、Ozon 同步容错测试、插件接口映射测试、smoke 脚本、交接清单、上线检查、佣金覆盖报告和依赖审计记录。',
+      '后续优化方向包括运行模式可视化、Worker/队列运维、佣金可信映射补齐、权限和审计增强、插件发布自动化、日志脱敏、备份演练和部署自动化。',
     ],
   },
   {
