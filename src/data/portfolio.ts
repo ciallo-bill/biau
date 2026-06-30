@@ -326,16 +326,115 @@ export const projects: Project[] = [
   {
     id: 'xunqiu',
     title: '寻球｜移动端与现代后端重建',
-    summary: '面向足球社群和约赛场景的移动端业务系统：旧版客户端保留旧链路，新版 64 位客户端接入 Spring Boot 后端、托管数据库与 R2 上传链路。',
+    summary: '足球社群移动端迁移案例：旧版 App 和旧后端保留历史链路，新 64 位 Android 客户端接入 Spring Boot 3、PostgreSQL、Render 与 R2 上传链路。',
     category: 'mobile',
     status: 'main',
     role: 'Android 64 位 / Spring Boot 3 / Render / R2',
     image: '/images/projects/showcase/xunqiu-android64-runtime.png',
-    stack: ['Android 64', 'Spring Boot 3', 'PostgreSQL', 'Cloudflare R2', 'Render'],
-    highlights: ['新旧客户端分流', '兼容旧接口 envelope', 'Flyway 数据初始化', 'R2 上传验收'],
+    stack: ['Android 64', 'Java 17', 'Spring Boot 3', 'PostgreSQL', 'Flyway', 'Cloudflare R2', 'Render'],
+    highlights: ['新旧链路分流', '旧接口兼容', '短视频上传播放', '测试矩阵与烟测'],
     links: [
       externalLink('产品展示页', `${XUNQIU_SITE_URL}/`),
       externalLink('新后端仓库', 'https://github.com/Drew-Z/xunqiu-backend-modern'),
+    ],
+    detailContent: {
+      overview: [
+        {
+          title: '从旧足球社区 App 到可演示的新链路',
+          body:
+            '寻球围绕足球社群、球队管理、约赛日程、动态内容、短视频和球场信息展开。这个项目的核心不是简单升级一个 Android 包，而是把旧客户端、旧 Java WAR 后端、现代后端和 64 位新客户端拆开治理，让公开展示能说明产品路径、迁移边界和工程验证。',
+        },
+        {
+          title: '新旧并行降低迁移风险',
+          body:
+            '旧版客户端继续对应旧后端和历史接口，64 位新客户端通过配置化 Host 接入现代后端。这样可以保留旧包可回滚的安全边界，同时让新客户端独立验证登录、动态、球队、约赛、球场和短视频等核心体验。',
+        },
+      ],
+      workflow: [
+        {
+          title: '移动端核心工作流',
+          items: [
+            '新客户端以单 Activity shell 承接登录、首次偏好、首页、社区、动态、短视频、日程、赛事、球场、球币和个人页等页面。',
+            '动态链路支持列表、精选、详情、点赞、评论、文字动态和单图动态发布；发布完成后可以回到内容流或个人主页。',
+            '球队和约赛链路覆盖我的球队、球队主页、成员、邀请码、临时队员、队费安全页、日程、活动创建、报名、待定和请假等入口。',
+          ],
+        },
+        {
+          title: '短视频上传与播放',
+          items: [
+            '短视频链路包含文件选择、大小和时长校验、封面预览、上传前确认、multipart 上传、列表回流、播放、点赞和评论。',
+            '播放页根据真实视频宽高适配竖屏、横屏或普通视频，避免竖屏内容被压成横屏，也避免横屏视频被强拉伸。',
+            '高副作用能力如支付、保险、IM、推送、地图和外部分享先做安全等价页，不在展示环境触发真实第三方服务。',
+          ],
+        },
+      ],
+      architecture: [
+        {
+          title: '遗留系统拆解',
+          body:
+            '旧工作区包含 Android、iOS、旧 Java WAR 服务端、康复服务端、部署脚本和历史文档。旧 Android 工程依赖旧构建栈、多个业务模块和视频/IM/推送/支付等第三方能力；旧服务端依赖 Tomcat、MySQL、Redis 和历史配置。迁移前先把这些边界文档化，避免把所有风险压到一次升级里。',
+        },
+        {
+          title: '64 位客户端重建',
+          body:
+            '新版 Android 工程是轻量单模块客户端，包内不引入旧 32 位 native so，接口集中在 ApiClient，登录态、异步任务、UI 工具和内容排序工具分别封装。客户端继续兼容旧接口路径和返回 envelope，把字段 fallback 与媒体 URL 归一化集中处理。',
+        },
+        {
+          title: '现代后端与接口兼容',
+          body:
+            '新后端使用 Spring Boot 3、Java 17、PostgreSQL、Flyway、Docker 和 Render。服务保持 `/free_kicker` 上下文和旧客户端熟悉的接口形态，控制器覆盖账号、用户、动态、短视频、球队、比赛、球场、搜索和 fallback；尚未真实接入的旧接口返回安全空结果或安全 stub。',
+        },
+        {
+          title: '文件与媒体存储',
+          body:
+            '上传由服务端接收 multipart，再通过 S3-compatible 客户端写入 Cloudflare R2；数据库记录对象 key、公开 URL、文件名、MIME 和大小。未配置 R2 时，后端仍能返回可用于链路验证的占位公开 URL，便于先验证客户端主流程。',
+        },
+      ],
+      quality: [
+        {
+          title: '验证链路',
+          items: [
+            'Android 侧维护测试矩阵，把功能标记为已验证、需回归、兜底可用或待接入，覆盖登录、首页、动态、短视频、球队、日程、赛事、球场、球币、消息和三方安全页。',
+            '旧版入口对照清单把旧 App 主要入口映射到 64 位客户端的真实接入、安全等价、待回归或不纳入主线状态。',
+            '后端 MockMvc 测试覆盖健康检查、旧登录 envelope、动态发布、视频上传校验、球队、球场、fallback 和幂等社交流。',
+            'PostgreSQL/Testcontainers 测试验证 Flyway seed 与核心控制器，部署烟测脚本覆盖 health、login、tweets、videos、team 和 pitches。',
+          ],
+        },
+        {
+          title: '部署和展示边界',
+          body:
+            '公开产品展示站由 Cloudflare Pages 承载静态页面、技术文档、素材和阶段 APK 下载；动态 API 由独立 Render 服务承载，数据库由 PostgreSQL/Flyway 初始化，文件上传走 R2。静态站和 BIAU Port 都只展示项目材料，不保存私有配置或密钥。',
+        },
+      ],
+      limitations: [
+        {
+          title: '当前边界',
+          items: [
+            '64 位客户端仍有一部分页面处于需回归或安全等价状态，不能把所有旧版深层能力都表述为完整生产可用。',
+            '支付、IM、推送、地图、分享、真实兑换、赛事创建和比分提交等高副作用能力保留边界，不在展示环境触发真实外部服务。',
+            'Render 免费服务、演示数据、静态 APK 下载和 R2 配置都更适合展示和轻量验证，不应被描述为长期生产运营方案。',
+          ],
+        },
+      ],
+      roadmap: [
+        {
+          title: '后续优化方向',
+          items: [
+            '继续按测试矩阵回归真实手机、图片选择、短视频上传、球队队费、日程签到、WebView 兜底和旧接口字段兼容。',
+            '逐步把更多旧 WebView 和安全等价页改成原生页面，减少旧网页质量和第三方 SDK 对核心体验的影响。',
+            '强化后端权限、审计、文件治理、监控和部署策略，让 Render/R2 演示链路演进为更稳的生产部署。',
+            '短视频后续可评估 ExoPlayer、缓存、多清晰度、错误恢复和更完整的信息流交互。',
+          ],
+        },
+      ],
+    },
+    assistantContext: [
+      '寻球是足球社群移动端迁移案例，核心是旧版 App/旧 Java WAR 后端保留历史链路，新 64 位 Android 客户端接入 Spring Boot 3 现代后端。',
+      '64 位客户端是轻量单模块 Android 工程，接口集中在 ApiClient，保留旧接口路径和 response envelope，覆盖登录、动态、短视频、球队、日程、赛事、球场、球币和个人页等核心路径。',
+      '现代后端使用 Spring Boot 3、Java 17、PostgreSQL、Flyway、Docker、Render 和 Cloudflare R2，控制器覆盖账号、用户、动态、视频、球队、比赛、球场、搜索和 fallback。',
+      '短视频链路包含文件选择、大小/时长校验、封面、multipart 上传、R2 存储、列表回流、播放比例适配、点赞和评论，并针对小文件异常视频做了防护。',
+      '项目有 Android 测试矩阵、旧版入口对照、后端 MockMvc 测试、PostgreSQL/Testcontainers 测试和部署烟测脚本；支付、IM、推送、地图、分享等高副作用能力当前以安全等价或 stub 方式收口。',
+      '后续优化方向包括真实设备回归、旧 WebView 原生化、权限与审计、文件治理、监控部署、短视频播放器升级和更完整的生产化运维。',
     ],
   },
 ]
