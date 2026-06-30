@@ -36,22 +36,23 @@
   },
   {
     "id": "project:pet-workspace",
-    "title": "AI 宠物生成与审核管线",
-    "summary": "围绕 App 端、生成规则服务、Android 验证与生成管线组织的 AI 宠物项目工作区。",
+    "title": "AI 桌宠社区与生成管线",
+    "summary": "仍在推进中的 AI 桌宠工程工作区，围绕 Android 桌宠社区、Community API、生成服务、人审发布、质量门禁和 App 安全契约组织。 AI 桌宠项目是进行中的多模块工程工作区，核心包括 Android 桌宠社区 App、Node Community API、Admin Review、Pet Generator 适配层、FastAPI 风格生成规则服务、可信 Worker、QA 门禁和人工审核发布链路。 Android 侧覆盖桌宠 shell、默认桌宠资产、桌面悬浮服务、生成 UI 状态、Community API client、pet.zip 导入请求构造和社区交互，不直接调用生成内核或 Agent。 Community API 是 App 唯一后端入口，包含 health、SLA、metrics、feed、community-home、approved pets、package download descriptor、wallet、check-in、submissions、import drafts、bundle validation、admin review 和 fantasy-pet proxy 等能力。 生成规则服务负责 app-safe job 创建、轮询、artifact 索引、不透明 downloadId、人工 review decision、package plan、pet.zip 构建、worker readiness 和内部 GA/Codex/QA 证据；机器证据不能替代人工视觉 accept。 质量证据包括 Node workspace tests、Android 单元测试、Community API routes/server/store/rate-limit/metrics/SLA/logging/postgres 测试、pet package contract 测试、追踪矩阵、结构化日志、Prometheus metrics 和 SLA 文档。 当前项目应被描述为 WIP：Android 模拟器 E2E、live 私有部署验证、生产鉴权、租户隔离、Worker daemon、队列运营、Runbook、长期 SLA 和可观测告警仍是后续优化方向。",
     "href": "/projects/pet-workspace",
     "tags": [
       "ai",
       "main",
-      "生成管线 / 质量门禁 / App 接口契约 / Android 联调",
-      "Agent",
-      "Worker",
-      "质量门禁",
+      "Android App / Community API / 生成管线 / 质量门禁 / 人审发布",
       "Android",
-      "Docker",
-      "任务状态机",
-      "生成审核",
-      "人审发布",
-      "App 接口契约"
+      "Node.js",
+      "FastAPI",
+      "PostgreSQL",
+      "Agent Worker",
+      "质量门禁",
+      "桌宠孵化",
+      "社区审核",
+      "不透明下载 ID",
+      "人审发布"
     ],
     "visibility": "public"
   },
@@ -83,20 +84,21 @@
   {
     "id": "project:biau-playlab",
     "title": "Biau Playlab｜游戏作品集与系统设计内容站",
-    "summary": "基于 Astro 的独立游戏内容站，整合六个 Godot 游戏原型、Web 试玩、系统设计文章和开发日志。",
+    "summary": "基于 Astro 的独立游戏作品集与试玩平台，整合六个已部署 Godot Web 游戏、项目详情、截图/视频、开发日志和系统设计文章。 Biau Playlab 是已部署的 Astro 5 游戏作品集与试玩平台，整合六个 Godot Web 游戏、项目详情页、截图/视频、开发日志、系统设计文章和公开试玩入口。 站点使用 Astro content collections 管理 games、devlogs、published articles 和 article workbench；games schema 包含 status、engine、platforms、screenshots、playableWeb、embedUrl、downloadLinks、repoUrl、challenge、mechanic、contribution、outcome、nextStep、milestones 和 devlogSlugs。 六个游戏包括 Tetris、Next Spacewar、intespace、Raiden、space-war 和 Spacewar II；每个都有游戏详情页和独立 Web 试玩入口。 Playlab 的质量链路包括 content:audit、Astro build、dist:audit、deploy:pages、deploy:play、play export/check/upload 和 deploy:check；公开端点检查覆盖游戏站、六个游戏详情页、六个试玩入口、RSS、sitemap、robots 和主站项目页。 当前 Playlab 应作为游戏作品集平台展示；博客和部分文章归档质量仍是后续优化方向，不应把它描述成已经完全成熟的内容产品。",
     "href": "/projects/biau-playlab",
     "tags": [
       "platform",
       "live",
-      "Astro 作品集 / Godot 游戏展示 / 系统设计文章 / Cloudflare Pages",
+      "Astro 作品集 / Godot Web 试玩 / 内容审计 / Cloudflare Pages",
       "Astro 5",
       "Content Collections",
       "Godot Web",
       "Cloudflare Pages",
-      "六个游戏案例",
-      "Web 试玩入口",
-      "系统设计文章",
-      "开发日志"
+      "R2",
+      "六个可试玩游戏",
+      "项目详情页",
+      "内容审计",
+      "公开端点检查"
     ],
     "visibility": "public"
   },
@@ -123,7 +125,7 @@
   {
     "id": "project:game-first-tetris",
     "title": "俄罗斯方块原型｜Tetris",
-    "summary": "Godot 4 俄罗斯方块原型，包含经典计分、软降/硬降得分、combo、back-to-back、肉鸽三选一强化、触屏桥接、响应式布局和截图回归。",
+    "summary": "Godot 4 俄罗斯方块原型，包含经典计分、软降/硬降得分、combo、back-to-back、肉鸽三选一强化、触屏桥接、响应式布局和截图回归。 Tetris 是 Godot 4 俄罗斯方块原型，包含经典计分、软降/硬降得分、combo、back-to-back、肉鸽三选一强化实验、触屏桥接、响应式 UI 和 Web 试玩。 项目重点是把经典规则、现代计分反馈、移动触控和可展示的 Web 构建组织在一起；后续方向包括移动端触控细节、Rogue 强化平衡、截图/试玩回归和长期迭代。",
     "href": "/projects/game-first-tetris",
     "tags": [
       "interactive",
@@ -142,7 +144,7 @@
   {
     "id": "project:game-next-spacewar",
     "title": "太空战机｜展示构建",
-    "summary": "Godot 4.6 太空射击展示构建，补齐三波短任务、漂移/装甲目标、障碍压力、击破连击、波次奖励、主菜单、帮助、暂停、结果页和单局复盘。",
+    "summary": "Godot 4.6 太空射击展示构建，补齐三波短任务、漂移/装甲目标、障碍压力、击破连击、波次奖励、主菜单、帮助、暂停、结果页和单局复盘。 Next Spacewar 是 Godot 4.6 太空射击展示构建，核心是三波短任务、漂移目标、装甲目标、障碍压力、击破连击、波次奖励、主菜单、帮助、暂停、结果页和单局复盘。 项目定位偏 showcase，适合说明如何把一个短时长战斗循环收束成可试玩作品；后续方向包括关卡密度、敌人差异、反馈节奏和更细的移动/键鼠输入体验。",
     "href": "/projects/game-next-spacewar",
     "tags": [
       "interactive",
@@ -161,7 +163,7 @@
   {
     "id": "project:intespace",
     "title": "竖屏肉鸽射击｜intespace",
-    "summary": "竖屏自动射击肉鸽游戏，围绕章节推进、生存挑战、Boss 试炼、武器树、局内升级、局外成长和集成试玩收口。",
+    "summary": "竖屏自动射击肉鸽游戏，围绕章节推进、生存挑战、Boss 试炼、武器树、局内升级、局外成长和集成试玩收口。 intespace 是竖屏自动射击肉鸽项目，包含章节推进、生存挑战、Boss 试炼、武器树、局内升级、局外成长、玩家 hub、结果总结和集成试玩入口。 项目重点是把移动端竖屏射击、Roguelite 成长、武器路线和 Boss 压力组合成较完整的长期迭代样本；后续方向包括平衡、试玩反馈、UI 文案、移动端体验和内容节奏优化。",
     "href": "/projects/intespace",
     "tags": [
       "interactive",
@@ -181,7 +183,7 @@
   {
     "id": "project:raiden-prototype",
     "title": "纵版弹幕射击｜垂直切片",
-    "summary": "Godot 纵版射击垂直切片，覆盖双关卡章节、火力成长、连锁击破奖励、首领相位、章节过场和试玩验证。",
+    "summary": "Godot 纵版射击垂直切片，覆盖双关卡章节、火力成长、连锁击破奖励、首领相位、章节过场和试玩验证。 Raiden prototype 是 Godot 纵版弹幕射击垂直切片，覆盖双关卡章节、火力成长、连锁击破奖励、首领相位、章节过场、结果页、公开 Demo 和 Web 试玩。 项目适合展示纵版射击的章节节奏、Boss 阶段和奖励反馈如何被压缩成可玩的垂直切片；后续方向包括弹幕可读性、音效/手感、关卡内容、难度曲线和移动端适配。",
     "href": "/projects/raiden-prototype",
     "tags": [
       "interactive",
@@ -200,7 +202,7 @@
   {
     "id": "project:space-war",
     "title": "复古横版射击｜space-war",
-    "summary": "复古横向太空射击完整版本，包含五个 Sector、连续击破奖励、首领战、道具、高分、结果页、程序化音效和发布文档。",
+    "summary": "复古横向太空射击完整版本，包含五个 Sector、连续击破奖励、首领战、道具、高分、结果页、程序化音效和发布文档。 space-war 是复古横版太空射击完整展示版本，受 Nokia 3310 Space Impact 风格启发，包含五个 Sector、敌机与道具、Boss、高分、连续击破奖励、结果页、程序化音效、Web/Windows 发布材料。 项目展示了从原型到发布版的收束：菜单、战斗、结算、截图素材、发布文档和公开试玩入口都已组织起来；后续方向包括平衡、移动端输入、音频层次、可观测试玩反馈和更多关卡变化。",
     "href": "/projects/space-war",
     "tags": [
       "interactive",
@@ -219,7 +221,7 @@
   {
     "id": "project:spacewar-ii",
     "title": "移动纵向射击｜Spacewar II",
-    "summary": "Godot 4.6 纵向移动射击续作原型，围绕差异化敌群、Boss 阶段、多向弹幕、拾取升级、炸弹、短窗口连击、清关资源结算、紧凑 HUD 和结果页接入第六个 Web 试玩位。",
+    "summary": "Godot 4.6 纵向移动射击续作原型，围绕差异化敌群、Boss 阶段、多向弹幕、拾取升级、炸弹、短窗口连击、清关资源结算、紧凑 HUD 和结果页接入第六个 Web 试玩位。 Spacewar II 是 Godot 4.6 纵向移动射击续作，作为第六个游戏接入 Playlab，包含差异化敌群、Boss 阶段、多向弹幕、拾取升级、炸弹、短窗口连击、资源结算、紧凑 HUD、结果页和 Web 试玩。 项目重点是把移动纵向射击的敌群、弹幕、拾取和结算节奏整理成可展示版本；后续方向包括移动端触控、Boss 可读性、关卡节奏、资源成长和发布素材继续打磨。",
     "href": "/projects/spacewar-ii",
     "tags": [
       "interactive",

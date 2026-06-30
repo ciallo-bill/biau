@@ -194,15 +194,114 @@ export const projects: Project[] = [
   },
   {
     id: 'pet-workspace',
-    title: 'AI 宠物生成与审核管线',
-    summary: '围绕 App 端、生成规则服务、Android 验证与生成管线组织的 AI 宠物项目工作区。',
+    title: 'AI 桌宠社区与生成管线',
+    summary: '仍在推进中的 AI 桌宠工程工作区，围绕 Android 桌宠社区、Community API、生成服务、人审发布、质量门禁和 App 安全契约组织。',
     category: 'ai',
     status: 'main',
-    role: '生成管线 / 质量门禁 / App 接口契约 / Android 联调',
+    role: 'Android App / Community API / 生成管线 / 质量门禁 / 人审发布',
     image: '/images/projects/showcase/fantasy-pet-flow.png',
-    stack: ['Agent', 'Worker', '质量门禁', 'Android', 'Docker'],
-    highlights: ['任务状态机', '生成审核', '人审发布', 'App 接口契约'],
+    stack: ['Android', 'Node.js', 'FastAPI', 'PostgreSQL', 'Agent Worker', '质量门禁'],
+    highlights: ['桌宠孵化', '社区审核', '不透明下载 ID', '人审发布'],
     links: [],
+    detailContent: {
+      overview: [
+        {
+          title: '一个还在打磨的 AI 桌宠产品工作区',
+          body:
+            '这个项目不是单一 Demo，而是把 Android 桌宠呈现、社区 Feed、桌宠生成、导入草稿、审核队列、奖励账本和生成质量门禁拆成多个协作模块。当前适合展示“项目正在如何被工程化”：哪些能力已经有代码和测试，哪些仍处在生产化补强阶段。',
+        },
+        {
+          title: '公开页面只说明工程结构',
+          body:
+            '公开案例不会暴露真实部署主机、提供商地址、密钥、连接串、适配器配置或私有运维命令；它只说明 App、网关、生成服务、Worker、人审和质量证据之间的关系。',
+        },
+      ],
+      workflow: [
+        {
+          title: 'App 与社区体验',
+          items: [
+            'Android 侧包含桌宠 shell、默认桌宠资产、桌面悬浮服务、生成 UI 状态、Community API 客户端和 pet.zip 导入请求构造。',
+            '社区链路覆盖动态流、社区首页、已通过桌宠展架、资源包下载、签到、钱包、导入草稿、提交审核和审核结果回流。',
+            'Admin Review 提供内部审核队列和审核决策界面，用来把候选桌宠从“可看”推进到“可发布”。',
+          ],
+        },
+        {
+          title: '生成与人审链路',
+          items: [
+            '用户提交文本描述后，App 只通过 Community API 进入生成网关，不直接触达生成内核、Agent、Worker 或文件系统。',
+            '生成服务创建任务、准备可信 Worker 流程，由编排/生成/复核阶段产出候选、QA 证据和 App 安全状态。',
+            '候选必须经过人工视觉审核；机器 QA、Agent 复核和回归记忆只作为修复压力与审计证据，不能替代人审 accept。',
+            '包下载通过不透明 downloadId 暴露给 App，内部路径、Worker 命令、提示词包和运行配置不会出现在公开响应里。',
+          ],
+        },
+      ],
+      architecture: [
+        {
+          title: '分层边界',
+          body:
+            '工作区按职责拆分：Android App 负责桌宠呈现和用户交互；Community API 是 App 唯一后端入口；Admin Review 面向审核人员；Pet Generator 适配生成结果进入社区；生成规则服务负责服务端生成任务、Worker 编排、QA、学习记忆和包构建。这个边界让 App 保持轻量，也避免把高权限生成能力下放到客户端。',
+        },
+        {
+          title: 'Community API',
+          body:
+            'Community API 采用 Node workspace 组织，路由覆盖健康检查、SLA、Metrics、Feed、社区首页、已通过桌宠、资源包、钱包、签到、提交、导入草稿、包校验、审核队列和审核决策。存储层支持本地 JSON 快照和 PostgreSQL 迁移路径，便于先验证产品闭环，再继续推进持久化和运维能力。',
+        },
+        {
+          title: '生成服务与质量门禁',
+          body:
+            '生成规则服务提供 App 安全 API、任务轮询、候选 artifact 索引、人工审核、包计划和 pet.zip 构建。内部 Worker 会按编排、生成、复核和 QA 阶段留下可审计证据，并把循环锚点、可见运动、透明背景、布局选择、动作稳定性和阶段门禁作为生成质量压力。',
+        },
+      ],
+      quality: [
+        {
+          title: '测试与追踪证据',
+          items: [
+            'gamer workspace 有 Node 测试脚本覆盖 apps、packages、services 和 tools；Android 侧有生成 UI、API mapper、Repository、桌宠 shell、导入请求构造等单元测试。',
+            'Community API 测试覆盖 health、鉴权、Feed、已通过桌宠、资源包、导入草稿、审核、签到、钱包、SLA、限流、结构化日志、指标和 PostgreSQL 迁移。',
+            '追踪矩阵把孵化室、桌宠呈现、社区展示、创作审核、奖励账本、安全边界、限流 SLA、生成质量和数据模型映射到测试用例。',
+          ],
+        },
+        {
+          title: '可观测与运行约束',
+          items: [
+            'Community API 已有结构化日志、敏感字段脱敏、Prometheus 指标、SLA 配置端点和限流策略设计。',
+            '项目文档明确区分公开 App API、内部 Admin/Worker surface、服务器证明摘要和学习记忆，避免把过程完成误写成视觉质量通过。',
+            '当前 Android 模拟器端到端和私有 live 部署验证仍依赖替代证据路线，适合在案例页中如实说明为后续生产化方向。',
+          ],
+        },
+      ],
+      limitations: [
+        {
+          title: '当前边界',
+          items: [
+            '这是进行中的产品工程，不应描述为已经完全生产化的公共 AI 桌宠平台。',
+            '真实生成 Worker、模型适配、私有运维、部署验证、租户权限和完整鉴权仍属于受控后台能力，不对公开访客开放。',
+            '机器 QA 只能帮助发现透明背景、动作稳定性、循环锚点和布局问题，最终发布仍需要人类视觉审核。',
+            'Android 真实设备/模拟器端到端、长期 SLA、队列守护、运维 Runbook 和监控告警仍需要继续补强。',
+          ],
+        },
+      ],
+      roadmap: [
+        {
+          title: '后续优化方向',
+          items: [
+            '把 PostgreSQL 持久化、迁移演练、备份恢复和数据治理补成稳定运行路径。',
+            '完善认证、租户隔离、下载权限、审核权限和生成任务限流，减少演示态与真实使用之间的差距。',
+            '把 Worker 池化、队列位置、动态 SLA、失败恢复和运行面板做成可运营能力。',
+            '继续提升 Android 端桌宠交互、候选画廊、反馈备注、真实设备 E2E 和桌宠资源包体验。',
+            '沉淀生成质量回归报告，让动作、透明背景、包结构和人审反馈可以跨版本对比。',
+          ],
+        },
+      ],
+    },
+    assistantContext: [
+      'AI 桌宠项目是进行中的多模块工程工作区，核心包括 Android 桌宠社区 App、Node Community API、Admin Review、Pet Generator 适配层、FastAPI 风格生成规则服务、可信 Worker、QA 门禁和人工审核发布链路。',
+      'Android 侧覆盖桌宠 shell、默认桌宠资产、桌面悬浮服务、生成 UI 状态、Community API client、pet.zip 导入请求构造和社区交互，不直接调用生成内核或 Agent。',
+      'Community API 是 App 唯一后端入口，包含 health、SLA、metrics、feed、community-home、approved pets、package download descriptor、wallet、check-in、submissions、import drafts、bundle validation、admin review 和 fantasy-pet proxy 等能力。',
+      '生成规则服务负责 app-safe job 创建、轮询、artifact 索引、不透明 downloadId、人工 review decision、package plan、pet.zip 构建、worker readiness 和内部 GA/Codex/QA 证据；机器证据不能替代人工视觉 accept。',
+      '质量证据包括 Node workspace tests、Android 单元测试、Community API routes/server/store/rate-limit/metrics/SLA/logging/postgres 测试、pet package contract 测试、追踪矩阵、结构化日志、Prometheus metrics 和 SLA 文档。',
+      '当前项目应被描述为 WIP：Android 模拟器 E2E、live 私有部署验证、生产鉴权、租户隔离、Worker daemon、队列运营、Runbook、长期 SLA 和可观测告警仍是后续优化方向。',
+    ],
   },
   {
     id: 'ozon-erp',
@@ -330,16 +429,108 @@ export const projects: Project[] = [
   {
     id: 'biau-playlab',
     title: 'Biau Playlab｜游戏作品集与系统设计内容站',
-    summary: '基于 Astro 的独立游戏内容站，整合六个 Godot 游戏原型、Web 试玩、系统设计文章和开发日志。',
+    summary: '基于 Astro 的独立游戏作品集与试玩平台，整合六个已部署 Godot Web 游戏、项目详情、截图/视频、开发日志和系统设计文章。',
     category: 'platform',
     status: 'live',
-    role: 'Astro 作品集 / Godot 游戏展示 / 系统设计文章 / Cloudflare Pages',
-    stack: ['Astro 5', 'Content Collections', 'Godot Web', 'Cloudflare Pages'],
-    highlights: ['六个游戏案例', 'Web 试玩入口', '系统设计文章', '开发日志'],
+    role: 'Astro 作品集 / Godot Web 试玩 / 内容审计 / Cloudflare Pages',
+    stack: ['Astro 5', 'Content Collections', 'Godot Web', 'Cloudflare Pages', 'R2'],
+    highlights: ['六个可试玩游戏', '项目详情页', '内容审计', '公开端点检查'],
     detailLink: externalLink('进入游戏站', `${GAME_SITE_URL}/`),
     links: [
       externalLink('游戏站', `${GAME_SITE_URL}/`),
       externalLink('源码仓库', 'https://github.com/ciallo-bill/blog'),
+    ],
+    detailContent: {
+      overview: [
+        {
+          title: '把游戏原型变成可访问的作品集平台',
+          body:
+            'Biau Playlab 不是只放几张截图的列表页，而是把六个 Godot 项目整理成可访问、可试玩、可复盘的内容站。访客可以从游戏总览进入单个项目详情，再跳到独立 Web 试玩入口，看到玩法目标、机制贡献、截图/视频、里程碑、开发日志和后续计划。',
+        },
+        {
+          title: '游戏展示先于博客优化',
+          body:
+            '当前站点里游戏项目页和试玩入口已经形成完整展示链路，文章与博客归档仍有后续整理空间。主站项目页会优先把 Playlab 作为游戏作品集平台说明，不把博客内容质量包装成已经完全成型的内容产品。',
+        },
+      ],
+      workflow: [
+        {
+          title: '访客路径',
+          items: [
+            '首页和游戏列表展示六个项目：俄罗斯方块、Next Spacewar、intespace、Raiden、space-war 和 Spacewar II。',
+            '每个游戏详情页提供玩法摘要、当前状态、引擎、平台、截图/视频、Web 试玩、项目贡献、结果和下一步。',
+            '独立试玩域名承载 Godot Web 导出，让案例页和可玩版本解耦，项目说明与实际体验可以互相跳转。',
+          ],
+        },
+        {
+          title: '内容维护工作流',
+          items: [
+            'Astro content collections 约束 games、devlogs、published articles 和 article workbench 的 frontmatter 结构。',
+            '游戏条目可以记录 challenge、mechanic、contribution、outcome、nextStep、milestones、screenshots、downloadLinks、repoUrl 和 devlogSlugs。',
+            '开发日志和游戏项目通过 slug 关系互相引用，内容审计会检查引用关系、重复 ID、标签 slug 冲突和静态资源缺失。',
+          ],
+        },
+      ],
+      architecture: [
+        {
+          title: 'Astro 静态站架构',
+          body:
+            'Playlab 使用 Astro 5 生成静态内容站，游戏、开发日志和文章都通过 content collections 建模。页面层围绕游戏列表、游戏详情、文章归档、开发日志、RSS、sitemap 和 robots 输出，适合放在 Cloudflare Pages 这类静态部署环境中。',
+        },
+        {
+          title: '试玩与展示分离',
+          body:
+            'Godot Web 包被放在独立试玩入口，内容站只负责说明、导航和嵌入/跳转。这种分离让游戏导出、R2/静态资产上传、页面内容更新和主站项目页引用可以分别迭代，也降低了单个游戏构建影响整个作品站的风险。',
+        },
+        {
+          title: '自动化检查',
+          body:
+            '站点脚本覆盖内容审计、构建、构建产物链接审计、Cloudflare Pages 部署、试玩包导出检查、试玩资源上传和公开端点检查。公开端点检查会访问游戏站首页、六个游戏详情、文章/日志入口、RSS、sitemap、robots、六个 Web 试玩入口和主站项目页。',
+        },
+      ],
+      quality: [
+        {
+          title: '内容与发布质量',
+          items: [
+            'content:audit 会统计公开文章、文章工作区、游戏项目和开发日志，并检查静态资源引用和内容关系。',
+            'verify 会串起内容审计、Astro build 和构建产物审计，减少断链、缺图和结构化数据问题。',
+            'deploy:check 使用公开 URL 做端点可用性检查，覆盖内容站和试玩站的关键入口。',
+          ],
+        },
+        {
+          title: '项目证据来自实际游戏工程',
+          body:
+            '六个游戏条目不是从 README 单点摘抄，而是结合内容站 frontmatter、Godot 项目结构、脚本目录、截图/视频资产、开发日志和发布检查来整理。这样主站案例页能说明“这些游戏如何被展示和部署”，而不是只复述一个过时说明文件。',
+        },
+      ],
+      limitations: [
+        {
+          title: '当前边界',
+          items: [
+            'Playlab 的游戏展示和试玩链路已经较完整，但博客/文章归档还需要继续筛选、重写和排版优化。',
+            '每个游戏的系统深度不同：有的是完整展示构建，有的是持续迭代项目，主站不应把所有条目都写成同等成熟度。',
+            'Godot Web 试玩仍受浏览器性能、移动端输入、加载体积和静态资源缓存影响，需要长期实机回归。',
+          ],
+        },
+      ],
+      roadmap: [
+        {
+          title: '后续优化方向',
+          items: [
+            '重写博客与项目文档，让系统设计文章、开发日志和项目案例在叙事上更统一。',
+            '为每个游戏补更清晰的版本记录、试玩反馈、移动端适配结论和性能说明。',
+            '继续完善试玩包自动导出、资源上传、端点检查和失败告警，让游戏发布更接近一键化。',
+            '把主站、Playlab 内容站和试玩站的项目信息进一步对齐，减少多站点重复维护。',
+          ],
+        },
+      ],
+    },
+    assistantContext: [
+      'Biau Playlab 是已部署的 Astro 5 游戏作品集与试玩平台，整合六个 Godot Web 游戏、项目详情页、截图/视频、开发日志、系统设计文章和公开试玩入口。',
+      '站点使用 Astro content collections 管理 games、devlogs、published articles 和 article workbench；games schema 包含 status、engine、platforms、screenshots、playableWeb、embedUrl、downloadLinks、repoUrl、challenge、mechanic、contribution、outcome、nextStep、milestones 和 devlogSlugs。',
+      '六个游戏包括 Tetris、Next Spacewar、intespace、Raiden、space-war 和 Spacewar II；每个都有游戏详情页和独立 Web 试玩入口。',
+      'Playlab 的质量链路包括 content:audit、Astro build、dist:audit、deploy:pages、deploy:play、play export/check/upload 和 deploy:check；公开端点检查覆盖游戏站、六个游戏详情页、六个试玩入口、RSS、sitemap、robots 和主站项目页。',
+      '当前 Playlab 应作为游戏作品集平台展示；博客和部分文章归档质量仍是后续优化方向，不应把它描述成已经完全成熟的内容产品。',
     ],
   },
   {
@@ -365,6 +556,10 @@ export const projects: Project[] = [
     highlights: ['经典计分', '软硬降得分', 'combo/B2B', '触屏输入'],
     detailLink: gameSiteLink('first-tetris'),
     links: [gameSiteLink('first-tetris'), gamePlayLink('first-tetris')],
+    assistantContext: [
+      'Tetris 是 Godot 4 俄罗斯方块原型，包含经典计分、软降/硬降得分、combo、back-to-back、肉鸽三选一强化实验、触屏桥接、响应式 UI 和 Web 试玩。',
+      '项目重点是把经典规则、现代计分反馈、移动触控和可展示的 Web 构建组织在一起；后续方向包括移动端触控细节、Rogue 强化平衡、截图/试玩回归和长期迭代。',
+    ],
   },
   {
     id: 'game-next-spacewar',
@@ -378,6 +573,10 @@ export const projects: Project[] = [
     highlights: ['三波短任务', '击破连击', '波次奖励', '结果复盘'],
     detailLink: gameSiteLink('next-spacewar'),
     links: [gameSiteLink('next-spacewar'), gamePlayLink('next-spacewar')],
+    assistantContext: [
+      'Next Spacewar 是 Godot 4.6 太空射击展示构建，核心是三波短任务、漂移目标、装甲目标、障碍压力、击破连击、波次奖励、主菜单、帮助、暂停、结果页和单局复盘。',
+      '项目定位偏 showcase，适合说明如何把一个短时长战斗循环收束成可试玩作品；后续方向包括关卡密度、敌人差异、反馈节奏和更细的移动/键鼠输入体验。',
+    ],
   },
   {
     id: 'intespace',
@@ -391,6 +590,10 @@ export const projects: Project[] = [
     highlights: ['章节推进', '生存挑战', 'Boss 试炼', '局外成长'],
     detailLink: gameSiteLink('intespace'),
     links: [gameSiteLink('intespace'), gamePlayLink('intespace')],
+    assistantContext: [
+      'intespace 是竖屏自动射击肉鸽项目，包含章节推进、生存挑战、Boss 试炼、武器树、局内升级、局外成长、玩家 hub、结果总结和集成试玩入口。',
+      '项目重点是把移动端竖屏射击、Roguelite 成长、武器路线和 Boss 压力组合成较完整的长期迭代样本；后续方向包括平衡、试玩反馈、UI 文案、移动端体验和内容节奏优化。',
+    ],
   },
   {
     id: 'raiden-prototype',
@@ -404,6 +607,10 @@ export const projects: Project[] = [
     highlights: ['双关卡章节', '连锁击破', '首领收束', '试玩验证'],
     detailLink: gameSiteLink('raiden'),
     links: [gameSiteLink('raiden'), gamePlayLink('raiden')],
+    assistantContext: [
+      'Raiden prototype 是 Godot 纵版弹幕射击垂直切片，覆盖双关卡章节、火力成长、连锁击破奖励、首领相位、章节过场、结果页、公开 Demo 和 Web 试玩。',
+      '项目适合展示纵版射击的章节节奏、Boss 阶段和奖励反馈如何被压缩成可玩的垂直切片；后续方向包括弹幕可读性、音效/手感、关卡内容、难度曲线和移动端适配。',
+    ],
   },
   {
     id: 'space-war',
@@ -417,6 +624,10 @@ export const projects: Project[] = [
     highlights: ['五个 Sector', '连续击破', '高分结算', '发布文档'],
     detailLink: gameSiteLink('space-war'),
     links: [gameSiteLink('space-war'), gamePlayLink('space-war')],
+    assistantContext: [
+      'space-war 是复古横版太空射击完整展示版本，受 Nokia 3310 Space Impact 风格启发，包含五个 Sector、敌机与道具、Boss、高分、连续击破奖励、结果页、程序化音效、Web/Windows 发布材料。',
+      '项目展示了从原型到发布版的收束：菜单、战斗、结算、截图素材、发布文档和公开试玩入口都已组织起来；后续方向包括平衡、移动端输入、音频层次、可观测试玩反馈和更多关卡变化。',
+    ],
   },
   {
     id: 'spacewar-ii',
@@ -430,6 +641,10 @@ export const projects: Project[] = [
     highlights: ['差异化敌群', '短窗口连击', 'Boss 阶段', '结果结算'],
     detailLink: gameSiteLink('spacewar-ii'),
     links: [gameSiteLink('spacewar-ii'), gamePlayLink('spacewar-ii')],
+    assistantContext: [
+      'Spacewar II 是 Godot 4.6 纵向移动射击续作，作为第六个游戏接入 Playlab，包含差异化敌群、Boss 阶段、多向弹幕、拾取升级、炸弹、短窗口连击、资源结算、紧凑 HUD、结果页和 Web 试玩。',
+      '项目重点是把移动纵向射击的敌群、弹幕、拾取和结算节奏整理成可展示版本；后续方向包括移动端触控、Boss 可读性、关卡节奏、资源成长和发布素材继续打磨。',
+    ],
   },
   {
     id: 'xunqiu',
