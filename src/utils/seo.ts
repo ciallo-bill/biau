@@ -56,6 +56,24 @@ export function getStaticSeo(pathname: string): SeoMeta {
     }
   }
 
+  if (path === '/assistant') {
+    return {
+      title: '内部助手 | BIAU Port',
+      description: 'BIAU Port 内部助手工作台，用于组织公开内容问答、内部成员聊天与交付辅助。',
+      canonicalPath: '/assistant',
+      type: 'website',
+    }
+  }
+
+  if (path === '/assistant/admin') {
+    return {
+      title: '内部助手管理页 | BIAU Port',
+      description: 'BIAU Port 内部助手管理页，用于规划邀请码、成员额度、用量与导出能力。',
+      canonicalPath: '/assistant/admin',
+      type: 'website',
+    }
+  }
+
   return {
     title: '页面没有靠岸 | BIAU Port',
     description: '这个地址暂时没有对应内容，可以回到 BIAU Port 泊岸首页、项目集或知识库继续浏览。',

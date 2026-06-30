@@ -7,6 +7,8 @@ const routes = [
   { path: '/', title: 'BIAU PORT', nav: '所有项目', canonical: '/' },
   { path: '/projects', title: '项目集', nav: '回主页', canonical: '/projects' },
   { path: '/blog', title: '知识库', nav: '回主页', canonical: '/blog' },
+  { path: '/assistant', title: '内部助手', nav: '回主页', canonical: '/assistant' },
+  { path: '/assistant/admin', title: '内部助手管理页', nav: '回主页', canonical: '/assistant/admin' },
   { path: '/projects/legal-rag', title: 'Legal RAG', nav: '回主页', canonical: '/projects/legal-rag' },
   {
     path: '/blog/ai-fullstack-day-01-rag-overview',
@@ -107,9 +109,9 @@ await interactionPage.close()
 
 const navFocusPage = await browser.newPage({ viewport: viewports[0] })
 await navFocusPage.goto(`${base}/blog`, { waitUntil: 'networkidle' })
-const expectedNavFocusTargets = new Set(['brand', '首页', '项目', '博客', 'theme', 'language', 'primary'])
+const expectedNavFocusTargets = new Set(['brand', '首页', '项目', '博客', '助手', 'theme', 'language', 'primary'])
 const seenNavFocusTargets = new Map()
-for (let index = 0; index < 16; index += 1) {
+for (let index = 0; index < 24; index += 1) {
   await navFocusPage.keyboard.press('Tab')
   const focused = await navFocusPage.evaluate(() => {
     const active = document.activeElement
@@ -135,7 +137,7 @@ for (let index = 0; index < 16; index += 1) {
     seenNavFocusTargets.set(focused.key, focused)
   }
 
-  if (expectedNavFocusTargets.size === seenNavFocusTargets.size) break
+  if ([...expectedNavFocusTargets].every((target) => seenNavFocusTargets.has(target))) break
 }
 
 for (const target of expectedNavFocusTargets) {
@@ -163,6 +165,41 @@ if (navIndicator.width < 32 || navIndicator.height < 3 || navIndicator.shadow ==
   failures.push('/blog nav indicator: active underline should be wide, thick, and visible')
 }
 await navIndicatorPage.close()
+
+const assistantPage = await browser.newPage({ viewport: viewports[0] })
+await assistantPage.goto(`${base}/assistant`, { waitUntil: 'networkidle' })
+if (await assistantPage.locator('.public-assistant').count()) {
+  failures.push('/assistant: public assistant widget should be hidden on assistant routes')
+}
+await assistantPage.locator('.assistant-suggestions button').first().click()
+await assistantPage.waitForTimeout(150)
+if ((await assistantPage.locator('.assistant-bubble.is-user').count()) < 1) {
+  failures.push('/assistant: expected suggestion click to append a user message')
+}
+if ((await assistantPage.locator('.assistant-bubble.is-assistant').count()) < 2) {
+  failures.push('/assistant: expected suggestion click to append an assistant answer')
+}
+await assistantPage.close()
+
+const publicAssistantPage = await browser.newPage({ viewport: viewports[0] })
+await publicAssistantPage.goto(`${base}/blog`, { waitUntil: 'networkidle' })
+await publicAssistantPage.locator('.public-assistant__trigger').click()
+if (!(await publicAssistantPage.locator('.public-assistant__panel').isVisible())) {
+  failures.push('/blog public assistant: expected panel to open')
+}
+await publicAssistantPage.locator('.public-assistant__suggestion').first().click()
+await publicAssistantPage.waitForTimeout(150)
+if ((await publicAssistantPage.locator('.public-assistant__message.is-user').count()) < 1) {
+  failures.push('/blog public assistant: expected suggestion click to append a user message')
+}
+if ((await publicAssistantPage.locator('.public-assistant__citation').count()) < 1) {
+  failures.push('/blog public assistant: expected cited local knowledge')
+}
+await publicAssistantPage.locator('.public-assistant__close').click()
+if (await publicAssistantPage.locator('.public-assistant__panel').isVisible().catch(() => false)) {
+  failures.push('/blog public assistant: expected panel to close')
+}
+await publicAssistantPage.close()
 
 for (const path of ['/projects', '/blog']) {
   const routeFlashPage = await browser.newPage({ viewport: viewports[0] })

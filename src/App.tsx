@@ -3,11 +3,14 @@ import { Route, Routes, useLocation } from 'react-router-dom'
 import './App.css'
 import { useTheme } from './hooks/useTheme'
 import { Navigation } from './components/Navigation'
+import { PublicAssistantWidget } from './components/PublicAssistantWidget'
 import { SeoManager } from './components/SeoManager'
 import { HarborIntro } from './components/HarborIntro'
 import { BlogPage } from './pages/BlogPage'
 import { HomePage } from './pages/HomePage'
 import { ProjectsPage } from './pages/ProjectsPage'
+import { AssistantPage } from './pages/AssistantPage'
+import { AssistantAdminPage } from './pages/AssistantAdminPage'
 
 type SiteLanguage = 'zh' | 'en'
 type HarborScene = 'dusk' | 'garden' | 'stellar'
@@ -27,6 +30,16 @@ const ProjectDetailPage = lazy(() =>
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage').then((module) => ({ default: module.BlogPostPage })))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then((module) => ({ default: module.NotFoundPage })))
 
+function getPageClass(pathname: string) {
+  if (pathname === '/') return 'page-home'
+  if (pathname === '/projects') return 'page-tools page-subpage'
+  if (pathname.startsWith('/projects/')) return 'page-detail page-project-detail page-subpage'
+  if (pathname === '/assistant' || pathname.startsWith('/assistant/')) return 'page-assistant page-subpage'
+  if (pathname === '/blog') return 'page-letters page-blog page-subpage'
+  if (pathname.startsWith('/blog/')) return 'page-detail page-blog-post page-subpage'
+  return 'page-not-found page-subpage'
+}
+
 function App() {
   const [language, setLanguage] = useState<SiteLanguage>('zh')
   const [harborScene, setHarborScene] = useState<HarborScene>(readHarborScene)
@@ -39,18 +52,8 @@ function App() {
     window.localStorage.setItem(HARBOR_SCENE_STORAGE_KEY, harborScene)
   }, [harborScene])
 
-  const pageClass =
-    pathname === '/'
-      ? 'page-home'
-      : pathname === '/projects'
-        ? 'page-tools page-subpage'
-        : pathname.startsWith('/projects')
-          ? 'page-detail page-project-detail page-subpage'
-          : pathname === '/blog'
-            ? 'page-letters page-blog page-subpage'
-            : pathname.startsWith('/blog')
-              ? 'page-detail page-blog-post page-subpage'
-              : 'page-not-found page-subpage'
+  const pageClass = getPageClass(pathname)
+  const showPublicAssistant = !pathname.startsWith('/assistant')
 
   return (
     <div className={`app ${pageClass}`}>
@@ -74,6 +77,7 @@ function App() {
         }
         onToggleLanguage={() => setLanguage((prev) => (prev === 'zh' ? 'en' : 'zh'))}
       />
+      {showPublicAssistant && <PublicAssistantWidget />}
 
       <Suspense
         fallback={
@@ -86,6 +90,8 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
+          <Route path="/assistant" element={<AssistantPage />} />
+          <Route path="/assistant/admin" element={<AssistantAdminPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="*" element={<NotFoundPage />} />

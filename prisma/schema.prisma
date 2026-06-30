@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Invite {
+  id         String    @id @default(cuid())
+  codeHash   String    @unique
+  label      String
+  role       MemberRole @default(MEMBER)
+  dailyQuota Int       @default(24)
+  maxUses    Int       @default(1)
+  usedCount  Int       @default(0)
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  members    Member[]
+}
+
+model Member {
+  id         String     @id @default(cuid())
+  name       String
+  role       MemberRole @default(MEMBER)
+  tokenHash  String     @unique
+  dailyQuota Int        @default(24)
+  inviteId   String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  invite     Invite?    @relation(fields: [inviteId], references: [id])
+  sessions   ChatSession[]
+  messages   ChatMessage[]
+  usageLogs  UsageLog[]
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  memberId  String
+  title     String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  member    Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  messages  ChatMessage[]
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  memberId  String?
+  sessionId String?
+  role      MessageRole
+  content   String
+  citations Json?
+  createdAt DateTime    @default(now())
+  member    Member?     @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  session   ChatSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model UsageLog {
+  id        String   @id @default(cuid())
+  memberId  String?
+  scope     String
+  model     String?
+  tokensIn  Int      @default(0)
+  tokensOut Int      @default(0)
+  createdAt DateTime @default(now())
+  member    Member?  @relation(fields: [memberId], references: [id], onDelete: SetNull)
+}
+
+enum MemberRole {
+  MEMBER
+  ADMIN
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}

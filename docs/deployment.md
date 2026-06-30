@@ -41,6 +41,95 @@ Root directory: 留空
 NODE_VERSION=22
 ```
 
+前端如果要连接内部助手 API，需要在 Cloudflare Pages 环境变量中增加：
+
+```text
+VITE_CHAT_API_BASE_URL=https://<render-assistant-api>.onrender.com
+```
+
+未配置该变量时，公开助手和内部助手页面会使用本地公开知识回退，不会调用远程 API。
+
+## 内部助手 API 部署
+
+助手后端位于当前仓库的 `server/`，和静态前端独立部署。推荐第一版部署到 Render Web Service，数据库使用 Aiven PostgreSQL。
+
+Render 配置建议：
+
+```text
+Runtime: Node
+Build Command: npm ci && npm run assistant:index && npm run prisma:generate && npm run server:build
+Start Command: npm run prisma:migrate && npm run server:start
+```
+
+Render 环境变量：
+
+```text
+DATABASE_URL=postgresql://...
+CORS_ORIGIN=https://biau.playlab.eu.cc
+ADMIN_TOKEN=<生成一个长随机字符串>
+OPENAI_BASE_URL=https://api.openai.com/v1
+OPENAI_API_KEY=<OpenAI 或兼容服务 Key，可留空使用本地回退>
+OPENAI_MODEL=gpt-4.1-mini
+PORT=10000
+```
+
+本地后端开发：
+
+```bash
+npm run assistant:index
+npm run prisma:validate
+npm run prisma:generate
+npm run server:dev
+```
+
+生产数据库迁移：
+
+```bash
+npm run prisma:migrate
+```
+
+### 邀请码初始化
+
+管理员用 `ADMIN_TOKEN` 创建邀请码：
+
+```bash
+curl -X POST "$ASSISTANT_API/admin/invites" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"code":"BIAU-PORT-ALPHA","label":"Alpha member","role":"MEMBER","dailyQuota":24,"maxUses":1}'
+```
+
+内部成员用邀请码兑换成员 token：
+
+```bash
+curl -X POST "$ASSISTANT_API/auth/redeem-invite" \
+  -H "Content-Type: application/json" \
+  -d '{"code":"BIAU-PORT-ALPHA","name":"成员名称"}'
+```
+
+前端内部助手第一版在 `/assistant` 提供邀请码兑换表单。兑换成功后会把 `biau-assistant-member-token`、基础成员信息和当前 `biau-assistant-session-id` 保存在当前浏览器的 `localStorage`。未配置 API、未兑换 token、数据库不可用或模型服务不可用时，页面会退回到已脱敏的公开站点知识，并明确说明限制。
+
+隐藏管理页位于 `/assistant/admin`。第一版通过手动输入并本地保存 `ADMIN_TOKEN` 调用 `GET /admin/summary` 和 `POST /admin/invites`，只用于验证轻量管理链路，不包含完整成员列表、历史记录浏览、删除/禁用、导出或私有知识源管理。
+
+当前公开助手和内部助手都只使用生成的公开站点知识。网站博客页和项目页内容后续可以继续优化；在这之前，助手应在低置信度问题上说明公开内容不足，而不是补造细节。
+
+### API 健康检查
+
+```bash
+curl "$ASSISTANT_API/health"
+```
+
+最小接口包括：
+
+```text
+GET /health
+POST /auth/redeem-invite
+POST /chat/public
+POST /chat/internal
+GET /admin/summary
+POST /admin/invites
+```
+
 ## 自定义域名
 
 当前绑定域名：

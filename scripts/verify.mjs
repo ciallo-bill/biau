@@ -101,7 +101,11 @@ async function stopPreview(child) {
   await waitForExit(child)
 }
 
+await run(['run', 'assistant:index'])
+await run(['run', 'prisma:validate'])
 await run(['run', 'lint'])
+await run(['run', 'server:build'])
+await run(['run', 'server:smoke'])
 await run(['run', 'build'])
 await run(['run', 'blog:check'])
 

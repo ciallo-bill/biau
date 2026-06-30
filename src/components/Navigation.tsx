@@ -28,6 +28,7 @@ const navItems: NavItem[] = [
   { to: '/', label: { en: 'HOME', zh: '首页' } },
   { to: '/projects', label: { en: 'PROJECTS', zh: '项目' } },
   { to: '/blog', label: { en: 'BLOG', zh: '博客' } },
+  { to: '/assistant', label: { en: 'ASSISTANT', zh: '助手' } },
 ]
 
 const brandTitle: Record<SiteLanguage, string> = { zh: '泊岸', en: 'BIAU PORT' }
