@@ -64,6 +64,53 @@ model channel contract. Read this before changing `scripts/generate-blog-draft.m
 - Base: no `--generate` creates a scaffold with evidence pack, safe facts, forbidden details, model strategy, review gates, and promotion checklist.
 - Bad: truthy-checking `process.env[key]` while loading `.env.local`, because an intentionally empty key gets overwritten by private local config.
 
+### 5.1 Custom Draft Template Convention
+
+- Custom article templates are allowed for draft content, but they must not remove
+  the evidence scaffold headings that `blog:check` treats as the public-safety
+  contract.
+- Keep these headings intact for evidence drafts: `## Evidence Pack`,
+  `## Safe Public Facts`, `## Uncertain Or Stale Facts`,
+  `## Forbidden / Private Details`, `## Draft Brief`, `## Article Outline`,
+  `## Review Gates`, and `## Promotion Checklist`.
+- Put visitor-readable long-form content under an additional heading such as
+  `## Draft Body` when a user asks for a custom writing structure.
+- Use `## Article Outline` to record the selected template, including bilingual
+  labels when useful. This keeps custom templates visible without confusing them
+  with the machine-checked safety sections.
+
+#### Wrong
+
+```markdown
+## 问题起点
+...
+
+## 关键决策
+...
+```
+
+The draft may read well, but `blog:check` can no longer tell whether evidence,
+unsafe facts, review gates, and promotion boundaries are present.
+
+#### Correct
+
+```markdown
+## Evidence Pack
+...
+
+## Article Outline
+- 问题起点 / Problem
+- 关键决策 / Decision
+
+## Draft Body
+
+### 问题起点
+...
+```
+
+The custom structure is still visible to the author and reader, while the
+evidence-first contract remains testable.
+
 ### 6. Tests Required
 
 - Run `npm.cmd run blog:plan` or the equivalent list path when changing plan parsing.
