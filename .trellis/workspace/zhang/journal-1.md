@@ -239,3 +239,37 @@ Verified project-page assistant knowledge, fixed backend public-knowledge loadin
 ### Next Steps
 
 - None - task complete
+
+
+## Session 8: Blog content cleanup
+
+**Date**: 2026-07-01
+**Task**: Blog content cleanup
+**Branch**: `main`
+
+### Summary
+
+Curated public blog content down to 9 selected posts, hid bulk generated posts from public routes/search/assistant/sitemap/runtime loaders, and recorded the public blog curation contract.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `df9b941` | (see git log) |
+| `7215ddf` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
