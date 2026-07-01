@@ -205,6 +205,7 @@ export const projects: Project[] = [
     stack: ['Android', 'Node.js', 'FastAPI', 'PostgreSQL', 'Agent Worker', '质量门禁'],
     highlights: ['桌宠孵化', '社区审核', '不透明下载 ID', '人审发布'],
     links: [
+      externalLink('App 展示页源码', 'https://github.com/Drew-Z/gamer/tree/cursor-windows-migration/pet-app-showcase-site'),
       internalLink('生成管线文章', '/blog/pet-workspace-pipeline'),
     ],
     detailContent: {
@@ -219,6 +220,11 @@ export const projects: Project[] = [
           body:
             '公开案例不会暴露真实部署主机、提供商地址、密钥、连接串、适配器配置或私有运维命令；它只说明 App、网关、生成服务、Worker、人审和质量证据之间的关系。',
         },
+        {
+          title: '新增 App 展示与下载状态页',
+          body:
+            '当前已经补充一个独立静态展示页，用真实 Android 模拟器截图呈现桌宠模式、孵化桌宠、社区和个人页。页面明确标注 APK 待公开构建，不提供占位下载链接，也不把 debug 包包装成公开发布包。',
+        },
       ],
       workflow: [
         {
@@ -227,6 +233,7 @@ export const projects: Project[] = [
             'Android 侧包含桌宠 shell、默认桌宠资产、桌面悬浮服务、生成 UI 状态、Community API 客户端和 pet.zip 导入请求构造。',
             '社区链路覆盖动态流、社区首页、已通过桌宠展架、资源包下载、签到、钱包、导入草稿、提交审核和审核结果回流。',
             'Admin Review 提供内部审核队列和审核决策界面，用来把候选桌宠从“可看”推进到“可发布”。',
+            '静态展示页把当前 App 画面、下载门禁和后续发布条件整理给访客查看，避免只展示内部工程文档。',
           ],
         },
         {
@@ -279,6 +286,7 @@ export const projects: Project[] = [
           title: '当前边界',
           items: [
             '这是进行中的产品工程，不应描述为已经完全生产化的公共 AI 桌宠平台。',
+            '公开 APK 还没有开放下载；展示页只说明当前 App 画面和发布门禁，不提供伪造或占位下载。',
             '真实生成 Worker、模型适配、私有运维、部署验证、租户权限和完整鉴权仍属于受控后台能力，不对公开访客开放。',
             '机器 QA 只能帮助发现透明背景、动作稳定性、循环锚点和布局问题，最终发布仍需要人类视觉审核。',
             'Android 真实设备/模拟器端到端、长期 SLA、队列守护、运维 Runbook 和监控告警仍需要继续补强。',
@@ -294,6 +302,7 @@ export const projects: Project[] = [
             '把 Worker 池化、队列位置、动态 SLA、失败恢复和运行面板做成可运营能力。',
             '继续提升 Android 端桌宠交互、候选画廊、反馈备注、真实设备 E2E 和桌宠资源包体验。',
             '沉淀生成质量回归报告，让动作、透明背景、包结构和人审反馈可以跨版本对比。',
+            '把 App 展示页接入正式公开访问地址，并在签名、版本说明、回归和人工审核完成后再开放 APK 下载。',
           ],
         },
       ],
@@ -304,6 +313,7 @@ export const projects: Project[] = [
       'Community API 是 App 唯一后端入口，包含 health、SLA、metrics、feed、community-home、approved pets、package download descriptor、wallet、check-in、submissions、import drafts、bundle validation、admin review 和 fantasy-pet proxy 等能力。',
       '生成规则服务负责 app-safe job 创建、轮询、artifact 索引、不透明 downloadId、人工 review decision、package plan、pet.zip 构建、worker readiness 和内部 GA/Codex/QA 证据；机器证据不能替代人工视觉 accept。',
       '质量证据包括 Node workspace tests、Android 单元测试、Community API routes/server/store/rate-limit/metrics/SLA/logging/postgres 测试、pet package contract 测试、追踪矩阵、结构化日志、Prometheus metrics 和 SLA 文档。',
+      '项目新增了静态 App 展示与下载状态页，使用真实 Android 模拟器截图展示桌宠模式、孵化桌宠、社区和个人页；APK 区域明确标注待公开构建，不提供占位下载。',
       '当前项目应被描述为 WIP：Android 模拟器 E2E、live 私有部署验证、生产鉴权、租户隔离、Worker daemon、队列运营、Runbook、长期 SLA 和可观测告警仍是后续优化方向。',
     ],
   },
@@ -338,9 +348,17 @@ export const projects: Project[] = [
         {
           title: '管理后台工作流',
           items: [
-            'Vue/Vite 管理后台包含登录、注册、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等路由。',
+            'Vue/Vite 管理后台包含登录、注册、Owner 初始化、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等路由。',
             '店铺侧维护授权状态、区域、币种、商品上限和 Seller 会话；商品侧承接同步、价格、库存、类目、图片、评分和导入回读。',
             '采集商品进入采集箱或草稿后，可以继续编辑标题、描述、图片、规格、重量、品牌、价格、库存和 Ozon 上架字段，再提交受控写入。',
+          ],
+        },
+        {
+          title: '认证入口体验',
+          items: [
+            '登录/注册页已经整理成更清晰的产品入口，访客从主站进入 ERP 时可以返回项目说明，也能区分登录、普通注册和首次 Owner 初始化。',
+            '普通注册和 Owner 初始化增加确认密码校验，在请求 API 前拦截两次密码不一致的情况。',
+            '生产自助注册仍由服务端策略控制；未开放注册时页面会显示锁定说明，并引导用户使用已有账号或联系 Owner 分配账号。',
           ],
         },
         {
@@ -421,7 +439,8 @@ export const projects: Project[] = [
     },
     assistantContext: [
       'Ozon ERP 是面向小团队跨境店铺运营的业务系统，包含 Vue/Vite 管理后台、Express API、Prisma/PostgreSQL 数据模型、可选 Redis/BullMQ 队列、WXT/Chrome MV3 浏览器插件和共享计算包。',
-      '管理后台覆盖登录、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等工作流，重点解决店铺授权、商品同步、采集铺货、定价利润和运营追踪。',
+      '管理后台覆盖登录、注册、Owner 初始化、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等工作流，重点解决店铺授权、商品同步、采集铺货、定价利润和运营追踪。',
+      '认证入口已经补充确认密码校验、Owner 初始化提示、注册关闭提示和主站返回桥接；生产自助注册仍由服务端策略控制，不在前端默认开启。',
       'Express API 注册 auth、shops、products、selection、settings、ozon、collect、market metrics、commission rates、api.chrome、exchange rates、watermark 和 uploads 等路由。',
       'Prisma 模型覆盖用户、店铺、Ozon 凭证、Seller 会话、商品、采集商品、草稿、导入日志、PendingAction、JobQueue、AuditLog、市场指标和佣金映射等对象。',
       '外部平台写入通过 PendingAction 和 JobQueue 收口；当前代码和测试显示商品写入与一键铺货默认偏向队列或本地后台执行，只有显式配置 inline 才同步执行。',
