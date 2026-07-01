@@ -6,26 +6,44 @@ series: "AI 应用知识库"
 tag: "AI 应用"
 sourceCurrentSlug: "rag-chunk-strategy"
 status: "draft"
-generatedBy: "model-assisted-polish:review:deepseek-v4-pro:deepseek-v4-pro"
-generatedAt: "2026-07-01T19:05:42.010Z"
-modelStrategy: "Codex evidence pack + Codex scaffold + strong profile draft + review profile polish + Codex final fact/safety review"
+generatedBy: "codex-reviewed-draft"
+generatedAt: "2026-07-02T00:00:00.000Z"
+modelStrategy: "Codex-only scaffold/review; model channel: none; previous model body reviewed against current evidence"
 ---
 
 # RAG 文档切分：Chunk 为什么决定答案能不能被验证
 
 ## Evidence Pack
-- TODO: add source paths, URLs, screenshots, task notes, test output, or external references.
+- `scripts/blog-rewrite-plan.json` 中的 `chunk-strategy-public` 选题。
+- `src/data/blogShared.ts` 的 `knowledge` 栏目定义。
+- `content-drafts/01-rag-overview-public.md` 和 `content-drafts/03-embedding-vector-search-public.md`，用于检查主题边界，避免和 RAG 总览、向量检索草稿重复。
+- `legal-rag/apps/api/src/chunks/splitter.ts`：`CHUNK_SIZE = 850`、`OVERLAP = 120`；按段落累积，遇到 `第...条` 或 `位置：` 时优先切新 chunk；超长段落按固定窗口加 overlap 切分。
+- `legal-rag/apps/api/src/documents/text.ts`：`cleanText` 规范换行、tab 和空格；`detectSection` 识别条款标题、位置标题和短标题；`estimateTokens` 给中文和拉丁文本估算 token。
+- `legal-rag/apps/api/src/documents/ingestion-service.ts`：导入链路会清洗文本、项目内 hash 去重、切 chunk、补 metadata、批量 embedding，再 upsert 到 vector store。
+- `legal-rag/apps/api/src/citations/citations.ts`：citation 输出包含 `documentId`、`title`、`chunkIndex`、`section` 和截断 quote。
+- `legal-rag/apps/api/src/rag/rag-service.ts`：查询链路召回向量和关键词候选，合并、过滤、rerank，最终引用前 3 个 answer chunks。
+- `legal-rag/apps/api/src/validate.ts`：本地验证会导入文本、检查 chunk 数量、重复导入、project 隔离、citations、vector/rerank diagnostics 和 fallback/refusal。
+- `legal-rag/apps/web/src/components/QaView.vue`：前端展示回答、diagnostics、引用来源、chunk 编号和 quote，并支持点击 citation 定位。
 
 ## Safe Public Facts
 - 这是一篇知识积累草稿，主题来自 `scripts/blog-rewrite-plan.json` 的 `chunk-strategy-public` 选题。
 - 公开角度是把 chunk 讲成 RAG 的最小证据单元，强调切分质量如何影响召回、引用和审查报告。
+- Legal RAG 当前 splitter 会先按空行分段，再根据条款标题、位置标题和 chunk 长度决定切分边界。
+- 每个 chunk 会保留 `title`、`content`、`chunkIndex`、`page`、`section`、`tokenEstimate` 和包含 `projectId` 的 metadata。
+- chunk 的 `section` 会进入 citation，前端引用卡片会显示 `title · section`、chunk 编号和 quote。
+- 查询阶段只把通过可回答性判断的 chunks 转成 citations；证据不足时会走 refusal。
+- 本轮只刷新草稿，不发布，不改公开博客运行时数据。
 
 ## Uncertain Or Stale Facts
-- 文中的 Legal RAG 和企业制度文档例子需要发布前回到真实代码、文档或截图核验。
-- 模型生成的技术判断需要由 Codex 或作者逐条复核后才能发布。
+- 当前草稿还没有补真实产品截图；如果未来公开发布，应优先使用真实 QA 引用卡片截图或自制流程图。
+- Legal RAG 的实际线上模型、向量库配置、数据规模和当前服务健康状态不在本轮核验范围内。
+- 复杂 PDF、OCR、表格保留和多模态解析仍属于后续方向，不能写成当前已完成能力。
+- 这篇文章曾有模型生成正文，本轮已由 Codex 按证据改写关键段落，但公开发布前仍应逐段审稿。
 
 ## Forbidden / Private Details
 - Do not include real IPs, accounts, keys, database URLs, private dashboards, local secret paths, customer names, or sensitive metrics.
+- 不公开真实模型中转站、数据库连接、部署后台、演示账号、客户合同、私有语料、访问指标或未脱敏日志。
+- 不把 Legal RAG 包装成正式法律意见服务；法律判断仍需要人工复核。
 
 ## Draft Brief
 - Column: 知识积累 / Knowledge Notes
@@ -45,18 +63,19 @@ modelStrategy: "Codex evidence pack + Codex scaffold + strong profile draft + re
 - Practical checklist
 
 ## Model Strategy
-- Codex evidence pack + Codex scaffold + strong profile draft + review profile polish + Codex final fact/safety review
-- This generated draft used the `strong` profile for the first model body.
-- Review/polish with the `review` profile only after evidence facts are checked.
-- Review/polish stage used the `review` profile (deepseek-v4-pro / deepseek-v4-pro).
-- Codex final fact/safety review is still required before promotion.
+- Writing mode: Codex-only scaffold/review.
+- Model channel: none.
+- 本轮没有调用 live model、`--generate`、`--polish-from` 或 live doctor。
+- 历史正文里保留的模型表达已经按当前代码证据局部改写；如未来继续模型润色，应先确认 `strong` / `review` profile，再由 Codex 做事实、安全和重复度复核。
 
 ## Review Gates
-- [ ] Every project claim is backed by the evidence pack.
-- [ ] No private or sensitive information is included.
-- [ ] The selected column matches the actual purpose of the article.
-- [ ] Model-generated placeholders have been replaced or removed before publishing.
-- [ ] Hidden drafts remain hidden until explicitly curated.
+- [x] Every project claim is backed by the evidence pack.
+- [x] No private or sensitive information is included.
+- [x] The selected column matches the actual purpose of the article.
+- [x] Model-generated placeholders have been replaced or removed before publishing.
+- [x] Hidden drafts remain hidden until explicitly curated.
+- [x] No live model use happened in this refresh.
+- [ ] Publication still needs human review, optional screenshot/diagram decision, and explicit curation.
 
 ## Promotion Checklist
 - [ ] Convert reviewed content into `src/data/blog-posts/<slug>.ts` only after review.
@@ -112,29 +131,21 @@ Overlap 的工程初衷，是为了防止硬切分截断关键句子。但从溯
 
 在合同审查这类高要求场景下，通常必须选择策略 B，或者采用“结构化切分 + 内部二次固定长度切分”的混合方式。
 
-## 4. 实践案例：Legal RAG 与企业制度文档入库
+## 4. 实践案例：Legal RAG 的 section-aware chunk
 
-*（注：以下项目实现细节目前为框架说明，请在发布前替换或补充真实的工程实践记录。）*
+Legal RAG 当前没有把“条款级切分”写成一个笼统口号，而是在 splitter 里做了几层可验证的边界处理。
 
-### 案例一：Legal RAG 的条款级切分
+第一层是文本清洗。导入服务会先调用 `cleanText`，统一换行、tab、连续空格和过多空行。这个动作看起来基础，但它决定后续按空行拆段是否稳定。如果清洗前后格式差异太大，chunk 边界就会变得不可复现。
 
-处理法律合同或审查任务时，按 Token 切分基本不可行。合同的效力往往精确到具体的条款。
+第二层是 section 识别。`detectSection` 会尝试识别三类信息：`第...条` 形式的合同条款标题、`位置：` 开头的位置标题，以及长度不超过 28 且没有句末标点的短标题。识别出的 section 会写进 chunk，也会在 citation 里展示出来。
 
-**实现思路**
-在文档解析阶段，放弃纯文本提取，而是通过版面分析或正则表达式，把合同解析成树状结构。切分的最小粒度严格控制在“条款”级别。
-- 元数据注入：每个 Chunk 都要注入父级节点的结构信息。比如，当前 Chunk 的文本是“乙方应在三个工作日内赔偿”，它的元数据就必须包含 `{"chapter": "第七章 违约责任", "clause": "7.2.1 赔偿期限"}`。
-- 溯源效果：当 LLM 指出合同存在风险时，引用的不再只是一段话，而是明确指向“第七章 7.2.1 条”，用户核验的效率会大幅提升。
+第三层是边界切换。splitter 按空行分段累积文本；如果新段落以条款或位置开头，并且当前 chunk 已有内容，就先推送当前 chunk，再开启新 chunk。这样做的目标不是绝对语义理解，而是避免一个 chunk 横跨多个明显的条款或位置段落。
 
-> `[待作者补充：请在此处插入真实的 Legal RAG 切分代码片段，或展示一段包含层级元数据的 Chunk JSON 数据。请务必回到代码库或部署脚本中核验逻辑，不要依赖 README。]`
+第四层是长度兜底。当前 `CHUNK_SIZE` 是 850，`OVERLAP` 是 120。普通段落会尽量累积到限制内；超长段落再按固定窗口切分并带 overlap。也就是说，项目没有完全依赖固定长度，也没有假装能理解所有复杂文档结构，而是采用“结构优先，长度兜底”的折中。
 
-### 案例二：企业制度文档入库
+这些 chunk 之后会保留 `title`、`content`、`chunkIndex`、`page`、`section`、`tokenEstimate` 和带 `projectId` 的 metadata。回答阶段生成 citation 时，会把 `title`、`section`、`chunkIndex` 和 quote 返回给前端；QA 页面则把它渲染成可点击的引用来源。用户看到的不是“模型说了什么”，而是“这个结论关联到哪份文档、哪个 section、哪个 chunk 摘录”。
 
-企业内部的报销制度、HR 手册里，往往包含大量列表和跨段落的条件分支。
-
-**实现思路**
-采用基于 Markdown 的标题层级切分。把文档转成 Markdown 后，按 `#`、`##`、`###` 进行分块。如果某个 `###` 下的内容超过了 LLM 的处理上限，再做子段落切分，但必须保留父标题的元数据。
-
-> `[待作者补充：请在此处插入企业制度文档在系统前端的“引用溯源卡片”截图，展示元数据是如何辅助用户验证答案的。请确认截图来源于真实测试或 Trellis 任务记录。]`
+这也是 chunk 策略和前端体验之间最直接的关系：如果切分时丢了 section，前端就只能展示弱引用；如果 chunk 横跨多个条款，quote 可能仍然存在，但用户复核成本会明显上升。
 
 ## 5. 常见的失效模式
 
@@ -158,4 +169,4 @@ Overlap 的工程初衷，是为了防止硬切分截断关键句子。但从溯
 - [ ] **独立检索测试**：暂时关掉 LLM 生成模块，直接输入 Query，观察召回的 Top-3 Chunks 能不能直接作为证据回答问题。
 - [ ] **UI 溯源闭环**：前端界面是否提供了明显的引用标记；点击引用后，能不能高亮显示对应的 Chunk 文本及其元数据。
 
-> `[待作者补充：发布前请再次核对文中涉及的技术方案、项目场景与实际部署状态是否一致，替换所有占位符，并附上相关的外部参考链接或开源依赖（如适用）。]`
+发布前还需要再做一轮人工审稿：核对 Legal RAG 最新代码、是否补真实截图或流程图、是否需要模型润色，以及是否和 RAG 总览/向量检索草稿产生重复。
