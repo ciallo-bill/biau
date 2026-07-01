@@ -143,6 +143,66 @@ const citations = isRecord(payload) ? normalizeAssistantCitations(payload.citati
 
 Normalize once through the assistant data module and let UI components consume typed results.
 
+## Scenario: Public Blog Curation
+
+### 1. Scope / Trigger
+
+- Trigger: blog content is bulk-generated or draft-like, but only a curated subset should be public.
+- Owner: `src/data/blogCuration.ts` is the source of truth for blog visibility, role, priority, project relations, public selectors, and assistant tags.
+
+### 2. Signatures
+
+- `BlogVisibility = 'featured' | 'archive' | 'hidden'`.
+- `BlogContentRole = 'case-study' | 'technical-method' | 'resource' | 'roadmap'`.
+- `getPublicBlogPosts()` returns posts allowed in public lists, search, project readings, sitemap, and assistant knowledge.
+- `getPublicBlogPostSummary(slug)` gates `/blog/:slug` detail SEO and direct access.
+- `getLoadableBlogPostSlugs()` from `src/data/blogContent.ts` returns only public post loaders.
+
+### 3. Contracts
+
+- Default curation for unspecified posts is `hidden`.
+- Hidden posts may remain as source files under `src/data/blog-posts/`, but must not be registered in `src/data/blogContent.ts`.
+- `src/pages/BlogPage.tsx`, `src/pages/BlogPostPage.tsx`, `src/pages/ProjectDetailPage.tsx`, `src/components/SeoManager.tsx`, `scripts/generate-sitemap.mjs`, `src/data/assistant.ts`, and `scripts/generate-assistant-knowledge.ts` must use public selectors, not raw `blogPosts`, for public surfaces.
+- Hidden article direct URLs should render the existing missing-article state.
+
+### 4. Validation & Error Matrix
+
+- Hidden post appears in public selector -> `npm.cmd run blog:audit` fails.
+- Hidden post has a runtime loader -> `npm.cmd run blog:audit` fails.
+- Featured post lacks valid priority/role -> `npm.cmd run blog:audit` fails.
+- Public assistant index includes hidden post -> regenerate with `npm.cmd run assistant:index` and rerun `blog:audit`.
+
+### 5. Good/Base/Bad Cases
+
+- Good: a rewritten project case is added to `blogCuration` as `featured`, gets a loader in `blogContent.ts`, and appears in sitemap/assistant after generation.
+- Base: a draft/source article remains in `blogPosts` and `src/data/blog-posts/` but defaults to `hidden`.
+- Bad: a component imports `blogPosts` and filters it directly for a public page, bypassing curation.
+
+### 6. Tests Required
+
+- Run `npm.cmd run blog:audit` after changing `blogCuration.ts`, `blogContent.ts`, project/blog relations, or sitemap generation.
+- Run `npm.cmd run assistant:index` after changing public blog visibility or assistant tags.
+- Run `npm.cmd run sitemap:generate` after changing public blog visibility.
+- Run `npm.cmd run lint` and `npm.cmd run build` for frontend changes; broad blog/assistant changes should run `npm.cmd run verify`.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```tsx
+const post = blogPosts.find((item) => item.slug === slug)
+```
+
+This makes hidden content available to a public route.
+
+#### Correct
+
+```tsx
+const post = getPublicBlogPostSummary(slug)
+```
+
+The route follows the same public curation contract as lists, assistant knowledge, and sitemap generation.
+
 ### React Effect Gotcha
 
 React 19 lint can flag effect bodies that call functions which synchronously set state. For owner/admin actions such as refreshing assistant summary counts, prefer an explicit button/action handler unless the page genuinely needs subscription-style synchronization.
