@@ -613,3 +613,36 @@ Refreshed the blog-content-system build-log draft with an evidence-first skill w
 ### Next Steps
 
 - None - task complete
+
+
+## Session 19: Add model setup gate to blog pipeline
+
+**Date**: 2026-07-02
+**Task**: Add model setup gate to blog pipeline
+**Branch**: `main`
+
+### Summary
+
+Added a mode gate to the blog content pipeline so normal runs distinguish Codex-only, model-assisted, review-only, and publish flows; documented setup/status/doctor preflight before model-assisted generation and captured the convention in the blog draft workflow spec.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `8004148` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
