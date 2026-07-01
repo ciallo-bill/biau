@@ -514,3 +514,36 @@ Extracted blog-content-pipeline into standalone repo D:/workspace4Cursor/blog-co
 ### Next Steps
 
 - None - task complete
+
+
+## Session 16: Blog pipeline dry run
+
+**Date**: 2026-07-01
+**Task**: Blog pipeline dry run
+**Branch**: `main`
+
+### Summary
+
+Ran the blog-content-pipeline strong-profile dry run, captured the model routing failure, added a dry-run report, and updated the blog draft workflow spec with model setup wizard guidance.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `0d7474c` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
