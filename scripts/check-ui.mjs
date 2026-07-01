@@ -385,6 +385,37 @@ await homeCarouselClickPage.waitForURL(`${base}/projects/legal-rag`, { timeout: 
 })
 await homeCarouselClickPage.close()
 
+const homeCarouselActionKeyboardPage = await browser.newPage({ viewport: viewports[0] })
+await homeCarouselActionKeyboardPage.addInitScript(() => {
+  window.sessionStorage.setItem('biau-port-harbor-intro:v1', '1')
+  window.__openedUrls = []
+  window.open = (url) => {
+    window.__openedUrls.push(String(url))
+    return null
+  }
+})
+await homeCarouselActionKeyboardPage.goto(`${base}/`, { waitUntil: 'networkidle' })
+await homeCarouselActionKeyboardPage.locator('.carousel-viewport').hover({ force: true })
+const legalRagAction = homeCarouselActionKeyboardPage
+  .getByRole('button', { name: '打开外部项目页面：法律智能机器人' })
+  .nth(1)
+await legalRagAction.focus()
+await homeCarouselActionKeyboardPage.keyboard.press('Enter')
+await homeCarouselActionKeyboardPage.waitForTimeout(100)
+await homeCarouselActionKeyboardPage.keyboard.press('Space')
+await homeCarouselActionKeyboardPage.waitForTimeout(100)
+const actionKeyboardResult = await homeCarouselActionKeyboardPage.evaluate(() => ({
+  pathname: window.location.pathname,
+  openedUrls: window.__openedUrls ?? [],
+}))
+if (actionKeyboardResult.pathname !== '/') {
+  failures.push('/ home carousel: keyboard activation on external action should not navigate to project detail')
+}
+if (!actionKeyboardResult.openedUrls.some((url) => url === 'https://legal-rag-web.onrender.com')) {
+  failures.push('/ home carousel: expected keyboard activation on Legal RAG action to open external link')
+}
+await homeCarouselActionKeyboardPage.close()
+
 const keyboardPage = await browser.newPage({ viewport: viewports[0] })
 await keyboardPage.goto(`${base}/projects`, { waitUntil: 'networkidle' })
 for (let index = 0; index < 20; index += 1) {

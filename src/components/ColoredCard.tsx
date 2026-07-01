@@ -12,6 +12,7 @@ interface ColoredCardProps {
 export function ColoredCard({ project, index, onClick, onActionClick }: ColoredCardProps) {
   const number = String((index % 5) + 1).padStart(2, '0')
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.target !== event.currentTarget) return
     if (event.key !== 'Enter' && event.key !== ' ') return
     event.preventDefault()
     onClick()
@@ -44,6 +45,9 @@ export function ColoredCard({ project, index, onClick, onActionClick }: ColoredC
           onClick={(event) => {
             event.stopPropagation()
             onActionClick()
+          }}
+          onKeyDown={(event) => {
+            event.stopPropagation()
           }}
         >
           <span>{project.action}</span>
