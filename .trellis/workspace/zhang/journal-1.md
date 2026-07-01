@@ -481,3 +481,36 @@ Strengthened blog-content-pipeline with evidence-first routes, legacy rewrite/re
 ### Next Steps
 
 - None - task complete
+
+
+## Session 15: Extract blog content pipeline skill
+
+**Date**: 2026-07-01
+**Task**: Extract blog content pipeline skill
+**Branch**: `main`
+
+### Summary
+
+Extracted blog-content-pipeline into standalone repo D:/workspace4Cursor/blog-content-pipeline, pushed git@github.com:Drew-Z/blog-content-pipeline.git, added usage guidance for model profiles and image generation policy, and synced the updated skill back into blog-semi.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `a094ff3` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
