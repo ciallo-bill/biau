@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-cost-governance-strategy",
   "title": "AI 应用成本治理：预算、限流、缓存、降级与高成本审批",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用的成本来自模型、token、OCR、向量库、队列和人工复核。本文讨论如何把成本治理设计进产品和工程流程。",
   "date": "2026-06-20",
   "readTime": "10 min",

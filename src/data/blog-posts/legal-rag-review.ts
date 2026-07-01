@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "legal-rag-review",
   "title": "合同审查 RAG 项目复盘：从可演示 MVP 到生产化路线",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "project-notes",
   "detail": "复盘法律智能机器人与合同审查项目的设计思路：如何从文档导入、条款切分、引用问答和风险审查，走向可解释、可复核、可迭代的 AI 应用。",
   "date": "2026-06-11",
   "readTime": "12 min",

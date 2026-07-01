@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "frontend-ai-workbench",
   "title": "前端 AI 工作台设计：把证据、状态和人工决策放到同一界面",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "真实 AI 应用不只是聊天框。本文讨论工作台如何展示输入、证据、AI 结论、任务状态、人工复核和高风险操作，让人机协作可解释。",
   "date": "2026-06-20",
   "readTime": "10 min",

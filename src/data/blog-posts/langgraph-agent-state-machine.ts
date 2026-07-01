@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "langgraph-agent-state-machine",
   "title": "Agent 状态机设计：用 LangGraph 思路拆解复杂工作流",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "复杂 Agent 不能只靠一段大 prompt 推进。本文用 LangGraph 的 State、Node、Edge、条件路由和 checkpoint 思路，说明如何让 Agent 可追踪、可恢复。",
   "date": "2026-06-20",
   "readTime": "10 min",

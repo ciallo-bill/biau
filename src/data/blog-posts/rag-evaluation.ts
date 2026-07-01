@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-evaluation",
   "title": "RAG 评估体系：召回、引用和答案如何一起验收",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 系统不能只凭“答案看起来不错”验收。本文整理 golden set、召回命中、citation 命中率和错误案例复盘的评估方法。",
   "date": "2026-06-20",
   "readTime": "11 min",

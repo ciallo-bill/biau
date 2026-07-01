@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "file-upload-security-ai",
   "title": "文件上传安全：大小限制、类型校验、病毒扫描和异步处理",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 文档上传是知识库的入口风险。本文讨论文件大小、类型校验、内容嗅探、隔离存储、扫描和异步入库如何协同。",
   "date": "2026-06-20",
   "readTime": "9 min",

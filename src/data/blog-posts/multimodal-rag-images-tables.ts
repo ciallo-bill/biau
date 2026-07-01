@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "multimodal-rag-images-tables",
   "title": "多模态 RAG：图片、扫描件与表格如何变成可引用证据",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "企业资料经常混合图片、扫描件和表格。本文讨论 OCR、视觉描述、表格结构化和原始位置回溯如何支撑可信检索。",
   "date": "2026-06-20",
   "readTime": "10 min",

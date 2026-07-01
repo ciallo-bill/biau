@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-chunk-strategy",
   "title": "RAG 文档切分策略：Chunk Size、Overlap 与元数据设计",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "文档切分决定了 RAG 能否检索到正确证据。本文围绕 chunk size、overlap、结构化元数据和合同条款切分，整理一套可落地的设计方法。",
   "date": "2026-06-20",
   "readTime": "9 min",

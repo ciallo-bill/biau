@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "contract-review-collaborative-review",
   "title": "合同审查协同复核：法务、业务与管理员如何分工",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "合同审查系统进入真实流程后，风险项需要多人协同处理。本文讨论法务、业务、管理员和系统任务如何围绕风险项分工。",
   "date": "2026-06-20",
   "readTime": "10 min",

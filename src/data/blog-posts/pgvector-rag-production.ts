@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "pgvector-rag-production",
   "title": "pgvector 落地方案：中小型 RAG 项目如何持久化向量",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 从内存 Demo 走向可交付系统，必须解决文档、chunk、embedding 和权限过滤的持久化问题。本文讨论 PostgreSQL + pgvector 的落地方式。",
   "date": "2026-06-20",
   "readTime": "11 min",

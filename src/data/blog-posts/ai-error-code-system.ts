@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-error-code-system",
   "title": "AI 应用错误码体系：用户提示、诊断信息与重试语义",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用错误要同时服务用户、前端和开发诊断。本文讨论 code、message、retryable、stage、traceId 和 nextAction 的设计。",
   "date": "2026-06-20",
   "readTime": "9 min",

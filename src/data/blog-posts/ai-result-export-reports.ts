@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-result-export-reports",
   "title": "AI 结果导出：从结构化报告到 Markdown、PDF 与 DOCX",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 审查结果进入业务流程时，需要稳定导出为可阅读、可归档、可编辑的材料。本文讨论报告模型、格式选择和版本记录。",
   "date": "2026-06-20",
   "readTime": "9 min",

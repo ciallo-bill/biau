@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-release-checklist",
   "title": "AI 应用发布检查清单：质量、安全、成本与回滚",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用上线不能只看页面能否点击。本文把 RAG 质量、Agent 安全、权限隔离、监控成本、降级和回滚纳入发布检查。",
   "date": "2026-06-20",
   "readTime": "10 min",

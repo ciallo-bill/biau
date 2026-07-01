@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-api-contracts",
   "title": "AI 应用 API 契约：流式响应、任务状态与错误语义",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI API 不应该只返回 answer 字符串。本文讨论同步、SSE、异步 job、任务状态、错误码、取消、重试和幂等语义。",
   "date": "2026-06-20",
   "readTime": "10 min",

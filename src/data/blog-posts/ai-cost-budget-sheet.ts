@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-cost-budget-sheet",
   "title": "AI 成本预算表：模型、Token、OCR、存储与人审",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 成本来自完整业务链路，而不只是一次模型回答。本文把入库、查询、生成、导出和人工审核拆成可估算预算表。",
   "date": "2026-06-20",
   "readTime": "9 min",

@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "contract-review-batch-processing",
   "title": "合同审查批量处理：多份合同、批量风险项与报告合并",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "合同审查进入团队使用后，问题会从单份合同扩展到批量任务。本文讨论 batch、job、riskItems、部分失败和报告合并如何设计。",
   "date": "2026-06-20",
   "readTime": "10 min",

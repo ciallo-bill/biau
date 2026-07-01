@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-app-deployment-layers",
   "title": "AI 应用部署分层：静态站、API、Worker 和数据服务如何协作",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "展示站可以静态托管，模型调用、数据库、队列和文件处理必须留在服务端。本文梳理 Cloudflare Pages、API、Worker、PostgreSQL、Redis 和对象存储的部署边界。",
   "date": "2026-06-20",
   "readTime": "11 min",

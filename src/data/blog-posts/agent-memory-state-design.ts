@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "agent-memory-state-design",
   "title": "Agent 记忆系统：短期记忆、长期记忆与任务状态的边界",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "Agent 应用不能把历史消息、用户偏好和任务进度都塞进 memory。本文拆解三类状态的生命周期、存储方式和权限边界。",
   "date": "2026-06-20",
   "readTime": "9 min",

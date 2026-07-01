@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "frontend-ai-task-state-management",
   "title": "前端任务状态管理：AI 长任务的进度、取消与恢复",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 长任务不能只显示 loading。本文讨论前端如何基于后端状态枚举展示进度、失败原因、取消、重试、人工处理和刷新恢复。",
   "date": "2026-06-20",
   "readTime": "10 min",

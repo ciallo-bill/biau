@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-batch-jobs-priority",
   "title": "RAG 批量任务设计：Batch、Job、Step 与优先级",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "多文档入库和批量合同审查需要任务化处理。本文讨论 Batch、Job、Step 三层结构、并发限制、失败恢复和成本控制。",
   "date": "2026-06-20",
   "readTime": "9 min",

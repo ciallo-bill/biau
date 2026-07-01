@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "model-provider-abstraction",
   "title": "模型供应商抽象：让生成、Embedding 与 Rerank 可切换",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用不应该把业务逻辑绑死在单一 SDK 上。本文讨论 provider 抽象、OpenAI-compatible 接口、本地模型和模型切换评估。",
   "date": "2026-06-20",
   "readTime": "9 min",

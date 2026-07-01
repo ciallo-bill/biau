@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "content-modeling-project-site",
   "title": "内容模型设计：项目、资源与博客如何分层",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "产品化展示站点不能把所有内容塞进一个页面。本文讨论如何把项目、资源、博客、案例和试玩入口拆成稳定内容模型。",
   "date": "2026-06-20",
   "readTime": "9 min",

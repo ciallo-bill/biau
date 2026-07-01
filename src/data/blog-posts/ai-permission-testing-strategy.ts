@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-permission-testing-strategy",
   "title": "AI 应用权限测试：跨租户、过期链接、导出与工具调用",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用权限测试不能只验证登录。本文讨论如何覆盖 RAG 检索、citation、报告导出、缓存、工具调用和多租户隔离中的越权风险。",
   "date": "2026-06-20",
   "readTime": "10 min",

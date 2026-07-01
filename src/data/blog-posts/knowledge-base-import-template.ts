@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "knowledge-base-import-template",
   "title": "知识库导入模板：目录、标签、Owner 与权限字段",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 入库前的 metadata 会决定后续检索、权限和运营质量。本文讨论导入模板如何标准化目录、标签、owner、权限和生命周期。",
   "date": "2026-06-20",
   "readTime": "9 min",

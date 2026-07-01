@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "agent-planning-debugging",
   "title": "Agent 规划失败排查：循环调用、错误工具与目标漂移",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "Agent 失败通常不是模型突然变差，而是状态、工具、权限或目标约束出了问题。本文讨论 trace、状态机和人工接管的排查方法。",
   "date": "2026-06-20",
   "readTime": "10 min",

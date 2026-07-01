@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-data-versioning",
   "title": "RAG 数据版本：文档、Chunk 与 Embedding 如何支持回溯",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "文档会更新，切分策略和 embedding 模型也会升级。本文讨论 documentVersion、chunkVersion、embeddingVersion 和 reindex 任务如何支撑审计。",
   "date": "2026-06-20",
   "readTime": "9 min",

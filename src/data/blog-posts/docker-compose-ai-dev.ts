@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "docker-compose-ai-dev",
   "title": "Docker Compose 本地编排：AI 全栈应用如何一键跑起来",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用通常包含前端、API、PostgreSQL、Redis、Worker、对象存储和模型配置。本文讨论如何用 Docker Compose 降低本地联调和交付成本。",
   "date": "2026-06-20",
   "readTime": "10 min",

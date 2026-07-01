@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-operations-console",
   "title": "RAG 运营后台：文档质量、查询质量、反馈与 Owner 任务",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 上线后需要持续运营。本文讨论如何把文档质量、查询失败、用户反馈、引用问题和 owner 任务组织成可执行后台。",
   "date": "2026-06-20",
   "readTime": "10 min",

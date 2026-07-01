@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "prompt-version-management",
   "title": "Prompt 版本管理：让提示词迭代可评估、可回滚",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "提示词不是一次性字符串，而是影响 AI 质量的工程资产。本文讨论 promptVersion、模板变量、评测回归、灰度发布和异常回滚。",
   "date": "2026-06-20",
   "readTime": "11 min",

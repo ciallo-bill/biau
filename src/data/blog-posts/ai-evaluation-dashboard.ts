@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-evaluation-dashboard",
   "title": "AI 评测看板：召回、引用、延迟、成本与反馈",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 质量需要被持续观察。本文讨论如何把离线 Golden Set、线上 trace、质量、成本、错误和人工反馈放进统一看板。",
   "date": "2026-06-20",
   "readTime": "10 min",

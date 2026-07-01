@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-query-rewrite-routing",
   "title": "RAG Query Rewrite：把口语问题变成可检索查询",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "用户问题常常口语化、范围不清或依赖上下文。本文讨论问题改写、意图识别和检索路由如何提升 RAG 召回质量。",
   "date": "2026-06-20",
   "readTime": "9 min",

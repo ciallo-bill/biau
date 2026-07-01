@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "model-fallback-timeout-provider-switch",
   "title": "模型降级与供应商切换：让 AI 调用失败时可恢复",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "模型服务会超时、限流、返回异常或效果波动。本文讨论 timeout、错误分类、retry、fallback、provider 抽象和人工接管如何保证可用性。",
   "date": "2026-06-20",
   "readTime": "11 min",

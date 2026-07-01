@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-data-desensitization-privacy",
   "title": "AI 数据脱敏与隐私边界：控制模型输入、日志和引用片段",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用会把用户输入、检索上下文、prompt、模型输出和日志串起来。本文讨论如何最小化模型输入、脱敏日志、控制引用片段和人审权限。",
   "date": "2026-06-20",
   "readTime": "11 min",

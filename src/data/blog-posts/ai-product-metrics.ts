@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-product-metrics",
   "title": "AI 应用产品指标：采纳率、人工节省与质量反馈",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用不能只看调用次数和回答数量。本文讨论如何用采纳率、人工节省时间、复核通过率、失败率和成本指标衡量真实价值。",
   "date": "2026-06-20",
   "readTime": "10 min",

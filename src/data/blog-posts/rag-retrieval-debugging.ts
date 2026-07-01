@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-retrieval-debugging",
   "title": "RAG 召回失败排查：从入库到 Citation 的逐层定位",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 召回失败可能发生在入库、过滤、召回、精排或生成阶段。本文给出从无结果到错引用的逐层排查路径。",
   "date": "2026-06-20",
   "readTime": "10 min",

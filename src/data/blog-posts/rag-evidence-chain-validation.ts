@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-evidence-chain-validation",
   "title": "RAG 证据链校验：Citation、Quote、ChunkId 与版本一致性",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 的可信度不只取决于有没有引用，还取决于引用是否能回到正确版本的原文。本文讨论证据链一致性如何校验。",
   "date": "2026-06-20",
   "readTime": "10 min",

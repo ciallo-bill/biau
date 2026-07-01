@@ -1,6 +1,6 @@
 import type { BlogPost } from './blogShared'
 
-export { categoryLabels } from './blogShared'
+export { blogColumnMeta, blogColumnOrder } from './blogShared'
 
 const postLoaders: Record<string, () => Promise<{ default: BlogPost }>> = {
   'legal-rag-review': () => import('./blog-posts/legal-rag-review'),

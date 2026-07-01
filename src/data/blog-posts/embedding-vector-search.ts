@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "embedding-vector-search",
   "title": "Embedding 与向量检索：让业务文本进入语义搜索系统",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "Embedding 让文本可以参与相似度计算，但向量检索不是全部答案。本文从概念、流程、工程取舍和合同审查项目例子，梳理语义检索如何落地。",
   "date": "2026-06-20",
   "readTime": "11 min",

@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "runtime-config-center",
   "title": "运行时配置中心：模型、Prompt 与检索参数的灰度调整",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "模型、Prompt 和检索参数上线后会持续调整。本文讨论运行时配置的作用域、审计、灰度、回滚和前端调试配合。",
   "date": "2026-06-20",
   "readTime": "9 min",

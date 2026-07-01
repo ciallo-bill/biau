@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "multi-tenant-rag-isolation",
   "title": "多租户 RAG 数据隔离：避免向量检索跨边界召回",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "企业 RAG 的安全底线是不能跨租户、跨工作区、跨权限召回数据。本文讨论 tenantId、metadata filter、缓存隔离和跨租户测试。",
   "date": "2026-06-20",
   "readTime": "11 min",

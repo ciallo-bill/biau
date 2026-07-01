@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-access-control-model",
   "title": "AI 应用权限模型：租户、工作区、角色与资源 ACL",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 权限模型必须覆盖资料检索和工具调用。本文讨论 tenant、workspace、RBAC、ACL、metadata filter 和 action scope 如何统一。",
   "date": "2026-06-20",
   "readTime": "10 min",

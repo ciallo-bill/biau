@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "tool-calling-idempotency",
   "title": "Tool Calling 幂等性：Agent 重试时如何避免重复写入",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "Agent 调用工具会遇到重试、超时和重复提交。本文讨论 idempotencyKey、数据库约束、外部平台写入和人工确认如何让重试变安全。",
   "date": "2026-06-20",
   "readTime": "9 min",

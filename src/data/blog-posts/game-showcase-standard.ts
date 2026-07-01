@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "game-showcase-standard",
   "title": "游戏项目展示系统：玩法模型、试玩入口与版本证据",
   "tag": "游戏项目",
-  "category": "project",
+  "column": "project-notes",
   "detail": "游戏项目展示不能只放源码和截图。本文讨论如何用玩法模型、操作说明、试玩入口、截图证据和版本状态，让原型被理解成可体验项目。",
   "date": "2026-06-13",
   "readTime": "8 min",

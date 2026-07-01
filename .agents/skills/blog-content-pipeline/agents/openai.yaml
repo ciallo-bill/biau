@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blog Content Pipeline"
+  short_description: "Evidence-first blog content workflow"
+  default_prompt: "Use the blog content pipeline to plan, draft, review, and publish a site blog post."

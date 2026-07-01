@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-rerank",
   "title": "Rerank 精排：从初召回到高质量上下文",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 的初召回只负责找候选，Rerank 负责把真正能支撑回答的证据排到前面。本文讨论精排在上下文质量和引用准确性中的作用。",
   "date": "2026-06-20",
   "readTime": "10 min",

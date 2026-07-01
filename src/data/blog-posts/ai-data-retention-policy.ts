@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-data-retention-policy",
   "title": "AI 应用数据留存策略：原文、Chunk、Prompt 与日志",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用会产生大量原文、派生数据和调试日志。本文讨论按数据类型分级、设置留存周期、删除派生数据和审计生命周期。",
   "date": "2026-06-20",
   "readTime": "10 min",

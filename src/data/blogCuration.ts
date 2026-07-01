@@ -1,4 +1,4 @@
-import { blogPosts, type BlogCategory, type BlogPostSummary } from './blog'
+import { blogColumnMeta, blogPosts, type BlogColumn, type BlogPostSummary } from './blog'
 import type { Project } from './portfolio'
 
 export type BlogVisibility = 'featured' | 'archive' | 'hidden'
@@ -152,9 +152,12 @@ export function getBlogProjectIds(slug: string) {
 }
 
 export function getBlogAssistantTags(post: CuratedBlogPost) {
+  const column = blogColumnMeta[post.column]
   return Array.from(new Set([
     post.tag,
-    post.category,
+    post.column,
+    column.titleZh,
+    column.titleEn,
     post.series ?? '',
     blogVisibilityLabels[post.visibility],
     blogRoleLabels[post.role],
@@ -165,20 +168,24 @@ export function getBlogAssistantTags(post: CuratedBlogPost) {
 
 export function filterBlogPosts(
   posts: CuratedBlogPost[],
-  options: { category: BlogCategory | 'all'; query: string },
+  options: { column: BlogColumn | 'all'; query: string },
 ) {
   const normalizedQuery = options.query.trim().toLowerCase()
 
   return posts.filter((post) => {
-    const matchesCategory = options.category === 'all' || post.category === options.category
-    if (!matchesCategory) return false
+    const matchesColumn = options.column === 'all' || post.column === options.column
+    if (!matchesColumn) return false
     if (!normalizedQuery) return true
+    const column = blogColumnMeta[post.column]
 
     return [
       post.title,
       post.detail,
       post.tag,
       post.series,
+      column.titleZh,
+      column.titleEn,
+      column.description,
       blogVisibilityLabels[post.visibility],
       blogRoleLabels[post.role],
       ...(post.knowledgePoints ?? []),
@@ -189,7 +196,7 @@ export function filterBlogPosts(
   })
 }
 
-export function getRelatedBlogPosts(post: Pick<BlogPostSummary, 'slug' | 'category' | 'series'>, limit = 3) {
+export function getRelatedBlogPosts(post: Pick<BlogPostSummary, 'slug' | 'column' | 'series'>, limit = 3) {
   const currentProjectIds = new Set(getBlogProjectIds(post.slug))
 
   return getPublicBlogPosts()
@@ -198,7 +205,7 @@ export function getRelatedBlogPosts(post: Pick<BlogPostSummary, 'slug' | 'catego
       let score = 0
       if (candidate.projectIds?.some((projectId) => currentProjectIds.has(projectId))) score += 40
       if (post.series && candidate.series === post.series) score += 20
-      if (candidate.category === post.category) score += 10
+      if (candidate.column === post.column) score += 10
       if (candidate.visibility === 'featured') score += 5
       return { candidate, score }
     })

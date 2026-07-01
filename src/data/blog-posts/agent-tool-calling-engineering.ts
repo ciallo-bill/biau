@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "agent-tool-calling-engineering",
   "title": "Agent Tool Calling 工程化：从聊天回答到可控任务执行",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "Agent 的难点不是让模型多说几句话，而是让模型在受控边界内调用工具、推进状态、处理失败，并把高风险动作交给权限和人工复核。",
   "date": "2026-06-20",
   "readTime": "12 min",

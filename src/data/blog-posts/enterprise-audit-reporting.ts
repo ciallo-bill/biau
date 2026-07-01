@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "enterprise-audit-reporting",
   "title": "企业审计报表：文档访问、报告导出与工具调用追踪",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "企业 AI 需要回答谁在何时访问了哪些资料、导出了哪些报告、触发了哪些工具。本文讨论审计记录和报表筛选设计。",
   "date": "2026-06-20",
   "readTime": "9 min",

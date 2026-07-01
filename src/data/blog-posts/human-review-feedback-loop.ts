@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "human-review-feedback-loop",
   "title": "人审反馈闭环：把审核结果变成系统改进数据",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "Human-in-the-loop 不只是让人点通过。本文讨论审核记录如何沉淀为规则、Prompt 调整、Golden Set 和质量指标。",
   "date": "2026-06-20",
   "readTime": "9 min",

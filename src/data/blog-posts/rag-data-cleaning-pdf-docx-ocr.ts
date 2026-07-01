@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-data-cleaning-pdf-docx-ocr",
   "title": "RAG 数据清洗：PDF、DOCX 与 OCR 文本如何变成可靠证据",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 的质量上限往往在入库前就被决定。本文讨论 PDF、DOCX、OCR 解析后的噪声清理、结构保留、表格处理和引用回溯。",
   "date": "2026-06-20",
   "readTime": "10 min",

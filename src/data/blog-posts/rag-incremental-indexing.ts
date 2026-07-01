@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-incremental-indexing",
   "title": "RAG 增量索引：文档更新、删除与重新 Embedding",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "企业知识库会持续更新。本文讨论 documentVersion、contentHash、软删除、索引切换和缓存失效如何支撑增量索引。",
   "date": "2026-06-20",
   "readTime": "10 min",

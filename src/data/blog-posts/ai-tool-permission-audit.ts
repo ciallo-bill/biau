@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-tool-permission-audit",
   "title": "AI 工具调用权限与审计：让 Agent 行动保持可控",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "Agent 能调用工具后，风险从“答错”升级为“做错”。本文讨论后端权限校验、PendingAction、审计日志和高风险动作确认如何共同构成安全边界。",
   "date": "2026-06-20",
   "readTime": "11 min",

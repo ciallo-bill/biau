@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "sse-streaming-ai-progress",
   "title": "SSE 流式交互：AI 应用如何把生成过程交给用户",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 问答、合同审查和生成管线都不是瞬时完成的请求。本文讨论如何用 SSE 推送文本流、阶段进度和最终状态，让长任务可感知、可恢复。",
   "date": "2026-06-20",
   "readTime": "10 min",

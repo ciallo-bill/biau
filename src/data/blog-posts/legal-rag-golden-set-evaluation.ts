@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "legal-rag-golden-set-evaluation",
   "title": "合同审查 Golden Set：让 RAG 质量从演示走向可评估",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "合同审查不能只靠临场演示判断效果。本文讨论如何设计标准问题、标准引用、风险标签和人工复核样例，让 RAG 优化有回归基准。",
   "date": "2026-06-20",
   "readTime": "9 min",

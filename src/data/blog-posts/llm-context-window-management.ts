@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "llm-context-window-management",
   "title": "模型上下文管理：System Prompt、历史消息与检索证据如何分配",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "模型上下文不是越多越好。本文讨论如何为系统指令、历史消息、检索证据、工具结果和输出约束分配 token 预算。",
   "date": "2026-06-20",
   "readTime": "9 min",

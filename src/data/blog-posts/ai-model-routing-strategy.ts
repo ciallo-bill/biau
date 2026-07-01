@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-model-routing-strategy",
   "title": "多模型路由策略：快模型、强模型与本地模型如何分工",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "不同 AI 任务对质量、延迟、成本和合规要求不同。本文讨论如何设计多模型路由，让快模型、强模型和本地模型各司其职。",
   "date": "2026-06-20",
   "readTime": "9 min",

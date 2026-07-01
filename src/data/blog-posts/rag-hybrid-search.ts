@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-hybrid-search",
   "title": "混合检索：让 RAG 同时抓住语义与精确事实",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "向量检索擅长语义召回，关键词检索擅长精确命中。本文讨论如何把两者组合起来，让 RAG 在合同、政策和企业知识库场景中更可靠。",
   "date": "2026-06-20",
   "readTime": "11 min",

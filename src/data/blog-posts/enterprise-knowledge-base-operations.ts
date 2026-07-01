@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "enterprise-knowledge-base-operations",
   "title": "企业知识库运营：文档生命周期、权限变更与内容质量",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 上线后，知识库还会过期、变权和积累低质量内容。本文讨论文档 owner、状态、过期提醒、权限联动和内容质量指标。",
   "date": "2026-06-20",
   "readTime": "9 min",

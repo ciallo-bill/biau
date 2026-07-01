@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-app-production-roadmap",
   "title": "AI 应用生产化路线：从可演示 MVP 到可交付系统",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI MVP 证明的是链路能跑通，生产化系统要证明能被别人稳定使用。本文梳理模型、数据、队列、权限、评估、监控和交付材料的升级路线。",
   "date": "2026-06-20",
   "readTime": "10 min",

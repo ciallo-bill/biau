@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "frontend-citation-interaction",
   "title": "前端引用交互：citation 卡片、原文定位与风险说明设计",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 的可信度需要被前端呈现出来。本文讨论 citation 卡片、原文定位、风险说明、低置信度提示和反馈闭环如何设计。",
   "date": "2026-06-20",
   "readTime": "9 min",

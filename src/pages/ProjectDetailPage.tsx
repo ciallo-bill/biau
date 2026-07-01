@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { IconArrowLeft, IconLink } from '@douyinfe/semi-icons'
-import { categoryLabels as blogCategoryLabels } from '../data/blog'
+import { blogColumnMeta } from '../data/blog'
 import { getProjectBlogPosts } from '../data/blogCuration'
 import {
   projects,
@@ -128,7 +128,7 @@ export function ProjectDetailPage() {
           <div className="detail-related-grid">
             {projectReadings.map((post) => (
               <Link key={post.slug} to={`/blog/${post.slug}`} className="detail-related-card">
-                <span className="detail-related-cat">{blogCategoryLabels[post.category]}</span>
+                <span className="detail-related-cat">{blogColumnMeta[post.column].titleZh}</span>
                 <h3>{post.title}</h3>
                 <p>{post.detail}</p>
               </Link>

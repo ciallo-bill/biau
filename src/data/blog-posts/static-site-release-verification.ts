@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "static-site-release-verification",
   "title": "静态站发布验证：构建、缓存、资源指纹与线上检查",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "静态站上线不只是 push 代码。本文讨论如何用构建产物、资源指纹、缓存刷新、内容扫描和线上 bundle 抽查确认发布真的生效。",
   "date": "2026-06-20",
   "readTime": "9 min",

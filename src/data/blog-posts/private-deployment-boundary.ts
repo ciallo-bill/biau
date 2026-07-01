@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "private-deployment-boundary",
   "title": "私有化部署边界：模型、存储、日志脱敏与企业网络限制",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "企业 AI 应用常会遇到私有化或专有环境部署。本文讨论模型接入、文件存储、日志脱敏、网络限制和运维边界如何提前设计。",
   "date": "2026-06-20",
   "readTime": "10 min",

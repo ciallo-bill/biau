@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "bullmq-ai-long-tasks",
   "title": "BullMQ 长任务队列：让 AI 文档处理和生成管线跑稳",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用里的文档解析、embedding、批量审查和素材生成都不适合同步请求。本文讨论如何用 BullMQ 设计任务状态、重试、幂等和失败恢复。",
   "date": "2026-06-20",
   "readTime": "11 min",

@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ozon-erp-architecture",
   "title": "电商 ERP 架构：后台、队列、插件与审计如何协同",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "project-notes",
   "detail": "电商 ERP 的价值不在页面数量，而在业务对象、任务状态、平台写入和审计闭环。本文讨论后台、API、Worker、插件和数据库如何形成可运营系统。",
   "date": "2026-06-12",
   "readTime": "9 min",

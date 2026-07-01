@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-incident-drill",
   "title": "AI 应用故障演练：模型、队列、向量库与解析链路",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用依赖模型、向量库、队列、对象存储和解析器。本文讨论如何提前演练故障发现、降级、人工接管和恢复验证。",
   "date": "2026-06-20",
   "readTime": "10 min",

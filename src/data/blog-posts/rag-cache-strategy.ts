@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-cache-strategy",
   "title": "RAG 缓存策略：Embedding、检索结果和答案如何安全复用",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 缓存能降低成本和延迟，但也可能带来权限、版本和旧答案风险。本文讨论 documentHash、embedding 缓存、检索缓存、答案缓存和失效策略。",
   "date": "2026-06-20",
   "readTime": "9 min",

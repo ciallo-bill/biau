@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-environment-config-management",
   "title": "AI 多环境配置管理：dev、staging、prod 的隔离策略",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用会同时连接模型、数据库、队列、对象存储和回调服务。本文讨论开发、预发和生产环境如何隔离密钥、数据和写入链路。",
   "date": "2026-06-20",
   "readTime": "9 min",

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { IconArrowLeft } from '@douyinfe/semi-icons'
-import { categoryLabels } from '../data/blog'
+import { blogColumnMeta } from '../data/blog'
 import { getBlogProjectIds, getPublicBlogPostSummary, getRelatedBlogPosts } from '../data/blogCuration'
 import { getBlogPost } from '../data/blogContent'
 import type { BlogPost } from '../data/blogShared'
@@ -78,7 +78,7 @@ export function BlogPostPage() {
 
       <header className="detail-header">
         <div className="detail-badges">
-          <span className="tag">{categoryLabels[post.category]}</span>
+          <span className="tag">{blogColumnMeta[post.column].titleZh}</span>
           {post.series && <span className="blog-series">「{post.series}」</span>}
         </div>
         <h1 className="detail-title">{post.title}</h1>
@@ -166,7 +166,7 @@ export function BlogPostPage() {
           <div className="detail-related-grid">
             {related.map((item) => (
               <Link key={item.slug} to={`/blog/${item.slug}`} className="detail-related-card">
-                <span className="detail-related-cat">{categoryLabels[item.category]}</span>
+                <span className="detail-related-cat">{blogColumnMeta[item.column].titleZh}</span>
                 <h3>{item.title}</h3>
                 <p>{item.detail}</p>
               </Link>

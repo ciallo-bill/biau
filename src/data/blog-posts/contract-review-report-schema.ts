@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "contract-review-report-schema",
   "title": "合同审查报告结构：Summary、RiskItems、Citations 与 Recommendations",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "合同审查报告不能只是一段总结。本文讨论如何把摘要、风险项、引用依据、修改建议、人工复核和导出信息组织成稳定 schema。",
   "date": "2026-06-20",
   "readTime": "10 min",

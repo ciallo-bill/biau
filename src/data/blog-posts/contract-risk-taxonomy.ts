@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "contract-risk-taxonomy",
   "title": "合同审查风险分类：付款、违约、期限、保密与管辖如何建模",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "合同审查不能只输出泛泛风险提示。本文讨论如何把付款、违约、期限、保密、知识产权和争议解决等风险建成可检索、可评估、可复核的分类体系。",
   "date": "2026-06-20",
   "readTime": "10 min",

@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-observability-trace-cost-quality",
   "title": "AI 应用可观测性：用 Trace 串起日志、成本和质量指标",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用上线后不能只看接口错误率。本文讨论如何用 traceId 串起检索、模型、工具、队列、成本、引用质量和人工复核数据。",
   "date": "2026-06-20",
   "readTime": "10 min",

@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-application-testing-strategy",
   "title": "AI 应用测试策略：单元测试、Golden Set 与人工验收",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 输出不稳定不代表系统无法测试。本文讨论确定性代码、RAG 评测集、工具调用链路和人工验收如何组合成质量体系。",
   "date": "2026-06-20",
   "readTime": "10 min",

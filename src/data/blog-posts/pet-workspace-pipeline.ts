@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "pet-workspace-pipeline",
   "title": "AI 生成管线：任务编排、QA Gate 与 App 发布边界",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "project-notes",
   "detail": "生成类 AI 项目不能停在单次出图。本文讨论如何把生成任务、自动质检、人工复核、发布记录和 App API 组织成可控管线。",
   "date": "2026-06-14",
   "readTime": "11 min",

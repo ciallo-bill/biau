@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-search-page-integration",
   "title": "RAG 与传统搜索融合：什么时候用搜索页，什么时候用问答页",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 不应该替代所有搜索体验。本文讨论搜索页、问答页、筛选器、引用卡片和无答案处理如何协同，让用户在查资料和要结论之间自然切换。",
   "date": "2026-06-20",
   "readTime": "9 min",

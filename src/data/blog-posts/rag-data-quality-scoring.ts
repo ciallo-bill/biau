@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-data-quality-scoring",
   "title": "RAG 数据质量评分：解析、Chunk、Metadata 与 Citation",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 质量上限来自数据。本文讨论如何把解析质量、chunk 完整度、metadata 覆盖率和 citation 命中转成可治理指标。",
   "date": "2026-06-20",
   "readTime": "10 min",

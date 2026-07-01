@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-fullstack-day-01-rag-overview",
   "title": "RAG 系统入门：从检索增强生成到合同审查应用",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "从业务问题出发理解 RAG：它为什么不是一个聊天框，如何通过文档入库、检索召回、引用溯源和人工复核支撑合同审查类应用。",
   "date": "2026-06-20",
   "readTime": "12 min",

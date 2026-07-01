@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "knowledge-base-governance-workflow",
   "title": "知识库治理流程：新增、复核、下线、归档与责任人机制",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "企业知识库不是一次性导入文档。本文讨论如何设计 owner、reviewCycle、过期复核、下线归档和治理任务，让 RAG 知识长期保持可信。",
   "date": "2026-06-20",
   "readTime": "10 min",

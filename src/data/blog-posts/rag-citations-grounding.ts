@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-citations-grounding",
   "title": "引用溯源设计：让 AI 回答回到原文证据",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 的可信度不只取决于答案是否流畅，更取决于答案能否回到原文。本文整理 citation 字段、前端展示和低幻觉输出策略。",
   "date": "2026-06-20",
   "readTime": "10 min",

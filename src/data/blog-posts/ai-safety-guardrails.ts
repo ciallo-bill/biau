@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-safety-guardrails",
   "title": "AI 安全护栏：从输入拦截到工具调用边界",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 安全不是一个敏感词列表。本文讨论输入识别、检索权限、工具最小权限、输出审核和可解释拦截如何组成完整护栏。",
   "date": "2026-06-20",
   "readTime": "10 min",

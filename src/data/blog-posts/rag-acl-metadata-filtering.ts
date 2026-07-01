@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-acl-metadata-filtering",
   "title": "RAG 权限过滤：让检索、上下文和引用都遵守访问边界",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "企业 RAG 的权限风险不在页面列表，而在检索链路。本文讨论 document ACL、metadata filter、检索缓存和 citation 展示如何统一。",
   "date": "2026-06-20",
   "readTime": "9 min",

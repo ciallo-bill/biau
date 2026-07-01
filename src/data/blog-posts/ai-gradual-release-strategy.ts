@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-gradual-release-strategy",
   "title": "AI 应用灰度发布：模型、Prompt 与检索参数如何逐步放量",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用发布不能只切一次开关。本文讨论如何对模型、prompt、检索参数、工具调用和用户范围做灰度发布与回滚。",
   "date": "2026-06-20",
   "readTime": "9 min",

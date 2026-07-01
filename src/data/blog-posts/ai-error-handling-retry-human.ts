@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-error-handling-retry-human",
   "title": "AI 应用错误处理：可重试错误、不可重试错误和人工接管",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用的失败可能来自文件、检索、模型、工具和权限。本文讨论如何分类错误，并在重试、降级与人工接管之间做工程决策。",
   "date": "2026-06-20",
   "readTime": "9 min",

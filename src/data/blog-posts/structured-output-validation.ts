@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "structured-output-validation",
   "title": "结构化输出校验：让 AI 结果从文本变成可用数据",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 结果要进入业务系统，必须从自然语言变成可校验、可存储、可展示的数据。本文讨论 JSON Schema、服务端校验、失败重试和人工复核。",
   "date": "2026-06-20",
   "readTime": "11 min",

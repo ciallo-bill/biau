@@ -383,8 +383,8 @@ input:focus-visible,
   font-size: 0.75rem;
 }
 
-/* Category Filter */
-.category-filter {
+/* Blog Column Filter */
+.blog-column-filter {
   display: flex;
   gap: 0.75rem;
   padding: 2rem 0;
@@ -392,6 +392,10 @@ input:focus-visible,
 }
 
 .filter-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 0.5rem 1.25rem;
   background: transparent;
   border: 1px solid var(--border-subtle);
@@ -401,6 +405,16 @@ input:focus-visible,
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-base);
+}
+
+.filter-btn-title,
+.filter-btn-subtitle {
+  line-height: 1.2;
+}
+
+.filter-btn-subtitle {
+  font-size: 0.72rem;
+  color: color-mix(in oklch, currentColor 72%, transparent);
 }
 
 .filter-btn:hover {

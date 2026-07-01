@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "rag-query-log-analysis",
   "title": "RAG 查询日志分析：用户问题、无答案与内容缺口",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 上线后，用户问题本身就是知识库运营信号。本文讨论如何分析查询日志、无答案问题、低置信度回答和 citation 反馈来改进知识库。",
   "date": "2026-06-20",
   "readTime": "9 min",

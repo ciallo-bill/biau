@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "model-evaluation-benchmark",
   "title": "模型评测基准：同一业务场景下的质量、成本与安全对比",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "通用排行榜不能直接决定业务选型。本文讨论如何用业务样例同时比较不同模型的质量、结构化输出、延迟、成本和安全表现。",
   "date": "2026-06-20",
   "readTime": "10 min",

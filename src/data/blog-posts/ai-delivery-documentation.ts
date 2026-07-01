@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-delivery-documentation",
   "title": "AI 应用交付文档：README、架构图、接口说明与 Runbook",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 项目要能被理解、启动、验证、部署和排障。本文讨论 README、架构图、数据模型、API 契约、评测报告和 Runbook 的组织方式。",
   "date": "2026-06-20",
   "readTime": "9 min",

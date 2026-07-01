@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-cost-optimization",
   "title": "AI 成本优化：Token 预算、缓存和模型分级",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用进入真实使用后，成本会来自 token、检索、rerank、重试和生成任务。本文整理如何用预算、缓存和模型分级控制成本。",
   "date": "2026-06-20",
   "readTime": "10 min",

@@ -97,7 +97,7 @@ function main() {
     publicContentLoaders: loadableSlugs.size,
     contentFiles: fileSlugs.size,
     visibility: sortCountMap(countBy(catalog, (post) => post.visibility)),
-    categories: sortCountMap(countBy(catalog, (post) => post.category)),
+    columns: sortCountMap(countBy(catalog, (post) => post.column)),
     tags: sortCountMap(countBy(catalog, (post) => post.tag)),
     topSeries: Object.fromEntries(
       Object.entries(countBy(catalog, (post) => post.series ?? '(none)'))

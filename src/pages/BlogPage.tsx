@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BlogCard } from '../components/BlogCard'
-import { CategoryFilter } from '../components/CategoryFilter'
-import { type BlogCategory } from '../data/blog'
+import { BlogColumnFilter } from '../components/BlogColumnFilter'
+import { blogColumnOrder, type BlogColumn } from '../data/blog'
 import {
   filterBlogPosts,
   getPublicBlogPosts,
@@ -12,7 +12,7 @@ const PAGE_SIZE = 12
 
 export function BlogPage() {
   const navigate = useNavigate()
-  const [selectedBlogCategory, setSelectedBlogCategory] = useState<BlogCategory | 'all'>('all')
+  const [selectedBlogColumn, setSelectedBlogColumn] = useState<BlogColumn | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [page, setPage] = useState(1)
 
@@ -20,20 +20,21 @@ export function BlogPage() {
 
   const filteredBlogs = useMemo(() => {
     return filterBlogPosts(publicBlogs, {
-      category: selectedBlogCategory,
+      column: selectedBlogColumn,
       query: searchQuery,
     })
-  }, [publicBlogs, searchQuery, selectedBlogCategory])
+  }, [publicBlogs, searchQuery, selectedBlogColumn])
 
   const totalPages = Math.max(1, Math.ceil(filteredBlogs.length / PAGE_SIZE))
   const visibleBlogs = filteredBlogs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const availableCategories = useMemo(() => {
-    return Array.from(new Set(publicBlogs.map((post) => post.category)))
+  const availableColumns = useMemo(() => {
+    const columns = new Set(publicBlogs.map((post) => post.column))
+    return blogColumnOrder.filter((column) => columns.has(column))
   }, [publicBlogs])
 
-  const handleSelectCategory = (category: BlogCategory | 'all') => {
-    setSelectedBlogCategory(category)
+  const handleSelectColumn = (column: BlogColumn | 'all') => {
+    setSelectedBlogColumn(column)
     setPage(1)
   }
 
@@ -50,10 +51,10 @@ export function BlogPage() {
         <p className="section-description">从实践中提炼项目方法、技术路线和公开内容系统。</p>
       </section>
 
-      <CategoryFilter
-        categories={availableCategories}
-        selectedCategory={selectedBlogCategory}
-        onSelect={handleSelectCategory}
+      <BlogColumnFilter
+        columns={availableColumns}
+        selectedColumn={selectedBlogColumn}
+        onSelect={handleSelectColumn}
       />
 
       <section className="blog-tools" aria-label="文章检索">

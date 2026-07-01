@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "vector-index-tuning-hnsw-ivfflat",
   "title": "向量索引调优：从精确查询到 HNSW 与 IVFFlat",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "向量检索从小规模精确查询走向近似索引时，必须同时关注召回、延迟、过滤条件和维护成本。本文讨论 HNSW 与 IVFFlat 的取舍。",
   "date": "2026-06-20",
   "readTime": "9 min",

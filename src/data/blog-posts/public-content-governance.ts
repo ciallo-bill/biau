@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "public-content-governance",
   "title": "公开内容治理：技术案例如何脱敏、分层与版本化",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "公开站点既要展示能力，也要控制信息边界。本文讨论技术案例如何区分公开内容、私有复盘、运行证据和敏感配置。",
   "date": "2026-06-20",
   "readTime": "10 min",

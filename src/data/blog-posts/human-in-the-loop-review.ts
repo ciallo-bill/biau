@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "human-in-the-loop-review",
   "title": "Human-in-the-loop 设计：高风险 AI 应用如何接入人工复核",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "法律结论、合同风险、生成内容发布和外部平台写入都不能完全交给模型。本文讨论人工复核的触发规则、状态设计、审计记录和反馈闭环。",
   "date": "2026-06-20",
   "readTime": "10 min",

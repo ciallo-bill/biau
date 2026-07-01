@@ -1128,7 +1128,7 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   transform: none;
 }
 
-.blog-index-page .category-filter {
+.blog-index-page .blog-column-filter {
   width: 100%;
   margin: 0;
   padding: var(--space-8) var(--space-16);
@@ -1145,7 +1145,7 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 }
 
 .blog-index-page .filter-btn {
-  min-height: 40px;
+  min-height: 52px;
   padding: 0 var(--space-16);
   color: var(--muted);
   background: transparent;
@@ -1155,6 +1155,19 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.02em;
+}
+
+.blog-index-page .filter-btn-title {
+  font-size: 13px;
+  line-height: 1.15;
+}
+
+.blog-index-page .filter-btn-subtitle {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.15;
+  letter-spacing: 0;
+  opacity: 0.72;
 }
 
 .blog-index-page .filter-btn:hover {
@@ -2735,14 +2748,14 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
     padding-inline: var(--space-16);
   }
 
-  .blog-index-page .category-filter {
+  .blog-index-page .blog-column-filter {
     justify-content: flex-start;
     overflow-x: auto;
     flex-wrap: nowrap;
     scrollbar-width: none;
   }
 
-  .blog-index-page .category-filter::-webkit-scrollbar {
+  .blog-index-page .blog-column-filter::-webkit-scrollbar {
     display: none;
   }
 

@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "prompt-template-variable-design",
   "title": "Prompt 模板设计：把变量、约束和输出格式拆清楚",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "Prompt 不应该是随手拼接的长字符串。本文讨论如何拆分模板、动态变量、任务约束、few-shot 示例和输出 schema。",
   "date": "2026-06-20",
   "readTime": "9 min",

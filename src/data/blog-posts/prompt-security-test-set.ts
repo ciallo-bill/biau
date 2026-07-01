@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "prompt-security-test-set",
   "title": "Prompt 安全测试集：越权、注入、泄露与工具滥用",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "安全不能只靠一句系统提示。本文讨论如何用固定样例测试 prompt injection、越权请求、敏感信息泄露、危险输出和工具滥用。",
   "date": "2026-06-20",
   "readTime": "10 min",

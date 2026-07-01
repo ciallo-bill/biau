@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "legal-rag-disclaimer-human-review",
   "title": "法律 RAG 责任边界：AI 辅助、人工复核与免责声明",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "法律场景需要清晰说明 AI 输出的辅助定位。本文讨论免责声明、人工复核、低置信度提示、引用依据和报告边界如何共同降低误用风险。",
   "date": "2026-06-20",
   "readTime": "9 min",

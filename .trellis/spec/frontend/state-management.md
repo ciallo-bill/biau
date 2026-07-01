@@ -154,6 +154,8 @@ Normalize once through the assistant data module and let UI components consume t
 
 - `BlogVisibility = 'featured' | 'archive' | 'hidden'`.
 - `BlogContentRole = 'case-study' | 'technical-method' | 'resource' | 'roadmap'`.
+- `BlogColumn = 'knowledge' | 'project-notes' | 'resources' | 'ai-daily' | 'build-log'`.
+- `blogColumnMeta` from `src/data/blogShared.ts` is the single source for blog column Chinese/English labels, descriptions, scope, and avoid notes.
 - `getPublicBlogPosts()` returns posts allowed in public lists, search, project readings, sitemap, and assistant knowledge.
 - `getPublicBlogPostSummary(slug)` gates `/blog/:slug` detail SEO and direct access.
 - `getLoadableBlogPostSlugs()` from `src/data/blogContent.ts` returns only public post loaders.
@@ -163,6 +165,8 @@ Normalize once through the assistant data module and let UI components consume t
 - Default curation for unspecified posts is `hidden`.
 - Hidden posts may remain as source files under `src/data/blog-posts/`, but must not be registered in `src/data/blogContent.ts`.
 - `src/pages/BlogPage.tsx`, `src/pages/BlogPostPage.tsx`, `src/pages/ProjectDetailPage.tsx`, `src/components/SeoManager.tsx`, `scripts/generate-sitemap.mjs`, `src/data/assistant.ts`, and `scripts/generate-assistant-knowledge.ts` must use public selectors, not raw `blogPosts`, for public surfaces.
+- Blog public filters and related-reading scoring use `post.column`, not legacy `category` values. The blog domain should not reintroduce `BlogCategory` / `categoryLabels`; those names are only valid for project categories in `src/data/portfolio.ts`.
+- `BlogContentRole` remains a curation role and must not be treated as the first-level blog column.
 - Hidden article direct URLs should render the existing missing-article state.
 
 ### 4. Validation & Error Matrix

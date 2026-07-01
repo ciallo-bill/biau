@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "worker-observability",
   "title": "Worker 可观测性：队列积压、失败率与死信任务",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI Worker 承接解析、Embedding、审查、导出和生成任务。本文讨论如何用队列指标、trace、死信任务和告警动作判断后台是否健康。",
   "date": "2026-06-20",
   "readTime": "10 min",

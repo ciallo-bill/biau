@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "document-parser-selection-rag",
   "title": "RAG 文档解析器选型：PDF、DOCX、OCR 与 Markdown 如何接入",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "RAG 的第一步不是 embedding，而是把业务文档变成可检索、可引用的文本结构。本文讨论不同格式的解析路线、结构保留和失败处理。",
   "date": "2026-06-20",
   "readTime": "10 min",

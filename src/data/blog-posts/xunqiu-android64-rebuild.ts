@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "xunqiu-android64-rebuild",
   "title": "Android 历史项目重构：64 位客户端、接口复用与阶段验收",
   "tag": "移动端",
-  "category": "tech",
+  "column": "project-notes",
   "detail": "历史移动端项目的难点不只是补页面，而是识别旧依赖、接口边界和发布风险。本文讨论新建 64 位客户端、复用协议和沉淀验收证据的路线。",
   "date": "2026-06-15",
   "readTime": "10 min",

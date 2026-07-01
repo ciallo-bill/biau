@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-fullstack-knowledge-map",
   "title": "AI 应用全栈知识图谱：从业务入口到交付运营",
   "tag": "AI 应用",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用全栈不是模型调用清单。本文把业务入口、RAG、Agent、前端工作台、后端任务、监控评测和运营串成一张知识图谱。",
   "date": "2026-06-20",
   "readTime": "11 min",

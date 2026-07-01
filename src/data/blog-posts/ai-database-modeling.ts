@@ -4,7 +4,7 @@ const post: BlogPost = {
   "slug": "ai-database-modeling",
   "title": "AI 应用数据库建模：Document、Chunk、Embedding 与审计表",
   "tag": "全栈开发",
-  "category": "tech",
+  "column": "knowledge",
   "detail": "AI 应用不只有聊天记录。本文从 Document、Chunk、Embedding、Job、AuditLog 和 Feedback 出发，讨论可追踪的数据边界。",
   "date": "2026-06-20",
   "readTime": "10 min",
