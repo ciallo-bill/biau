@@ -680,3 +680,71 @@ Improved the blog model setup wizard, verified three profile-specific model chan
 ### Next Steps
 
 - None - task complete
+
+
+## Session 21: Overnight cross-project optimization
+
+**Date**: 2026-07-02
+**Task**: Overnight cross-project optimization
+**Branch**: `main`
+
+### Summary
+
+Completed the unattended cross-project queue: polished ERP auth entry UX, split
+blog-semi homepage project card detail/site actions, added a Pet App static
+showcase/download-status page, synchronized project detail data and assistant
+knowledge, and recorded a safe non-public blog backlog.
+
+### Main Changes
+
+- ERP login/register/Owner setup page now has confirmation-password validation,
+  clearer Owner setup copy, explicit registration-disabled messaging, and a
+  more polished SaaS entry surface.
+- blog-semi homepage project cards now open internal project details, while
+  explicit action buttons open verified external project sites.
+- Pet/Gamer gained `pet-app-showcase-site/` with real Android screenshots and a
+  disabled `APK 待公开构建` state.
+- blog-semi project data now reflects ERP auth polish and the Pet showcase page;
+  assistant public knowledge was regenerated.
+- Added `content-drafts/blog-content-backlog-2026-07-02.md` for safe future
+  blog work without publishing, deleting, or model generation.
+
+### Git Commits
+
+| Repo | Hash | Message |
+|------|------|---------|
+| `erp` | `2774f3d` | `feat(auth): polish login and registration entry` |
+| `blog-semi` | `1f87df6` | `feat(home): split project card detail and site actions` |
+| `gamer` | `56a1812` | `feat(app): add pet showcase download page` |
+| `blog-semi` | `7bbc243` | `feat(projects): sync erp and pet showcase updates` |
+| `blog-semi` | `e0342e0` | `docs(blog): record safe content backlog` |
+
+### Testing
+
+- ERP: `npm run build --workspace @erp/web`; `npm run test --workspace @erp/api`.
+- blog-semi homepage: `npm.cmd run lint`; `npm.cmd run build`; `npm.cmd run check:ui` with a temporary dev server on `5174`.
+- Pet showcase: local Playwright file checks for desktop/mobile, disabled APK button, image loading, and no horizontal overflow.
+- blog-semi project sync: `assistant:index`; `sitemap:generate`; `blog:check`; `lint`; `build`.
+- Content backlog: `blog:plan`; `blog:check`; `git diff --check`.
+
+### Human Review / Blockers
+
+- ERP production self-registration was not enabled and still needs human review
+  before any production policy change.
+- ERP branch `codex/ozon-plugin-parity` and Gamer branch
+  `cursor-windows-migration` were pushed for review.
+- Pet APK download remains pending; no real APK link was added.
+- Blog drafts remain non-public; no legacy content was deleted and no live model
+  or image generation was run.
+- Gamer still has unrelated pre-existing dirty pagination files that were not
+  staged or modified by this work.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- Review/merge the ERP and Gamer branches.
+- Decide whether to deploy the Pet showcase page and when to publish a signed APK.
+- Use the new blog backlog to choose the next article only after human review.
