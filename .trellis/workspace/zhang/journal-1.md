@@ -415,3 +415,36 @@ Prepared the first Project Notes evidence-pack batch: added six project-notes pl
 ### Next Steps
 
 - None - task complete
+
+
+## Session 13: Archive legacy blog content
+
+**Date**: 2026-07-01
+**Task**: Archive legacy blog content
+**Branch**: `main`
+
+### Summary
+
+Moved 87 hidden generated blog posts out of the runtime catalog into content-archive/legacy-blog with a rewrite queue, kept 10 curated public posts in runtime data, updated blog audit checks and public blog curation spec, and verified blog audit/check, assistant index, sitemap, lint, and build.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b4a092b` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

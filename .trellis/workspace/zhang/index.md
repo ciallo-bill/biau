@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 12
+- **Total Sessions**: 13
 - **Last Active**: 2026-07-01
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~417 | Active |
+| `journal-1.md` | ~450 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 13 | 2026-07-01 | Archive legacy blog content | `b4a092b` | `main` |
 | 12 | 2026-07-01 | Project notes draft evidence packs | `6a59985` | `main` |
 | 11 | 2026-07-01 | Upgrade blog draft generator | `5e6de8a` | `main` |
 | 10 | 2026-07-01 | Publish first build log post | `2ac3419` | `main` |
