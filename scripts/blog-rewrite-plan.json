@@ -112,5 +112,279 @@
     ],
     "modelStrategy": "Codex 先整理证据包与边界；如需长文改写，串行调用一个强内容模型；最后由 Codex 做事实核查、脱敏、结构调整和入库。",
     "priority": 10
+  },
+  {
+    "order": 8,
+    "slug": "legal-rag-project-notes-draft",
+    "title": "Legal RAG 项目总结：把合同问答做成可追溯的审查工作台",
+    "column": "project-notes",
+    "tag": "项目总结",
+    "series": "项目工程复盘",
+    "summary": "基于 Legal RAG 的代码、评测、文档和主站案例，整理一个访客可读的项目总结草稿，重点说明 RAG、引用、合同审查、质量评测与后续生产化方向。",
+    "targetReader": "想理解法律 RAG、合同审查工作台和 AI 应用工程化的访客、开发者和项目协作者",
+    "knowledgePoints": ["RAG pipeline", "引用溯源", "合同风险审查", "质量评测", "适配器边界"],
+    "projectExamples": ["Legal RAG 合同审查", "公开安全数据集问答", "质量诊断面板"],
+    "publicAngle": "不重复项目详情页的功能清单，而是复盘为什么要把问答、引用、规则审查和质量诊断放进同一个可演示工作台。",
+    "evidenceSources": [
+      "D:\\workspace4Cursor\\legal-rag\\package.json",
+      "D:\\workspace4Cursor\\legal-rag\\apps\\api\\src",
+      "D:\\workspace4Cursor\\legal-rag\\apps\\web\\src",
+      "D:\\workspace4Cursor\\legal-rag\\packages\\shared\\src\\types.ts",
+      "D:\\workspace4Cursor\\legal-rag\\eval\\contract-review-eval-set.json",
+      "D:\\workspace4Cursor\\legal-rag\\eval\\rag-eval-set.json",
+      "D:\\workspace4Cursor\\legal-rag\\docs\\architecture.md",
+      "D:\\workspace4Cursor\\legal-rag\\docs\\demo-script.md",
+      "D:\\workspace4Cursor\\legal-rag\\docs\\adr",
+      "src/data/portfolio.ts",
+      ".trellis/tasks/07-01-project-notes-draft-evidence-packs/research/evidence-snapshots.md"
+    ],
+    "safeFacts": [
+      "Legal RAG 是一个包含 API、Web、shared package、eval fixtures、docs 和部署说明的 workspace 项目。",
+      "API 模块覆盖 audit、auth、chunks、citations、datasets、documents、embeddings、evaluation、ingestion、model-providers、quality、rag、review、store 和 vector-store 等边界。",
+      "项目包含 RAG 与合同审查评测 fixtures，也有 architecture、demo、deploy 和 ADR 文档。",
+      "当前主站已把它描述为已部署的法律文档 RAG 与合同审查工作台。",
+      "后续优化方向可以围绕权限、更多脱敏数据集、评测趋势、OCR、rerank、CI 和可复现部署展开。"
+    ],
+    "uncertainFacts": [
+      "确切线上服务健康状态、模型提供商、向量存储模式、数据规模和访问量需要在公开发布前重新核验。",
+      "README 或旧部署文档可能落后于当前代码，应以代码、测试、主站项目数据和最新部署记录交叉确认。"
+    ],
+    "forbiddenDetails": [
+      "不要公开凭据、私有端点、部署后台、数据库 URL、模型密钥、私有账号或客户信息。",
+      "不要把项目包装成正式法律意见服务。",
+      "不要编造使用量、准确率、客户反馈或未验证的生产指标。"
+    ],
+    "modelStrategy": "Codex 先整理项目证据包和禁写边界；如需长文，串行调用一个强内容模型生成初稿；Codex 再做事实核查、脱敏和结构调整。",
+    "priority": 11
+  },
+  {
+    "order": 9,
+    "slug": "ozon-erp-project-notes-draft",
+    "title": "Ozon ERP 项目总结：从运营脚本走向可交接的业务系统",
+    "column": "project-notes",
+    "tag": "项目总结",
+    "series": "项目工程复盘",
+    "summary": "整理 Ozon ERP 的后台、API、数据库、任务、共享包和 Chrome MV3 插件证据，形成一个面向访客的业务系统项目总结草稿。",
+    "targetReader": "关注跨境电商运营系统、插件采集、后台 API 和业务数据治理的访客与开发者",
+    "knowledgePoints": ["业务后台", "Prisma 数据模型", "Chrome MV3 插件", "队列任务", "审计与发布"],
+    "projectExamples": ["Ozon ERP 管理后台", "商品采集插件", "共享业务规则包"],
+    "publicAngle": "聚焦项目如何把店铺运营、商品采集、草稿编辑、定价利润、任务和审计组织成可维护系统，而不是只列技术栈。",
+    "evidenceSources": [
+      "D:\\workspace4Cursor\\erp\\package.json",
+      "D:\\workspace4Cursor\\erp\\apps\\api",
+      "D:\\workspace4Cursor\\erp\\apps\\web",
+      "D:\\workspace4Cursor\\erp\\apps\\extension",
+      "D:\\workspace4Cursor\\erp\\packages\\shared",
+      "D:\\workspace4Cursor\\erp\\scripts",
+      "D:\\workspace4Cursor\\erp\\docs",
+      "D:\\workspace4Cursor\\erp\\docker-compose.yml",
+      "src/data/portfolio.ts",
+      ".trellis/tasks/07-01-project-notes-draft-evidence-packs/research/evidence-snapshots.md"
+    ],
+    "safeFacts": [
+      "Ozon ERP 是包含 API、Web、Chrome 扩展、shared package、脚本、docs、Docker 和 compose 资产的 workspace 项目。",
+      "根脚本包含 Web/API/扩展开发、构建、测试、Prisma 生成、发布辅助和安全审计相关流程。",
+      "API 侧包含 Prisma schema、routes、services、lib 和 worker 边界。",
+      "Web 侧包含 Vue 路由、services、stores 和 views，用于运营后台体验。",
+      "扩展侧基于 WXT / Chrome MV3，并保留打包输出证据。",
+      "后续优化方向可以围绕发布清单、字段一致性漂移、插件打包、审计追踪、备份演练和公开文档展开。"
+    ],
+    "uncertainFacts": [
+      "确切线上入口健康、店铺数量、业务指标和数据规模需要单独验证。",
+      "扩展打包产物可能包含历史版本，不能仅凭输出目录判断当前发布版本。"
+    ],
+    "forbiddenDetails": [
+      "不要公开部署主机、用户名、IP、账号、数据库 URL、店铺凭证、Seller token、Cookie 或私有业务指标。",
+      "根部署脚本中出现的主机和账号信息只能抽象为部署脚本证据，不能写入公开草稿。",
+      "不要把内部运营数据写成公开案例素材。"
+    ],
+    "modelStrategy": "Codex 整理证据包后，优先由一个内容模型串行起草访客可读复盘；Codex 负责删除部署与业务敏感细节并核对每个系统能力。",
+    "priority": 12
+  },
+  {
+    "order": 10,
+    "slug": "xunqiu-modernization-project-notes-draft",
+    "title": "寻球项目总结：移动端 64 位迁移与现代后端重建",
+    "column": "project-notes",
+    "tag": "项目总结",
+    "series": "项目工程复盘",
+    "summary": "把寻球旧客户端、64 位 Android、新 Spring Boot 后端、上传链路、测试矩阵和部署材料整理成迁移复盘草稿。",
+    "targetReader": "关注移动端遗留迁移、Spring Boot 后端现代化和展示型产品重建的访客与开发者",
+    "knowledgePoints": ["遗留系统迁移", "Android 64 位", "Spring Boot 3", "Flyway", "S3-compatible 上传", "测试矩阵"],
+    "projectExamples": ["寻球 Android 64 位客户端", "xunqiu-backend-modern", "产品展示站"],
+    "publicAngle": "说明项目如何把旧 App、旧后端、新客户端和现代后端拆开治理，用测试矩阵和安全等价页降低迁移风险。",
+    "evidenceSources": [
+      "D:\\workspace4Codex\\xunqiu",
+      "D:\\workspace4Codex\\xunqiu\\xunqiu-android64",
+      "D:\\workspace4Codex\\xunqiu\\xunqiu-android64\\docs\\ANDROID64_LEGACY_ENTRY_MATRIX.md",
+      "D:\\workspace4Codex\\xunqiu\\xunqiu-android64\\docs\\TEST_MATRIX.md",
+      "D:\\workspace4Codex\\xunqiu-backend-modern\\pom.xml",
+      "D:\\workspace4Codex\\xunqiu-backend-modern\\src\\main",
+      "D:\\workspace4Codex\\xunqiu-backend-modern\\src\\test",
+      "D:\\workspace4Codex\\xunqiu-backend-modern\\src\\main\\resources\\db\\migration",
+      "D:\\workspace4Codex\\xunqiu-backend-modern\\scripts\\smoke-test.ps1",
+      "D:\\workspace4Codex\\xunqiu-backend-modern\\docs\\render-deploy-checklist.md",
+      "D:\\workspace4Codex\\xunqiu-backend-modern\\render.yaml",
+      "D:\\workspace4Codex\\xunqiu-backend-modern\\Dockerfile",
+      "src/data/portfolio.ts",
+      ".trellis/tasks/07-01-project-notes-draft-evidence-packs/research/evidence-snapshots.md"
+    ],
+    "safeFacts": [
+      "寻球工作区包含历史 Android/iOS/后端、现代后端、Android 64 位客户端、展示站、docs、deploy、release 和 tooling 等材料。",
+      "Android 64 位项目有旧入口矩阵和测试矩阵文档。",
+      "现代后端使用 Spring Boot 3.3.6、Java 17、JPA、Security、Validation、Web、Flyway PostgreSQL、S3-compatible SDK、H2 和 Testcontainers。",
+      "现代后端包含 main/test 源码、数据库迁移、烟测脚本、Render 部署检查清单、Render 配置和 Dockerfile。",
+      "后续优化方向可以围绕真机回归、旧 WebView 原生化、权限与审计、媒体治理、监控部署和视频播放升级展开。"
+    ],
+    "uncertainFacts": [
+      "实时线上服务健康、APK 下载状态和完整功能可用性需要发布前单独验证。",
+      "历史工程目录只能作为迁移背景，不能直接当作当前实现事实。"
+    ],
+    "forbiddenDetails": [
+      "不要读取或公开 jdbc.properties、local.properties、.env、签名文件、私有 app key、R2 凭据、数据库 URL、部署账号或第三方服务凭证。",
+      "不要声称支付、IM、推送、地图、分享、真实兑换等高副作用能力已经完整生产启用，除非后续证据明确验证。",
+      "不要公开旧系统私有运维和账号信息。"
+    ],
+    "modelStrategy": "Codex 负责按新旧链路拆证据；内容模型只生成迁移复盘表达；Codex 最后核查每个功能状态是否被写成过度承诺。",
+    "priority": 13
+  },
+  {
+    "order": 11,
+    "slug": "playlab-games-project-notes-draft",
+    "title": "Playlab 项目总结：把六个 Godot 试玩整理成可展示的游戏作品集",
+    "column": "project-notes",
+    "tag": "项目总结",
+    "series": "项目工程复盘",
+    "summary": "整理 Playlab 游戏站、六个 Godot Web 试玩、Astro 内容集合、开发日志、发布脚本和内容清理边界，形成项目总结草稿。",
+    "targetReader": "关注独立游戏原型、Godot Web 导出、作品集站点和内容发布流程的访客与开发者",
+    "knowledgePoints": ["Godot Web", "Astro 内容集合", "游戏作品集", "试玩导出", "端点验证"],
+    "projectExamples": ["Biau Playlab", "六个 Godot Web 游戏", "play.playlab 试玩入口"],
+    "publicAngle": "复盘项目如何把多个成熟度不同的游戏原型统一成游戏站、详情页、试玩入口和发布检查，而不是把所有游戏写成同一类完成品。",
+    "evidenceSources": [
+      "D:\\workspace4Cursor\\game",
+      "D:\\workspace4Cursor\\game\\blog\\package.json",
+      "D:\\workspace4Cursor\\game\\blog\\src\\content\\games",
+      "D:\\workspace4Cursor\\game\\blog\\src\\content\\devlogs",
+      "D:\\workspace4Cursor\\game\\blog\\src\\content\\articles",
+      "D:\\workspace4Cursor\\game\\blog\\scripts",
+      "src/data/portfolio.ts",
+      ".trellis/tasks/07-01-project-notes-draft-evidence-packs/research/evidence-snapshots.md"
+    ],
+    "safeFacts": [
+      "游戏工作区包含多个 Godot/game 项目，包括 Tetris、Next Spacewar、intespace、Raiden prototype、space-war 和 Spacewar II。",
+      "主游戏站是 Astro 5 项目，脚本覆盖 content audit、build、dist audit、verify、play export/check 和部署检查。",
+      "内容集合包含 games 与 devlogs，开发日志覆盖站点统一、Web playable intake、showcase finishing、Tetris 响应式基线和触屏控制等主题。",
+      "工具侧包含审计、端点检查、试玩导出/上传和渲染相关脚本。",
+      "后续优化方向可以围绕博客和文章清理、单游戏版本记录、移动端适配结论、性能说明、自动导出和多站点内容对齐展开。"
+    ],
+    "uncertainFacts": [
+      "每个游戏成熟度不同，发布前需要逐一确认当前 playable 包、截图和详情页状态。",
+      "旧文章和归档内容质量不稳定，不能直接当作公开博客标准。"
+    ],
+    "forbiddenDetails": [
+      "不要把低质量归档文案当成公开项目描述。",
+      "不要公开存储凭据、部署 token、私有 bucket、未发布试玩包路径或运营后台信息。",
+      "不要把所有游戏都描述成同等成熟的完整产品。"
+    ],
+    "modelStrategy": "Codex 先按站点、游戏条目、发布脚本和内容质量整理证据；一个内容模型可用于写访客可读复盘；Codex 最后按每个游戏成熟度做事实校正。",
+    "priority": 14
+  },
+  {
+    "order": 12,
+    "slug": "pet-workspace-project-notes-draft",
+    "title": "Pet Workspace 项目总结：WIP 桌宠社区与生成管线的工程边界",
+    "column": "project-notes",
+    "tag": "项目总结",
+    "series": "项目工程复盘",
+    "summary": "基于 Pet workspace 的 PRD、架构、Community API、Android community、admin review、pet generator 和测试文档，整理一个明确标注 WIP 的项目总结草稿。",
+    "targetReader": "关注 AI 生成产品、移动社区、人工审核、质量门禁和工程化边界的访客与协作者",
+    "knowledgePoints": ["WIP 工程展示", "Community API", "Android 社区", "人审发布", "生成 Worker", "质量门禁"],
+    "projectExamples": ["AI 桌宠社区", "Pet Generator", "Admin Review", "Community API"],
+    "publicAngle": "如实展示当前工作状态：哪些链路已经有代码、测试和文档，哪些仍是后续生产化方向，避免把进行中的项目包装成完全体。",
+    "evidenceSources": [
+      "D:\\workspace4Cursor\\pet\\PRD*.md",
+      "D:\\workspace4Cursor\\pet\\ARCHITECTURE.md",
+      "D:\\workspace4Cursor\\pet\\DATA-MODEL.md",
+      "D:\\workspace4Cursor\\pet\\TEST-STRATEGY.md",
+      "D:\\workspace4Cursor\\pet\\ROADMAP.md",
+      "D:\\workspace4Cursor\\pet\\OPTIMIZATION-ROADMAP.md",
+      "D:\\workspace4Cursor\\pet\\gamer\\package.json",
+      "D:\\workspace4Cursor\\pet\\gamer\\apps\\admin-review",
+      "D:\\workspace4Cursor\\pet\\gamer\\apps\\android-community",
+      "D:\\workspace4Cursor\\pet\\gamer\\packages\\community-contracts",
+      "D:\\workspace4Cursor\\pet\\gamer\\packages\\pet-package-spec",
+      "D:\\workspace4Cursor\\pet\\gamer\\packages\\pet-runtime",
+      "D:\\workspace4Cursor\\pet\\gamer\\services\\community-api",
+      "D:\\workspace4Cursor\\pet\\gamer\\services\\pet-generator",
+      "D:\\workspace4Cursor\\pet\\gamer\\docs",
+      "src/data/portfolio.ts",
+      ".trellis/tasks/07-01-project-notes-draft-evidence-packs/research/evidence-snapshots.md"
+    ],
+    "safeFacts": [
+      "Pet Workspace 是 WIP/current work，不应描述为已经完成的公开平台。",
+      "工作区包含 Android community app、admin review、community contracts、pet package/runtime packages、Community API、pet generator service 和大量工程文档。",
+      "Community API 测试和模块覆盖 routes、rate limit、metrics、SLA、logging、PostgreSQL/migrations 以及运维 preflight/smoke/audit 方向。",
+      "Pet generator 包含 adapter、worker、state source 和 Supabase sync 测试证据。",
+      "文档覆盖 observability、rate limiting、SLA configuration、traceability、Community API、人审流程和移动社区 UI 方向。",
+      "后续优化方向可以围绕持久化、鉴权/租户边界、下载权限、Worker 池化、队列可见性、动态 SLA、运维面板、真机 E2E 和质量报告展开。"
+    ],
+    "uncertainFacts": [
+      "当前部署状态、模型 provider 路由、Android 设备覆盖和生产就绪度必须保持谨慎表达。",
+      "部分文档描述目标架构，不能不经代码和测试核验就写成已完全交付。"
+    ],
+    "forbiddenDetails": [
+      "不要公开模型/provider 端点、密钥、Worker 命令、私有运维脚本、部署主机、存储 URL、数据库连接串或审核私有数据。",
+      "不要把 WIP 项目包装成已经完全上线的 AI 桌宠平台。",
+      "不要让机器 QA 看起来可以替代人工视觉审核。"
+    ],
+    "modelStrategy": "Codex 保持 WIP 边界和证据分类；内容模型只辅助把复杂模块写成可读复盘；Codex 最后压掉过度承诺和敏感运行细节。",
+    "priority": 15
+  },
+  {
+    "order": 13,
+    "slug": "blog-semi-project-notes-draft",
+    "title": "BIAU Port 项目总结：React + Semi 主站如何承接项目案例和博客治理",
+    "column": "project-notes",
+    "tag": "项目总结",
+    "series": "项目工程复盘",
+    "summary": "整理当前主站的 React/Vite/Semi 架构、项目数据、博客栏目、草稿生成器、公开策展和校验脚本，形成主站自身的项目总结草稿。",
+    "targetReader": "关注项目展示站、内容治理、AI 助手知识索引和前端工程化的访客与协作者",
+    "knowledgePoints": ["React 主站", "Semi Design", "项目案例数据", "博客栏目", "公开策展", "AI 助手知识索引"],
+    "projectExamples": ["BIAU Port 主站", "blog-content-pipeline", "Project Notes 草稿系统"],
+    "publicAngle": "复盘主站如何从作品展示页发展成项目案例、博客栏目、公开助手和 Trellis 内容治理共同工作的产品入口。",
+    "evidenceSources": [
+      "package.json",
+      "src/data/blogShared.ts",
+      "src/data/blogCuration.ts",
+      "src/data/blogContent.ts",
+      "src/data/portfolio.ts",
+      "scripts/generate-blog-draft.mjs",
+      "scripts/check-public-blog.mjs",
+      "scripts/audit-blog-catalog.ts",
+      "scripts/verify.mjs",
+      ".agents/skills/blog-content-pipeline/SKILL.md",
+      ".agents/skills/blog-content-pipeline/references/templates.md",
+      ".trellis/tasks/archive/2026-07/07-01-first-build-log-post",
+      ".trellis/tasks/07-01-project-notes-draft-evidence-packs/research/evidence-snapshots.md"
+    ],
+    "safeFacts": [
+      "BIAU Port 是 React、Vite、TypeScript 和 Semi Design 构建的产品/解决方案展示主站。",
+      "博客系统当前有 Knowledge Notes、Project Notes、Resource Picks、AI Daily 和 Build Log 五个一级栏目。",
+      "公开博客通过策展数据控制可见性，draft 文件保留在 content-drafts 中。",
+      "草稿生成器支持 evidence-first scaffold，也保留显式 --generate 的模型辅助路径。",
+      "公开博客检查脚本能校验旧结构草稿和新 evidence-pack 草稿。",
+      "后续优化方向可以围绕草稿 schema 校验、可选 Markdown ingestion、公开助手知识对齐、旧博客清理和更强 review gates 展开。"
+    ],
+    "uncertainFacts": [
+      "是否从 TypeScript blog object 迁移到 Markdown collections 应作为未来设计任务，不在当前草稿任务中决定。",
+      "旧博客内容清理另有后续任务，不应在这篇草稿里假设已经完成。"
+    ],
+    "forbiddenDetails": [
+      "不要写入模型中转站 URL、API key、本地 secret 路径、私有部署细节或未公开助手内部材料。",
+      "不要把 draft-only evidence pack 当作已发布文章引用。",
+      "不要编造访问量、SEO 效果或用户反馈指标。"
+    ],
+    "modelStrategy": "Codex 已能直接生成证据包草稿；若后续写正式长文，串行调用一个强内容模型改写表达，再由 Codex 复核事实、脱敏和入库。",
+    "priority": 16
   }
 ]
