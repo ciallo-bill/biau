@@ -306,3 +306,40 @@ Migrated public blog content from legacy categories to first-level BlogColumn me
 ### Next Steps
 
 - None - task complete
+
+
+## Session 10: Publish first build log post
+
+**Date**: 2026-07-01
+**Task**: Publish first build log post
+**Branch**: `main`
+
+### Summary
+
+Published the first Build Log article, validated the blog/public assistant/sitemap pipeline, and recorded external blog-generation workflow research.
+
+### Main Changes
+
+- Published the first public Build Log article and wired it into blog summaries, full-post loader, public curation, assistant knowledge, and sitemap.
+- Added research notes comparing external AI/blog-generation workflows and keeping this site on an evidence-first, PR-reviewed content pipeline.
+- Updated the UI pagination check so it follows the curated article count instead of a stale hard-coded value.
+- Verification passed: blog:audit, assistant:index, sitemap:generate, lint, build, and full verify.
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `2ac3419` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
