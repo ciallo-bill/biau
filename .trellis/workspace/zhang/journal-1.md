@@ -786,3 +786,37 @@ knowledge, and recorded a safe non-public blog backlog.
 ### Next Steps
 
 - None - task complete
+
+
+## Session 22: 可观测性二期与 metrics 预留
+
+**Date**: 2026-07-02
+**Task**: 可观测性二期与 metrics 预留
+**Branch**: `main`
+
+### Summary
+
+拆清访问分析与工程可观测性，新增 docs/observability-strategy.md，给 assistant API 增加默认关闭的 Prometheus /metrics 预留端点，并沉淀 backend observability spec。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `a2e73f0` | (see git log) |
+| `6d4b29c` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
