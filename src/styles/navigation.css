@@ -133,6 +133,48 @@
   filter: brightness(1.08) saturate(1.08) drop-shadow(0 0 8px rgba(214, 168, 90, 0.24));
 }
 
+.nav-logo .biau-port-mark {
+  overflow: visible;
+}
+
+.nav-logo .biau-port-mark__shell,
+.nav-logo .biau-port-mark__spine,
+.nav-logo .biau-port-mark__bowl,
+.nav-logo .biau-port-mark__water,
+.nav-logo .biau-port-mark__terminal,
+.nav-logo .biau-port-mark__beacon,
+.nav-logo .biau-port-mark__beacon-glow {
+  transition:
+    opacity 0.24s var(--ease-smooth),
+    transform 0.28s var(--ease-out-expo),
+    filter 0.28s var(--ease-out-expo);
+  transform-origin: center;
+}
+
+.nav-brand-section:hover .biau-port-mark__water,
+.nav-brand-section:focus-visible .biau-port-mark__water {
+  transform: translateY(-0.6px);
+  filter: drop-shadow(0 0 5px rgba(242, 162, 58, 0.42));
+}
+
+.nav-brand-section:hover .biau-port-mark__terminal,
+.nav-brand-section:focus-visible .biau-port-mark__terminal {
+  opacity: 1;
+  transform: translateX(0.8px);
+}
+
+.nav-brand-section:hover .biau-port-mark__beacon,
+.nav-brand-section:focus-visible .biau-port-mark__beacon {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 5px rgba(242, 162, 58, 0.72));
+}
+
+.nav-brand-section:hover .biau-port-mark__beacon-glow,
+.nav-brand-section:focus-visible .biau-port-mark__beacon-glow {
+  opacity: 0.32;
+  transform: scale(1.16);
+}
+
 .nav-logo:hover,
 .nav-brand-section:hover .nav-logo {
   transform: translateY(-1px) scale(1.015);
@@ -658,19 +700,78 @@
 /* 响应式 */
 @media (max-width: 768px) {
   .navigation-top {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 0;
+  }
+
+  .nav-inner {
+    width: calc(100% - 24px);
+    margin-top: 16px;
+    padding: 10px 12px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.55rem;
+    border-radius: 24px;
+  }
+
+  .nav-brand-section {
+    min-height: 46px;
+    gap: 0;
+    padding: 0;
+    border-radius: 16px;
+  }
+
+  .nav-brand-text {
+    display: none;
+  }
+
+  .nav-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 15px;
+  }
+
+  .nav-logo svg {
+    width: 44px;
+    height: 44px;
   }
   
   .nav-items-center {
-    gap: 1rem;
+    min-width: 0;
+    gap: 0.08rem;
   }
-  
-  .nav-link-zh {
-    display: none;
+
+  .nav-link-center {
+    min-width: auto;
+    padding: 0.5rem 0.28rem 0.62rem;
+    border-radius: 14px;
+  }
+
+  .nav-link-en {
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-actions {
+    gap: 0.3rem;
+  }
+
+  .nav-theme-toggle,
+  .nav-lang-toggle {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    flex: 0 0 40px;
+    padding: 0;
   }
   
   .nav-all-tools {
-    font-size: 0.6875rem;
-    padding: 0.375rem 0.875rem;
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .app.page-home .nav-lang-toggle,
+  .app.page-tools .nav-lang-toggle,
+  .app.page-subpage .nav-lang-toggle {
+    display: inline-flex;
   }
 }
