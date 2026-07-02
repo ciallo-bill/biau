@@ -5,10 +5,14 @@ interface OpenAIResponse {
   choices?: Array<{ message?: { content?: string } }>
 }
 
+export type AssistantFallbackReason = 'not_configured' | 'provider_error' | 'empty_response'
+
 export interface GeneratedAnswer {
   answer: string
   mode: 'model' | 'fallback'
   model: string
+  provider: string
+  reason?: AssistantFallbackReason
 }
 
 function buildFallbackAnswer(question: string, citations: KnowledgeItem[], scope: 'public' | 'internal') {
@@ -22,16 +26,37 @@ function buildFallbackAnswer(question: string, citations: KnowledgeItem[], scope
   return `${prefix}${citations.map((item) => `${item.title}：${item.summary}`).join(' ')}`
 }
 
-function fallbackResult(question: string, citations: KnowledgeItem[], scope: 'public' | 'internal'): GeneratedAnswer {
+function readModelConfig() {
+  return {
+    apiKey: env.assistantModelApiKey || env.openaiApiKey,
+    baseUrl: env.assistantModelBaseUrl || env.openaiBaseUrl,
+    model: env.assistantModelName || env.openaiModel,
+    provider: env.assistantModelProvider || 'openai-compatible',
+  }
+}
+
+function fallbackResult(
+  question: string,
+  citations: KnowledgeItem[],
+  scope: 'public' | 'internal',
+  reason: AssistantFallbackReason,
+  model = 'fallback',
+  provider = 'local-public-knowledge',
+): GeneratedAnswer {
   return {
     answer: buildFallbackAnswer(question, citations, scope),
     mode: 'fallback',
-    model: 'fallback',
+    model,
+    provider,
+    reason,
   }
 }
 
 export async function generateAnswer(question: string, citations: KnowledgeItem[], scope: 'public' | 'internal'): Promise<GeneratedAnswer> {
-  if (!hasModelProvider()) return fallbackResult(question, citations, scope)
+  if (!hasModelProvider()) return fallbackResult(question, citations, scope, 'not_configured')
+
+  const modelConfig = readModelConfig()
+  if (!modelConfig.apiKey) return fallbackResult(question, citations, scope, 'not_configured')
 
   const context = citations.map((item, index) => `${index + 1}. ${item.title}\n${item.summary}\n${item.href}`).join('\n\n')
   const system =
@@ -39,31 +64,33 @@ export async function generateAnswer(question: string, citations: KnowledgeItem[
       ? '你是 BIAU Port 泊岸公开助手。只能基于提供的公开站点资料回答，回答要简洁，并提醒用户可打开引用链接继续阅读。'
       : '你是 BIAU Port 泊岸内部助手。基于提供的站点资料帮助内部成员整理项目、提纲和交付检查，避免宣称已执行真实写操作。'
 
-  const response = await fetch(`${env.openaiBaseUrl}/chat/completions`, {
+  const response = await fetch(`${modelConfig.baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${env.openaiApiKey}`,
+      Authorization: `Bearer ${modelConfig.apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: env.openaiModel,
+      model: modelConfig.model,
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: `资料：\n${context || '暂无命中资料'}\n\n问题：${question}` },
       ],
-      temperature: 0.3,
     }),
   }).catch(() => null)
 
-  if (!response?.ok) return fallbackResult(question, citations, scope)
+  if (!response?.ok) {
+    return fallbackResult(question, citations, scope, 'provider_error', modelConfig.model, modelConfig.provider)
+  }
 
   const payload = (await response.json().catch(() => null)) as OpenAIResponse | null
   const answer = payload?.choices?.[0]?.message?.content?.trim()
-  if (!answer) return fallbackResult(question, citations, scope)
+  if (!answer) return fallbackResult(question, citations, scope, 'empty_response', modelConfig.model, modelConfig.provider)
 
   return {
     answer,
     mode: 'model',
-    model: env.openaiModel,
+    model: modelConfig.model,
+    provider: modelConfig.provider,
   }
 }

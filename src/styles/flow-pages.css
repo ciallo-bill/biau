@@ -2006,8 +2006,19 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   border-color: color-mix(in oklch, var(--green) 35%, var(--flow-ui-card-border));
 }
 
+.public-assistant__status.is-ready,
+.public-assistant__status.is-local {
+  color: color-mix(in oklch, var(--blue) 74%, var(--ink));
+  border-color: color-mix(in oklch, var(--blue) 24%, var(--flow-ui-card-border));
+}
+
 .public-assistant__status.is-fallback {
   color: color-mix(in oklch, var(--amber) 78%, var(--ink));
+}
+
+.public-assistant__status.is-error {
+  color: color-mix(in oklch, var(--rose) 76%, var(--ink));
+  border-color: color-mix(in oklch, var(--rose) 30%, var(--flow-ui-card-border));
 }
 
 .public-assistant__meta {
@@ -2181,7 +2192,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 }
 
 .assistant-bubble__meta span,
-.assistant-loading {
+.assistant-loading,
+.public-assistant__loading {
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -2409,6 +2421,7 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   display: inline-flex;
   align-items: center;
   gap: var(--space-8);
+  max-width: min(320px, calc(100vw - 32px));
   color: var(--ink);
   background: color-mix(in oklch, var(--panel) 74%, transparent);
   border: 1px solid var(--flow-ui-border-strong);
@@ -2432,6 +2445,13 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   font-weight: 900;
 }
 
+.public-assistant__trigger-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .public-assistant__panel {
   width: min(420px, calc(100vw - 32px));
   max-height: min(680px, calc(100vh - 104px));
@@ -2446,6 +2466,11 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   gap: var(--space-12, 12px);
   align-items: flex-start;
   justify-content: space-between;
+}
+
+.public-assistant__header h2 {
+  font-size: clamp(1.38rem, 4vw, 1.8rem);
+  line-height: 1.08;
 }
 
 .public-assistant__hint {
@@ -2467,6 +2492,10 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   padding: var(--space-12, 12px);
 }
 
+.public-assistant__message p {
+  margin: 0;
+}
+
 .public-assistant__message.is-user {
   margin-left: var(--space-32);
   background: color-mix(in oklch, var(--blue) 15%, var(--panel-strong));
@@ -2481,6 +2510,22 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 .public-assistant__composer input {
   min-height: 40px;
   padding: 0 var(--space-12, 12px);
+}
+
+.public-assistant__close {
+  width: 38px;
+  min-width: 38px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+
+.public-assistant__composer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .assistant-session:focus-visible,

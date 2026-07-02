@@ -29,7 +29,8 @@ export function createApp() {
       ok: true,
       service: 'biau-assistant-api',
       database: hasDatabase(),
-      model: hasModelProvider() ? env.openaiModel : 'fallback',
+      model: hasModelProvider() ? env.assistantModelName : 'fallback',
+      provider: hasModelProvider() ? env.assistantModelProvider : 'local-public-knowledge',
     })
   })
 
@@ -106,6 +107,8 @@ export function createApp() {
         meta: {
           mode: generated.mode,
           model: generated.model,
+          provider: generated.provider,
+          reason: generated.reason,
           citationCount: citations.length,
         },
       }
@@ -184,6 +187,8 @@ export function createApp() {
         meta: {
           mode: generated.mode,
           model: generated.model,
+          provider: generated.provider,
+          reason: generated.reason,
           citationCount: citations.length,
         },
         sessionId: activeSession.id,

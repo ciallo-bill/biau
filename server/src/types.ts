@@ -23,13 +23,18 @@ export interface ChatPayload {
   sessionId?: string
 }
 
+export type ChatAnswerMode = 'model' | 'fallback'
+export type ChatFallbackReason = 'not_configured' | 'provider_error' | 'empty_response'
+
 export interface ChatResponse {
   answer: string
   citations: Citation[]
   meta?: {
-    mode: 'model' | 'fallback'
+    mode: ChatAnswerMode
     model: string
     citationCount: number
+    provider?: string
+    reason?: ChatFallbackReason
   }
   sessionId?: string
   messageId?: string

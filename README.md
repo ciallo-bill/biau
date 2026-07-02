@@ -28,7 +28,7 @@ npm run server:build
 npm run server:smoke
 ```
 
-前端通过 `VITE_CHAT_API_BASE_URL` 指向助手 API；未配置时会使用站点本地公开知识回退。
+前端通过 `VITE_CHAT_API_BASE_URL` 指向助手 API；模型通道只在服务端用 `ASSISTANT_MODEL_*` 配置。未配置 API 或模型时，公开助手会使用站点本地公开知识回退。
 
 内部成员入口位于 `/assistant`。第一版支持输入邀请码和显示名兑换成员 token，并把 token 保存在当前浏览器的 `localStorage`；没有 API、没有 token 或数据库不可用时，页面会退回到已脱敏的公开站点知识。
 

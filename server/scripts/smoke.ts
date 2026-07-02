@@ -28,10 +28,38 @@ function hasCitation(citations: unknown[], id: string) {
   })
 }
 
+function snapshotModelEnv() {
+  return {
+    assistantModelApiKey: env.assistantModelApiKey,
+    assistantModelBaseUrl: env.assistantModelBaseUrl,
+    assistantModelName: env.assistantModelName,
+    assistantModelProvider: env.assistantModelProvider,
+    openaiApiKey: env.openaiApiKey,
+    openaiBaseUrl: env.openaiBaseUrl,
+    openaiModel: env.openaiModel,
+  }
+}
+
+function restoreModelEnv(snapshot: ReturnType<typeof snapshotModelEnv>) {
+  env.assistantModelApiKey = snapshot.assistantModelApiKey
+  env.assistantModelBaseUrl = snapshot.assistantModelBaseUrl
+  env.assistantModelName = snapshot.assistantModelName
+  env.assistantModelProvider = snapshot.assistantModelProvider
+  env.openaiApiKey = snapshot.openaiApiKey
+  env.openaiBaseUrl = snapshot.openaiBaseUrl
+  env.openaiModel = snapshot.openaiModel
+}
+
+function forceNoModelProvider() {
+  env.assistantModelApiKey = ''
+  env.openaiApiKey = ''
+}
+
 const port = await findAvailablePort(8977)
 const app = createApp()
 const server = app.listen(port, '127.0.0.1')
 const base = `http://127.0.0.1:${port}`
+const originalModelEnv = snapshotModelEnv()
 
 try {
   const health = await fetch(`${base}/health`)
@@ -48,6 +76,7 @@ try {
     throw new Error(`metrics should be disabled by default, got ${metrics.status}`)
   }
 
+  forceNoModelProvider()
   const publicChat = await fetch(`${base}/chat/public`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -57,7 +86,7 @@ try {
   const publicPayload = (await publicChat.json()) as {
     answer?: string
     citations?: unknown[]
-    meta?: { mode?: string; model?: string; citationCount?: number }
+    meta?: { mode?: string; model?: string; provider?: string; reason?: string; citationCount?: number }
   }
   if (!publicPayload.answer || !Array.isArray(publicPayload.citations)) {
     throw new Error('public chat returned invalid payload')
@@ -68,16 +97,21 @@ try {
   if (
     publicPayload.meta?.mode !== 'fallback' ||
     publicPayload.meta.model !== 'fallback' ||
+    publicPayload.meta.provider !== 'local-public-knowledge' ||
+    publicPayload.meta.reason !== 'not_configured' ||
     publicPayload.meta.citationCount !== publicPayload.citations.length
   ) {
     throw new Error('public chat fallback meta is invalid')
   }
 
-  const originalOpenaiApiKey = env.openaiApiKey
-  const originalOpenaiBaseUrl = env.openaiBaseUrl
   try {
-    env.openaiApiKey = 'smoke-test-key'
+    env.assistantModelApiKey = 'smoke-test-key'
+    env.assistantModelBaseUrl = base
+    env.assistantModelName = 'smoke-test-model'
+    env.assistantModelProvider = 'smoke-test-provider'
+    env.openaiApiKey = ''
     env.openaiBaseUrl = base
+    env.openaiModel = 'legacy-smoke-test-model'
     const providerFailureChat = await fetch(`${base}/chat/public`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -87,18 +121,20 @@ try {
     const providerFailurePayload = (await providerFailureChat.json()) as {
       answer?: string
       citations?: unknown[]
-      meta?: { mode?: string; model?: string; citationCount?: number }
+      meta?: { mode?: string; model?: string; provider?: string; reason?: string; citationCount?: number }
     }
     if (
       !providerFailurePayload.answer ||
       !Array.isArray(providerFailurePayload.citations) ||
-      providerFailurePayload.meta?.mode !== 'fallback'
+      providerFailurePayload.meta?.mode !== 'fallback' ||
+      providerFailurePayload.meta.model !== 'smoke-test-model' ||
+      providerFailurePayload.meta.provider !== 'smoke-test-provider' ||
+      providerFailurePayload.meta.reason !== 'provider_error'
     ) {
       throw new Error('provider failure did not fall back to public knowledge')
     }
   } finally {
-    env.openaiApiKey = originalOpenaiApiKey
-    env.openaiBaseUrl = originalOpenaiBaseUrl
+    restoreModelEnv(originalModelEnv)
   }
 
   const internalChat = await fetch(`${base}/chat/internal`, {
@@ -126,6 +162,7 @@ try {
 
   console.log('Assistant API smoke passed')
 } finally {
+  restoreModelEnv(originalModelEnv)
   server.close()
 }
 
