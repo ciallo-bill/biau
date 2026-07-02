@@ -71,6 +71,13 @@ export function ProjectDetailPage() {
         <h1 className="detail-title">{project.title}</h1>
         <p className="detail-role">{project.role}</p>
         <p className="detail-summary">{project.summary}</p>
+        {project.links.length > 0 && (
+          <nav className="detail-quick-links" aria-label={`${project.title} 快速链接`}>
+            {project.links.map((link) => (
+              <ProjectLinkBadge key={link.href} link={link} />
+            ))}
+          </nav>
+        )}
       </header>
 
       {project.image && (

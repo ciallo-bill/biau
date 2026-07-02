@@ -523,6 +523,67 @@ if (!originalImageActionVisible) {
 }
 await originalImageLinkPage.close()
 
+const detailQuickLinksPage = await browser.newPage({ viewport: viewports[1] })
+await detailQuickLinksPage.goto(`${base}/projects/legal-rag`, { waitUntil: 'networkidle' })
+const legalQuickLinks = detailQuickLinksPage.locator('.detail-header .detail-quick-links')
+const legalQuickLinkCount = await legalQuickLinks.locator('a.link-badge').count()
+const legalQuickExternal = legalQuickLinks.getByRole('link', { name: '在线工作台' }).first()
+const legalQuickInternal = legalQuickLinks.getByRole('link', { name: '项目复盘' }).first()
+const legalQuickExternalVisible = await legalQuickExternal.isVisible().catch(() => false)
+const legalQuickInternalVisible = await legalQuickInternal.isVisible().catch(() => false)
+const legalQuickExternalTarget = await legalQuickExternal.getAttribute('target').catch(() => null)
+const legalQuickExternalRel = await legalQuickExternal.getAttribute('rel').catch(() => null)
+const legalQuickInternalHref = await legalQuickInternal.getAttribute('href').catch(() => null)
+const legalQuickInternalTarget = await legalQuickInternal.getAttribute('target').catch(() => null)
+const legalQuickLinksBeforeImage = await detailQuickLinksPage.evaluate(() => {
+  const quickLinks = document.querySelector('.detail-header .detail-quick-links')
+  const image = document.querySelector('.detail-hero-image')
+  if (!quickLinks || !image) return false
+  return quickLinks.getBoundingClientRect().bottom < image.getBoundingClientRect().top
+})
+const legalLowerLinkCount = await detailQuickLinksPage.locator('.detail-body .detail-links a.link-badge').count()
+if (legalQuickLinkCount < 4) {
+  failures.push(`/projects/legal-rag quick links: expected header to expose existing links, got ${legalQuickLinkCount}`)
+}
+if (!legalQuickExternalVisible || !legalQuickInternalVisible) {
+  failures.push('/projects/legal-rag quick links: expected external and internal quick links to be visible')
+}
+if (legalQuickExternalTarget !== '_blank') {
+  failures.push(`/projects/legal-rag quick links: expected external target _blank, got "${legalQuickExternalTarget}"`)
+}
+if (legalQuickExternalRel !== 'noopener noreferrer') {
+  failures.push(`/projects/legal-rag quick links: expected external rel noopener noreferrer, got "${legalQuickExternalRel}"`)
+}
+if (legalQuickInternalHref !== '/blog/legal-rag-review' || legalQuickInternalTarget) {
+  failures.push('/projects/legal-rag quick links: expected internal quick link to stay an SPA route without target')
+}
+if (!legalQuickLinksBeforeImage) {
+  failures.push('/projects/legal-rag quick links: expected header quick links before project screenshot')
+}
+if (legalLowerLinkCount < 4) {
+  failures.push(`/projects/legal-rag quick links: expected lower related links block to remain, got ${legalLowerLinkCount}`)
+}
+await detailQuickLinksPage.close()
+
+const xunqiuQuickLinksPage = await browser.newPage({ viewport: viewports[1] })
+await xunqiuQuickLinksPage.goto(`${base}/projects/xunqiu`, { waitUntil: 'networkidle' })
+const xunqiuQuickLinks = xunqiuQuickLinksPage.locator('.detail-header .detail-quick-links')
+for (const label of ['产品展示页', '技术文档', '阶段 APK']) {
+  if (!(await xunqiuQuickLinks.getByRole('link', { name: label }).first().isVisible().catch(() => false))) {
+    failures.push(`/projects/xunqiu quick links: expected visible "${label}" quick link`)
+  }
+}
+const xunqiuQuickLinksBeforeImage = await xunqiuQuickLinksPage.evaluate(() => {
+  const quickLinks = document.querySelector('.detail-header .detail-quick-links')
+  const image = document.querySelector('.detail-hero-image')
+  if (!quickLinks || !image) return false
+  return quickLinks.getBoundingClientRect().bottom < image.getBoundingClientRect().top
+})
+if (!xunqiuQuickLinksBeforeImage) {
+  failures.push('/projects/xunqiu quick links: expected header quick links before project screenshot')
+}
+await xunqiuQuickLinksPage.close()
+
 for (const projectId of ['ozon-erp', 'xunqiu']) {
   const projectPath = `/projects/${projectId}`
   const relatedPage = await browser.newPage({ viewport: viewports[0] })
