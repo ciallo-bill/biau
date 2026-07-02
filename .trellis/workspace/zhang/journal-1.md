@@ -1062,3 +1062,43 @@ Refined BIAU Port brand mark, favicon, and first-entry intro animation.
 ### Next Steps
 
 - None - task complete
+
+
+## Session 29: Projects mobile card actions
+
+**Date**: 2026-07-02
+**Task**: Projects mobile card actions
+**Branch**: `main`
+
+### Summary
+
+Restored visible mobile project card actions and added UI regression coverage.
+
+### Main Changes
+
+- 完成 child task `07-02-07-02-projects-mobile-card-actions`。
+- 修复 `/projects` 手机视口项目卡片隐藏操作区的问题：移动端现在保留紧凑的“查看详情”按钮和最多两个外部项目入口。
+- 保持卡片主体点击/键盘进入详情，外部链接继续 `target="_blank"` + `rel="noopener noreferrer"`，并阻止冒泡避免误跳详情页。
+- 在 `scripts/check-ui.mjs` 增加移动端项目卡操作区回归检查，覆盖 footer 可见、详情按钮可见、外链可见、安全属性和外链点击不触发卡片详情导航。
+- 验证：`npm.cmd run lint`、`npm.cmd run build`、`npm.cmd run check:ui`、`git diff --check`、严格敏感信息扫描和移动端截图检查均通过。
+- child 已归档；父任务更新为 24/24 done，并继续作为长期优化队列保留。
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `e8ac2d8` | (see git log) |
+| `7b7d604` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
