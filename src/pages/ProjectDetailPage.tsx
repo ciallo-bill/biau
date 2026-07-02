@@ -74,9 +74,19 @@ export function ProjectDetailPage() {
       </header>
 
       {project.image && (
-        <div className="detail-hero-image">
+        <a
+          href={project.image}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="detail-hero-image"
+          aria-label={`打开 ${project.title} 项目截图原图`}
+        >
           <ResponsiveImage src={project.image} alt={project.title} loading="eager" />
-        </div>
+          <span className="detail-hero-image-action" aria-hidden="true">
+            <IconLink />
+            <span>打开原图</span>
+          </span>
+        </a>
       )}
 
       <div className="detail-body">

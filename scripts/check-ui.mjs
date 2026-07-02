@@ -461,6 +461,27 @@ if (!webpSource?.endsWith('.webp')) {
 }
 await imagePage.close()
 
+const originalImageLinkPage = await browser.newPage({ viewport: viewports[1] })
+await originalImageLinkPage.goto(`${base}/projects/xunqiu`, { waitUntil: 'networkidle' })
+const originalImageLink = originalImageLinkPage.getByRole('link', { name: /打开 .+ 项目截图原图/ })
+const originalImageHref = await originalImageLink.getAttribute('href')
+const originalImageTarget = await originalImageLink.getAttribute('target')
+const originalImageRel = await originalImageLink.getAttribute('rel')
+const originalImageActionVisible = await originalImageLink.locator('.detail-hero-image-action').isVisible().catch(() => false)
+if (!originalImageHref?.endsWith('/images/projects/showcase/xunqiu-android64-runtime.png')) {
+  failures.push(`/projects/xunqiu original image: expected hero link to point to project image, got "${originalImageHref}"`)
+}
+if (originalImageTarget !== '_blank') {
+  failures.push(`/projects/xunqiu original image: expected target _blank, got "${originalImageTarget}"`)
+}
+if (originalImageRel !== 'noopener noreferrer') {
+  failures.push(`/projects/xunqiu original image: expected rel noopener noreferrer, got "${originalImageRel}"`)
+}
+if (!originalImageActionVisible) {
+  failures.push('/projects/xunqiu original image: expected visible open-original affordance')
+}
+await originalImageLinkPage.close()
+
 for (const projectId of ['ozon-erp', 'xunqiu']) {
   const projectPath = `/projects/${projectId}`
   const relatedPage = await browser.newPage({ viewport: viewports[0] })
