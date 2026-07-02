@@ -65,6 +65,15 @@ export function getStaticSeo(pathname: string): SeoMeta {
     }
   }
 
+  if (path === '/status') {
+    return {
+      title: '站点入口状态 | BIAU Port',
+      description: '查看 BIAU Port 泊岸主页项目入口的最近一次公开可用性检测结果。',
+      canonicalPath: '/status',
+      type: 'website',
+    }
+  }
+
   if (path === '/assistant/admin') {
     return {
       title: '内部助手管理页 | BIAU Port',

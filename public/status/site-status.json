@@ -1,0 +1,82 @@
+{
+  "checkedAt": "2026-07-02T23:12:14.198Z",
+  "base": "https://biau.playlab.eu.cc",
+  "ok": true,
+  "summary": {
+    "total": 4,
+    "online": 4,
+    "degraded": 0,
+    "offline": 0,
+    "unchecked": 0
+  },
+  "targets": [
+    {
+      "id": "legal-rag-entry",
+      "projectId": "legal-rag",
+      "projectTitle": "法律智能机器人",
+      "label": "Legal RAG 在线工作台",
+      "url": "https://legal-rag-web.onrender.com",
+      "kind": "workbench",
+      "expectation": "login-gated",
+      "description": "法律 RAG 与合同审查演示工作台入口。",
+      "note": "工作台可能有登录门禁或 Render 冷启动；入口可达不代表公开凭据已开放。",
+      "status": "online",
+      "httpStatus": 200,
+      "durationMs": 612,
+      "checkedAt": "2026-07-02T23:12:14.199Z",
+      "finalUrl": "https://legal-rag-web.onrender.com/",
+      "issues": []
+    },
+    {
+      "id": "ozon-erp-entry",
+      "projectId": "ozon-erp",
+      "projectTitle": "电商业务系统",
+      "label": "Ozon ERP 演示入口",
+      "url": "https://erp.ciallobill.qzz.io/#/login?from=biau-port",
+      "kind": "business",
+      "expectation": "login-gated",
+      "description": "电商业务系统登录与演示入口。",
+      "note": "生产注册与演示账号属于人工 gate；状态页只检查公开入口是否响应。",
+      "status": "online",
+      "httpStatus": 200,
+      "durationMs": 1017,
+      "checkedAt": "2026-07-02T23:12:14.811Z",
+      "finalUrl": "https://erp.ciallobill.qzz.io/",
+      "issues": []
+    },
+    {
+      "id": "biau-playlab-entry",
+      "projectId": "biau-playlab",
+      "projectTitle": "Biau Playlab 游戏站",
+      "label": "BIAU Playlab 游戏站",
+      "url": "https://games.playlab.eu.cc/",
+      "kind": "showcase",
+      "expectation": "static-site",
+      "description": "Godot 游戏项目展示、详情与 Web 试玩入口。",
+      "note": "静态站可用不代表每个 Web 试玩资源都已完成运行检查。",
+      "status": "online",
+      "httpStatus": 200,
+      "durationMs": 782,
+      "checkedAt": "2026-07-02T23:12:15.828Z",
+      "finalUrl": "https://games.playlab.eu.cc/",
+      "issues": []
+    },
+    {
+      "id": "xunqiu-entry",
+      "projectId": "xunqiu",
+      "projectTitle": "寻球移动端系统",
+      "label": "寻球产品展示页",
+      "url": "https://xunqiu.playlab.eu.cc/",
+      "kind": "mobile",
+      "expectation": "static-site",
+      "description": "寻球 Android 64 位迁移展示页、文档和阶段包入口。",
+      "note": "阶段 APK 是否公开发布仍需人工确认；这里只检查展示页入口。",
+      "status": "online",
+      "httpStatus": 200,
+      "durationMs": 754,
+      "checkedAt": "2026-07-02T23:12:16.610Z",
+      "finalUrl": "https://xunqiu.playlab.eu.cc/",
+      "issues": []
+    }
+  ]
+}

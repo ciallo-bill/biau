@@ -25,6 +25,7 @@ const routes = [
   { loc: '/', priority: '1.0', changefreq: 'weekly' },
   { loc: '/projects', priority: '0.9', changefreq: 'weekly' },
   { loc: '/blog', priority: '0.9', changefreq: 'weekly' },
+  { loc: '/status', priority: '0.6', changefreq: 'daily' },
   ...staticRoutes,
   ...projectIds.map((id) => ({ loc: `/projects/${id}`, priority: '0.8', changefreq: 'monthly' })),
   ...posts.map((post) => ({ loc: `/blog/${post.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: post.date })),
