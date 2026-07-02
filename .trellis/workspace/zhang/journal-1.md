@@ -1022,3 +1022,43 @@ Clarified observability tooling choices and added offline docs check.
 ### Next Steps
 
 - None - task complete
+
+
+## Session 28: Biau Port logo intro animation
+
+**Date**: 2026-07-02
+**Task**: Biau Port logo intro animation
+**Branch**: `main`
+
+### Summary
+
+Refined BIAU Port brand mark, favicon, and first-entry intro animation.
+
+### Main Changes
+
+- 完成 child task `07-02-biau-port-logo-intro-animation`。
+- 将用户提供的两版外部模型方案融合为第一版泊岸品牌识别：`b` 字母、港湾 / 数字端口、水线与暖色灯塔点。
+- 新增复用 SVG 品牌组件 `BiauPortMark`，替换导航 logo、首页首次入场动画和 favicon，并收紧移动端导航布局。
+- 设计上未引入 GSAP / Lottie / 生成图片，保持首屏低依赖；`prefers-reduced-motion` 和首次访问 sessionStorage 逻辑保留。
+- 验证：`npm.cmd run lint`、`npm.cmd run build`、`npm.cmd run check:ui`、`git diff --check`、changed files 敏感信息扫描均通过。
+- child 已归档；父任务已更新为 23/23 done，继续作为长期优化队列保留。
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `63dec57` | (see git log) |
+| `3f68c36` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

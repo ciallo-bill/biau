@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 27
+- **Total Sessions**: 28
 - **Last Active**: 2026-07-02
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1024 | Active |
+| `journal-1.md` | ~1064 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 28 | 2026-07-02 | Biau Port logo intro animation | `63dec57`, `3f68c36` | `main` |
 | 27 | 2026-07-02 | Observability tooling decision matrix | `835bc22`, `afac85c`, `d144daf` | `main` |
 | 26 | 2026-07-02 | 博客模型工具 env-file 别名清理 | `5dde6c5`, `c70024b`, `03fb8ac` | `main` |
 | 25 | 2026-07-02 | 项目详情主图原图查看入口 | `fce05df`, `98fc461`, `06b9186` | `main` |
