@@ -1225,3 +1225,36 @@ Capped mobile project detail long-image previews and kept original-image action 
 ### Next Steps
 
 - None - task complete
+
+
+## Session 33: Harbor intro nav-logo docking
+
+**Date**: 2026-07-02
+**Task**: Harbor intro nav-logo docking
+**Branch**: `main`
+
+### Summary
+
+Made the BIAU Port home intro measure and dock into the real navigation logo, added a UI regression assertion for dock target and scale, and documented the brand intro docking convention.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `5d81684` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

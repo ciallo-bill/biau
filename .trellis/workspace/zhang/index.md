@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 32
+- **Total Sessions**: 33
 - **Last Active**: 2026-07-02
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1227 | Active |
+| `journal-1.md` | ~1260 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 33 | 2026-07-02 | Harbor intro nav-logo docking | `5d81684` | `main` |
 | 32 | 2026-07-02 | Project detail mobile image framing | `75af013`, `7604f41` | `main` |
 | 31 | 2026-07-02 | Project detail link type affordance | `7f0bffb`, `91c4037` | `main` |
 | 30 | 2026-07-02 | Project detail hero quick links | `41e242d`, `0afa187` | `main` |
