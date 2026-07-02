@@ -516,7 +516,7 @@ export const projects: Project[] = [
         {
           title: '把游戏原型变成可访问的作品集平台',
           body:
-            'Biau Playlab 不是只放几张截图的列表页，而是把六个 Godot 项目整理成可访问、可试玩、可复盘的内容站。访客可以从游戏总览进入单个项目详情，再跳到独立 Web 试玩入口，看到玩法目标、机制贡献、截图/视频、里程碑、开发日志和后续计划。',
+            'Biau Playlab 不是只放几张截图的列表页，而是把六个 Godot 项目整理成可访问、可试玩、可复盘的内容站。访客可以从游戏总览进入单个项目详情，再跳到独立 Web 试玩入口，看到玩法目标、机制贡献、截图/视频、里程碑、开发日志和后续计划；Spacewar II 已作为第六个公开 Web 试玩项目接入统一内容模型。',
         },
         {
           title: '游戏展示先于博客优化',
@@ -531,6 +531,7 @@ export const projects: Project[] = [
             '首页和游戏列表展示六个项目：俄罗斯方块、Next Spacewar、intespace、Raiden、space-war 和 Spacewar II。',
             '每个游戏详情页提供玩法摘要、当前状态、引擎、平台、截图/视频、Web 试玩、项目贡献、结果和下一步。',
             '独立试玩域名承载 Godot Web 导出，让案例页和可玩版本解耦，项目说明与实际体验可以互相跳转。',
+            '试玩页需要提醒首次加载 Godot Web 运行时和项目资源可能偏慢，移动端输入、横竖屏缩放、HUD 可读性和浏览器性能仍要持续回归。',
           ],
         },
         {
@@ -563,7 +564,7 @@ export const projects: Project[] = [
         {
           title: '内容与发布质量',
           items: [
-            'content:audit 会统计公开文章、文章工作区、游戏项目和开发日志，并检查静态资源引用和内容关系。',
+            'content:audit 当前统计到 4 篇已发布文章、39 篇文章工作区草稿、6 个游戏项目和 5 篇开发日志，并检查静态资源引用和内容关系。',
             'verify 会串起内容审计、Astro build 和构建产物审计，减少断链、缺图和结构化数据问题。',
             'deploy:check 使用公开 URL 做端点可用性检查，覆盖内容站和试玩站的关键入口。',
           ],
@@ -580,7 +581,7 @@ export const projects: Project[] = [
           items: [
             'Playlab 的游戏展示和试玩链路已经较完整，但博客/文章归档还需要继续筛选、重写和排版优化。',
             '每个游戏的系统深度不同：有的是完整展示构建，有的是持续迭代项目，主站不应把所有条目都写成同等成熟度。',
-            'Godot Web 试玩仍受浏览器性能、移动端输入、加载体积和静态资源缓存影响，需要长期实机回归。',
+            'Godot Web 试玩仍受浏览器性能、移动端输入、加载体积、横竖屏缩放、HUD 可读性和静态资源缓存影响，需要长期实机回归。',
           ],
         },
       ],
@@ -599,7 +600,9 @@ export const projects: Project[] = [
     assistantContext: [
       'Biau Playlab 是已部署的 Astro 5 游戏作品集与试玩平台，整合六个 Godot Web 游戏、项目详情页、截图/视频、开发日志、系统设计文章和公开试玩入口。',
       '站点使用 Astro content collections 管理 games、devlogs、published articles 和 article workbench；games schema 包含 status、engine、platforms、screenshots、playableWeb、embedUrl、downloadLinks、repoUrl、challenge、mechanic、contribution、outcome、nextStep、milestones 和 devlogSlugs。',
-      '六个游戏包括 Tetris、Next Spacewar、intespace、Raiden、space-war 和 Spacewar II；每个都有游戏详情页和独立 Web 试玩入口。',
+      '六个游戏包括 Tetris、Next Spacewar、intespace、Raiden、space-war 和 Spacewar II；Spacewar II 已作为第六个公开 Web 试玩项目接入，并补齐菜单、战斗和结果页真实截图。',
+      'Godot Web 试玩入口由独立试玩域名承载，首次加载可能较慢；移动端输入、横竖屏缩放、HUD 可读性和浏览器性能仍需要持续回归。',
+      '最近内容审计统计到 4 篇已发布文章、39 篇文章工作区草稿、6 个游戏项目和 5 篇开发日志，静态资源引用和内容关系检查通过。',
       'Playlab 的质量链路包括 content:audit、Astro build、dist:audit、deploy:pages、deploy:play、play export/check/upload 和 deploy:check；公开端点检查覆盖游戏站、六个游戏详情页、六个试玩入口、RSS、sitemap、robots 和主站项目页。',
       '当前 Playlab 应作为游戏作品集平台展示；博客和部分文章归档质量仍是后续优化方向，不应把它描述成已经完全成熟的内容产品。',
     ],

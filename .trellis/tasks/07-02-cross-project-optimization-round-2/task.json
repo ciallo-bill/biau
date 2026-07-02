@@ -54,7 +54,8 @@
     "07-02-erp-production-registration-enable",
     "07-02-public-assistant-model-productization",
     "07-02-legal-rag-demo-access-qa-monitoring",
-    "07-02-xunqiu-showcase-health-doc-entry-sync"
+    "07-02-xunqiu-showcase-health-doc-entry-sync",
+    "07-02-game-playlab-showcase-entry-sync"
   ],
   "parent": null,
   "relatedFiles": [],
