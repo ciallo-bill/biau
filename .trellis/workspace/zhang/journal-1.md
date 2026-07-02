@@ -1692,3 +1692,47 @@ Enabled the approved production registration path for Ozon ERP by adding auth ro
 ### Next Steps
 
 - Continue with visitor-visible product and assistant experience improvements.
+
+
+## Session 44: Public assistant product follow-up
+
+**Date**: 2026-07-02
+**Task**: 公开助手产品体验与模型接入落地补强
+**Branch**: `main`
+
+### Summary
+
+补强公开助手模型接入落地：新增推荐的 `ASSISTANT_MODEL_*` 服务端配置入口并兼容旧 `OPENAI_*`，后端返回非敏感 provider/model/reason meta，前端浮窗展示 AI 辅助、公开知识兜底和服务错误状态，部署文档同步接入方式。
+
+### Main Changes
+
+- `server/src/env.ts` 支持 `ASSISTANT_MODEL_API_KEY`、`ASSISTANT_MODEL_BASE_URL`、`ASSISTANT_MODEL_NAME`、`ASSISTANT_MODEL_PROVIDER`。
+- `server/src/model.ts` 保持公开知识 fallback，并只暴露 `not_configured`、`provider_error`、`empty_response` 等粗粒度原因。
+- `src/components/PublicAssistantWidget.tsx` 和 CSS 增强公开助手产品态、引用 meta、错误兜底和图标按钮。
+- `server/scripts/smoke.ts` 强制使用空模型/假 provider 路径验证 fallback，不发真实模型测活请求。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `3b65d3b` | feat: strengthen public assistant model entry |
+
+### Testing
+
+- [OK] `npm.cmd run assistant:index`
+- [OK] `npm.cmd run server:build`
+- [OK] `npm.cmd run server:smoke`
+- [OK] `npm.cmd run blog:check`
+- [OK] `npm.cmd run lint`
+- [OK] `npm.cmd run build`
+- [OK] `npm.cmd run check:ui`
+- [OK] `git diff --check`
+- [OK] changed-file sensitive scan reviewed; hits were placeholders, env variable names, fake smoke values, and safety-boundary wording only.
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- Continue with the next visitor-visible optimization from the long-running parent queue.
