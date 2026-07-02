@@ -900,3 +900,43 @@ knowledge, and recorded a safe non-public blog backlog.
 ### Next Steps
 
 - None - task complete
+
+
+## Session 25: 项目详情主图原图查看入口
+
+**Date**: 2026-07-02
+**Task**: 项目详情主图原图查看入口
+**Branch**: `main`
+
+### Summary
+
+为项目详情主图增加可访问原图入口并补 UI 回归检查。
+
+### Main Changes
+
+- Added an accessible original-image link around project detail hero images, using the existing public `project.image` path and safe `_blank` link attributes.
+- Added a visible `打开原图` affordance with hover/focus styling so long screenshots and mobile screenshots can be inspected without changing source assets.
+- Extended `scripts/check-ui.mjs` to verify `/projects/xunqiu` hero image link href, target, rel, and visible affordance.
+- Ran `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run check:ui`, `git diff --check`, and changed-file sensitive scan. Sensitive scan only found inspected false positives for local UI check URL, CSS mask properties, and existing task slug text.
+- Archived the child task and updated the long-running parent task to 20 completed children.
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `fce05df` | (see git log) |
+| `98fc461` | (see git log) |
+| `06b9186` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
