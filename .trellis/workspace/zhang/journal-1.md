@@ -1622,3 +1622,36 @@ Enabled the approved production registration path for Ozon ERP by adding auth ro
 ### Next Steps
 
 - None - task complete
+
+
+## Session 42: RAG overview knowledge draft review
+
+**Date**: 2026-07-02
+**Task**: RAG overview knowledge draft review
+**Branch**: `main`
+
+### Summary
+
+以 Codex-only scaffold/review 模式刷新 RAG 总览知识积累草稿：补充 Legal RAG 最新 RagService、diagnostics、answer source 与 e2e smoke 证据，新增实践检查清单和发布阻塞，不发布 runtime blog。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `36134dd` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
