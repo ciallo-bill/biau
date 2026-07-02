@@ -1655,3 +1655,40 @@ Enabled the approved production registration path for Ozon ERP by adding auth ro
 ### Next Steps
 
 - None - task complete
+
+
+## Session 43: Chunk strategy knowledge draft review
+
+**Date**: 2026-07-02
+**Task**: Chunk strategy knowledge draft review
+**Branch**: `main`
+
+### Summary
+
+以 Codex-only scaffold/review 模式刷新 chunk strategy 知识积累草稿：补充 Legal RAG section-aware splitter、estimated page、citation quote、diagnostics 和 refusal 路径边界，不发布 runtime blog。
+
+### Main Changes
+
+- 更新 `content-drafts/02-chunk-strategy-public.md` 的 evidence pack、safe/uncertain facts、review gates 和 publish blockers。
+- 明确 `page` 当前是 chunk index 估算，不是 PDF parser 真实页码。
+- 将 citation quote 描述为压缩空白并截断到卡片可读长度，避免包装成完整原文替代。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `5681c2b` | docs: review chunk strategy draft evidence |
+
+### Testing
+
+- [OK] `npm.cmd run blog:check`
+- [OK] `git diff --check`
+- [OK] changed-file sensitive scan
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- Continue with visitor-visible product and assistant experience improvements.
