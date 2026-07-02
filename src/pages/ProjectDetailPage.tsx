@@ -11,6 +11,7 @@ import {
   type ProjectDetailContent,
   type ProjectDetailContentKey,
   type ProjectDetailSection,
+  type ProjectLink,
 } from '../data/portfolio'
 import { ResponsiveImage } from '../components/ResponsiveImage'
 const projectDetailContentOrder: ProjectDetailContentKey[] = [
@@ -104,16 +105,7 @@ export function ProjectDetailPage() {
             <h2 className="detail-block-title">相关链接</h2>
             <div className="detail-links">
               {project.links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target={link.type === 'external' ? '_blank' : undefined}
-                  rel={link.type === 'external' ? 'noopener noreferrer' : undefined}
-                  className="link-badge"
-                >
-                  <IconLink />
-                  <span>{link.label}</span>
-                </a>
+                <ProjectLinkBadge key={link.href} link={link} />
               ))}
             </div>
           </section>
@@ -201,19 +193,33 @@ function ProjectDetailContentSection({ section }: ProjectDetailContentSectionPro
       {section.links && section.links.length > 0 && (
         <div className="detail-links project-case-study__links">
           {section.links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              target={link.type === 'external' ? '_blank' : undefined}
-              rel={link.type === 'external' ? 'noopener noreferrer' : undefined}
-              className="link-badge"
-            >
-              <IconLink />
-              <span>{link.label}</span>
-            </a>
+            <ProjectLinkBadge key={link.href} link={link} />
           ))}
         </div>
       )}
     </article>
+  )
+}
+
+function ProjectLinkBadge({ link }: { link: ProjectLink }) {
+  const content = (
+    <>
+      <IconLink />
+      <span>{link.label}</span>
+    </>
+  )
+
+  if (link.type === 'internal') {
+    return (
+      <Link to={link.href} className="link-badge">
+        {content}
+      </Link>
+    )
+  }
+
+  return (
+    <a href={link.href} target="_blank" rel="noopener noreferrer" className="link-badge">
+      {content}
+    </a>
   )
 }

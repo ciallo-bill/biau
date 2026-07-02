@@ -461,6 +461,22 @@ if (!webpSource?.endsWith('.webp')) {
 }
 await imagePage.close()
 
+const projectDetailInternalLinkPage = await browser.newPage({ viewport: viewports[0] })
+await projectDetailInternalLinkPage.goto(`${base}/projects/legal-rag`, { waitUntil: 'networkidle' })
+const projectDetailSpaMarker = await projectDetailInternalLinkPage.evaluate(() => {
+  window.__projectDetailSpaMarker = `project-detail-${Date.now()}`
+  return window.__projectDetailSpaMarker
+})
+await projectDetailInternalLinkPage.locator('.detail-links a.link-badge[href="/blog/legal-rag-review"]').first().click()
+await projectDetailInternalLinkPage.waitForURL(`${base}/blog/legal-rag-review`, { timeout: 5000 }).catch(() => {
+  failures.push('/projects/legal-rag internal link: expected project review link to navigate to blog route')
+})
+const projectDetailSpaMarkerAfter = await projectDetailInternalLinkPage.evaluate(() => window.__projectDetailSpaMarker)
+if (projectDetailSpaMarkerAfter !== projectDetailSpaMarker) {
+  failures.push('/projects/legal-rag internal link: expected internal link to preserve SPA page context')
+}
+await projectDetailInternalLinkPage.close()
+
 await browser.close()
 
 if (failures.length > 0) {
