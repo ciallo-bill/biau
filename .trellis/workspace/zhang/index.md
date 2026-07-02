@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 29
+- **Total Sessions**: 30
 - **Last Active**: 2026-07-02
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1104 | Active |
+| `journal-1.md` | ~1145 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 30 | 2026-07-02 | Project detail hero quick links | `41e242d`, `0afa187` | `main` |
 | 29 | 2026-07-02 | Projects mobile card actions | `e8ac2d8`, `7b7d604` | `main` |
 | 28 | 2026-07-02 | Biau Port logo intro animation | `63dec57`, `3f68c36` | `main` |
 | 27 | 2026-07-02 | Observability tooling decision matrix | `835bc22`, `afac85c`, `d144daf` | `main` |

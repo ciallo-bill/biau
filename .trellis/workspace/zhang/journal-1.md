@@ -1102,3 +1102,44 @@ Restored visible mobile project card actions and added UI regression coverage.
 ### Next Steps
 
 - None - task complete
+
+
+## Session 30: Project detail hero quick links
+
+**Date**: 2026-07-02
+**Task**: Project detail hero quick links
+**Branch**: `main`
+
+### Summary
+
+Added header quick links to project detail pages and regression coverage.
+
+### Main Changes
+
+- 完成 child task `07-02-07-02-project-detail-hero-quick-links`。
+- 在项目详情页标题区复用现有 `project.links` 渲染首屏快速链接，让演示、文档、源码、APK 和相关文章入口在移动端更早可见。
+- 保持内部链接走 React Router `Link`，外部链接继续 `target="_blank"` + `rel="noopener noreferrer"`；未新增、删除或改写任何项目 URL / 事实数据。
+- 增加 `detail-quick-links` 样式，支持移动端换行、无横向溢出，并保留下方完整“相关链接”区块。
+- 在 `scripts/check-ui.mjs` 增加 Legal RAG 和 Xunqiu 的 quick links 回归检查，覆盖可见性、链接语义、安全属性、截图前位置和下方链接区仍存在。
+- 验证：`npm.cmd run lint`、`npm.cmd run build`、`npm.cmd run check:ui`、`git diff --check`、严格敏感信息扫描和移动端截图检查均通过。
+- child 已归档；父任务更新为 25/25 done，并继续作为长期优化队列保留。
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `41e242d` | (see git log) |
+| `0afa187` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
