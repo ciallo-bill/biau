@@ -49,10 +49,15 @@ Gemini CLI 或其他模型只适合辅助场景，例如临时扩写某一段、
 npm run blog:model -- setup
 npm run blog:model -- status --all --format markdown
 npm run blog:model -- doctor --all --format markdown
+```
+
+`status` 和默认 `doctor` 都是离线检查，只显示 set/missing、非敏感 provider label、model id、temperature 和来源；不要把 `doctor --live` 当成普通测活。只有在用户明确批准一个小型博客诊断任务时，才运行：
+
+```bash
 npm run blog:model -- doctor --profile strong --live --format markdown
 ```
 
-`status` 和默认 `doctor` 都是离线检查，只显示 set/missing、非敏感 provider label、model id、temperature 和来源；只有显式加 `--live` 才会发起一次最小模型请求来验证路由，且不会覆盖草稿。真实中转地址和 API key 只进入 `.env.local`，不要写进文档或提交记录。
+这个命令会向模型中转发送一次公开安全的小内容任务，可能消耗额度或触发私有 relay；它不会覆盖草稿。真实中转地址和 API key 只进入 `.env.local`，不要写进文档或提交记录。
 
 ```bash
 BLOG_DRAFT_PROFILE=strong

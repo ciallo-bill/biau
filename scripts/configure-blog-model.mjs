@@ -187,7 +187,7 @@ function usage() {
     '  setup without --profile guides strong, review, and fast.',
     '  beginner setup does not ask for temperature; use --advanced or --temperature.',
     '  status is offline and never prints API keys or real relay URLs.',
-    '  doctor is offline by default; add --live for an explicit minimal model request.',
+    '  doctor is offline by default; add --live only after approval for a small blog diagnostic model task.',
   ].join('\n')
 }
 
@@ -325,7 +325,7 @@ async function runDoctor(args) {
     return {
       ...statusResult,
       command: 'doctor',
-      message: 'offline doctor passed; no model request was sent. Add --live only when you explicitly want a minimal channel check.',
+      message: 'offline doctor passed; no model request was sent. Add --live only after approval for a small blog diagnostic model task.',
       recovery: statusResult.warnings.length > 0
         ? [`Run npm.cmd run blog:model -- setup --profile ${statusResult.profile} to avoid relying on fallback or legacy values.`]
         : [],
@@ -344,8 +344,20 @@ async function runDoctor(args) {
         model: config.model,
         temperature: config.temperature,
         messages: [
-          { role: 'system', content: 'You are a blog model channel health check. Reply with OK only.' },
-          { role: 'user', content: 'Reply with OK if this blog draft model channel works.' },
+          {
+            role: 'system',
+            content: [
+              'You are completing an approved small diagnostic task for a technical blog draft pipeline.',
+              'Return only compact JSON. Do not include private URLs, credentials, accounts, local paths, metrics, or invented project facts.',
+            ].join(' '),
+          },
+          {
+            role: 'user',
+            content: [
+              'Diagnostic task: propose one public-safe Chinese technical blog angle about evidence-first AI project writing.',
+              'Return JSON with keys "title", "angle", and "safety". Keep each value short.',
+            ].join(' '),
+          },
         ],
       }),
     })
@@ -373,7 +385,7 @@ async function runDoctor(args) {
       ok: Boolean(content),
       command: 'doctor',
       httpStatus: response.status,
-      message: content ? 'model channel responded' : 'model channel returned no message content',
+      message: content ? 'model channel completed the approved small diagnostic task' : 'model channel returned no message content',
       recovery: content ? [] : ['Check whether the relay returns OpenAI-compatible choices[0].message.content.'],
     }
   } catch (error) {

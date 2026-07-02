@@ -69,12 +69,18 @@ npm.cmd run blog:model -- doctor --all --format markdown
 npm.cmd run blog:model -- setup --profile strong
 npm.cmd run blog:model -- status --profile strong --format markdown
 npm.cmd run blog:model -- doctor --profile strong --format markdown
-npm.cmd run blog:model -- doctor --profile strong --live --format markdown
 ```
 
-`status` and default `doctor` should be offline and masked. Add `--live` only
-when you explicitly want a minimal live request; it must not write or overwrite
-drafts.
+`status` and default `doctor` should be offline and masked. Do not use
+`doctor --live` as a casual health check. Run it only after the user explicitly
+approves a small blog diagnostic model task; it may spend quota or touch a
+private relay, and it must not write or overwrite drafts.
+
+Approved live diagnostic command:
+
+```powershell
+npm.cmd run blog:model -- doctor --profile strong --live --format markdown
+```
 
 For scripted setup, pass placeholders only in public examples:
 

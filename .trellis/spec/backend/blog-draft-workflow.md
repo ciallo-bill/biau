@@ -25,7 +25,7 @@ model channel contract. Read this before changing `scripts/generate-blog-draft.m
 - `npm.cmd run blog:model -- status --all --format json|markdown` prints masked offline status for the recommended three-profile flow.
 - `npm.cmd run blog:model -- doctor --profile <profile> --format json|markdown` performs an offline channel configuration check without writing drafts.
 - `npm.cmd run blog:model -- doctor --all --format json|markdown` performs offline checks for the recommended three-profile flow without sending model requests.
-- `npm.cmd run blog:model -- doctor --profile <profile> --live --format json|markdown` performs an explicit minimal live channel check without writing drafts.
+- `npm.cmd run blog:model -- doctor --profile <profile> --live --format json|markdown` performs an explicit approved small blog diagnostic model task without writing drafts.
 - `npm.cmd run blog:model -- config path --format json|markdown` reports the private env target without printing secret values.
 - Supported profile names are open-ended, but current documented profiles are `default`, `strong`, `fast`, and `review`.
 - `BLOG_DRAFT_PROFILE=<profile>` selects a default profile when `--profile` is omitted.
@@ -93,8 +93,9 @@ model channel contract. Read this before changing `scripts/generate-blog-draft.m
   model id, status code, and suggested configuration fix.
 - `doctor` without `--live` -> perform config validation only and report that no
   model request was sent.
-- `doctor --live` -> may spend model quota and must be treated as an explicit
-  small diagnostic task, never a casual/default health check.
+- `doctor --live` -> may spend model quota or touch a private relay and must be
+  treated as an explicit approved small blog diagnostic task, never a
+  casual/default health check.
 - Existing draft without `--force` -> skip rather than overwrite.
 - Generated draft noise from validation, especially `generatedAt`, must not be committed unless the task is intentionally updating that draft.
 
@@ -216,8 +217,9 @@ npm.cmd run blog:model -- doctor --profile strong --format markdown
 npm.cmd run blog:model -- doctor --profile strong --live --format markdown
 ```
 
-The first command is offline. The second command is an explicit small model task
-and should only be run when the user has approved live validation.
+The first command is offline. The second command sends an approved small blog
+diagnostic task and should only be run when the user has approved live
+validation.
 
 #### Wrong
 
@@ -258,7 +260,7 @@ Behavior:
 - Write private values to `.env.local` or an explicitly provided private env
   file; never to tracked docs or examples.
 - Offer `status` and default `doctor` for offline masked inspection, and
-  `doctor --live` for a minimal profile/model routing check without writing or
-  overwriting a draft.
+  `doctor --live` only as an approved small blog diagnostic model task without
+  writing or overwriting a draft.
 - Print actionable failures, but never print API keys, real relay URLs, account
   names, private paths, or request headers.
