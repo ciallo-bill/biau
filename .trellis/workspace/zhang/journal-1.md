@@ -1359,3 +1359,54 @@ Synced the latest ERP login and overview guidance facts into the Ozon ERP projec
 ### Next Steps
 
 - None - task complete
+
+## Session 37: Pet app static showcase and APK artifact record
+
+**Date**: 2026-07-02
+**Task**: Pet App 展示页接入主站
+**Branch**: `main` / `pet/gamer:cursor-windows-migration`
+
+### Summary
+
+Published a BIAU Port static Pet App showcase page, synced Pet project links and assistant knowledge, organized `pet/gamer` community pagination dirty files into a tested feature, recorded a local debug APK artifact, and kept public APK download gated.
+
+### Main Changes
+
+- Added `/pet-app-showcase/` static page with four Android screenshots and disabled APK release gate.
+- Updated Pet project detail links, public assistant knowledge, and sitemap generation.
+- Added community API cursor/offset pagination helpers and route/store/Postgres coverage in `pet/gamer`.
+- Fixed two Pet test blockers: metrics timer now unrefs; structured logger default context is valid.
+- Recorded local debug APK path, checksum, and non-public publication gate.
+- Logged follow-up backlog: ERP production registration approved, Legal RAG demo access/monitoring, public assistant model productization.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `caf065f` | `feat: add community pagination and APK build record` (`pet/gamer`) |
+| `37641d8` | `feat: publish Pet app static showcase` (`blog-semi`) |
+
+### Testing
+
+- [OK] `blog-semi`: `npm.cmd run assistant:index`
+- [OK] `blog-semi`: `npm.cmd run sitemap:generate`
+- [OK] `blog-semi`: `npm.cmd run blog:check`
+- [OK] `blog-semi`: `npm.cmd run lint`
+- [OK] `blog-semi`: `npm.cmd run build`
+- [OK] `blog-semi`: `npm.cmd run check:ui`
+- [OK] `blog-semi`: static Pet showcase asset/APK/sitemap assertion
+- [OK] `pet/gamer`: `npm.cmd test`
+- [OK] `pet/gamer`: `apps/android-community/gradlew.bat testDebugUnitTest --console=plain`
+- [OK] `pet/gamer`: `apps/android-community/gradlew.bat assembleDebug --console=plain --rerun-tasks`
+- [OK] Both repos: `git diff --check`
+- [OK] Both repos: changed-file sensitive scan
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- Start ERP production registration child task; user approved real production registration.
+- Start Legal RAG demo access and legal QA monitoring child task using public demo credentials, not real admin passwords.
+- Start public assistant model productization child task with server-side model configuration, RAG boundary, fallback, rate limiting, and product UI polish.
