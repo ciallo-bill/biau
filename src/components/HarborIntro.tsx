@@ -30,6 +30,8 @@ function markIntroSeen() {
 export function HarborIntro() {
   const [visible, setVisible] = useState(() => !introTriggeredThisRuntime && canShowIntro())
   const [leaving, setLeaving] = useState(false)
+  const introRef = useRef<HTMLDivElement>(null)
+  const vesselRef = useRef<HTMLDivElement>(null)
   const completionRef = useRef({ vessel: false, mark: false, leaving: false })
 
   useLayoutEffect(() => {
@@ -39,7 +41,46 @@ export function HarborIntro() {
     document.documentElement.classList.add('harbor-intro-active')
 
     return () => {
-      document.documentElement.classList.remove('harbor-intro-active')
+      document.documentElement.classList.remove('harbor-intro-active', 'harbor-intro-settling')
+    }
+  }, [visible])
+
+  useLayoutEffect(() => {
+    if (!visible) return
+
+    const intro = introRef.current
+    const vessel = vesselRef.current
+    if (!intro || !vessel) return
+
+    const syncDockTarget = () => {
+      const navLogo = document.querySelector<HTMLElement>('.nav-logo')
+      if (!navLogo) return
+
+      const navRect = navLogo.getBoundingClientRect()
+      const vesselWidth = vessel.offsetWidth
+      const targetScale = navRect.width > 0 && vesselWidth > 0 ? navRect.width / vesselWidth : 0.32
+
+      intro.style.setProperty('--harbor-logo-x', `${navRect.left + navRect.width / 2}px`)
+      intro.style.setProperty('--harbor-logo-y', `${navRect.top + navRect.height / 2}px`)
+      intro.style.setProperty('--harbor-logo-target-scale', targetScale.toFixed(4))
+    }
+
+    syncDockTarget()
+
+    const frameId = window.requestAnimationFrame(syncDockTarget)
+    const timeoutIds = [120, 360, 620, 980].map((delay) => window.setTimeout(syncDockTarget, delay))
+    const navInner = document.querySelector<HTMLElement>('.nav-inner')
+
+    window.addEventListener('resize', syncDockTarget)
+    window.addEventListener('orientationchange', syncDockTarget)
+    navInner?.addEventListener('animationend', syncDockTarget)
+
+    return () => {
+      window.cancelAnimationFrame(frameId)
+      timeoutIds.forEach((id) => window.clearTimeout(id))
+      window.removeEventListener('resize', syncDockTarget)
+      window.removeEventListener('orientationchange', syncDockTarget)
+      navInner?.removeEventListener('animationend', syncDockTarget)
     }
   }, [visible])
 
@@ -52,6 +93,7 @@ export function HarborIntro() {
 
   return (
     <div
+      ref={introRef}
       className={`harbor-intro ${leaving ? 'is-harbor-intro-leaving' : ''}`}
       aria-hidden="true"
       onAnimationEnd={(event) => {
@@ -67,6 +109,7 @@ export function HarborIntro() {
         }
         if (completionRef.current.mark && completionRef.current.vessel && !completionRef.current.leaving) {
           completionRef.current.leaving = true
+          document.documentElement.classList.add('harbor-intro-settling')
           event.currentTarget.classList.add('is-harbor-intro-leaving')
           setLeaving(true)
           return
@@ -79,7 +122,7 @@ export function HarborIntro() {
       <div className="harbor-intro__dock-light" />
       <div className="harbor-intro__wake harbor-intro__wake--a" />
       <div className="harbor-intro__wake harbor-intro__wake--b" />
-      <div className="harbor-intro__vessel">
+      <div ref={vesselRef} className="harbor-intro__vessel">
         <BiauPortMark className="harbor-intro__boat" animated />
       </div>
       <div className="harbor-intro__mark">

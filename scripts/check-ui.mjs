@@ -264,6 +264,55 @@ await homeIntroPage.goto(`${base}/`, { waitUntil: 'domcontentloaded' })
 await homeIntroPage.waitForSelector('.harbor-intro__vessel', { timeout: 3000 }).catch(() => {
   failures.push('/ home intro: expected harbor intro vessel to mount on first visit')
 })
+await homeIntroPage.waitForTimeout(700)
+const harborDockMetrics = await homeIntroPage.evaluate(() => {
+  const intro = document.querySelector('.harbor-intro')
+  const navLogo = document.querySelector('.nav-logo')
+  const vessel = document.querySelector('.harbor-intro__vessel')
+  if (!(intro instanceof HTMLElement) || !(navLogo instanceof HTMLElement) || !(vessel instanceof HTMLElement)) {
+    return null
+  }
+
+  const introStyle = getComputedStyle(intro)
+  const navRect = navLogo.getBoundingClientRect()
+  const dockX = Number.parseFloat(introStyle.getPropertyValue('--harbor-logo-x'))
+  const dockY = Number.parseFloat(introStyle.getPropertyValue('--harbor-logo-y'))
+  const dockScale = Number.parseFloat(introStyle.getPropertyValue('--harbor-logo-target-scale'))
+  const expectedScale = vessel.offsetWidth > 0 ? navRect.width / vessel.offsetWidth : 0
+
+  return {
+    dx: Math.abs(dockX - (navRect.left + navRect.width / 2)),
+    dy: Math.abs(dockY - (navRect.top + navRect.height / 2)),
+    dockScale,
+    expectedScale,
+    navOpacity: getComputedStyle(navLogo).opacity,
+  }
+})
+if (!harborDockMetrics) {
+  failures.push('/ home intro docking: expected measurable intro, vessel, and navigation logo')
+} else {
+  if (
+    !Number.isFinite(harborDockMetrics.dx) ||
+    !Number.isFinite(harborDockMetrics.dy) ||
+    !Number.isFinite(harborDockMetrics.dockScale) ||
+    !Number.isFinite(harborDockMetrics.expectedScale)
+  ) {
+    failures.push('/ home intro docking: expected finite dock target CSS variables')
+  }
+  if (harborDockMetrics.dx > 1 || harborDockMetrics.dy > 1) {
+    failures.push(
+      `/ home intro docking: expected intro dock target to match nav logo center, got dx=${harborDockMetrics.dx}, dy=${harborDockMetrics.dy}`,
+    )
+  }
+  if (Math.abs(harborDockMetrics.dockScale - harborDockMetrics.expectedScale) > 0.02) {
+    failures.push(
+      `/ home intro docking: expected dock scale ${harborDockMetrics.expectedScale}, got ${harborDockMetrics.dockScale}`,
+    )
+  }
+  if (harborDockMetrics.navOpacity !== '0') {
+    failures.push('/ home intro docking: expected nav logo hidden before settling crossfade')
+  }
+}
 await homeIntroPage
   .waitForFunction(
     () => {

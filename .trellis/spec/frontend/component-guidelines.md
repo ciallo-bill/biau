@@ -29,6 +29,18 @@ Use existing class-based CSS systems such as `glass-card`, `feature-card`, `hove
 
 Do not create card-in-card page structures or marketing-only landing layouts. The site should feel like a production product showcase with clear information architecture.
 
+### Convention: Brand Intro Docking
+
+When a first-entry brand animation resolves into the navigation logo, reuse the same SVG component as the real navigation mark and calculate the final target from the live `.nav-logo` DOM rect. Do not hard-code desktop/mobile `x` / `y` coordinates as the final source of truth; fixed CSS variables may exist only as fallbacks before measurement.
+
+```tsx
+const navRect = navLogo.getBoundingClientRect()
+intro.style.setProperty('--harbor-logo-x', `${navRect.left + navRect.width / 2}px`)
+intro.style.setProperty('--harbor-logo-y', `${navRect.top + navRect.height / 2}px`)
+```
+
+Hide or crossfade the underlying navigation logo during the docking segment to avoid a double-image effect, then let the real navigation logo resume its normal hover, focus, and click behavior after the intro unmounts. `scripts/check-ui.mjs` should assert that the intro target center and scale match `.nav-logo` so responsive navigation changes cannot silently break the landing motion.
+
 ## Content and Assets
 
 Use real sanitized project screenshots when available. If an asset is missing, use a stable fallback asset or omit the image; do not fabricate business evidence, metrics, customers, or screenshots.

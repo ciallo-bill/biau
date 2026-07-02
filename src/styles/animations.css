@@ -51,6 +51,7 @@ html.harbor-intro-active body {
 .harbor-intro {
   --harbor-logo-x: clamp(88px, 7.6vw, 118px);
   --harbor-logo-y: 72px;
+  --harbor-logo-target-scale: 0.32;
   position: fixed;
   inset: 0;
   z-index: 2147482000;
@@ -70,6 +71,10 @@ html.harbor-intro-active body {
 
 .harbor-intro.is-harbor-intro-leaving {
   animation: harborIntroVeil 0.28s ease-out forwards;
+}
+
+html.harbor-intro-active:not(.harbor-intro-settling) .nav-logo {
+  opacity: 0;
 }
 
 .harbor-intro::before,
@@ -689,12 +694,12 @@ html.harbor-intro-active body {
     transform: translate3d(50vw, 50vh, 0) translate(-50%, -50%) scale(0.96);
   }
   96% {
-    opacity: 0.98;
-    transform: translate3d(calc(var(--harbor-logo-x) + 4px), calc(var(--harbor-logo-y) + 4px), 0) translate(-50%, -50%) scale(0.36);
+    opacity: 1;
+    transform: translate3d(calc(var(--harbor-logo-x) + 4px), calc(var(--harbor-logo-y) + 4px), 0) translate(-50%, -50%) scale(calc(var(--harbor-logo-target-scale) * 1.08));
   }
   100% {
-    opacity: 0;
-    transform: translate3d(var(--harbor-logo-x), var(--harbor-logo-y), 0) translate(-50%, -50%) scale(0.32);
+    opacity: 1;
+    transform: translate3d(var(--harbor-logo-x), var(--harbor-logo-y), 0) translate(-50%, -50%) scale(var(--harbor-logo-target-scale));
   }
 }
 
