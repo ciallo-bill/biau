@@ -1184,3 +1184,44 @@ Distinguished external and internal project detail links with visual affordances
 ### Next Steps
 
 - None - task complete
+
+
+## Session 32: Project detail mobile image framing
+
+**Date**: 2026-07-02
+**Task**: Project detail mobile image framing
+**Branch**: `main`
+
+### Summary
+
+Capped mobile project detail long-image previews and kept original-image action visible.
+
+### Main Changes
+
+- 完成 child task `07-02-07-02-project-detail-mobile-image-framing`。
+- 针对移动端项目详情页限制长截图预览高度：`xunqiu` 竖向截图从约 522px 降到约 362px，避免吞掉大半个首屏。
+- 将移动端“打开原图”入口从截图底部移到顶部角落，保证长图进入视口时入口可见；桌面图片行为不变。
+- 保持原图链接的 `href`、`target="_blank"`、`rel="noopener noreferrer"` 和可访问名称不变；未修改截图资源、项目事实、链接、助手知识、sitemap 或博客内容。
+- 在 `scripts/check-ui.mjs` 增加 xunqiu 移动端图片高度与首屏入口位置断言，并保留 legal-rag 图片加载/无横向溢出检查。
+- 验证：`npm.cmd run lint`、`npm.cmd run build`、`npm.cmd run check:ui`、`git diff --check`、严格敏感信息扫描和移动端截图检查均通过。
+- child 已归档；父任务更新为 27/27 done，并继续作为长期优化队列保留。
+
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `75af013` | (see git log) |
+| `7604f41` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

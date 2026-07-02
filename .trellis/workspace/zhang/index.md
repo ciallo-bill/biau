@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 31
+- **Total Sessions**: 32
 - **Last Active**: 2026-07-02
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~1186 | Active |
+| `journal-1.md` | ~1227 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 32 | 2026-07-02 | Project detail mobile image framing | `75af013`, `7604f41` | `main` |
 | 31 | 2026-07-02 | Project detail link type affordance | `7f0bffb`, `91c4037` | `main` |
 | 30 | 2026-07-02 | Project detail hero quick links | `41e242d`, `0afa187` | `main` |
 | 29 | 2026-07-02 | Projects mobile card actions | `e8ac2d8`, `7b7d604` | `main` |
