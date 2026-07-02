@@ -14,6 +14,13 @@ interface WidgetMessage {
   role: 'user' | 'assistant'
   content: string
   citations?: AssistantKnowledgeItem[]
+  meta?: AssistantAnswerMeta
+}
+
+interface AssistantAnswerMeta {
+  mode: 'model' | 'fallback'
+  model: string
+  citationCount: number
 }
 
 const API_BASE = import.meta.env.VITE_CHAT_API_BASE_URL?.trim()
@@ -30,7 +37,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
-async function requestPublicAnswer(question: string) {
+interface PublicAnswerResult {
+  content: string
+  citations: AssistantKnowledgeItem[]
+  meta: AssistantAnswerMeta
+}
+
+async function requestPublicAnswer(question: string): Promise<PublicAnswerResult> {
   if (!API_BASE) {
     const citations = searchPublicKnowledge(question)
     if (citations.length === 0) {
@@ -38,6 +51,11 @@ async function requestPublicAnswer(question: string) {
         content:
           '我目前只回答本站公开内容。这个问题暂时没有命中相关资料；项目页和博客页还在继续整理，可以先换一个项目名、技术词，或直接浏览公开页面。',
         citations: [] as AssistantKnowledgeItem[],
+        meta: {
+          mode: 'fallback' as const,
+          model: 'local-public-knowledge',
+          citationCount: 0,
+        },
       }
     }
 
@@ -48,6 +66,11 @@ async function requestPublicAnswer(question: string) {
     return {
       content: `根据当前公开内容，我优先找到了这些信息：${summary}`,
       citations,
+      meta: {
+        mode: 'fallback' as const,
+        model: 'local-public-knowledge',
+        citationCount: citations.length,
+      },
     }
   }
 
@@ -64,13 +87,28 @@ async function requestPublicAnswer(question: string) {
   const payload = (await response.json()) as unknown
   const answer = isRecord(payload) && typeof payload.answer === 'string' ? payload.answer.trim() : ''
   const citations = isRecord(payload) ? normalizeAssistantCitations(payload.citations) : []
+  const rawMeta = isRecord(payload) && isRecord(payload.meta) ? payload.meta : undefined
+  const mode: AssistantAnswerMeta['mode'] = rawMeta?.mode === 'model' ? 'model' : 'fallback'
+  const model = typeof rawMeta?.model === 'string' && rawMeta.model.trim() ? rawMeta.model.trim() : mode
+  const citationCount = typeof rawMeta?.citationCount === 'number' ? rawMeta.citationCount : citations.length
 
   return {
     content:
       answer ||
       '公开助手暂时没有返回内容。你可以稍后重试，或者先去项目页和知识库查看详细资料。',
     citations,
+    meta: {
+      mode,
+      model,
+      citationCount,
+    },
   }
+}
+
+function formatAnswerMeta(meta?: AssistantAnswerMeta) {
+  if (!meta) return ''
+  const modeLabel = meta.mode === 'model' ? '模型辅助' : '本地知识'
+  return `${modeLabel} · ${meta.model} · ${meta.citationCount} 条引用`
 }
 
 export function PublicAssistantWidget() {
@@ -128,6 +166,7 @@ export function PublicAssistantWidget() {
           role: 'assistant',
           content: result.content,
           citations: result.citations,
+          meta: result.meta,
         },
       ])
     } catch {
@@ -137,6 +176,11 @@ export function PublicAssistantWidget() {
           id: createMessageId('assistant'),
           role: 'assistant',
           content: '公开助手暂时不可用。可以先浏览项目页、博客页，或稍后再试。',
+          meta: {
+            mode: 'fallback',
+            model: 'error-fallback',
+            citationCount: 0,
+          },
         },
       ])
     } finally {
@@ -165,6 +209,9 @@ export function PublicAssistantWidget() {
             <div>
               <p className="public-assistant__eyebrow">PUBLIC ASSISTANT</p>
               <h2>本站公开内容问答</h2>
+              <span className={`public-assistant__status ${API_BASE ? 'is-model' : 'is-fallback'}`}>
+                {API_BASE ? '服务端模型接入点已配置' : '本地公开知识兜底'}
+              </span>
             </div>
             <button type="button" className="public-assistant__close" onClick={() => setIsOpen(false)} aria-label="关闭公开助手">
               关闭
@@ -172,7 +219,7 @@ export function PublicAssistantWidget() {
           </header>
 
           <p className="public-assistant__hint">
-            仅回答站点公开内容，不提供通用中转聊天。
+            仅回答站点公开内容；配置服务端模型后会先检索公开知识再生成回答。
             <Link to="/assistant">内部成员入口</Link>
           </p>
 
@@ -180,6 +227,9 @@ export function PublicAssistantWidget() {
             {messages.map((message) => (
               <article key={message.id} className={`public-assistant__message is-${message.role}`}>
                 <p>{message.content}</p>
+                {message.role === 'assistant' && message.meta && (
+                  <small className="public-assistant__meta">{formatAnswerMeta(message.meta)}</small>
+                )}
                 {message.citations && message.citations.length > 0 && (
                   <div className="public-assistant__citations">
                     {message.citations.map((item) => (

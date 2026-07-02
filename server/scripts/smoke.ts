@@ -1,5 +1,6 @@
 import { createServer } from 'node:net'
 import { createApp } from '../src/app.js'
+import { env } from '../src/env.js'
 
 function findAvailablePort(startPort: number) {
   return new Promise<number>((resolve, reject) => {
@@ -53,12 +54,51 @@ try {
     body: JSON.stringify({ message: 'RAG 项目' }),
   })
   if (!publicChat.ok) throw new Error(`public chat failed: ${publicChat.status}`)
-  const publicPayload = (await publicChat.json()) as { answer?: string; citations?: unknown[] }
+  const publicPayload = (await publicChat.json()) as {
+    answer?: string
+    citations?: unknown[]
+    meta?: { mode?: string; model?: string; citationCount?: number }
+  }
   if (!publicPayload.answer || !Array.isArray(publicPayload.citations)) {
     throw new Error('public chat returned invalid payload')
   }
   if (!hasCitation(publicPayload.citations, 'project:legal-rag')) {
     throw new Error('public chat did not cite Legal RAG for RAG project query')
+  }
+  if (
+    publicPayload.meta?.mode !== 'fallback' ||
+    publicPayload.meta.model !== 'fallback' ||
+    publicPayload.meta.citationCount !== publicPayload.citations.length
+  ) {
+    throw new Error('public chat fallback meta is invalid')
+  }
+
+  const originalOpenaiApiKey = env.openaiApiKey
+  const originalOpenaiBaseUrl = env.openaiBaseUrl
+  try {
+    env.openaiApiKey = 'smoke-test-key'
+    env.openaiBaseUrl = base
+    const providerFailureChat = await fetch(`${base}/chat/public`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'RAG 项目' }),
+    })
+    if (!providerFailureChat.ok) throw new Error(`provider fallback chat failed: ${providerFailureChat.status}`)
+    const providerFailurePayload = (await providerFailureChat.json()) as {
+      answer?: string
+      citations?: unknown[]
+      meta?: { mode?: string; model?: string; citationCount?: number }
+    }
+    if (
+      !providerFailurePayload.answer ||
+      !Array.isArray(providerFailurePayload.citations) ||
+      providerFailurePayload.meta?.mode !== 'fallback'
+    ) {
+      throw new Error('provider failure did not fall back to public knowledge')
+    }
+  } finally {
+    env.openaiApiKey = originalOpenaiApiKey
+    env.openaiBaseUrl = originalOpenaiBaseUrl
   }
 
   const internalChat = await fetch(`${base}/chat/internal`, {

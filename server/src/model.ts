@@ -5,6 +5,12 @@ interface OpenAIResponse {
   choices?: Array<{ message?: { content?: string } }>
 }
 
+export interface GeneratedAnswer {
+  answer: string
+  mode: 'model' | 'fallback'
+  model: string
+}
+
 function buildFallbackAnswer(question: string, citations: KnowledgeItem[], scope: 'public' | 'internal') {
   if (citations.length === 0) {
     return scope === 'public'
@@ -16,8 +22,16 @@ function buildFallbackAnswer(question: string, citations: KnowledgeItem[], scope
   return `${prefix}${citations.map((item) => `${item.title}：${item.summary}`).join(' ')}`
 }
 
-export async function generateAnswer(question: string, citations: KnowledgeItem[], scope: 'public' | 'internal') {
-  if (!hasModelProvider()) return buildFallbackAnswer(question, citations, scope)
+function fallbackResult(question: string, citations: KnowledgeItem[], scope: 'public' | 'internal'): GeneratedAnswer {
+  return {
+    answer: buildFallbackAnswer(question, citations, scope),
+    mode: 'fallback',
+    model: 'fallback',
+  }
+}
+
+export async function generateAnswer(question: string, citations: KnowledgeItem[], scope: 'public' | 'internal'): Promise<GeneratedAnswer> {
+  if (!hasModelProvider()) return fallbackResult(question, citations, scope)
 
   const context = citations.map((item, index) => `${index + 1}. ${item.title}\n${item.summary}\n${item.href}`).join('\n\n')
   const system =
@@ -39,10 +53,17 @@ export async function generateAnswer(question: string, citations: KnowledgeItem[
       ],
       temperature: 0.3,
     }),
-  })
+  }).catch(() => null)
 
-  if (!response.ok) return buildFallbackAnswer(question, citations, scope)
+  if (!response?.ok) return fallbackResult(question, citations, scope)
 
-  const payload = (await response.json()) as OpenAIResponse
-  return payload.choices?.[0]?.message?.content?.trim() || buildFallbackAnswer(question, citations, scope)
+  const payload = (await response.json().catch(() => null)) as OpenAIResponse | null
+  const answer = payload?.choices?.[0]?.message?.content?.trim()
+  if (!answer) return fallbackResult(question, citations, scope)
+
+  return {
+    answer,
+    mode: 'model',
+    model: env.openaiModel,
+  }
 }

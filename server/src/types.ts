@@ -26,6 +26,11 @@ export interface ChatPayload {
 export interface ChatResponse {
   answer: string
   citations: Citation[]
+  meta?: {
+    mode: 'model' | 'fallback'
+    model: string
+    citationCount: number
+  }
   sessionId?: string
   messageId?: string
 }

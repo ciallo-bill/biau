@@ -99,8 +99,16 @@ export function createApp() {
       }
 
       const citations = searchKnowledge(question)
-      const answer = await generateAnswer(question, citations, 'public')
-      const response: ChatResponse = { answer, citations }
+      const generated = await generateAnswer(question, citations, 'public')
+      const response: ChatResponse = {
+        answer: generated.answer,
+        citations,
+        meta: {
+          mode: generated.mode,
+          model: generated.model,
+          citationCount: citations.length,
+        },
+      }
       res.json(response)
     } catch (error) {
       next(error)
@@ -152,13 +160,13 @@ export function createApp() {
       })
 
       const citations = searchKnowledge(question)
-      const answer = await generateAnswer(question, citations, 'internal')
+      const generated = await generateAnswer(question, citations, 'internal')
       const reply = await prisma.chatMessage.create({
         data: {
           memberId: member.id,
           sessionId: activeSession.id,
           role: 'ASSISTANT',
-          content: answer,
+          content: generated.answer,
           citations: citations as unknown as Prisma.InputJsonValue,
         },
       })
@@ -166,11 +174,21 @@ export function createApp() {
         data: {
           memberId: member.id,
           scope: 'internal-chat',
-          model: hasModelProvider() ? env.openaiModel : 'fallback',
+          model: generated.model,
         },
       })
 
-      res.json({ answer, citations, sessionId: activeSession.id, messageId: reply.id } satisfies ChatResponse)
+      res.json({
+        answer: generated.answer,
+        citations,
+        meta: {
+          mode: generated.mode,
+          model: generated.model,
+          citationCount: citations.length,
+        },
+        sessionId: activeSession.id,
+        messageId: reply.id,
+      } satisfies ChatResponse)
     } catch (error) {
       next(error)
     }

@@ -51,7 +51,8 @@
     "07-02-erp-login-visual-registration-locked-ui",
     "07-02-erp-login-experience-main-site-sync",
     "07-02-pet-app-showcase-main-site-entry",
-    "07-02-erp-production-registration-enable"
+    "07-02-erp-production-registration-enable",
+    "07-02-public-assistant-model-productization"
   ],
   "parent": null,
   "relatedFiles": [],
