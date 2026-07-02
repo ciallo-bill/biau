@@ -115,14 +115,19 @@ export const projects: Project[] = [
         {
           title: '公开演示只使用安全材料',
           body:
-            '公开演示围绕已脱敏或公开安全的数据集展开，展示登录后的知识库初始化、RAG 问答、合同审查和质量报告，不暴露演示密码、模型密钥、数据库连接串或部署后台信息。',
+            '公开演示围绕已脱敏或公开安全的数据集展开，展示登录后的知识库初始化、RAG 问答、合同审查和质量报告。真实后台/admin 密码、模型密钥、数据库连接串和部署后台信息不会进入公开页面；如果开放访客登录，只能发布专门创建的低权限 demo 凭据。',
+        },
+        {
+          title: 'Demo 访问边界',
+          body:
+            '线上工作台有登录门禁，这是为了保护模型网关、上传接口和 pgvector 数据库资源。当前公开页面先提供项目说明、工作台入口和 API health 入口；低权限 demo 账号/密码需要单独确认后再公开，不用真实后台密码代替。',
         },
       ],
       workflow: [
         {
           title: '公开演示路径',
           items: [
-            '先打开带登录门禁的线上工作台，说明登录保护用于隔离模型 key、上传接口和数据库资源，公开材料不展示账号密码。',
+            '先打开带登录门禁的线上工作台，说明登录保护用于隔离模型 key、上传接口和数据库资源；如果公开 demo 凭据已确认，再使用专用 demo 账号登录。',
             '进入知识库页初始化公开安全数据集，观察导入任务、文档判重、chunk 和 pgvector 持久化链路。',
             '切到智能问答，提问技术服务合同验收风险，重点看 answer、citations、diagnostics 和 answer source，而不是只看生成文本是否流畅。',
             '切到合同审查，使用示例合同查看风险条款、风险等级、修改建议、引用和导出边界。',
@@ -169,6 +174,14 @@ export const projects: Project[] = [
             '仓库中保留 RAG 问答和合同审查的 eval fixtures，API 也提供 quality 与 evaluation 报告路由。页面中的质量面板用于展示检索命中、引用、结构化审查等维度，让调整 chunk、召回、rerank 或提示词时有可对比的基线。',
         },
         {
+          title: '演示健康检查',
+          items: [
+            'Web e2e smoke 会检查 API health，并在启用认证时通过环境变量读取 demo email/password 登录，不把密码写进仓库。',
+            'Smoke 会初始化或复用公开安全数据集，再执行一次 RAG 问答，断言 answer、citations、retrieved chunks 和 diagnostics 可用。',
+            '失败信息会指向 health、auth、dataset seed、ingestion job、RAG query 或 Web 渲染中的具体环节，方便演示前排查。',
+          ],
+        },
+        {
           title: '质量面板看什么',
           items: [
             '运行时状态展示模型提供商、向量库、embedding 模型、文档数和 chunk 数，帮助判断当前是本地 mock/memory 还是线上 pgvector 模式。',
@@ -212,6 +225,7 @@ export const projects: Project[] = [
       '系统支持公开安全数据集和文档导入，RAG pipeline 包含清洗、项目级 SHA-256 去重、章节感知 chunk、embedding、memory/pgvector 存储、query rewrite、向量+关键词混合召回、merge/filter/rerank、grounded answer 或 refusal、citations 与 diagnostics。',
       '合同审查采用规则优先策略，规则召回付款、交付、违约责任、知识产权、争议解决和终止等风险；模型只辅助改写已召回风险的解释和建议，并在 schema 校验失败时回退到规则结果。',
       '项目包含 RAG 与合同审查 eval fixtures、quality/evaluation 报告路由和质量面板，适合说明 AI 应用如何做引用溯源、可解释风险审查和质量评测。',
+      '线上工作台有登录门禁，公开页面不会放真实后台/admin 密码；如果开放访客登录，应使用专门低权限 demo 凭据，并通过 smoke 检查 health、登录、公开数据集初始化和 RAG 问答。',
       '推荐公开演示顺序是：登录受保护工作台、初始化公开安全数据集、执行带 citation/diagnostics 的 RAG 问答、运行示例合同审查、查看质量面板的 runtime、citation/refusal 评测、审查召回、readiness checks、趋势和审计日志。',
       '后续优化方向包括更完整的用户/邀请权限、更多脱敏数据集、评测趋势、OCR、rerank 模型、CI 与镜像发布。',
     ],
