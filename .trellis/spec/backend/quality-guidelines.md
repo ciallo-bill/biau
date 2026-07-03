@@ -56,6 +56,7 @@ Do not read `.env`, `.env.local`, `.env.*.local`, private key files, or SSH file
 - The frontend only uses `VITE_CHAT_API_BASE_URL`; never expose model base URLs or API keys through Vite variables.
 - Public-scope model calls must be grounded in public citations from `server/data/public-knowledge.json`.
 - If public search returns zero citations, return fallback with `reason: 'no_public_context'` and do not call the provider.
+- Cloudflare Pages can serve same-domain public assistant endpoints through `functions/api/health.ts` and `functions/api/chat/public.ts`. Keep these endpoints compatible with the same `ChatResponse` shape as the Express `/health` and `/chat/public` routes.
 
 ### 4. Validation & Error Matrix
 
@@ -74,6 +75,7 @@ Do not read `.env`, `.env.local`, `.env.*.local`, private key files, or SSH file
 ### 6. Tests Required
 
 - `server:smoke` must cover configured OpenAI-compatible success, unconfigured fallback, provider failure fallback, `/health`, and protected internal auth behavior.
+- `cf-assistant:smoke` must cover the Cloudflare Pages Function fallback, configured OpenAI-compatible success, and provider failure fallback.
 - `check:ui` should assert the public assistant opens in a concise default state before citations appear.
 - Run `assistant:index`, `server:build`, `server:smoke`, `lint`, `build`, `prisma:validate`, `git diff --check`, and a sensitive-value scan after model-provider work.
 

@@ -28,7 +28,8 @@ interface AssistantAnswerMeta {
 type AssistantFallbackReason = 'not_configured' | 'provider_error' | 'empty_response' | 'no_public_context' | 'request_error'
 type AssistantServiceState = 'api-ready' | 'local' | 'model' | 'fallback' | 'error'
 
-const API_BASE = import.meta.env.VITE_CHAT_API_BASE_URL?.trim().replace(/\/+$/, '')
+const CONFIGURED_API_BASE = import.meta.env.VITE_CHAT_API_BASE_URL?.trim().replace(/\/+$/, '')
+const SAME_ORIGIN_API_BASE = '/api'
 const MAX_MESSAGE_LENGTH = 500
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -60,8 +61,8 @@ function buildLocalKnowledgeAnswer(citations: AssistantKnowledgeItem[]) {
   return `我先按站内公开知识给你一个短结论：\n${lines.join('\n')}\n可以点下面来源继续看。`
 }
 
-async function requestPublicAnswer(question: string): Promise<PublicAnswerResult> {
-  if (!API_BASE) {
+async function requestPublicAnswer(question: string, apiBase: string | null): Promise<PublicAnswerResult> {
+  if (!apiBase) {
     const citations = searchPublicKnowledge(question)
     return {
       content: buildLocalKnowledgeAnswer(citations),
@@ -76,7 +77,7 @@ async function requestPublicAnswer(question: string): Promise<PublicAnswerResult
     }
   }
 
-  const response = await fetch(`${API_BASE}/chat/public`, {
+  const response = await fetch(`${apiBase}/chat/public`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message: question }),
@@ -139,7 +140,8 @@ export function PublicAssistantWidget() {
   const [isLoading, setIsLoading] = useState(false)
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<WidgetMessage[]>([])
-  const [serviceState, setServiceState] = useState<AssistantServiceState>(API_BASE ? 'api-ready' : 'local')
+  const [apiBase, setApiBase] = useState<string | null>(CONFIGURED_API_BASE || null)
+  const [serviceState, setServiceState] = useState<AssistantServiceState>(CONFIGURED_API_BASE ? 'api-ready' : 'local')
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const messageSeq = useRef(0)
   const serviceStatus = getServiceStatus(serviceState)
@@ -155,18 +157,25 @@ export function PublicAssistantWidget() {
   }, [messages, isOpen])
 
   useEffect(() => {
-    if (!isOpen || !API_BASE) return
+    if (!isOpen) return
     let cancelled = false
+    const candidateApiBase = CONFIGURED_API_BASE || SAME_ORIGIN_API_BASE
 
     async function refreshServiceHealth() {
       try {
-        const response = await fetch(`${API_BASE}/health`)
+        const response = await fetch(`${candidateApiBase}/health`)
         if (!response.ok) throw new Error('assistant-health-failed')
         const payload = (await response.json()) as unknown
         const model = isRecord(payload) && typeof payload.model === 'string' ? payload.model.trim() : ''
-        if (!cancelled) setServiceState(model && model !== 'fallback' ? 'model' : 'fallback')
+        if (!cancelled) {
+          setApiBase(candidateApiBase)
+          setServiceState(model && model !== 'fallback' ? 'model' : 'fallback')
+        }
       } catch {
-        if (!cancelled) setServiceState('error')
+        if (!cancelled) {
+          setApiBase(CONFIGURED_API_BASE || null)
+          setServiceState(CONFIGURED_API_BASE ? 'error' : 'local')
+        }
       }
     }
 
@@ -205,8 +214,8 @@ export function PublicAssistantWidget() {
     setIsLoading(true)
 
     try {
-      const result = await requestPublicAnswer(trimmed)
-      setServiceState(result.meta.mode === 'model' ? 'model' : API_BASE ? 'fallback' : 'local')
+      const result = await requestPublicAnswer(trimmed, apiBase)
+      setServiceState(result.meta.mode === 'model' ? 'model' : apiBase ? 'fallback' : 'local')
       setMessages((current) => [
         ...current,
         {

@@ -41,17 +41,28 @@ Root directory: 留空
 NODE_VERSION=22
 ```
 
-前端如果要连接内部助手 API，需要在 Cloudflare Pages 环境变量中增加：
+前端如果要让公开助手优先走同域 Cloudflare Pages Functions，建议在 Cloudflare Pages 环境变量中增加：
 
 ```text
-VITE_CHAT_API_BASE_URL=https://<render-assistant-api>.onrender.com
+VITE_CHAT_API_BASE_URL=/api
 ```
 
-未配置该变量时，公开助手和内部助手页面会使用本地公开知识回退，不会调用远程 API。
+公开助手前端也会在打开时自动探测同域 `/api/health`；如果 Functions 未部署或未配置模型，会使用本地公开知识回退。内部助手页面如需使用邀请码、数据库和管理能力，仍建议额外部署下面的独立助手 API，并把 `VITE_CHAT_API_BASE_URL` 指向该 API。
+
+Cloudflare Pages Functions 需要在 Pages 的运行时环境变量中配置模型通道：
+
+```text
+ASSISTANT_MODEL_BASE_URL=<OpenAI-compatible relay base URL, for example https://.../v1>
+ASSISTANT_MODEL_API_KEY=<OpenAI 兼容中转 Key>
+ASSISTANT_MODEL_NAME=glm-5.2
+ASSISTANT_MODEL_PROVIDER=glm-compatible
+```
+
+这些变量只在 Pages Functions 服务端读取，不会进入浏览器 bundle。未配置 `ASSISTANT_MODEL_API_KEY` 时，`/api/chat/public` 会回退到公开知识摘要。
 
 ## 内部助手 API 部署
 
-助手后端位于当前仓库的 `server/`，和静态前端独立部署。推荐第一版部署到 Render Web Service，数据库使用 Aiven PostgreSQL。
+助手后端位于当前仓库的 `server/`，和静态前端独立部署。它仍是内部助手、邀请码、数据库、管理页和完整 Express API 的推荐路线；如果只需要公开助手接入 GLM，同域 Cloudflare Pages Functions 可以先覆盖 `/api/health` 与 `/api/chat/public`。
 
 Render 配置建议：
 

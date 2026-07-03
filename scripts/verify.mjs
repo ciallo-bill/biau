@@ -106,6 +106,7 @@ await run(['run', 'prisma:validate'])
 await run(['run', 'lint'])
 await run(['run', 'server:build'])
 await run(['run', 'server:smoke'])
+await run(['run', 'cf-assistant:smoke'])
 await run(['run', 'build'])
 await run(['run', 'blog:check'])
 
