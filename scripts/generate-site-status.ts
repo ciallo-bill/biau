@@ -1,9 +1,16 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { SITE_STATUS_BASE_URL, siteStatusTargets, type SiteStatusTarget } from '../src/data/statusTargets.ts'
+import {
+  SITE_STATUS_BASE_URL,
+  reliabilityProjects,
+  siteStatusTargets,
+  type ReliabilityProject,
+  type ReliabilityStatus,
+  type SiteStatusTarget,
+} from '../src/data/statusTargets.ts'
 
-type GeneratedStatus = 'online' | 'degraded' | 'offline' | 'unchecked'
+type GeneratedStatus = Extract<ReliabilityStatus, 'online' | 'degraded' | 'offline' | 'unchecked'>
 
 interface CheckResult extends SiteStatusTarget {
   status: GeneratedStatus
@@ -116,6 +123,26 @@ function summarize(results: CheckResult[]): Summary {
   )
 }
 
+function mergeReliabilityProjects(targets: CheckResult[]): ReliabilityProject[] {
+  const targetStatus = new Map(targets.map((target) => [target.id, target]))
+  return reliabilityProjects.map((project) => ({
+    ...project,
+    checks: project.checks.map((check) => {
+      if (!check.relatedTargetId) return check
+      const target = targetStatus.get(check.relatedTargetId)
+      if (!target) return check
+      const issue = target.issues[0]
+      return {
+        ...check,
+        status: target.status,
+        evidence: issue
+          ? `最近一次入口检测：${issue}。${check.evidence}`
+          : `最近一次入口检测通过：${target.httpStatus > 0 ? `HTTP ${target.httpStatus}` : 'host responded'}，耗时 ${target.durationMs} ms。${check.evidence}`,
+      }
+    }),
+  }))
+}
+
 async function checkTarget(target: SiteStatusTarget, timeoutMs: number): Promise<CheckResult> {
   const checkedAt = new Date().toISOString()
   const response = await fetchWithTimeout(target.url, timeoutMs)
@@ -149,6 +176,7 @@ async function main() {
     ok: summary.offline === 0,
     summary,
     targets,
+    reliabilityProjects: mergeReliabilityProjects(targets),
   }
 
   await mkdir(dirname(outputPath), { recursive: true })
@@ -164,4 +192,3 @@ main().catch((error) => {
   console.error(error instanceof Error ? error.message : String(error))
   process.exitCode = 1
 })
-

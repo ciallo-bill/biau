@@ -936,13 +936,14 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 
 .status-metrics {
   display: grid;
-  grid-template-columns: 1fr 1.2fr 0.7fr;
+  grid-template-columns: 1fr 1.2fr 0.7fr 0.7fr;
   gap: var(--space-12, 12px);
   margin: 0;
 }
 
 .status-metrics div,
-.status-target__facts div {
+.status-target__facts div,
+.status-check__facts div {
   min-width: 0;
   padding: var(--space-12, 12px);
   display: grid;
@@ -954,7 +955,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 }
 
 .status-metrics dt,
-.status-target__facts dt {
+.status-target__facts dt,
+.status-check__facts dt {
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -964,7 +966,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 }
 
 .status-metrics dd,
-.status-target__facts dd {
+.status-target__facts dd,
+.status-check__facts dd {
   min-width: 0;
   margin: 0;
   overflow-wrap: anywhere;
@@ -982,7 +985,7 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 
 .status-summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--space-16);
 }
 
@@ -1123,6 +1126,16 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   background: color-mix(in oklch, var(--blue) 12%, transparent);
 }
 
+.status-badge.is-planned,
+.status-summary-card.is-planned {
+  color: color-mix(in oklch, var(--ink) 72%, var(--muted));
+  border-color: color-mix(in oklch, var(--muted) 26%, transparent);
+}
+
+.status-badge.is-planned {
+  background: color-mix(in oklch, var(--muted) 11%, transparent);
+}
+
 .status-target__facts {
   display: grid;
   grid-template-columns: 0.7fr 0.7fr 1.2fr;
@@ -1160,6 +1173,186 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   flex: 0 0 auto;
   width: 15px;
   height: 15px;
+}
+
+.status-layer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-16);
+}
+
+.status-layer-card {
+  min-width: 0;
+  min-height: 148px;
+  padding: var(--space-20);
+  display: grid;
+  gap: var(--space-8);
+  align-content: start;
+  background: color-mix(in oklch, var(--panel) 54%, transparent);
+  border-color: var(--flow-ui-card-border);
+}
+
+.status-layer-card span {
+  width: max-content;
+  padding: 4px var(--space-8);
+  color: color-mix(in oklch, var(--amber) 86%, var(--ink));
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  border: 1px solid color-mix(in oklch, var(--amber) 25%, transparent);
+  border-radius: var(--radius-pill);
+}
+
+.status-layer-card h2,
+.status-project__header h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-serif-display);
+  font-weight: var(--weight-title);
+  line-height: 1.12;
+}
+
+.status-layer-card h2 {
+  font-size: 1.35rem;
+}
+
+.status-layer-card p,
+.status-project__summary,
+.status-check p,
+.status-project__footer p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.status-reliability {
+  display: grid;
+  gap: var(--space-16);
+}
+
+.status-project {
+  min-width: 0;
+  padding: var(--space-24);
+  display: grid;
+  gap: var(--space-18, 18px);
+  background: color-mix(in oklch, var(--panel) 58%, transparent);
+  border-color: var(--flow-ui-card-border);
+}
+
+.status-project__header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-16);
+  align-items: flex-start;
+}
+
+.status-project__header h2 {
+  margin-top: var(--space-4);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.status-project__header > span {
+  min-height: 30px;
+  padding: 0 var(--space-10);
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+  border: 1px solid var(--flow-ui-card-border);
+  border-radius: var(--radius-pill);
+}
+
+.status-check-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-12);
+}
+
+.status-check {
+  min-width: 0;
+  padding: var(--space-16);
+  display: grid;
+  gap: var(--space-12);
+  background: color-mix(in oklch, var(--panel-strong) 36%, transparent);
+  border: 1px solid var(--flow-ui-card-border);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 1px 0 var(--flow-ui-inset);
+}
+
+.status-check.is-online {
+  border-color: color-mix(in oklch, var(--green) 24%, var(--flow-ui-card-border));
+}
+
+.status-check.is-degraded {
+  border-color: color-mix(in oklch, var(--amber) 28%, var(--flow-ui-card-border));
+}
+
+.status-check.is-offline {
+  border-color: color-mix(in oklch, var(--rose) 30%, var(--flow-ui-card-border));
+}
+
+.status-check__head {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+.status-check__head h3 {
+  flex: 1 1 180px;
+  min-width: 0;
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.status-layer-chip {
+  min-height: 28px;
+  padding: 0 var(--space-8);
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  border: 1px solid var(--flow-ui-card-border);
+  border-radius: var(--radius-pill);
+}
+
+.status-check__facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-8);
+  margin: 0;
+}
+
+.status-project__footer {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-12);
+}
+
+.status-project__footer > div {
+  min-width: 0;
+  padding: var(--space-16);
+  display: grid;
+  gap: var(--space-8);
+  align-content: start;
+  background: color-mix(in oklch, var(--panel-strong) 30%, transparent);
+  border: 1px solid var(--flow-ui-card-border);
+  border-radius: var(--radius-md);
+}
+
+.status-project__footer h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.95rem;
 }
 
 .project-group {
@@ -3085,7 +3278,9 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   .assistant-shell,
   .assistant-admin-grid,
   .status-overview,
-  .status-targets {
+  .status-targets,
+  .status-check-list,
+  .status-project__footer {
     grid-template-columns: 1fr;
   }
 
@@ -3121,6 +3316,10 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   }
 
   .status-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .status-layer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -3211,7 +3410,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   }
 
   .status-overview,
-  .status-target {
+  .status-target,
+  .status-project {
     padding: var(--space-16);
     border-radius: var(--radius-lg);
   }
@@ -3227,8 +3427,14 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 
   .status-metrics,
   .status-target__facts,
+  .status-check__facts,
+  .status-layer-grid,
   .status-summary-grid {
     grid-template-columns: 1fr;
+  }
+
+  .status-project__header {
+    display: grid;
   }
 
   .status-target__actions {

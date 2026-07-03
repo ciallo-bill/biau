@@ -7,7 +7,7 @@ const routes = [
   { path: '/', title: 'BIAU PORT', nav: '所有项目', canonical: '/' },
   { path: '/projects', title: '项目集', nav: '回主页', canonical: '/projects' },
   { path: '/blog', title: '知识库', nav: '回主页', canonical: '/blog' },
-  { path: '/status', title: '站点入口状态', nav: '回主页', canonical: '/status' },
+  { path: '/status', title: '项目可靠性观察', nav: '回主页', canonical: '/status' },
   { path: '/assistant', title: '内部助手', nav: '回主页', canonical: '/assistant' },
   { path: '/assistant/admin', title: '内部助手管理页', nav: '回主页', canonical: '/assistant/admin' },
   { path: '/projects/legal-rag', title: 'Legal RAG', nav: '回主页', canonical: '/projects/legal-rag' },
@@ -85,6 +85,8 @@ for (const viewport of viewports) {
 const statusPage = await browser.newPage({ viewport: viewports[0] })
 await statusPage.goto(`${base}/status`, { waitUntil: 'networkidle' })
 const statusCards = await statusPage.locator('.status-target').count()
+const reliabilityProjects = await statusPage.locator('.status-project').count()
+const reliabilityChecks = await statusPage.locator('.status-check').count()
 const statusOnlineText = await statusPage.locator('.status-summary-card.is-online strong').innerText().catch(() => '')
 const legalStatusLink = statusPage.getByRole('link', { name: '打开入口' }).first()
 const legalStatusHref = await legalStatusLink.getAttribute('href').catch(() => null)
@@ -92,6 +94,12 @@ const legalStatusTarget = await legalStatusLink.getAttribute('target').catch(() 
 const legalStatusRel = await legalStatusLink.getAttribute('rel').catch(() => null)
 if (statusCards !== 4) {
   failures.push(`/status targets: expected 4 homepage external targets, got ${statusCards}`)
+}
+if (reliabilityProjects < 6) {
+  failures.push(`/status reliability: expected at least 6 project reliability groups, got ${reliabilityProjects}`)
+}
+if (reliabilityChecks < 20) {
+  failures.push(`/status reliability: expected at least 20 reliability checks, got ${reliabilityChecks}`)
 }
 if (!/^\d+$/.test(statusOnlineText.trim())) {
   failures.push(`/status summary: expected online count to be numeric, got "${statusOnlineText}"`)

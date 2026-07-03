@@ -1,12 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { IconExternalOpen, IconLink } from '@douyinfe/semi-icons'
-import { SITE_STATUS_BASE_URL, siteStatusTargets, type SiteStatusTarget } from '../data/statusTargets'
+import {
+  SITE_STATUS_BASE_URL,
+  reliabilityProjects,
+  siteStatusTargets,
+  type ReliabilityLayer,
+  type ReliabilityProject,
+  type SiteStatusTarget,
+} from '../data/statusTargets'
 
-type SiteStatusValue = 'online' | 'degraded' | 'offline' | 'unchecked'
+type SiteStatusValue = 'online' | 'degraded' | 'offline' | 'unchecked' | 'planned'
+type EntryStatusValue = Exclude<SiteStatusValue, 'planned'>
 
 interface SiteStatusCheck extends SiteStatusTarget {
-  status: SiteStatusValue
+  status: EntryStatusValue
   httpStatus: number
   durationMs: number
   checkedAt: string
@@ -28,6 +36,7 @@ interface SiteStatusPayload {
   ok: boolean
   summary: SiteStatusSummary
   targets: SiteStatusCheck[]
+  reliabilityProjects?: ReliabilityProject[]
 }
 
 const statusMeta: Record<SiteStatusValue, { label: string; tone: string; hint: string }> = {
@@ -35,12 +44,44 @@ const statusMeta: Record<SiteStatusValue, { label: string; tone: string; hint: s
   degraded: { label: '受限', tone: 'degraded', hint: '入口响应但可能需要登录、重试或人工说明' },
   offline: { label: '异常', tone: 'offline', hint: '最近一次检测未能确认入口可达' },
   unchecked: { label: '未检测', tone: 'unchecked', hint: '尚未生成公开检测数据' },
+  planned: { label: '待接入', tone: 'planned', hint: '已记录检查项，等待后续接入真实探针' },
 }
 
 const expectationLabels: Record<SiteStatusTarget['expectation'], string> = {
   'public-entry': '公开入口',
   'login-gated': '登录门禁',
   'static-site': '静态展示',
+}
+
+const layerLabels: Record<ReliabilityLayer, { title: string; code: string; description: string }> = {
+  entry: {
+    title: '入口可达',
+    code: 'L0',
+    description: '页面、工作台或展示站是否能响应。',
+  },
+  synthetic: {
+    title: '功能小任务',
+    code: 'L1',
+    description: '用真实小流程证明问答、合同审查、登录或试玩能跑通。',
+  },
+  metrics: {
+    title: '项目指标',
+    code: 'L2',
+    description: '服务暴露低敏指标，再交给 Prometheus 或托管平台采集。',
+  },
+  observability: {
+    title: '看板告警',
+    code: 'L3',
+    description: 'Grafana、ARMS、Sentry、LLM tracing 或访问分析。',
+  },
+}
+
+const projectCategoryLabels: Record<ReliabilityProject['category'], string> = {
+  'main-site': '主站',
+  'ai-workbench': 'AI 工作台',
+  'business-system': '业务系统',
+  'mobile-app': '移动应用',
+  interactive: '互动体验',
 }
 
 function createUncheckedTarget(target: SiteStatusTarget): SiteStatusCheck {
@@ -71,6 +112,7 @@ function mergePayload(payload: SiteStatusPayload | null): SiteStatusPayload {
   const generatedTargets = new Map(payloadTargets.map((target) => [target.id, target]))
   const targets = siteStatusTargets.map((target) => generatedTargets.get(target.id) ?? createUncheckedTarget(target))
   const summary = payload?.summary && payloadTargets.length === targets.length ? payload.summary : buildSummary(targets)
+  const projects = Array.isArray(payload?.reliabilityProjects) ? payload.reliabilityProjects : reliabilityProjects
 
   return {
     checkedAt: payload?.checkedAt ?? '',
@@ -78,6 +120,7 @@ function mergePayload(payload: SiteStatusPayload | null): SiteStatusPayload {
     ok: payload?.ok ?? false,
     summary,
     targets,
+    reliabilityProjects: projects,
   }
 }
 
@@ -129,13 +172,24 @@ export function SiteStatusPage() {
 
   const status = useMemo(() => mergePayload(payload), [payload])
   const allClear = status.summary.offline === 0 && status.summary.unchecked === 0
+  const reliabilitySummary = useMemo(() => {
+    const checks = status.reliabilityProjects?.flatMap((project) => project.checks) ?? []
+    return checks.reduce(
+      (summary, check) => {
+        summary.total += 1
+        summary[check.status] += 1
+        return summary
+      },
+      { total: 0, online: 0, degraded: 0, offline: 0, unchecked: 0, planned: 0 } as Record<SiteStatusValue | 'total', number>,
+    )
+  }, [status.reliabilityProjects])
 
   return (
     <main className="site-status-page page-stack">
       <section className="section-header page-hero status-hero">
         <p className="section-subtitle">SITE STATUS</p>
-        <h1 className="section-title">站点入口状态</h1>
-        <p className="section-description">最近一次公开项目入口检测，帮助访客判断哪些页面可以直接打开。</p>
+        <h1 className="section-title">项目可靠性观察</h1>
+        <p className="section-description">最近一次公开入口检测，以及每个重点项目的关键能力、指标接入和人工 gate。</p>
       </section>
 
       <section className="status-overview glass-card">
@@ -161,18 +215,35 @@ export function SiteStatusPage() {
               {status.summary.online}/{status.summary.total}
             </dd>
           </div>
+          <div>
+            <dt>可靠性项</dt>
+            <dd>{reliabilitySummary.total}</dd>
+          </div>
         </dl>
         {loadError && <p className="status-load-error">状态数据暂未读取成功：{loadError}</p>}
       </section>
 
       <section className="status-summary-grid" aria-label="状态统计">
-        {(['online', 'degraded', 'offline', 'unchecked'] as const).map((key) => (
+        {(['online', 'degraded', 'offline', 'unchecked', 'planned'] as const).map((key) => (
           <div key={key} className={`status-summary-card glass-card is-${statusMeta[key].tone}`}>
             <span>{statusMeta[key].label}</span>
-            <strong>{status.summary[key]}</strong>
+            <strong>{key === 'planned' ? reliabilitySummary.planned : status.summary[key]}</strong>
             <p>{statusMeta[key].hint}</p>
           </div>
         ))}
+      </section>
+
+      <section className="status-layer-grid" aria-label="可靠性分层">
+        {(Object.keys(layerLabels) as ReliabilityLayer[]).map((layer) => {
+          const meta = layerLabels[layer]
+          return (
+            <article key={layer} className="status-layer-card glass-card">
+              <span>{meta.code}</span>
+              <h2>{meta.title}</h2>
+              <p>{meta.description}</p>
+            </article>
+          )
+        })}
       </section>
 
       <section className="status-targets" aria-label="主页外链检测结果">
@@ -220,6 +291,68 @@ export function SiteStatusPage() {
             </article>
           )
         })}
+      </section>
+
+      <section className="status-reliability" aria-label="项目可靠性检查基线">
+        {status.reliabilityProjects?.map((project) => (
+          <article key={project.id} className="status-project glass-card">
+            <div className="status-project__header">
+              <div>
+                <p className="section-subtitle">{projectCategoryLabels[project.category]}</p>
+                <h2>{project.title}</h2>
+              </div>
+              <span>{project.checks.length} checks</span>
+            </div>
+            <p className="status-project__summary">{project.summary}</p>
+
+            <div className="status-check-list">
+              {project.checks.map((check) => {
+                const meta = statusMeta[check.status]
+                const layer = layerLabels[check.layer]
+                return (
+                  <section key={check.id} className={`status-check is-${meta.tone}`}>
+                    <div className="status-check__head">
+                      <span className={`status-badge is-${meta.tone}`}>{meta.label}</span>
+                      <span className="status-layer-chip">{layer.code}</span>
+                      <h3>{check.label}</h3>
+                    </div>
+                    <p>{check.description}</p>
+                    <dl className="status-check__facts">
+                      <div>
+                        <dt>层级</dt>
+                        <dd>{layer.title}</dd>
+                      </div>
+                      <div>
+                        <dt>频率</dt>
+                        <dd>{check.cadence}</dd>
+                      </div>
+                      <div>
+                        <dt>接入点</dt>
+                        <dd>{check.ownerHint}</dd>
+                      </div>
+                    </dl>
+                    <p className="status-target__note is-soft">{check.evidence}</p>
+                  </section>
+                )
+              })}
+            </div>
+
+            <div className="status-project__footer">
+              <div>
+                <h3>人工 gate</h3>
+                {project.gates.map((gate) => (
+                  <p key={gate}>{gate}</p>
+                ))}
+              </div>
+              <div>
+                <h3>后续接入</h3>
+                {project.nextActions.map((action) => (
+                  <p key={action}>{action}</p>
+                ))}
+              </div>
+            </div>
+          </article>
+        ))}
       </section>
     </main>
   )
