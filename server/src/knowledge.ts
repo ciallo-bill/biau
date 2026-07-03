@@ -14,6 +14,11 @@ const SEARCH_KEYWORDS = [
   'ai',
   'rag',
   '知识库',
+  '可靠性',
+  '状态',
+  '状态页',
+  '健康检查',
+  '外链',
   '合同审查',
   '合同',
   '法律',
@@ -53,6 +58,10 @@ const SEARCH_ALIASES = [
   {
     triggers: ['rag', '知识库', '合同审查', '合同', '法律'],
     terms: ['legal rag', '引用溯源', '合同审查', '风险审查'],
+  },
+  {
+    triggers: ['状态', '状态页', '可靠性', '健康检查', '外链'],
+    terms: ['项目可靠性观察', '状态页', 'health', 'synthetic', '公开入口'],
   },
   {
     triggers: ['游戏', '互动体验', '试玩', 'godot', 'playlab'],
@@ -120,6 +129,8 @@ function scoreKnowledgeItem(item: KnowledgeItem, normalized: string, terms: stri
   const asksForArticle = normalized.includes('文章') || normalized.includes('博客')
   const asksForSiteOverview =
     normalized.includes('站点') || normalized.includes('主要展示') || normalized.includes('能做什么')
+  const asksForStatus =
+    normalized.includes('状态') || normalized.includes('可靠性') || normalized.includes('健康检查') || normalized.includes('外链')
 
   let score = 0
   if (title.includes(normalized)) score += 8
@@ -136,6 +147,7 @@ function scoreKnowledgeItem(item: KnowledgeItem, normalized: string, terms: stri
   if (score > 0 && asksForProject && id.startsWith('project:')) score += 8
   if (score > 0 && asksForArticle && id.startsWith('blog:')) score += 4
   if (score > 0 && asksForSiteOverview && id === 'site:intro') score += 12
+  if (score > 0 && asksForStatus && item.href === '/status') score += 12
 
   return score
 }

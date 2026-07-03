@@ -75,7 +75,7 @@ METRICS_ENABLED=false
 PORT=10000
 ```
 
-公开助手的模型接入点在服务端，不在前端。前端只配置 `VITE_CHAT_API_BASE_URL` 指向助手 API；真实模型 Key、Base URL 和模型名只放在 Render/Aiven/本地 `.env.local` 等私有环境里。公开助手推荐使用 GLM-5.2 这类中文表达更稳的 OpenAI-compatible 模型；旧的 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 仍兼容，但新部署建议统一使用 `ASSISTANT_MODEL_*`。
+公开助手的模型接入点在服务端，不在前端。前端只配置 `VITE_CHAT_API_BASE_URL` 指向助手 API；真实模型 Key、Base URL 和模型名只放在 Render/Aiven/本地 `.env.local` 等私有环境里。公开助手推荐使用 GLM-5.2 这类中文表达更稳的 OpenAI-compatible 模型；`ASSISTANT_MODEL_BASE_URL` 推荐填写 `/v1` base URL，也可以填写完整 `/chat/completions` endpoint。旧的 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 仍兼容，但新部署建议统一使用 `ASSISTANT_MODEL_*`。
 
 本地后端开发：
 

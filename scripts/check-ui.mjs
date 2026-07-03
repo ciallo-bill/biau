@@ -279,6 +279,13 @@ await publicAssistantPage.locator('.public-assistant__trigger').click()
 if (!(await publicAssistantPage.locator('.public-assistant__panel').isVisible())) {
   failures.push('/blog public assistant: expected panel to open')
 }
+if ((await publicAssistantPage.locator('.public-assistant__message').count()) !== 0) {
+  failures.push('/blog public assistant: expected initial panel to open without default chat bubbles')
+}
+const publicAssistantStatus = await publicAssistantPage.locator('.public-assistant__status').innerText().catch(() => '')
+if (!publicAssistantStatus.includes('未连接模型')) {
+  failures.push(`/blog public assistant: expected local mode to say model is not connected, got "${publicAssistantStatus}"`)
+}
 if ((await publicAssistantPage.locator('.public-assistant__citation').count()) !== 0) {
   failures.push('/blog public assistant: expected initial panel to stay concise without citation cards')
 }

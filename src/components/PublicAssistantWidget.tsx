@@ -28,14 +28,8 @@ interface AssistantAnswerMeta {
 type AssistantFallbackReason = 'not_configured' | 'provider_error' | 'empty_response' | 'no_public_context' | 'request_error'
 type AssistantServiceState = 'api-ready' | 'local' | 'model' | 'fallback' | 'error'
 
-const API_BASE = import.meta.env.VITE_CHAT_API_BASE_URL?.trim()
+const API_BASE = import.meta.env.VITE_CHAT_API_BASE_URL?.trim().replace(/\/+$/, '')
 const MAX_MESSAGE_LENGTH = 500
-
-const introMessage: WidgetMessage = {
-  id: 'intro',
-  role: 'assistant',
-  content: '问我项目、文章或技术方向就行。我只看本站公开内容，回答后会附上可继续查看的引用。',
-}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -51,31 +45,26 @@ function isAssistantFallbackReason(value: unknown): value is AssistantFallbackRe
   return value === 'not_configured' || value === 'provider_error' || value === 'empty_response' || value === 'no_public_context'
 }
 
+function compactSummary(summary: string, maxLength = 104) {
+  const normalized = summary.replace(/\s+/g, ' ').trim()
+  if (normalized.length <= maxLength) return normalized
+  return `${normalized.slice(0, maxLength - 1)}…`
+}
+
+function buildLocalKnowledgeAnswer(citations: AssistantKnowledgeItem[]) {
+  if (citations.length === 0) {
+    return '公开资料里暂时没有足够证据。我不会补造结论；可以换成项目名、技术词，或先看项目页与状态页。'
+  }
+
+  const lines = citations.slice(0, 3).map((item) => `- ${item.title}：${compactSummary(item.summary)}`)
+  return `我先按站内公开知识给你一个短结论：\n${lines.join('\n')}\n可以点下面来源继续看。`
+}
+
 async function requestPublicAnswer(question: string): Promise<PublicAnswerResult> {
   if (!API_BASE) {
     const citations = searchPublicKnowledge(question)
-    if (citations.length === 0) {
-      return {
-        content:
-          '我目前只回答本站公开内容。这个问题暂时没有命中相关资料；可以换一个项目名、技术词，或先浏览项目页和知识库。',
-        citations: [] as AssistantKnowledgeItem[],
-        meta: {
-          mode: 'fallback' as const,
-          model: 'local-public-knowledge',
-          provider: 'browser-local',
-          reason: 'not_configured',
-          citationCount: 0,
-        },
-      }
-    }
-
-    const summary = citations
-      .slice(0, 3)
-      .map((item) => `- ${item.title}：${item.summary}`)
-      .join('\n')
-
     return {
-      content: `我先按浏览器里的公开知识给你一个方向：\n${summary}`,
+      content: buildLocalKnowledgeAnswer(citations),
       citations,
       meta: {
         mode: 'fallback' as const,
@@ -127,28 +116,29 @@ function getFallbackLabel(reason?: AssistantFallbackReason) {
   if (reason === 'empty_response') return '模型无内容，已回退'
   if (reason === 'no_public_context') return '未命中公开资料'
   if (reason === 'request_error') return '站内 API 暂不可用'
-  return '公开知识兜底'
+  return '站点知识兜底'
 }
 
 function formatAnswerMeta(meta?: AssistantAnswerMeta) {
   if (!meta) return ''
-  const modeLabel = meta.mode === 'model' ? '模型增强回答' : getFallbackLabel(meta.reason)
-  return [modeLabel, `${meta.citationCount} 条公开引用`].filter(Boolean).join(' · ')
+  const modeLabel = meta.mode === 'model' ? '模型增强' : getFallbackLabel(meta.reason)
+  const citationLabel = meta.citationCount > 0 ? `${meta.citationCount} 条来源` : '暂无来源'
+  return [modeLabel, citationLabel].filter(Boolean).join(' · ')
 }
 
 function getServiceStatus(state: AssistantServiceState) {
-  if (state === 'model') return { className: 'is-model', label: 'AI 辅助已启用' }
-  if (state === 'error') return { className: 'is-error', label: '服务暂不可用' }
-  if (state === 'fallback') return { className: 'is-fallback', label: '公开知识兜底' }
-  if (state === 'api-ready') return { className: 'is-ready', label: '站内 API 已连接' }
-  return { className: 'is-local', label: '本地公开知识' }
+  if (state === 'model') return { className: 'is-model', label: '模型增强在线' }
+  if (state === 'error') return { className: 'is-error', label: 'API 异常，已本地兜底' }
+  if (state === 'fallback') return { className: 'is-fallback', label: '服务端未配置模型' }
+  if (state === 'api-ready') return { className: 'is-ready', label: '服务端连接中' }
+  return { className: 'is-local', label: '未连接模型' }
 }
 
 export function PublicAssistantWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [input, setInput] = useState('')
-  const [messages, setMessages] = useState<WidgetMessage[]>([introMessage])
+  const [messages, setMessages] = useState<WidgetMessage[]>([])
   const [serviceState, setServiceState] = useState<AssistantServiceState>(API_BASE ? 'api-ready' : 'local')
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const messageSeq = useRef(0)
@@ -163,6 +153,28 @@ export function PublicAssistantWidget() {
     if (!scrollRef.current) return
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight
   }, [messages, isOpen])
+
+  useEffect(() => {
+    if (!isOpen || !API_BASE) return
+    let cancelled = false
+
+    async function refreshServiceHealth() {
+      try {
+        const response = await fetch(`${API_BASE}/health`)
+        if (!response.ok) throw new Error('assistant-health-failed')
+        const payload = (await response.json()) as unknown
+        const model = isRecord(payload) && typeof payload.model === 'string' ? payload.model.trim() : ''
+        if (!cancelled) setServiceState(model && model !== 'fallback' ? 'model' : 'fallback')
+      } catch {
+        if (!cancelled) setServiceState('error')
+      }
+    }
+
+    void refreshServiceHealth()
+    return () => {
+      cancelled = true
+    }
+  }, [isOpen])
 
   const toggleWidget = () => {
     if (!isOpen) {
@@ -207,16 +219,13 @@ export function PublicAssistantWidget() {
       ])
     } catch {
       const citations = searchPublicKnowledge(trimmed)
-      const fallbackSummary = citations.map((item) => `${item.title}：${item.summary}`).join(' ')
       setServiceState('error')
       setMessages((current) => [
         ...current,
         {
           id: createMessageId('assistant'),
           role: 'assistant',
-          content: fallbackSummary
-            ? `站内助手 API 暂时不可用，我先用浏览器本地公开知识保留这些线索：${fallbackSummary}`
-            : '站内助手 API 暂时不可用。我不会编造答案；可以先浏览项目页、博客页，或稍后再试。',
+          content: `站内助手 API 暂时不可用，已切回本地公开知识。\n${buildLocalKnowledgeAnswer(citations)}`,
           citations,
           meta: {
             mode: 'fallback',
@@ -244,7 +253,7 @@ export function PublicAssistantWidget() {
         <span className="public-assistant__trigger-mark" aria-hidden="true">
           B
         </span>
-        <span className="public-assistant__trigger-text">公开知识问答</span>
+        <span className="public-assistant__trigger-text">泊岸公开助手</span>
       </button>
 
       {isOpen && (
@@ -263,36 +272,38 @@ export function PublicAssistantWidget() {
           </header>
 
           <p className="public-assistant__hint">
-            只检索公开项目与文章；私有仓库、后台账号和未公开部署不进入回答。
+            只回答公开项目、文章与状态页。
             <Link to="/assistant">内部入口</Link>
           </p>
 
-          <div className="public-assistant__messages" ref={scrollRef}>
-            {messages.map((message) => (
-              <article key={message.id} className={`public-assistant__message is-${message.role}`}>
-                <p>{message.content}</p>
-                {message.role === 'assistant' && message.meta && (
-                  <small className="public-assistant__meta">{formatAnswerMeta(message.meta)}</small>
-                )}
-                {message.citations && message.citations.length > 0 && (
-                  <div className="public-assistant__citations">
-                    {message.citations.map((item) => (
-                      <Link key={item.id} to={item.href} className="public-assistant__citation">
-                        <strong>{item.title}</strong>
-                        <span>{item.summary}</span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </article>
-            ))}
+          {(messages.length > 0 || isLoading) && (
+            <div className="public-assistant__messages" ref={scrollRef}>
+              {messages.map((message) => (
+                <article key={message.id} className={`public-assistant__message is-${message.role}`}>
+                  <p>{message.content}</p>
+                  {message.role === 'assistant' && message.meta && (
+                    <small className="public-assistant__meta">{formatAnswerMeta(message.meta)}</small>
+                  )}
+                  {message.citations && message.citations.length > 0 && (
+                    <div className="public-assistant__citations">
+                      {message.citations.slice(0, 3).map((item) => (
+                        <Link key={item.id} to={item.href} className="public-assistant__citation" aria-label={`查看来源：${item.title}`}>
+                          <strong>{item.title}</strong>
+                          <span>打开来源</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              ))}
 
-            {isLoading && (
-              <div className="public-assistant__loading" aria-live="polite">
-                正在检索公开知识并组织回答…
-              </div>
-            )}
-          </div>
+              {isLoading && (
+                <div className="public-assistant__loading" aria-live="polite">
+                  正在检索公开资料…
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="public-assistant__suggestions" aria-label="建议提问">
             {publicAssistantSuggestions.map((suggestion) => (
@@ -323,7 +334,7 @@ export function PublicAssistantWidget() {
               maxLength={MAX_MESSAGE_LENGTH}
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder="问项目、文章或技术方向"
+              placeholder="问项目、演示入口或技术方向"
             />
             <button type="submit" disabled={isLoading || input.trim().length === 0}>
               <IconSend aria-hidden />

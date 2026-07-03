@@ -56,9 +56,9 @@ function forceNoModelProvider() {
   env.openaiApiKey = ''
 }
 
-function startMockModelServer(port: number) {
+function startMockModelServer(port: number, acceptedPath = '/chat/completions', content = '模型增强回答：Legal RAG 是本站公开展示的法律文档 RAG 与合同审查工作台。') {
   const server = createHttpServer((req, res) => {
-    if (req.method !== 'POST' || req.url !== '/chat/completions' || req.headers.authorization !== 'Bearer smoke-model-key') {
+    if (req.method !== 'POST' || req.url !== acceptedPath || req.headers.authorization !== 'Bearer smoke-model-key') {
       res.writeHead(404, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ error: 'not-found' }))
       return
@@ -70,7 +70,7 @@ function startMockModelServer(port: number) {
         choices: [
           {
             message: {
-              content: '模型增强回答：Legal RAG 是本站公开展示的法律文档 RAG 与合同审查工作台。',
+              content,
             },
           },
         ],
@@ -166,6 +166,45 @@ try {
       }
     } finally {
       await new Promise<void>((resolve) => mockModelServer.close(() => resolve()))
+      restoreModelEnv(originalModelEnv)
+    }
+
+    const mockRootModelPort = await findAvailablePort(9177)
+    const mockRootModelServer = await startMockModelServer(
+      mockRootModelPort,
+      '/v1/chat/completions',
+      '模型增强回答：Root base URL 已通过 /v1/chat/completions 兼容。',
+    )
+    try {
+      env.assistantModelApiKey = 'smoke-model-key'
+      env.assistantModelBaseUrl = `http://127.0.0.1:${mockRootModelPort}`
+      env.assistantModelName = 'glm-root-smoke-model'
+      env.assistantModelProvider = 'glm-compatible'
+      env.openaiApiKey = ''
+      env.openaiBaseUrl = ''
+      env.openaiModel = ''
+      const rootModelChat = await fetch(`${base}/chat/public`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'RAG 项目' }),
+      })
+      if (!rootModelChat.ok) throw new Error(`root model chat failed: ${rootModelChat.status}`)
+      const rootModelPayload = (await rootModelChat.json()) as {
+        answer?: string
+        citations?: unknown[]
+        meta?: { mode?: string; model?: string; provider?: string; reason?: string; citationCount?: number }
+      }
+      if (
+        !rootModelPayload.answer?.includes('Root base URL') ||
+        !Array.isArray(rootModelPayload.citations) ||
+        rootModelPayload.meta?.mode !== 'model' ||
+        rootModelPayload.meta.model !== 'glm-root-smoke-model' ||
+        rootModelPayload.meta.provider !== 'glm-compatible'
+      ) {
+        throw new Error('public chat did not normalize root model base URL to /v1 chat completions')
+      }
+    } finally {
+      await new Promise<void>((resolve) => mockRootModelServer.close(() => resolve()))
       restoreModelEnv(originalModelEnv)
     }
 

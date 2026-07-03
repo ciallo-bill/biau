@@ -43,6 +43,7 @@ Public catalog and article data are static TypeScript exports in `src/data/`. Ke
 - `detailContent` is for page rendering and must remain sanitized public copy.
 - `assistantContext` is for retrieval quality, not hidden/private knowledge; it must not include credentials, raw local paths, account data, private dashboards, or secrets.
 - `scripts/generate-assistant-knowledge.ts` and `src/data/assistant.ts` must both use the projection helpers instead of duplicating summary/tag construction.
+- Site-level public assistant entries such as `site:intro` or `site:status` belong in `publicKnowledgeBase`; the generation script should emit that same public knowledge source instead of rebuilding a separate list.
 - `server/data/public-knowledge.json` keeps the existing knowledge item shape: `{ id, title, summary, href, tags, visibility }`.
 
 ### 4. Validation & Error Matrix

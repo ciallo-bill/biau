@@ -53,19 +53,19 @@ export interface AssistantMemberProfile {
 
 export const publicAssistantSuggestions: AssistantSuggestion[] = [
   {
-    id: 'portfolio-overview',
-    label: '站点能做什么',
-    prompt: '请介绍一下这个站点里主要展示了哪些能力和项目方向。',
+    id: 'demo-ready-projects',
+    label: '哪些项目可演示',
+    prompt: '现在站点里哪些项目有公开演示入口？每个项目适合看什么？',
   },
   {
-    id: 'rag-projects',
-    label: '找 RAG 项目',
-    prompt: '这个站里有哪些和 RAG、知识库或者合同审查相关的项目或文章？',
+    id: 'legal-rag-entry',
+    label: 'Legal RAG 怎么体验',
+    prompt: 'Legal RAG 法律机器人现在能展示哪些能力？我应该从哪个入口开始看？',
   },
   {
-    id: 'game-showcase',
-    label: '看游戏项目',
-    prompt: '帮我快速看看这个站点里的互动体验和游戏项目有什么特色。',
+    id: 'status-overview',
+    label: '查看可靠性状态',
+    prompt: '项目可靠性观察页能告诉我哪些入口是否正常？',
   },
 ]
 
@@ -95,6 +95,11 @@ const SEARCH_KEYWORDS = [
   'ai',
   'rag',
   '知识库',
+  '可靠性',
+  '状态',
+  '状态页',
+  '健康检查',
+  '外链',
   '合同审查',
   '合同',
   '法律',
@@ -145,6 +150,10 @@ const SEARCH_ALIASES = [
     terms: ['legal rag', '登录门禁', '公开演示凭据', '受控演示', 'demo 凭据'],
   },
   {
+    triggers: ['状态', '状态页', '可靠性', '健康检查', '外链'],
+    terms: ['项目可靠性观察', '状态页', 'health', 'synthetic', '公开入口'],
+  },
+  {
     triggers: ['游戏', '互动体验', '试玩', 'godot', 'playlab'],
     terms: ['biau playlab', 'godot web', 'web 试玩', '互动体验'],
   },
@@ -192,6 +201,15 @@ export const publicKnowledgeBase: AssistantKnowledgeItem[] = [
       'BIAU Port 泊岸是一个围绕 AI 应用、业务系统、互动体验、移动端案例与知识内容组织的展示站，强调可演示、可筛选、可落地的项目表达。',
     href: '/',
     tags: ['BIAU Port', '项目展示', '知识库', '公开站点'],
+    visibility: 'public',
+  },
+  {
+    id: 'site:status',
+    title: '项目可靠性观察',
+    summary:
+      '状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned，方便访客判断哪些演示能直接打开、哪些仍需要配置或人工确认。',
+    href: '/status',
+    tags: ['状态页', '可靠性观察', '公开入口', 'health check', 'synthetic'],
     visibility: 'public',
   },
   ...projectKnowledge,
@@ -271,6 +289,8 @@ function scoreKnowledgeItem(item: AssistantKnowledgeItem, normalized: string, te
   const asksForArticle = normalized.includes('文章') || normalized.includes('博客')
   const asksForSiteOverview =
     normalized.includes('站点') || normalized.includes('主要展示') || normalized.includes('能做什么')
+  const asksForStatus =
+    normalized.includes('状态') || normalized.includes('可靠性') || normalized.includes('健康检查') || normalized.includes('外链')
 
   let score = 0
   if (title.includes(normalized)) score += 8
@@ -288,6 +308,7 @@ function scoreKnowledgeItem(item: AssistantKnowledgeItem, normalized: string, te
   if (score > 0 && asksForArticle && id.startsWith('blog:')) score += 4
   if (score > 0 && id.startsWith('blog:') && tags.includes('精选知识')) score += 2
   if (score > 0 && asksForSiteOverview && id === 'site:intro') score += 12
+  if (score > 0 && asksForStatus && item.href === '/status') score += 12
 
   return score
 }
