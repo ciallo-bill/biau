@@ -89,6 +89,8 @@ export const internalAssistantSuggestions: AssistantSuggestion[] = [
 
 const SEARCH_KEYWORDS = [
   '站点',
+  '网站',
+  '当前网站',
   '公开内容',
   '项目方向',
   '能力',
@@ -118,6 +120,7 @@ const SEARCH_KEYWORDS = [
   '凭据',
   'playlab',
   'biau',
+  '泊岸',
   'pet',
   '桌宠',
   '完成',
@@ -290,7 +293,12 @@ function scoreKnowledgeItem(item: AssistantKnowledgeItem, normalized: string, te
   const asksForProject = normalized.includes('项目') || normalized.includes('案例') || normalized.includes('作品')
   const asksForArticle = normalized.includes('文章') || normalized.includes('博客')
   const asksForSiteOverview =
-    normalized.includes('站点') || normalized.includes('主要展示') || normalized.includes('能做什么')
+    normalized.includes('站点') ||
+    normalized.includes('网站') ||
+    normalized.includes('当前网站') ||
+    normalized.includes('关于当前') ||
+    normalized.includes('主要展示') ||
+    normalized.includes('能做什么')
   const asksForStatus =
     normalized.includes('状态') || normalized.includes('可靠性') || normalized.includes('健康检查') || normalized.includes('外链')
 
@@ -309,7 +317,7 @@ function scoreKnowledgeItem(item: AssistantKnowledgeItem, normalized: string, te
   if (score > 0 && asksForProject && id.startsWith('project:')) score += 8
   if (score > 0 && asksForArticle && id.startsWith('blog:')) score += 4
   if (score > 0 && id.startsWith('blog:') && tags.includes('精选知识')) score += 2
-  if (score > 0 && asksForSiteOverview && id === 'site:intro') score += 12
+  if (asksForSiteOverview && id === 'site:intro') score += 12
   if (score > 0 && asksForStatus && item.href === '/status') score += 12
 
   return score

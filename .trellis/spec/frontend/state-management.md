@@ -104,6 +104,11 @@ const projectKnowledge = projects.map((project) => ({
 - `biau-assistant-session-id`: current internal chat session id returned by `/chat/internal`.
 - `biau-assistant-admin-token`: manually entered owner/admin token for `/assistant/admin`.
 - These values are browser convenience state, not production-grade secure storage.
+- In `PublicAssistantWidget`, `serviceState` represents API/model health for the
+  widget header, while each assistant message's `meta.mode` / `meta.reason`
+  represents how that specific answer was produced. Do not let one fallback
+  answer such as `no_public_context` downgrade a previously confirmed
+  `serviceState === 'model'`.
 
 ### 4. Validation & Error Matrix
 
@@ -112,18 +117,32 @@ const projectKnowledge = projects.map((project) => ({
 - `401 missing-or-invalid-token` -> explain token problem and keep the page usable through local fallback.
 - `503 database-not-configured` -> explain backend persistence is missing and keep local fallback.
 - Malformed citation/member payload -> drop invalid entries instead of casting with `as`.
+- Public widget receives `meta.mode: 'fallback'` with `reason: 'no_public_context'`
+  after health has confirmed a model provider -> keep the header in
+  `模型增强在线`; the message meta already communicates `未命中公开资料`.
 
 ### 5. Good/Base/Bad Cases
 
 - Good: token-bearing internal chat stores the returned `sessionId` and reuses it for the current browser session.
+- Good: public widget health shows `model`, a generic unsupported question returns
+  fallback meta, and the header remains `模型增强在线` while the message says
+  `未命中公开资料`.
 - Base: no API URL still lets public/internal assistants answer from sanitized site data.
+- Base: public widget health never reaches a model provider and answer meta is
+  `not_configured`, so the header may show API fallback or local fallback.
 - Bad: demo/example sessions are presented as persisted history.
+- Bad: `setServiceState(result.meta.mode === 'model' ? 'model' : 'fallback')`
+  couples global provider availability to one answer path and makes the model
+  appear disconnected after a fallback answer.
 
 ### 6. Tests Required
 
 - `check:ui` should still be able to click an `/assistant` suggestion without a backend and see user plus assistant bubbles.
 - `lint` and `build` must pass after touching browser storage or payload normalizers.
 - `verify` must be attempted for broad assistant changes because it exercises preview/UI behavior.
+- Public assistant model/status regressions should include API smoke coverage for
+  generic current-site questions that cite `site:intro`, plus a widget state
+  check when the header status behavior changes.
 
 ### 7. Wrong vs Correct
 
@@ -143,6 +162,26 @@ const citations = isRecord(payload) ? normalizeAssistantCitations(payload.citati
 ```
 
 Normalize once through the assistant data module and let UI components consume typed results.
+
+#### Wrong
+
+```tsx
+setServiceState(result.meta.mode === 'model' ? 'model' : apiBase ? 'fallback' : 'local')
+```
+
+This treats an answer fallback as proof that the provider is not configured.
+
+#### Correct
+
+```tsx
+setServiceState((current) => {
+  if (result.meta.mode === 'model') return 'model'
+  if (current === 'model' && result.meta.reason !== 'not_configured') return 'model'
+  return apiBase ? 'fallback' : 'local'
+})
+```
+
+Health-derived service status stays separate from per-answer fallback reasons.
 
 ## Scenario: Public Blog Curation
 

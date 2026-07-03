@@ -132,6 +132,28 @@ try {
     throw new Error('public chat fallback meta is invalid')
   }
 
+  const siteOverviewChat = await fetch(`${base}/chat/public`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: '我想问一下关于当前网站的问题' }),
+  })
+  if (!siteOverviewChat.ok) throw new Error(`site overview public chat failed: ${siteOverviewChat.status}`)
+  const siteOverviewPayload = (await siteOverviewChat.json()) as {
+    answer?: string
+    citations?: unknown[]
+    meta?: { mode?: string; model?: string; provider?: string; reason?: string; citationCount?: number }
+  }
+  if (
+    !siteOverviewPayload.answer ||
+    !Array.isArray(siteOverviewPayload.citations) ||
+    !hasCitation(siteOverviewPayload.citations, 'site:intro') ||
+    siteOverviewPayload.meta?.mode !== 'fallback' ||
+    siteOverviewPayload.meta.reason !== 'not_configured' ||
+    siteOverviewPayload.meta.citationCount !== siteOverviewPayload.citations.length
+  ) {
+    throw new Error('public chat should answer current-site questions from site intro knowledge')
+  }
+
   try {
     const mockModelPort = await findAvailablePort(9077)
     const mockModelServer = await startMockModelServer(mockModelPort)

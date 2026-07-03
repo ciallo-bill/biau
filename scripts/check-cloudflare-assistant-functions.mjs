@@ -85,6 +85,19 @@ if (
   throw new Error('Cloudflare public chat fallback payload is invalid')
 }
 
+const siteOverviewResponse = await publicChat({ request: makeChatRequest('我想问一下关于当前网站的问题'), env: emptyEnv })
+if (!siteOverviewResponse.ok) throw new Error(`site overview public chat failed: ${siteOverviewResponse.status}`)
+const siteOverviewPayload = await readJsonResponse(siteOverviewResponse)
+if (
+  !siteOverviewPayload.answer ||
+  !Array.isArray(siteOverviewPayload.citations) ||
+  !hasCitation(siteOverviewPayload.citations, 'site:intro') ||
+  siteOverviewPayload.meta?.mode !== 'fallback' ||
+  siteOverviewPayload.meta?.reason !== 'not_configured'
+) {
+  throw new Error('Cloudflare public chat should answer current-site questions from site intro knowledge')
+}
+
 const mockPort = await findAvailablePort(9277)
 const mockModelServer = await startMockModelServer(mockPort)
 try {

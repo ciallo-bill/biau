@@ -204,6 +204,16 @@ function getServiceStatus(state: AssistantServiceState) {
   return { className: 'is-local', label: '未连接模型，本地知识' }
 }
 
+function getServiceStateAfterAnswer(
+  current: AssistantServiceState,
+  meta: AssistantAnswerMeta,
+  hasApiBase: boolean,
+): AssistantServiceState {
+  if (meta.mode === 'model') return 'model'
+  if (current === 'model' && meta.reason !== 'not_configured') return 'model'
+  return hasApiBase ? 'fallback' : 'local'
+}
+
 export function PublicAssistantWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -286,7 +296,7 @@ export function PublicAssistantWidget() {
 
     try {
       const result = await requestPublicAnswer(trimmed, apiBase)
-      setServiceState(result.meta.mode === 'model' ? 'model' : apiBase ? 'fallback' : 'local')
+      setServiceState((current) => getServiceStateAfterAnswer(current, result.meta, Boolean(apiBase)))
       setMessages((current) => [
         ...current,
         {
