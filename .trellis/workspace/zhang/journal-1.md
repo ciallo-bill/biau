@@ -1809,3 +1809,36 @@ Enabled the approved production registration path for Ozon ERP by adding auth ro
 ### Status
 
 [OK] **Completed**
+
+
+## Session 43: Project reliability status baseline
+
+**Date**: 2026-07-03
+**Task**: Project reliability status baseline
+**Branch**: `main`
+
+### Summary
+
+Expanded /status from entry reachability into a layered project reliability baseline covering main site, Legal RAG, ERP, Xunqiu, Pet/Gamer, and Playlab; generated public status JSON, updated UI checks, validated site status, sitemap, lint, build, UI, assistant index, blog check, diff check, and sensitive scan.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `601bc1f` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
