@@ -234,7 +234,11 @@ function validateHealthResponse(response) {
   }
 
   if (response.parseError) {
-    issues.push('assistant health returned non-JSON response')
+    if (response.contentType.includes('text/html')) {
+      issues.push('assistant health returned static HTML; Cloudflare Pages Functions may be missing or stale')
+    } else {
+      issues.push('assistant health returned non-JSON response')
+    }
     return issues
   }
 
@@ -252,6 +256,9 @@ function validateChatResponse(response) {
 
   if (!response.ok) {
     issues.push(`assistant chat returned HTTP ${response.status || 'request failed'}`)
+    if (response.status === 405) {
+      issues.push('assistant chat method not allowed; /api/chat/public is likely handled by the static host instead of a Function')
+    }
     if (response.error) issues.push('assistant chat request failed')
     return { issues, mode, reason }
   }
@@ -299,6 +306,13 @@ function firstProblemStatus(...responses) {
   return problem?.status ?? responses[0]?.status ?? 0
 }
 
+function summarizeAssistantFailure(issues) {
+  if (issues.some((issue) => issue.includes('static HTML')) || issues.some((issue) => issue.includes('method not allowed'))) {
+    return 'Public assistant API is not deployed as a live Function on the current host'
+  }
+  return 'Public assistant API did not return valid health/chat JSON'
+}
+
 async function validateAssistantApi(baseUrl, timeoutMs, checkedAt) {
   const health = await requestJsonWithTimeout(absoluteUrl(baseUrl, '/api/health'), timeoutMs)
   const chat = await requestJsonWithTimeout(absoluteUrl(baseUrl, '/api/chat/public'), timeoutMs, {
@@ -321,6 +335,8 @@ async function validateAssistantApi(baseUrl, timeoutMs, checkedAt) {
     summary = chatValidation.reason
       ? `Public assistant API returned fallback answer (${chatValidation.reason})`
       : 'Public assistant API returned fallback answer'
+  } else if (issues.length > 0) {
+    summary = summarizeAssistantFailure(issues)
   }
 
   return {

@@ -27,13 +27,14 @@
 
 ## Acceptance Criteria
 
-- [ ] 明确记录公开助手当前线上接入状态：fallback、model-ready、model-live 或 blocked。
-- [ ] 本地 `cf-assistant:smoke` 或等效检查覆盖 fallback、模型成功和 provider failure fallback。
-- [ ] 如果线上未接入模型，PRD/文档列出用户需要在平台后台配置的变量和验证 URL。
-- [ ] 如果线上已接入模型，记录低敏验证证据，不输出 key。
-- [ ] UI 默认打开状态保持简洁，不再弹出大段默认说明。
-- [ ] 主站项目详情、助手知识和状态页只描述已验证能力。
+- [x] 明确记录公开助手当前线上接入状态：`blocked-by-deploy`，见 `live-check.md`。
+- [x] 本地 `cf-assistant:smoke` 覆盖 fallback、模型成功和 provider failure fallback。
+- [x] 线上未接入模型时，部署文档和 `live-check.md` 列出用户需要在平台后台配置的变量和验证 URL。
+- [x] 线上尚未进入 model-live；因此没有记录任何真实模型 key 或 provider 私有地址。
+- [x] UI 默认打开状态保持简洁，不再弹出大段默认说明；已用 `check:ui` 验证。
+- [x] 主站状态数据只描述已验证能力：公开路由 online，公开助手 API offline / Function 未部署或旧部署。
 
 ## Notes
 
 - 推荐第一步：检查线上 `/api/health` 是否返回 JSON，以及 `modelConfigured` / `mode` 状态；若返回首页 HTML 或 404，先处理 Cloudflare Functions 部署问题。
+- 2026-07-03 检查结论：`/api/health` 返回静态 HTML，`/api/chat/public` 返回 HTTP 405，且线上 HTML 仍是旧 `Biau Labs` shell。需要先在 Cloudflare Pages 重新部署最新 `main` 并确认 Functions 生效，再配置 `ASSISTANT_MODEL_*`。

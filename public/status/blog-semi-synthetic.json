@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-07-03T07:14:33.222Z",
+  "checkedAt": "2026-07-03T16:00:06.732Z",
   "baseConfigured": true,
   "ok": false,
   "checks": [
@@ -7,8 +7,8 @@
       "id": "blog-semi-public-routes",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 2956,
-      "checkedAt": "2026-07-03T07:14:33.222Z",
+      "durationMs": 5043,
+      "checkedAt": "2026-07-03T16:00:06.732Z",
       "summary": "7/7 public routes returned expected responses",
       "issues": []
     },
@@ -16,12 +16,13 @@
       "id": "blog-semi-public-assistant",
       "status": "offline",
       "httpStatus": 200,
-      "durationMs": 952,
-      "checkedAt": "2026-07-03T07:14:33.222Z",
-      "summary": "Public assistant API did not return valid health/chat JSON",
+      "durationMs": 497,
+      "checkedAt": "2026-07-03T16:00:06.732Z",
+      "summary": "Public assistant API is not deployed as a live Function on the current host",
       "issues": [
-        "assistant health returned non-JSON response",
-        "assistant chat returned HTTP 405"
+        "assistant health returned static HTML; Cloudflare Pages Functions may be missing or stale",
+        "assistant chat returned HTTP 405",
+        "assistant chat method not allowed; /api/chat/public is likely handled by the static host instead of a Function"
       ]
     }
   ]
