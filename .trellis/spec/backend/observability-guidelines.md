@@ -94,6 +94,12 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
 
 - Missing base URL -> all live checks `unchecked`; exit code `0`.
 - Missing credentials -> run public health/bootstrap checks only; protected checks `unchecked`; exit code `0`.
+- Same-domain Cloudflare Function expected but `/api/health` returns static HTML
+  -> write the affected API check as `offline` with an issue that Functions may
+  be missing or stale; do not mark it as a model-key failure.
+- Public assistant `POST /api/chat/public` returns `405` on the main host while
+  local Function smoke passes -> write the check as `offline` and point the next
+  action at Pages deployment / Functions enablement before model env setup.
 - Failed attempted request -> check becomes `offline` or `degraded` based on HTTP status; `--strict` may exit non-zero.
 - Malformed synthetic JSON -> `site:status` ignores that file and keeps static status data.
 

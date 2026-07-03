@@ -57,10 +57,20 @@ Do not read `.env`, `.env.local`, `.env.*.local`, private key files, or SSH file
 - Public-scope model calls must be grounded in public citations from `server/data/public-knowledge.json`.
 - If public search returns zero citations, return fallback with `reason: 'no_public_context'` and do not call the provider.
 - Cloudflare Pages can serve same-domain public assistant endpoints through `functions/api/health.ts` and `functions/api/chat/public.ts`. Keep these endpoints compatible with the same `ChatResponse` shape as the Express `/health` and `/chat/public` routes.
+- A live GLM/API key check is only meaningful after the deployed host proves that
+  Pages Functions are active. `GET /api/health` must return JSON; if it returns
+  the static site HTML, or `POST /api/chat/public` returns `404` / `405`, treat
+  the blocker as missing or stale Cloudflare Pages Functions deployment, not as a
+  model-provider or API-key failure.
 
 ### 4. Validation & Error Matrix
 
 - Missing model key or base URL -> `meta.mode: 'fallback'`, `reason: 'not_configured'`.
+- Live `/api/health` returns HTML instead of JSON -> deployment blocker:
+  Cloudflare Pages is serving only the static app or an older build.
+- Live `/api/chat/public` returns `404` / `405` while local
+  `cf-assistant:smoke` passes -> deployment blocker: Functions are missing,
+  disabled, or not included in the current Pages deployment.
 - Provider network failure, non-OK response, or timeout -> `meta.mode: 'fallback'`, `reason: 'provider_error'`.
 - Provider returns no message content -> `meta.mode: 'fallback'`, `reason: 'empty_response'`.
 - Public question has no matching public citations -> `meta.mode: 'fallback'`, `reason: 'no_public_context'`.
@@ -77,6 +87,9 @@ Do not read `.env`, `.env.local`, `.env.*.local`, private key files, or SSH file
 - `server:smoke` must cover configured OpenAI-compatible success, unconfigured fallback, provider failure fallback, `/health`, and protected internal auth behavior.
 - `cf-assistant:smoke` must cover the Cloudflare Pages Function fallback, configured OpenAI-compatible success, and provider failure fallback.
 - `check:ui` should assert the public assistant opens in a concise default state before citations appear.
+- Before asking a user to rotate or re-enter `ASSISTANT_MODEL_*`, verify the
+  live deployment layer first: `/api/health` must return JSON from the Function,
+  then `/api/chat/public` can be checked for `meta.mode`.
 - Run `assistant:index`, `server:build`, `server:smoke`, `lint`, `build`, `prisma:validate`, `git diff --check`, and a sensitive-value scan after model-provider work.
 
 ### 7. Wrong vs Correct
