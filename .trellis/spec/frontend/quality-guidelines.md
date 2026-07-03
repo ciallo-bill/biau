@@ -27,6 +27,11 @@ import { getRelatedProjects } from './src/pages/ProjectDetailPage.tsx'
 
 This keeps validation scripts executable with `npx tsx` and prevents page rendering dependencies from becoming hidden test dependencies.
 
+When a UI regression check asserts counts for data-driven lists such as homepage
+external targets, related projects, blog cards, or reliability groups, derive the
+expected value from the same public data source or generated manifest instead of
+hardcoding yesterday's number. This keeps tests useful when content grows.
+
 ## Review Priorities
 
 - Preserve the product website / solution showcase voice.

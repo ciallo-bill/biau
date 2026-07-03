@@ -1,0 +1,1 @@
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"运行 check:ui、lint、build、diff check 与敏感扫描。"}

@@ -1,4 +1,5 @@
 import { chromium } from 'playwright'
+import { siteStatusTargets } from '../src/data/statusTargets.ts'
 
 const base = process.env.UI_CHECK_BASE ?? 'http://127.0.0.1:5174'
 const siteUrl = 'https://biau.playlab.eu.cc'
@@ -85,6 +86,7 @@ for (const viewport of viewports) {
 const statusPage = await browser.newPage({ viewport: viewports[0] })
 await statusPage.goto(`${base}/status`, { waitUntil: 'networkidle' })
 const statusCards = await statusPage.locator('.status-target').count()
+const expectedStatusCards = siteStatusTargets.length
 const reliabilityProjects = await statusPage.locator('.status-project').count()
 const reliabilityChecks = await statusPage.locator('.status-check').count()
 const statusOnlineText = await statusPage.locator('.status-summary-card.is-online strong').innerText().catch(() => '')
@@ -92,8 +94,8 @@ const legalStatusLink = statusPage.getByRole('link', { name: '打开入口' }).f
 const legalStatusHref = await legalStatusLink.getAttribute('href').catch(() => null)
 const legalStatusTarget = await legalStatusLink.getAttribute('target').catch(() => null)
 const legalStatusRel = await legalStatusLink.getAttribute('rel').catch(() => null)
-if (statusCards !== 4) {
-  failures.push(`/status targets: expected 4 homepage external targets, got ${statusCards}`)
+if (statusCards !== expectedStatusCards) {
+  failures.push(`/status targets: expected ${expectedStatusCards} homepage external targets, got ${statusCards}`)
 }
 if (reliabilityProjects < 6) {
   failures.push(`/status reliability: expected at least 6 project reliability groups, got ${reliabilityProjects}`)

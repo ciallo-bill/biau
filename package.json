@@ -31,7 +31,7 @@
     "site:status": "tsx scripts/generate-site-status.ts",
     "xunqiu:synthetic": "node scripts/check-xunqiu-synthetic.mjs",
     "preview": "vite preview",
-    "check:ui": "node scripts/check-ui.mjs",
+    "check:ui": "tsx scripts/check-ui.mjs",
     "images:optimize": "node scripts/optimize-images.mjs",
     "sitemap:generate": "tsx scripts/generate-sitemap.mjs",
     "verify": "node scripts/verify.mjs"
