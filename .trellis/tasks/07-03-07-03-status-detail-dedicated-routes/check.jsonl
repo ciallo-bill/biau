@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/frontend/quality-guidelines.md", "reason": "Run and update UI checks for status detail route navigation."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Status detail route should derive from shared status data without duplicating state."}
