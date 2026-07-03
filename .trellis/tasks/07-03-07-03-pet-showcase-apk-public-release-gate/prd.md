@@ -19,13 +19,31 @@
 
 ## Acceptance Criteria
 
-- [ ] 已检查 Pet 工作区构建产物并记录 APK 是否满足公开条件。
+- [x] 已检查 Pet 工作区构建产物并记录 APK 是否满足公开条件。
 - [ ] 满足条件时，展示页能直接下载公开 APK，并显示版本、大小、SHA-256、风险提示和回滚说明。
-- [ ] 不满足条件时，展示页仍保持 gated 状态，且任务记录列出 blocker。
-- [ ] 主站 Pet 项目页、状态页或 synthetic 检查与实际下载状态一致。
-- [ ] `npm.cmd run pet:synthetic`、`npm.cmd run lint`、`npm.cmd run build` 通过或记录不可运行原因。
-- [ ] `git diff --check` 与敏感扫描通过。
+- [x] 不满足条件时，展示页仍保持 gated 状态，且任务记录列出 blocker。
+- [x] 主站 Pet 项目页、状态页或 synthetic 检查与实际下载状态一致。
+- [x] `npm.cmd run pet:synthetic`、`npm.cmd run lint`、`npm.cmd run build` 通过或记录不可运行原因。
+- [x] `git diff --check` 与敏感扫描通过。
 
 ## Human Review Gate
 
 - 用户已要求“按照 APK 的公开条件把 APK 公开出来”，但如果发现当前只有 debug/unsigned/未知来源包，不能绕过条件公开；必须记录 blocker。
+
+## Result
+
+- Outcome: blocked, keep public APK download closed.
+- Evidence: Pet workspace scan found only `app-debug.apk`; no release APK or AAB candidate was found.
+- Public-safety decision: debug package is not copied into `public/`, and `/pet-app-showcase/` keeps the disabled `APK 待公开构建` state with no `.apk` href.
+- Missing release conditions:
+  - reproducible release build command and release artifact;
+  - public signing policy;
+  - release notes for the public version;
+  - install/regression evidence for home, hatchery, community, profile, and package gates;
+  - explicit human approval after the release candidate exists.
+- Validation:
+  - `npm.cmd run pet:synthetic` passed and confirmed the showcase plus 4/4 screenshots are reachable.
+  - `npm.cmd run lint` passed.
+  - `npm.cmd run build` passed with existing Vite dynamic-import chunking warnings only.
+  - `git diff --check` passed with Windows line-ending warnings only.
+  - Sensitive scan found only a generic rule sentence in this task design, not a real secret.
