@@ -138,3 +138,85 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
   ]
 }
 ```
+
+## Scenario: External Demo Quality Fixtures
+
+### 1. Scope / Trigger
+
+- Trigger: a public project page links to an external demo whose quality,
+  evaluation, or readiness endpoints read bundled fixture files at runtime.
+- Use this when updating project showcase links, synthetic checks, Docker
+  packaging, or quality panels for demos such as Legal RAG.
+
+### 2. Signatures
+
+- Quality summary endpoint: `GET /api/quality/report`.
+- RAG evaluation endpoint: `GET /api/evaluation/report`.
+- Contract review evaluation endpoint: `GET /api/review/evaluation/report`.
+- Docker/runtime asset contract: copy public-safe runtime fixtures such as
+  `eval/*.json` into the production image or deployment artifact.
+
+### 3. Contracts
+
+- Fixture files used by public quality panels must contain only public-safe
+  test cases and sanitized sample text.
+- Missing fixture files are non-core observability degradation, not a product
+  workflow outage. The API should return a valid JSON report with `total=0`,
+  empty result arrays, and a readiness `warn` check.
+- Corrupt JSON, schema drift, or evaluation logic errors should still fail
+  loudly; do not hide bad fixtures behind a catch-all fallback.
+- Public status or assistant copy must not include real demo passwords, model
+  keys, database URLs, provider endpoints, or private dashboard links.
+
+### 4. Validation & Error Matrix
+
+- Fixture included in image -> quality/evaluation endpoints return normal
+  pass/fail metrics.
+- Fixture missing with `ENOENT` -> endpoint returns `200` with empty metrics
+  and warn details; core import, RAG query, and contract review remain usable.
+- Fixture malformed -> endpoint may return `500` during testing or deployment
+  verification so bad data is fixed.
+- Private fixture content detected -> remove it before commit and replace with
+  public-safe samples.
+
+### 5. Good/Base/Bad Cases
+
+- Good: Dockerfile copies `eval/` and unit tests assert missing paths degrade
+  to empty reports.
+- Base: a fresh clone without external env still builds and validates with
+  bundled public fixtures.
+- Bad: a deployment omits fixtures and `/api/quality/report` returns `500`,
+  causing the public workbench to show only `Request failed: 500`.
+
+### 6. Tests Required
+
+- Unit test missing fixture paths for every evaluation loader.
+- Run the external project typecheck/build plus any API validate/smoke command
+  that hits quality, evaluation, import, RAG query, and contract review paths.
+- Run `git diff --check` and a sensitive scan over changed files.
+- Regenerate main-site assistant/public knowledge when project copy changes.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+export async function loadEvalCases() {
+  return JSON.parse(await readFile("/app/eval/rag-eval-set.json", "utf8"));
+}
+```
+
+#### Correct
+
+```typescript
+export async function loadEvalCases(path = EVAL_SET_PATH) {
+  try {
+    return JSON.parse(await readFile(path, "utf8"));
+  } catch (error) {
+    if (isMissingFileError(error)) {
+      return [];
+    }
+    throw error;
+  }
+}
+```

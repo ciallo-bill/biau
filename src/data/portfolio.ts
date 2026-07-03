@@ -120,14 +120,14 @@ export const projects: Project[] = [
         {
           title: 'Demo 访问边界',
           body:
-            '线上工作台有登录门禁，这是为了保护模型网关、上传接口和 pgvector 数据库资源。当前公开页面先提供项目说明、工作台入口和 API health 入口；低权限 demo 账号/密码需要单独确认后再公开，不用真实后台密码代替。',
+            '线上工作台有登录门禁，这是为了保护模型网关、上传接口和 pgvector 数据库资源。如果登录页显示“公开演示凭据”，访客可以使用页面给出的低权限 demo 凭据试用；如果没有显示凭据，则该入口仍是受控演示，不应用真实后台密码代替。',
         },
       ],
       workflow: [
         {
           title: '公开演示路径',
           items: [
-            '先打开带登录门禁的线上工作台，说明登录保护用于隔离模型 key、上传接口和数据库资源；如果公开 demo 凭据已确认，再使用专用 demo 账号登录。',
+            '先打开带登录门禁的线上工作台，说明登录保护用于隔离模型 key、上传接口和数据库资源；如果登录页显示公开演示凭据，再使用页面给出的专用 demo 账号登录。',
             '进入知识库页初始化公开安全数据集，观察导入任务、文档判重、chunk 和 pgvector 持久化链路。',
             '切到智能问答，提问技术服务合同验收风险，重点看 answer、citations、diagnostics 和 answer source，而不是只看生成文本是否流畅。',
             '切到合同审查，使用示例合同查看风险条款、风险等级、修改建议、引用和导出边界。',
@@ -225,7 +225,7 @@ export const projects: Project[] = [
       '系统支持公开安全数据集和文档导入，RAG pipeline 包含清洗、项目级 SHA-256 去重、章节感知 chunk、embedding、memory/pgvector 存储、query rewrite、向量+关键词混合召回、merge/filter/rerank、grounded answer 或 refusal、citations 与 diagnostics。',
       '合同审查采用规则优先策略，规则召回付款、交付、违约责任、知识产权、争议解决和终止等风险；模型只辅助改写已召回风险的解释和建议，并在 schema 校验失败时回退到规则结果。',
       '项目包含 RAG 与合同审查 eval fixtures、quality/evaluation 报告路由和质量面板，适合说明 AI 应用如何做引用溯源、可解释风险审查和质量评测。',
-      '线上工作台有登录门禁，公开页面不会放真实后台/admin 密码；如果开放访客登录，应使用专门低权限 demo 凭据，并通过 smoke 检查 health、登录、公开数据集初始化和 RAG 问答。',
+      '线上工作台有登录门禁，公开页面不会放真实后台/admin 密码；如果 Legal RAG 登录页显示公开演示凭据，访客可以使用页面给出的低权限 demo 凭据试用；如果没有显示凭据，则仍是受控演示入口。',
       '推荐公开演示顺序是：登录受保护工作台、初始化公开安全数据集、执行带 citation/diagnostics 的 RAG 问答、运行示例合同审查、查看质量面板的 runtime、citation/refusal 评测、审查召回、readiness checks、趋势和审计日志。',
       '后续优化方向包括更完整的用户/邀请权限、更多脱敏数据集、评测趋势、OCR、rerank 模型、CI 与镜像发布。',
     ],
