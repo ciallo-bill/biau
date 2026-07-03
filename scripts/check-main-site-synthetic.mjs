@@ -7,6 +7,7 @@ const outputPath = resolve(repoRoot, 'public/status/blog-semi-synthetic.json')
 const DEFAULT_BASE_URL = 'https://biau.playlab.eu.cc'
 const DEFAULT_TIMEOUT_MS = 12_000
 const CHECK_ID = 'blog-semi-public-routes'
+const sitemapRequiredPaths = ['/', '/projects', '/blog', '/status', '/pet-app-showcase/']
 
 const targets = [
   { label: 'home', path: '/', kind: 'page', critical: true },
@@ -119,7 +120,7 @@ function validateTarget(target, response, baseUrl) {
 
   if (target.kind === 'sitemap') {
     if (!response.body.includes('<urlset')) issues.push('sitemap: missing urlset')
-    for (const path of ['/', '/projects', '/blog']) {
+    for (const path of sitemapRequiredPaths) {
       if (!response.body.includes(absoluteUrl(baseUrl, path))) issues.push(`sitemap: missing ${path}`)
     }
     return issues

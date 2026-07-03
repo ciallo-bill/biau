@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-07-03T03:14:10.354Z",
+  "checkedAt": "2026-07-03T03:21:46.890Z",
   "base": "https://biau.playlab.eu.cc",
   "ok": true,
   "summary": {
@@ -22,8 +22,8 @@
       "note": "工作台有登录门禁；入口可达不代表已开放公开 demo 凭据，未显示凭据时仍是受控演示。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 817,
-      "checkedAt": "2026-07-03T03:14:10.362Z",
+      "durationMs": 694,
+      "checkedAt": "2026-07-03T03:21:46.909Z",
       "finalUrl": "https://legal-rag-web.onrender.com/",
       "issues": []
     },
@@ -39,8 +39,8 @@
       "note": "生产注册与演示账号属于人工 gate；状态页只检查公开入口是否响应。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 1121,
-      "checkedAt": "2026-07-03T03:14:11.180Z",
+      "durationMs": 940,
+      "checkedAt": "2026-07-03T03:21:47.604Z",
       "finalUrl": "https://erp.ciallobill.qzz.io/",
       "issues": []
     },
@@ -56,8 +56,8 @@
       "note": "静态站可用不代表每个 Web 试玩资源都已完成运行检查。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 2379,
-      "checkedAt": "2026-07-03T03:14:12.301Z",
+      "durationMs": 1299,
+      "checkedAt": "2026-07-03T03:21:48.544Z",
       "finalUrl": "https://games.playlab.eu.cc/",
       "issues": []
     },
@@ -73,8 +73,8 @@
       "note": "阶段 APK 是否公开发布仍需人工确认；这里只检查展示页入口。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 835,
-      "checkedAt": "2026-07-03T03:14:14.681Z",
+      "durationMs": 896,
+      "checkedAt": "2026-07-03T03:21:49.843Z",
       "finalUrl": "https://xunqiu.playlab.eu.cc/",
       "issues": []
     }
@@ -137,7 +137,7 @@
           "label": "在线工作台入口",
           "status": "online",
           "description": "检查公开 Legal RAG 工作台入口是否响应。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 817 ms。由 L0 入口检测自动合并。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 694 ms。由 L0 入口检测自动合并。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "legal-rag-entry"
@@ -204,7 +204,7 @@
           "label": "演示入口",
           "status": "online",
           "description": "检查 ERP 登录/演示入口是否响应。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 1121 ms。由 L0 入口检测自动合并。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 940 ms。由 L0 入口检测自动合并。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "ozon-erp-entry"
@@ -271,7 +271,7 @@
           "label": "产品展示页",
           "status": "online",
           "description": "检查寻球展示页、文档和阶段包入口是否响应。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 835 ms。由 L0 入口检测自动合并。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 896 ms。由 L0 入口检测自动合并。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "xunqiu-entry"
@@ -372,7 +372,7 @@
           "label": "游戏站入口",
           "status": "online",
           "description": "检查 Playlab 静态站入口是否响应。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 2379 ms。由 L0 入口检测自动合并。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 1299 ms。由 L0 入口检测自动合并。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "biau-playlab-entry"
