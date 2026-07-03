@@ -72,6 +72,13 @@ const targetMeta: Record<
     description: '寻球 Android 64 位迁移展示页、文档和阶段包入口。',
     note: '阶段 APK 是否公开发布仍需人工确认；这里只检查展示页入口。',
   },
+  'pet-workspace': {
+    label: 'Pet App 展示页',
+    kind: 'mobile',
+    expectation: 'static-site',
+    description: 'AI 桌宠社区 App 截图、下载状态和 APK 发布门禁说明。',
+    note: '入口可达代表展示页和截图可访问；正式 APK 下载仍需签名包、校验摘要和人工确认。',
+  },
 }
 
 export const SITE_STATUS_BASE_URL = MAIN_SITE_URL
@@ -341,8 +348,8 @@ export const reliabilityProjects: ReliabilityProject[] = [
         layer: 'observability',
         label: 'APK 发布 gate',
         status: 'planned',
-        description: '检查签名、版本、下载链接、回滚说明和隐私说明后再公开。',
-        evidence: '当前只记录 gate，不声明 APK 已公开。',
+        description: '检查正式 release 构建、签名、校验摘要、下载链接、回滚说明和隐私说明后再公开。',
+        evidence: '当前只记录 gate；已定位内部 debug 构建，但不声明 APK 已公开。',
         cadence: '发布候选生成后',
         ownerHint: 'Release checklist',
       },
@@ -358,7 +365,7 @@ export const reliabilityProjects: ReliabilityProject[] = [
       },
     ],
     gates: ['真实 Pet APK 发布、后端部署和账号体系公开演示都需要人工确认。'],
-    nextActions: ['整理 Pet 展示页和 debug APK 产物记录。', '有正式签名包后补下载状态检查。'],
+    nextActions: ['将 debug 构建记录转成正式 release candidate 清单。', '有正式签名包、校验摘要和版本说明后补下载状态检查。'],
   },
   {
     id: 'biau-playlab',

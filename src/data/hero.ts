@@ -1,4 +1,4 @@
-import { OZON_ERP_ENTRY_URL } from './siteLinks'
+import { MAIN_SITE_URL, OZON_ERP_ENTRY_URL } from './siteLinks'
 
 export type SiteLanguage = 'zh' | 'en'
 
@@ -51,9 +51,10 @@ export const heroContent = {
       title: 'AI 宠物生成管线',
       description: '从生成、审核到发布，让不确定性进入确定流程',
       poetry: '《当算法编织出虚拟生命》',
-      action: 'GENERATE',
+      action: 'APP',
       accent: 'commerce',
       detailLink: '/projects/pet-workspace',
+      externalLink: `${MAIN_SITE_URL}/pet-app-showcase/`,
     },
     {
       id: 'ozon-erp',

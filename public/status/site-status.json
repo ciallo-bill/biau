@@ -1,10 +1,10 @@
 {
-  "checkedAt": "2026-07-03T03:21:46.890Z",
+  "checkedAt": "2026-07-03T03:37:46.220Z",
   "base": "https://biau.playlab.eu.cc",
   "ok": true,
   "summary": {
-    "total": 4,
-    "online": 4,
+    "total": 5,
+    "online": 5,
     "degraded": 0,
     "offline": 0,
     "unchecked": 0
@@ -22,9 +22,26 @@
       "note": "工作台有登录门禁；入口可达不代表已开放公开 demo 凭据，未显示凭据时仍是受控演示。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 694,
-      "checkedAt": "2026-07-03T03:21:46.909Z",
+      "durationMs": 978,
+      "checkedAt": "2026-07-03T03:37:46.245Z",
       "finalUrl": "https://legal-rag-web.onrender.com/",
+      "issues": []
+    },
+    {
+      "id": "pet-workspace-entry",
+      "projectId": "pet-workspace",
+      "projectTitle": "AI 宠物生成管线",
+      "label": "Pet App 展示页",
+      "url": "https://biau.playlab.eu.cc/pet-app-showcase/",
+      "kind": "mobile",
+      "expectation": "static-site",
+      "description": "AI 桌宠社区 App 截图、下载状态和 APK 发布门禁说明。",
+      "note": "入口可达代表展示页和截图可访问；正式 APK 下载仍需签名包、校验摘要和人工确认。",
+      "status": "online",
+      "httpStatus": 200,
+      "durationMs": 1027,
+      "checkedAt": "2026-07-03T03:37:47.223Z",
+      "finalUrl": "https://biau.playlab.eu.cc/pet-app-showcase/",
       "issues": []
     },
     {
@@ -39,8 +56,8 @@
       "note": "生产注册与演示账号属于人工 gate；状态页只检查公开入口是否响应。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 940,
-      "checkedAt": "2026-07-03T03:21:47.604Z",
+      "durationMs": 1208,
+      "checkedAt": "2026-07-03T03:37:48.250Z",
       "finalUrl": "https://erp.ciallobill.qzz.io/",
       "issues": []
     },
@@ -56,8 +73,8 @@
       "note": "静态站可用不代表每个 Web 试玩资源都已完成运行检查。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 1299,
-      "checkedAt": "2026-07-03T03:21:48.544Z",
+      "durationMs": 946,
+      "checkedAt": "2026-07-03T03:37:49.458Z",
       "finalUrl": "https://games.playlab.eu.cc/",
       "issues": []
     },
@@ -73,8 +90,8 @@
       "note": "阶段 APK 是否公开发布仍需人工确认；这里只检查展示页入口。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 896,
-      "checkedAt": "2026-07-03T03:21:49.843Z",
+      "durationMs": 1028,
+      "checkedAt": "2026-07-03T03:37:50.404Z",
       "finalUrl": "https://xunqiu.playlab.eu.cc/",
       "issues": []
     }
@@ -137,7 +154,7 @@
           "label": "在线工作台入口",
           "status": "online",
           "description": "检查公开 Legal RAG 工作台入口是否响应。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 694 ms。由 L0 入口检测自动合并。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 978 ms。由 L0 入口检测自动合并。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "legal-rag-entry"
@@ -204,7 +221,7 @@
           "label": "演示入口",
           "status": "online",
           "description": "检查 ERP 登录/演示入口是否响应。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 940 ms。由 L0 入口检测自动合并。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 1208 ms。由 L0 入口检测自动合并。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "ozon-erp-entry"
@@ -271,7 +288,7 @@
           "label": "产品展示页",
           "status": "online",
           "description": "检查寻球展示页、文档和阶段包入口是否响应。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 896 ms。由 L0 入口检测自动合并。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 1028 ms。由 L0 入口检测自动合并。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "xunqiu-entry"
@@ -336,8 +353,8 @@
           "layer": "observability",
           "label": "APK 发布 gate",
           "status": "planned",
-          "description": "检查签名、版本、下载链接、回滚说明和隐私说明后再公开。",
-          "evidence": "当前只记录 gate，不声明 APK 已公开。",
+          "description": "检查正式 release 构建、签名、校验摘要、下载链接、回滚说明和隐私说明后再公开。",
+          "evidence": "当前只记录 gate；已定位内部 debug 构建，但不声明 APK 已公开。",
           "cadence": "发布候选生成后",
           "ownerHint": "Release checklist"
         },
@@ -356,8 +373,8 @@
         "真实 Pet APK 发布、后端部署和账号体系公开演示都需要人工确认。"
       ],
       "nextActions": [
-        "整理 Pet 展示页和 debug APK 产物记录。",
-        "有正式签名包后补下载状态检查。"
+        "将 debug 构建记录转成正式 release candidate 清单。",
+        "有正式签名包、校验摘要和版本说明后补下载状态检查。"
       ]
     },
     {
@@ -372,7 +389,7 @@
           "label": "游戏站入口",
           "status": "online",
           "description": "检查 Playlab 静态站入口是否响应。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 1299 ms。由 L0 入口检测自动合并。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 946 ms。由 L0 入口检测自动合并。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "biau-playlab-entry"

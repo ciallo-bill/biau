@@ -262,7 +262,7 @@ export const projects: Project[] = [
         {
           title: '新增 App 展示与下载状态页',
           body:
-            '当前已经在主站补充 /pet-app-showcase/ 独立静态展示页，用真实 Android 模拟器截图呈现桌宠模式、孵化桌宠、社区和个人页。页面明确标注 APK 待公开构建，不提供占位下载链接，也不把 debug 包包装成公开发布包。',
+            '当前已经在主站补充 /pet-app-showcase/ 独立静态展示页，用真实 Android 模拟器截图呈现桌宠模式、孵化桌宠、社区和个人页。页面明确标注 APK 待正式签名包，记录 debug 构建只用于内部验证，不提供占位下载链接，也不把 debug 包包装成公开发布包。',
         },
       ],
       workflow: [
@@ -325,7 +325,7 @@ export const projects: Project[] = [
           title: '当前边界',
           items: [
             '这是进行中的产品工程，不应描述为已经完全生产化的公共 AI 桌宠平台。',
-            '公开 APK 还没有开放下载；展示页只说明当前 App 画面和发布门禁，不提供伪造或占位下载。',
+            '公开 APK 还没有开放下载；展示页只说明当前 App 画面、debug 构建内部验证信号和发布门禁，不提供伪造或占位下载。',
             '真实生成 Worker、模型适配、私有运维、部署验证、租户权限和完整鉴权仍属于受控后台能力，不对公开访客开放。',
             '机器 QA 只能帮助发现透明背景、动作稳定性、循环锚点和布局问题，最终发布仍需要人类视觉审核。',
             'Android 真实设备/模拟器端到端、长期 SLA、队列守护、运维 Runbook 和监控告警仍需要继续补强。',
@@ -352,7 +352,7 @@ export const projects: Project[] = [
       'Community API 是 App 唯一后端入口，包含 health、SLA、metrics、feed、community-home、approved pets、package download descriptor、wallet、check-in、submissions、import drafts、bundle validation、admin review 和 fantasy-pet proxy 等能力。',
       '生成规则服务负责 app-safe job 创建、轮询、artifact 索引、不透明 downloadId、人工 review decision、package plan、pet.zip 构建、worker readiness 和内部 GA/Codex/QA 证据；机器证据不能替代人工视觉 accept。',
       '质量证据包括 Node workspace tests、Android 单元测试、Community API routes/server/store/rate-limit/metrics/SLA/logging/postgres 测试、pet package contract 测试、追踪矩阵、结构化日志、Prometheus metrics 和 SLA 文档。',
-      '项目已在主站提供 /pet-app-showcase/ 静态 App 展示与下载状态页，使用真实 Android 模拟器截图展示桌宠模式、孵化桌宠、社区和个人页；APK 区域明确标注待公开构建，不提供占位下载。',
+      '项目已在主站提供 /pet-app-showcase/ 静态 App 展示与下载状态页，使用真实 Android 模拟器截图展示桌宠模式、孵化桌宠、社区和个人页；APK 区域明确标注待正式签名包，debug 构建只作为内部验证信号，不提供占位下载。',
       '当前项目应被描述为 WIP：Android 模拟器 E2E、live 私有部署验证、生产鉴权、租户隔离、Worker daemon、队列运营、Runbook、长期 SLA 和可观测告警仍是后续优化方向。',
     ],
   },

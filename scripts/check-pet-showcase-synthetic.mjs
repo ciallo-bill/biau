@@ -126,6 +126,10 @@ function validateShowcasePage(response) {
     if (!response.body.includes(text)) issues.push(`showcase page: missing ${text}`)
   }
 
+  if (/<a\b[^>]*href=["'][^"']+\.apk(?:[?#][^"']*)?["']/i.test(response.body)) {
+    issues.push('showcase page: APK download href is present before release approval')
+  }
+
   return issues
 }
 
