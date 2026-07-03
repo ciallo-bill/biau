@@ -112,6 +112,8 @@ const SEARCH_KEYWORDS = [
   '入口',
   '演示',
   '登录',
+  '注册',
+  'operator',
   '密码',
   '凭据',
   'playlab',
@@ -162,8 +164,8 @@ const SEARCH_ALIASES = [
     terms: ['pet-workspace', 'ai 桌宠', '生成管线', '质量门禁'],
   },
   {
-    triggers: ['ozon', 'erp', '电商'],
-    terms: ['ozon erp', '业务系统', '运营后台', '浏览器插件'],
+    triggers: ['ozon', 'erp', '电商', '注册', 'operator'],
+    terms: ['ozon erp', '业务系统', '运营后台', '浏览器插件', '默认开放注册', 'operator'],
   },
   {
     triggers: ['寻球', 'xunqiu', '足球', 'android', '移动端'],
@@ -207,9 +209,9 @@ export const publicKnowledgeBase: AssistantKnowledgeItem[] = [
     id: 'site:status',
     title: '项目可靠性观察',
     summary:
-      '状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned，方便访客判断哪些演示能直接打开、哪些仍需要配置或人工确认。',
+      '状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 BIAU Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned。当前主站会记录 ERP 默认开放注册、各站点可见品牌外壳/标题/favicon/归属提示对齐、Pet APK 继续关闭等公开安全事实。',
     href: '/status',
-    tags: ['状态页', '可靠性观察', '公开入口', 'health check', 'synthetic'],
+    tags: ['状态页', '可靠性观察', '公开入口', 'health check', 'synthetic', '注册', '品牌统一'],
     visibility: 'public',
   },
   ...projectKnowledge,

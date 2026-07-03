@@ -122,6 +122,11 @@ export const projects: Project[] = [
           body:
             '线上工作台有登录门禁，这是为了保护模型网关、上传接口和 pgvector 数据库资源。如果登录页显示“公开演示凭据”，访客可以使用页面给出的低权限 demo 凭据试用；如果没有显示凭据，则该入口仍是受控演示，需要维护者在 API 侧配置低权限登录密码，并在 Web 侧配置 VITE_PUBLIC_DEMO_EMAIL / VITE_PUBLIC_DEMO_PASSWORD 后重新部署。真实后台密码不能写进项目页、文章或状态页。',
         },
+        {
+          title: '泊岸品牌入口已同步',
+          body:
+            '线上工作台的页面标题、favicon、登录面板和侧边栏已经同步为 BIAU Port / 泊岸。Legal RAG 仍保留自己的产品名和登录门禁，品牌统一只用于说明它属于泊岸项目展示体系，不改变凭据公开规则。',
+        },
       ],
       workflow: [
         {
@@ -226,6 +231,7 @@ export const projects: Project[] = [
       '系统支持公开安全数据集和文档导入，RAG pipeline 包含清洗、项目级 SHA-256 去重、章节感知 chunk、embedding、memory/pgvector 存储、query rewrite、向量+关键词混合召回、merge/filter/rerank、grounded answer 或 refusal、citations 与 diagnostics。',
       '合同审查采用规则优先策略，规则召回付款、交付、违约责任、知识产权、争议解决和终止等风险；模型只辅助改写已召回风险的解释和建议，并在 schema 校验失败时回退到规则结果。',
       '项目包含 RAG 与合同审查 eval fixtures、quality/evaluation 报告路由和质量面板，适合说明 AI 应用如何做引用溯源、可解释风险审查和质量评测。',
+      'Legal RAG Web 工作台的标题、favicon、登录面板和侧边栏已对齐 BIAU Port / 泊岸品牌；公开试用凭据仍只能通过低权限、可轮换、可公开的 demo 配置展示。',
       '线上工作台入口是 https://legal-rag-web.onrender.com，有登录门禁，公开页面不会放真实后台/admin 密码；如果 Legal RAG 登录页显示公开演示凭据，访客可以使用页面给出的低权限 demo 凭据试用；如果没有显示凭据，则仍是受控演示入口。',
       'Legal RAG 公开自助试用需要维护者同时配置 API 侧登录校验密码和 Web 侧 VITE_PUBLIC_DEMO_EMAIL / VITE_PUBLIC_DEMO_PASSWORD；VITE_PUBLIC_DEMO_PASSWORD 会进入前端包，所以只能填写可公开、低权限、可轮换的 demo 密码。',
       '推荐公开演示顺序是：登录受保护工作台、初始化公开安全数据集、执行带 citation/diagnostics 的 RAG 问答、运行示例合同审查、查看质量面板的 runtime、citation/refusal 评测、审查召回、readiness checks、趋势和审计日志。',
@@ -262,7 +268,12 @@ export const projects: Project[] = [
         {
           title: '新增 App 展示与下载状态页',
           body:
-            '当前已经在主站补充 /pet-app-showcase/ 独立静态展示页，用真实 Android 模拟器截图呈现桌宠模式、孵化桌宠、社区和个人页。页面明确标注 APK 待正式签名包，记录 debug 构建只用于内部验证，不提供占位下载链接，也不把 debug 包包装成公开发布包。',
+            '当前已经在主站补充 /pet-app-showcase/ 独立静态展示页，用真实 Android 模拟器截图呈现桌宠模式、孵化桌宠、社区和个人页。页面标题、favicon 和入口文案已接入 BIAU Port / 泊岸统一品牌；APK 区域明确标注待正式签名包，记录 debug 构建只用于内部验证，不提供占位下载链接，也不把 debug 包包装成公开发布包。',
+        },
+        {
+          title: 'APK 发布门禁最新结论',
+          body:
+            '最近一次发布门禁审计只在 Pet 工作区找到 debug APK，没有找到满足公开条件的 release APK 或 AAB。因此主站和展示页继续保持 APK 下载关闭；后续必须补正式 release 构建、签名策略、校验摘要、版本说明、基础回归和人工确认后才能公开下载。',
         },
       ],
       workflow: [
@@ -352,7 +363,8 @@ export const projects: Project[] = [
       'Community API 是 App 唯一后端入口，包含 health、SLA、metrics、feed、community-home、approved pets、package download descriptor、wallet、check-in、submissions、import drafts、bundle validation、admin review 和 fantasy-pet proxy 等能力。',
       '生成规则服务负责 app-safe job 创建、轮询、artifact 索引、不透明 downloadId、人工 review decision、package plan、pet.zip 构建、worker readiness 和内部 GA/Codex/QA 证据；机器证据不能替代人工视觉 accept。',
       '质量证据包括 Node workspace tests、Android 单元测试、Community API routes/server/store/rate-limit/metrics/SLA/logging/postgres 测试、pet package contract 测试、追踪矩阵、结构化日志、Prometheus metrics 和 SLA 文档。',
-      '项目已在主站提供 /pet-app-showcase/ 静态 App 展示与下载状态页，使用真实 Android 模拟器截图展示桌宠模式、孵化桌宠、社区和个人页；APK 区域明确标注待正式签名包，debug 构建只作为内部验证信号，不提供占位下载。',
+      '项目已在主站提供 /pet-app-showcase/ 静态 App 展示与下载状态页，使用 BIAU Port / 泊岸标题与 favicon，并用真实 Android 模拟器截图展示桌宠模式、孵化桌宠、社区和个人页；APK 区域明确标注待正式签名包，debug 构建只作为内部验证信号，不提供占位下载。',
+      '最近一次 APK 发布门禁审计只找到 debug APK，没有 release APK/AAB 候选；公开下载继续关闭，后续需要正式构建、签名策略、校验摘要、版本说明、回归证据和人工确认。',
       '当前项目应被描述为 WIP：Android 模拟器 E2E、live 私有部署验证、生产鉴权、租户隔离、Worker daemon、队列运营、Runbook、长期 SLA 和可观测告警仍是后续优化方向。',
     ],
   },
@@ -395,9 +407,11 @@ export const projects: Project[] = [
         {
           title: '认证入口体验',
           items: [
-            '登录/注册页已经整理成受控工作台入口，左侧用“店铺授权、插件采集、后台回填”的链路说明 ERP 的真实工作方式；访客从主站进入 ERP 时可以返回项目说明，也能区分登录、普通注册和首次 Owner 初始化。',
+            '登录/注册页已经整理成 BIAU Port / 泊岸统一品牌外壳，左侧主视觉显示泊岸归属和 Ozon ERP 产品名，并用“店铺授权、插件采集、后台回填”的链路说明 ERP 的真实工作方式。',
+            '登录后工作台侧栏也使用泊岸统一图标和 BIAU Port / 泊岸归属说明，Ozon ERP 保留为业务系统产品名；访客从主站进入 ERP 时可以返回项目说明，也能区分登录、普通注册和首次 Owner 初始化。',
             '普通注册和 Owner 初始化增加确认密码校验，在请求 API 前拦截两次密码不一致的情况。',
-            '生产自助注册已获得明确批准，但仍由服务端 ERP_REGISTRATION_ENABLED 显式开关控制；已有 Owner 后，新注册账号默认是 operator，不自动获得 Owner 权限。',
+            '生产自助注册已获得明确批准并改为默认开放；如果需要受控演示或临时维护，仍可以通过 ERP_REGISTRATION_ENABLED 的显式关闭值关掉注册入口。',
+            '已有 Owner 后，新注册账号默认是 operator，不自动获得 Owner 权限；首次 Owner 初始化仍只在系统没有管理员时开放。',
             '如果 bootstrap 状态请求失败，前端不会默认展示自助注册入口，而是回到更保守的受控登录状态。',
           ],
         },
@@ -488,7 +502,8 @@ export const projects: Project[] = [
     assistantContext: [
       'Ozon ERP 是面向小团队跨境店铺运营的业务系统，包含 Vue/Vite 管理后台、Express API、Prisma/PostgreSQL 数据模型、可选 Redis/BullMQ 队列、WXT/Chrome MV3 浏览器插件和共享计算包。',
       '管理后台覆盖登录、注册、Owner 初始化、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等工作流，重点解决店铺授权、商品同步、采集铺货、定价利润和运营追踪。',
-      '认证入口已经补充确认密码校验、Owner 初始化提示、受控登录状态、主站返回桥接和 bootstrap 失败时不默认开放自助注册的前端兜底；生产自助注册已获批准，但必须通过服务端 ERP_REGISTRATION_ENABLED 显式开启。',
+      '认证入口已经补充确认密码校验、Owner 初始化提示、主站返回桥接、BIAU Port / 泊岸 favicon、登录页主品牌和登录后侧栏归属；Ozon ERP 保留为业务系统产品名。',
+      '生产自助注册已获批准并默认开放，显式设置关闭值时仍可切回受控登录。',
       'ERP 概览页已经补充登录后首次引导，展示当前账号/角色、Owner 与协作者职责说明，并说明已有 Owner 后新注册账号默认是 operator，不自动获得 Owner 权限。',
       'Express API 注册 auth、shops、products、selection、settings、ozon、collect、market metrics、commission rates、api.chrome、exchange rates、watermark 和 uploads 等路由。',
       'Prisma 模型覆盖用户、店铺、Ozon 凭证、Seller 会话、商品、采集商品、草稿、导入日志、PendingAction、JobQueue、AuditLog、市场指标和佣金映射等对象。',
@@ -500,7 +515,7 @@ export const projects: Project[] = [
   },
   {
     id: 'biau-playlab',
-    title: 'Biau Playlab｜游戏作品集与系统设计内容站',
+    title: 'BIAU Playlab｜游戏作品集与系统设计内容站',
     summary: '基于 Astro 的独立游戏作品集与试玩平台，整合六个已部署 Godot Web 游戏、项目详情、截图/视频、开发日志和系统设计文章。',
     category: 'platform',
     status: 'live',
@@ -518,12 +533,17 @@ export const projects: Project[] = [
         {
           title: '把游戏原型变成可访问的作品集平台',
           body:
-            'Biau Playlab 不是只放几张截图的列表页，而是把六个 Godot 项目整理成可访问、可试玩、可复盘的内容站。访客可以从游戏总览进入单个项目详情，再跳到独立 Web 试玩入口，看到玩法目标、机制贡献、截图/视频、里程碑、开发日志和后续计划；Spacewar II 已作为第六个公开 Web 试玩项目接入统一内容模型。',
+            'BIAU Playlab 不是只放几张截图的列表页，而是把六个 Godot 项目整理成可访问、可试玩、可复盘的内容站。访客可以从游戏总览进入单个项目详情，再跳到独立 Web 试玩入口，看到玩法目标、机制贡献、截图/视频、里程碑、开发日志和后续计划；Spacewar II 已作为第六个公开 Web 试玩项目接入统一内容模型。',
         },
         {
           title: '游戏展示先于博客优化',
           body:
             '当前站点里游戏项目页和试玩入口已经形成完整展示链路，文章与博客归档仍有后续整理空间。主站项目页会优先把 Playlab 作为游戏作品集平台说明，不把博客内容质量包装成已经完全成型的内容产品。',
+        },
+        {
+          title: '站点命名和图标对齐',
+          body:
+            '游戏站已统一为 BIAU Playlab 命名，并把 favicon 换成 BIAU Port / 泊岸图标；导航副标题和页脚也补充 BIAU Port / 泊岸归属。这样访客从主站、游戏站和试玩入口之间跳转时能识别它们属于同一展示体系，同时仍保留 Playlab 作为游戏作品集产品名。',
         },
       ],
       workflow: [
@@ -600,7 +620,8 @@ export const projects: Project[] = [
       ],
     },
     assistantContext: [
-      'Biau Playlab 是已部署的 Astro 5 游戏作品集与试玩平台，整合六个 Godot Web 游戏、项目详情页、截图/视频、开发日志、系统设计文章和公开试玩入口。',
+      'BIAU Playlab 是已部署的 Astro 5 游戏作品集与试玩平台，整合六个 Godot Web 游戏、项目详情页、截图/视频、开发日志、系统设计文章和公开试玩入口。',
+      '游戏站已统一使用 BIAU Playlab 命名，并把 favicon、导航副标题和页脚归属对齐到 BIAU Port / 泊岸，保留 Playlab 作为游戏作品集产品名。',
       '站点使用 Astro content collections 管理 games、devlogs、published articles 和 article workbench；games schema 包含 status、engine、platforms、screenshots、playableWeb、embedUrl、downloadLinks、repoUrl、challenge、mechanic、contribution、outcome、nextStep、milestones 和 devlogSlugs。',
       '六个游戏包括 Tetris、Next Spacewar、intespace、Raiden、space-war 和 Spacewar II；Spacewar II 已作为第六个公开 Web 试玩项目接入，并补齐菜单、战斗和结果页真实截图。',
       'Godot Web 试玩入口由独立试玩域名承载，首次加载可能较慢；移动端输入、横竖屏缩放、HUD 可读性和浏览器性能仍需要持续回归。',
@@ -1197,6 +1218,11 @@ export const projects: Project[] = [
           body:
             '旧版客户端继续对应旧后端和历史接口，64 位新客户端通过配置化 Host 接入现代后端。这样可以保留旧包可回滚的安全边界，同时让新客户端独立验证登录、动态、球队、约赛、球场和短视频等核心体验。',
         },
+        {
+          title: '展示站品牌入口对齐',
+          body:
+            '寻球静态展示站的首页、技术文档和 404 页已经补充 BIAU Port / 泊岸标题与统一 favicon，页脚也明确说明它归属于泊岸项目展示体系。寻球仍保留自己的产品名、文档入口和阶段 APK 边界。',
+        },
       ],
       workflow: [
         {
@@ -1292,6 +1318,7 @@ export const projects: Project[] = [
       '项目有 Android 测试矩阵、旧版入口对照、后端 MockMvc 测试、PostgreSQL/Testcontainers 测试和部署烟测脚本；支付、IM、推送、地图、分享等高副作用能力当前以安全等价或 stub 方式收口。',
       '现代后端健康检查路径是 /free_kicker/actuator/health，smoke 脚本覆盖 health、登录、动态、短视频、球队和球场；如果公开 health 冷启动或超时，应作为运维排查信号，而不是生产 SLA 结论。',
       '公开展示站提供产品页、技术文档和 latest-xunqiu64.apk 阶段包副本；这些入口用于展示与轻量验证，不代表完整生产发布或长期生产运营方案，也不包含旧后端 IP、测试密码、签名路径或私有云配置。',
+      '寻球静态展示站首页、技术文档页和 404 页已统一 BIAU Port / 泊岸标题与 favicon，并在页脚说明归属泊岸项目展示体系。',
       '后续优化方向包括真实设备回归、旧 WebView 原生化、权限与审计、文件治理、监控部署、短视频播放器升级和更完整的生产化运维。',
     ],
   },
@@ -1321,5 +1348,5 @@ export const capabilityTracks = [
   { title: 'AI 应用', detail: 'RAG、Agent、引用溯源、审核闭环', value: 'Legal RAG / Pet Workspace' },
   { title: '业务系统', detail: '后台、API、数据库、队列、审计日志', value: 'Ozon 电商 ERP' },
   { title: '互动体验', detail: 'Godot 展示入口、试玩计划、游戏展示页', value: '6 个游戏项目' },
-  { title: '博客系统', detail: 'React + Semi、Astro、内容审计、部署准备', value: 'Biau Port / Playlab' },
+  { title: '博客系统', detail: 'React + Semi、Astro、内容审计、部署准备', value: 'BIAU Port / Playlab' },
 ]

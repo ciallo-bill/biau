@@ -68,7 +68,7 @@ export const heroContent = {
     },
     {
       id: 'biau-playlab',
-      title: 'Biau Playlab 游戏站',
+      title: 'BIAU Playlab 游戏站',
       description: '六个 Godot 原型、Web 试玩、开发日志与系统拆解内容站',
       poetry: '《把可玩的想法停靠成港》',
       action: 'PLAY',
