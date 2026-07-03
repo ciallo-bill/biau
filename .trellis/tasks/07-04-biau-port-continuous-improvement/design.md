@@ -50,23 +50,25 @@ Discovery questions:
 When continuing autonomously:
 
 1. Prefer already-started `in_progress` child tasks.
-2. If no child is in progress, finish readiness review for existing child tasks before creating new work.
-3. Prioritize existing `P1` child tasks from `07-03-cross-project-release-readiness-round-3` before opening new discovery-driven tasks, unless all of them are blocked by manual actions.
-4. If existing `P1` child tasks are blocked, record the blockers and continue with the next unblocked child, such as public assistant local RAG groundwork or AI Daily draft-only planning.
-5. Run discovery sweeps continuously, but treat new findings as backlog candidates until current child tasks are closed, blocked, or explicitly superseded.
-6. Inspect planning child tasks and choose the one with:
+2. If the user has explicitly named a current priority child, select that child before the default queue. Current override: finish `07-04-public-assistant-kg-lite` first, while keeping production model/RAG/deployment validation behind manual gates.
+3. If no child is in progress and no user override is active, finish readiness review for existing child tasks before creating new work.
+4. Prioritize existing `P1` child tasks from `07-03-cross-project-release-readiness-round-3` before opening new discovery-driven tasks, unless all of them are blocked by manual actions.
+5. If existing `P1` child tasks are blocked, record the blockers and continue with the next unblocked child, such as public assistant local RAG groundwork or AI Daily draft-only planning.
+6. Run discovery sweeps continuously, but treat new findings as backlog candidates until current child tasks are closed, blocked, or explicitly superseded.
+7. Inspect planning child tasks and choose the one with:
    - highest user-visible impact;
    - least dependency on manual secrets/deployment actions;
    - clear local validation path;
    - low risk of broad unrelated churn.
-7. If a new gap has an independent deliverable, create or update a child task for it.
-8. If all active children are blocked on manual action, create or update a planning child task for the next unblocked improvement.
-9. Record the blocker in `manual-actions.md` and keep moving on unrelated unblocked work.
+8. If a new gap has an independent deliverable, create or update a child task for it.
+9. If all active children are blocked on manual action, create or update a planning child task for the next unblocked improvement.
+10. Record the blocker in `manual-actions.md` and keep moving on unrelated unblocked work.
 
 ## Existing Child Completion Bias
 
 The parent task must not keep expanding the task tree while previously accepted work remains open. The default execution posture is:
 
+- honor explicit user priority overrides first;
 - close or unblock existing `P1` children first;
 - keep `P2` children moving only when they are locally verifiable and do not delay `P1` closure;
 - create new child tasks only for issues found during evidence sweeps that are too large or risky to fold into an existing child.
