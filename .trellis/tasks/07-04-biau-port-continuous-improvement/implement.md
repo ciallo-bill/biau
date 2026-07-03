@@ -14,8 +14,14 @@
 
 ## Phase 2: Review Child Task Readiness
 
+- [ ] Apply child-first stabilization rule: do not create new implementation work until existing `P1` children are reviewed, started, blocked, or intentionally deferred.
 - [ ] Review public assistant frontier RAG artifacts.
 - [ ] Review cross-project release readiness tree.
+- [ ] Review `P1` child readiness in this order:
+  - [ ] ERP production registration live verify.
+  - [ ] Legal RAG demo access QA closure.
+  - [ ] Pet APK public release closure.
+  - [ ] Cross-project scheduled reliability observability.
 - [ ] Run a discovery sweep across main site data/routes and related project references.
 - [ ] Identify which child tasks can proceed without manual actions.
 - [ ] Identify which child tasks are blocked by manual actions.
@@ -50,25 +56,29 @@ Repeat while the user is away and context/time allows:
 
 ## Recommended First Autonomous Work Items
 
-1. Public assistant answer style cleanup
-   - Why: immediate visible quality issue already observed.
-   - Manual dependency: none.
-   - Risk: low.
-2. Public assistant knowledge export V2 planning / local deterministic export
-   - Why: foundation for Agentic Hybrid RAG.
-   - Manual dependency: none if kept local and mockable.
+1. ERP registration display and main-site sync review
+   - Why: user repeatedly called out registration availability and demo usability.
+   - Manual dependency: live production verification if credentials/deployment needed.
    - Risk: medium.
-3. Reliability/status page route and detail polish
+2. Legal RAG demo access and status wording closure
+   - Why: user reported the demo route was still blocked by login and wants legal Q&A monitored.
+   - Manual dependency: public credential/access policy if live checks are needed.
+   - Risk: medium.
+3. Pet showcase APK gate page/data cleanup
+   - Why: user requested homepage connection to Pet showcase and APK public release readiness.
+   - Manual dependency: release APK/signing/checksum approval.
+   - Risk: medium.
+4. Reliability/status page route and detail polish
    - Why: user already requested status card buttons and detail routes.
    - Manual dependency: none for local UI/data changes.
    - Risk: low to medium.
-4. Pet showcase APK gate page/data cleanup
-   - Why: user requested public APK readiness but actual release needs manual approval.
-   - Manual dependency: release APK/signing/checksum approval.
-   - Risk: medium.
-5. ERP registration display and main-site sync review
-   - Why: user repeatedly called out registration availability.
-   - Manual dependency: live production verification if credentials/deployment needed.
+5. Public assistant answer style cleanup
+   - Why: visible quality issue already observed, but it is `P2` after current release-readiness blockers.
+   - Manual dependency: none for local prompt/style/data changes; no model liveness checks.
+   - Risk: low.
+6. Public assistant knowledge export V2 planning / local deterministic export
+   - Why: foundation for Agentic Hybrid RAG.
+   - Manual dependency: none if kept local and mockable.
    - Risk: medium.
 
 ## Validation Commands By Work Type
