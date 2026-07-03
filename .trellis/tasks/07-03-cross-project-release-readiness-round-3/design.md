@@ -6,12 +6,16 @@ This is a parent coordination task. It owns cross-project release-readiness rule
 
 Child tasks own implementation and verification:
 
-- `07-03-public-assistant-glm-live-closure`
 - `07-03-erp-production-registration-live-verify`
 - `07-03-legal-rag-demo-access-qa-closure`
 - `07-03-pet-apk-public-release-closure`
 - `07-03-cross-project-scheduled-reliability-observability`
 - `07-03-ai-daily-content-pipeline-phase-1`
+
+Archived public-assistant GLM deployment closure is no longer an active child.
+Current public-assistant frontier work is tracked by
+`07-04-public-assistant-kg-lite` under the long-running continuous-improvement
+parent task.
 
 ## Evidence Model
 

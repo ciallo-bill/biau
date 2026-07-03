@@ -12,12 +12,15 @@
 
 ## Recommended Order
 
-1. `07-03-public-assistant-glm-live-closure`
-2. `07-03-erp-production-registration-live-verify`
-3. `07-03-legal-rag-demo-access-qa-closure`
-4. `07-03-cross-project-scheduled-reliability-observability`
-5. `07-03-pet-apk-public-release-closure`
-6. `07-03-ai-daily-content-pipeline-phase-1`
+1. `07-03-erp-production-registration-live-verify`
+2. `07-03-legal-rag-demo-access-qa-closure`
+3. `07-03-cross-project-scheduled-reliability-observability`
+4. `07-03-pet-apk-public-release-closure`
+5. `07-03-ai-daily-content-pipeline-phase-1`
+
+Note: `07-03-public-assistant-glm-live-closure` is archived. Current public
+assistant Agentic Hybrid RAG work is tracked by
+`07-04-public-assistant-kg-lite`.
 
 ## Validation Commands
 

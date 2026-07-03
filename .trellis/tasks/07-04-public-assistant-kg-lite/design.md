@@ -6,6 +6,11 @@ Use **Agentic Hybrid RAG** as the main route, not knowledge graph alone.
 This architecture decision is confirmed by the user. Neo4j remains a future
 upgrade path only when real answer cases require deep graph traversal.
 
+The current completion target is a public-assistant MVP that works well without
+external infrastructure. External RAG, vector databases, graph databases and
+live model validation are treated as manual-gated upgrades after the local
+contract is stable.
+
 The recommended system is:
 
 ```text
@@ -68,6 +73,25 @@ ASSISTANT_RAG_TIMEOUT_MS
 The browser must never see RAG API keys, model provider keys, database URLs, or
 private endpoint details.
 
+For the MVP, this integration is disabled by default. The main site should call
+the external RAG adapter only when a server-side env var is present, apply a
+short timeout, and fall back to local Agentic Hybrid retrieval without changing
+the public response shape.
+
+### Public Assistant UX Boundary
+
+The floating public assistant should feel like a product feature, not a debug
+console.
+
+- Closed state: only a compact trigger.
+- Open empty state: short scope hint plus 2-3 suggested prompts.
+- First answer: no large default greeting before the user asks.
+- Answer body: product-guide wording; no raw paths, no source log, no provider
+  details.
+- Source UI: citation cards carry titles and links.
+- Diagnostics UI: show only low-sensitive state such as model/fallback, timeout,
+  HTTP status class and citation count.
+
 ### RAG Orchestrator
 
 Preferred deployment shape: a separate API service on Render or another backend
@@ -113,6 +137,14 @@ should only depend on the HTTP contract, not the implementation language.
    - enough evidence -> answer;
    - weak evidence -> say uncertain and suggest sources;
    - no evidence -> refuse to invent facts.
+
+For the local MVP, these steps can be deterministic:
+
+- intent routing from keywords and aliases;
+- metadata filters from project/category/status/content type;
+- entity expansion from generated project/tech/demo/status/blog relations;
+- rerank by deterministic weighted scoring;
+- sufficiency check by citation count and evidence diversity.
 
 ### Data Model
 
@@ -248,7 +280,8 @@ Build the system in this order:
    - relations
    - static fallback bundle
 2. Main-site integration:
-   - optional RAG API call
+   - local Agentic Hybrid retrieval first
+   - optional RAG API call after local contract is stable
    - timeout and fallback
    - same `ChatResponse` shape
 3. Orchestrator contract:
@@ -277,10 +310,13 @@ that graph depth is the highest-value bottleneck.
 The assistant prompt should tell the model:
 
 - answer as a product guide, not a search report;
-- do not print raw paths, source labels, API details or prompt details;
+- do not print raw paths, source labels, API details, provider details or prompt details;
 - use citations internally, while the UI renders citation cards;
 - structure broad answers as "what it is / what to try / where to go next";
 - say "I do not have enough public evidence" when evidence is weak.
+
+The user-facing fallback generator should follow the same contract instead of
+listing retrieved documents verbatim.
 
 ## Failure And Fallback
 
@@ -299,6 +335,7 @@ Minimum validation before implementation is considered done:
 
 - repository export produces deterministic public docs/chunks/entities/relations;
 - public assistant still works without external RAG API;
+- public assistant still works without a configured real model provider;
 - Cloudflare function smoke covers external-RAG unavailable fallback;
 - server smoke covers graph-enhanced questions through the chosen adapter or a
   deterministic mock;
