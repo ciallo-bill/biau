@@ -1,6 +1,8 @@
-# Biau Labs 展示系统
+# BIAU Port / 泊岸
 
-基于 React、Vite、TypeScript 和 Semi Design 构建的动态展示网站，用于组织 AI 应用、全栈开发、游戏项目、案例中心和博客内容。
+基于 React、Vite、TypeScript 和 Semi Design 构建的产品官网，用于组织 AI 应用、业务系统、移动端应用、互动体验、知识内容和公开助手入口。
+
+站点目标是让访客能快速理解每个项目的实现、架构、技术栈、演示入口、可靠性状态和后续优化方向；公开内容只保留可展示、可验证、已脱敏的信息。
 
 ## 线上地址
 
@@ -17,9 +19,9 @@ npm run lint
 npm run preview
 ```
 
-## 内部助手 API
+## 助手 API
 
-本仓库同时包含一个独立的 Node/TypeScript 助手后端，位于 `server/`。前端仍部署到 Cloudflare Pages，助手 API 可单独部署到 Render，并连接 Aiven PostgreSQL。
+本仓库同时包含一个 Node/TypeScript 助手后端，位于 `server/`。公开助手可通过 Cloudflare Pages Functions 使用同域 `/api`，内部助手 API 也可以单独部署到 Render，并连接 PostgreSQL。
 
 ```bash
 npm run assistant:index

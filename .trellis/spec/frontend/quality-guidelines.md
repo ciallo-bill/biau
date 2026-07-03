@@ -63,6 +63,33 @@ small assertion or manual check that proves:
 This prevents the page from passing build/lint while still shipping broken
 screenshots or an accidentally public gated download.
 
+### Convention: Root Static SEO Shell
+
+`index.html` is the first SEO and social-card shell before React mounts. Keep
+its `<title>`, description, Open Graph, and Twitter fields aligned with the
+defaults in `src/utils/seo.ts`.
+
+Good:
+
+```html
+<meta property="og:site_name" content="BIAU Port" />
+<title>BIAU Port 泊岸 | AI 应用、项目展示与知识库</title>
+```
+
+Bad:
+
+```html
+<meta property="og:site_name" content="Old Brand" />
+<title>Old Brand | AI 应用、项目展示与知识库</title>
+```
+
+After changing brand, default title, default description, canonical host, or
+default social image, search both the static shell and runtime SEO source:
+
+```powershell
+rg -n "old brand|new brand" index.html src/utils/seo.ts README.md
+```
+
 ## Data Safety
 
 Everything committed to this public site should be treated as public. Never write real IPs, internal domains, database URLs, API keys, tokens, signing paths, certificates, private account details, exact sensitive metrics, or unsanitized customer/company names.
