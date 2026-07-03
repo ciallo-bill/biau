@@ -61,3 +61,80 @@ npm.cmd run build
 ```
 
 Also run a sensitive scan on changed files and manually inspect hits that mention token, key, bearer, database URL, private IP, or connection strings.
+
+## Scenario: Public Synthetic Status Reports
+
+### 1. Scope / Trigger
+
+- Trigger: adding a project reliability smoke check that writes into `public/status/` and is rendered by `/status`.
+- Use this for cross-project checks such as Legal RAG, ERP, xunqiu backend, game static resources, and future assistant production smoke checks.
+
+### 2. Signatures
+
+- `npm.cmd run <project>:synthetic` runs a project-specific script.
+- Script output path: `public/status/<project>-synthetic.json`.
+- Status aggregation: `npm.cmd run site:status` loads every `public/status/*-synthetic.json` file and merges checks by `id`.
+
+### 3. Contracts
+
+- Environment keys must be optional by default. Missing API base URL writes `unchecked` results and exits successfully.
+- Public report shape:
+  - `checkedAt: string`
+  - `apiBaseConfigured: boolean`
+  - `hasCredentials: boolean`
+  - `ok: boolean`
+  - `checks: Array<{ id, status, httpStatus, durationMs, checkedAt, summary, issues }>`
+- Allowed statuses are `online`, `degraded`, `offline`, and `unchecked`. Static data may still use `planned`.
+- Do not persist API base URLs, usernames, passwords, bearer tokens, private dashboard links, shop/SKU/order data, exact business metrics, or model-provider secrets.
+
+### 4. Validation & Error Matrix
+
+- Missing base URL -> all live checks `unchecked`; exit code `0`.
+- Missing credentials -> run public health/bootstrap checks only; protected checks `unchecked`; exit code `0`.
+- Failed attempted request -> check becomes `offline` or `degraded` based on HTTP status; `--strict` may exit non-zero.
+- Malformed synthetic JSON -> `site:status` ignores that file and keeps static status data.
+
+### 5. Good/Base/Bad Cases
+
+- Good: health endpoint returns a wrapped low-sensitive payload; script records status, HTTP status, duration, and a short summary.
+- Base: no environment configured; script records only `unchecked` placeholders so fresh clones still build.
+- Bad: report includes real hostnames, tokens, account names, raw response bodies, SKU/order metrics, or provider keys.
+
+### 6. Tests Required
+
+- Run the synthetic script with no env and assert it writes `unchecked` output.
+- Use an ephemeral local API to verify configured-base paths when adding protected smoke logic.
+- Run `npm.cmd run site:status` and confirm `/status` receives merged check statuses.
+- Run `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run check:ui`, `git diff --check`, and a sensitive scan over changed files.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```json
+{
+  "apiBaseUrl": "https://private.example.internal",
+  "token": "real-token",
+  "checks": [{ "id": "erp", "rawResponse": { "orders": 12345 } }]
+}
+```
+
+#### Correct
+
+```json
+{
+  "apiBaseConfigured": true,
+  "hasCredentials": true,
+  "checks": [
+    {
+      "id": "ozon-erp-auth",
+      "status": "online",
+      "httpStatus": 200,
+      "durationMs": 120,
+      "checkedAt": "2026-07-03T00:00:00.000Z",
+      "summary": "Auth bootstrap and login returned expected low-sensitive structures",
+      "issues": []
+    }
+  ]
+}
+```
