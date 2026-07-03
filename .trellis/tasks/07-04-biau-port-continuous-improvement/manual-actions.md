@@ -63,6 +63,27 @@ queue when the user is available.
 - Why manual: this affects public content quality, source trust, and model cost.
 - Codex can continue meanwhile: yes, by designing draft-only pipeline pieces and review gates.
 
+### M9. Confirm Xunqiu public release and backend production details
+
+- Related task: `07-04-biau-port-continuous-improvement`
+- Needed from user: approve which Xunqiu APK, backend URL, R2/Render/database settings, and production health endpoints may be used for public status or download claims.
+- Why manual: APK release, backend production URLs, storage, database, and deployment settings can expose private infrastructure or imply production support.
+- Codex can continue meanwhile: yes, by improving static showcase consistency, local build checks, docs, and non-secret status wording.
+
+### M10. Approve Game/Playlab public release changes
+
+- Related task: `07-04-biau-port-continuous-improvement`
+- Needed from user: approve any new playable build, downloadable binary, or public release wording before it is presented as official.
+- Why manual: public playable releases and binaries affect user expectations and may need manual QA beyond static checks.
+- Codex can continue meanwhile: yes, by checking static routes, screenshots, title/favicon consistency, mobile hints, and documentation.
+
+### M11. Confirm related-repository push policy
+
+- Related task: `07-04-biau-port-continuous-improvement`
+- Needed from user: confirm whether ERP, Legal RAG, Pet, Xunqiu, xunqiu-backend-modern, and Game/Playlab should be pushed automatically after successful commits, or left committed locally for review.
+- Why manual: `blog-semi` has an explicit default push rule, but related repositories may have different branch/deployment safety expectations.
+- Codex can continue meanwhile: yes, by keeping commits per repository and reporting exactly which repo/branch changed.
+
 ## Done
 
 - None yet.

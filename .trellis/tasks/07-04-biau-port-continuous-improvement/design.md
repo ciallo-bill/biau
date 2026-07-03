@@ -33,6 +33,8 @@ The parent task should actively inspect the following surfaces:
   - `D:\workspace4Cursor\legal-rag`
   - `D:\workspace4Cursor\pet`
 
+Related repositories are not read-only evidence sources. They may receive direct low-risk fixes when the work improves public demo readiness, reliable status evidence, build confidence, or the accuracy of BIAU Port project presentation.
+
 Discovery questions:
 
 - Does the public site accurately represent each project?
@@ -70,6 +72,31 @@ The parent task must not keep expanding the task tree while previously accepted 
 - create new child tasks only for issues found during evidence sweeps that are too large or risky to fold into an existing child.
 
 This preserves the user's requested long-running discovery behavior while preventing the workstream from becoming planning-only.
+
+## Related Repository Entry Protocol
+
+Before editing any related repository:
+
+1. Read repository-local guidance first, including `AGENTS.md`, `CLAUDE.md`, `.cursor/rules`, README, package manifests, build scripts, and test scripts when present.
+2. Inspect `git status --short` and avoid overwriting user changes.
+3. Confirm the proposed change is tied to at least one cross-project outcome:
+   - public entry or external link works better;
+   - login/demo/APK/build state is clearer or more usable;
+   - synthetic or smoke validation becomes more reliable;
+   - project detail, status page, assistant knowledge, or blog evidence becomes more truthful;
+   - a public-facing UI or artifact becomes more polished without broad refactor.
+4. Use the related project's own validation commands.
+5. Commit related-project changes separately from `blog-semi` changes unless the work is a single cross-repo coordinated fix with clear commit summaries in each repo.
+
+Related repository work must not introduce secrets, hidden deployment changes, paid cloud dependencies, production credential usage, or model liveness checks.
+
+## Cross-Repository Workstream Map
+
+- ERP: registration visibility, login/register UI polish, role-safety messaging, demo entry clarity, local auth smoke where possible.
+- Legal RAG: demo gate explanation, safe public credential surface, QA/contract-review smoke shape, quality-panel display readiness.
+- Pet: showcase evidence, APK gate truth, release artifact detection, App/backend public-demo readiness.
+- Xunqiu: static showcase consistency, APK/back-end status, health/smoke documentation, download boundary clarity.
+- Game/Playlab: playable links, screenshots, title/favicon consistency, static build confidence, mobile hints.
 
 ## Child Task Creation Rules
 
