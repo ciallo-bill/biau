@@ -91,6 +91,44 @@ default social image, search both the static shell and runtime SEO source:
 rg -n "old brand|new brand" index.html src/utils/seo.ts README.md
 ```
 
+### Convention: Cross-Site BIAU Port Brand Alignment
+
+When aligning a project demo or sibling showcase with BIAU Port / 泊岸, do not
+stop at browser metadata. The public visitor must see the relationship in the
+page chrome too.
+
+Check these surfaces:
+
+- Browser shell: `<title>`, `og:site_name`, favicon, apple touch icon, manifest
+  or Astro/Vite site metadata.
+- Visible shell: login hero, nav brand, sidebar logo, footer ownership line,
+  bridge banner, and "back to BIAU Port" links.
+- Main-site data: `src/data/portfolio.ts`, `src/data/statusTargets.ts`,
+  `src/data/assistant.ts`, generated assistant knowledge, sitemap, and status
+  JSON when relevant.
+
+Preserve product names such as `Ozon ERP`, `Legal RAG`, `BIAU Playlab`, and
+`寻球`; the BIAU Port / 泊岸 mark is the parent shell, not a replacement for the
+case-study product identity.
+
+Good:
+
+```text
+BIAU Port / 泊岸
+Ozon ERP 运营控制台
+```
+
+Bad:
+
+```text
+Ozon ERP
+```
+
+if BIAU Port only appears in a small bridge card or browser favicon.
+
+Validation should include a targeted `rg` for old/new brand strings, the
+affected site build, and main-site generated outputs if public data changed.
+
 ## Data Safety
 
 Everything committed to this public site should be treated as public. Never write real IPs, internal domains, database URLs, API keys, tokens, signing paths, certificates, private account details, exact sensitive metrics, or unsanitized customer/company names.
