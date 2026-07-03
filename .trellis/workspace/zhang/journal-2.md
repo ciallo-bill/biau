@@ -72,3 +72,37 @@ Deleted unused legacy Hero component and hero-reference stylesheet, removed stal
 ### Next Steps
 
 - None - task complete
+
+
+## Session 50: Unify public brand icons and site names
+
+**Date**: 2026-07-03
+**Task**: Unify public brand icons and site names
+**Branch**: `main`
+
+### Summary
+
+Audited public BIAU Port brand surfaces across main site, ERP, Legal RAG, Playlab, Pet, and Xunqiu; standardized main SEO site name and favicon hash; updated Pet showcase source with BIAU Port / 泊岸 title, favicon, and first-screen bridge while keeping APK download gated.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `5a17902` | (see git log) |
+| `e2e0ba5` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
