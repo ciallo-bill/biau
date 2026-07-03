@@ -60,6 +60,24 @@ ASSISTANT_MODEL_PROVIDER=glm-compatible
 
 这些变量只在 Pages Functions 服务端读取，不会进入浏览器 bundle。未配置 `ASSISTANT_MODEL_API_KEY` 时，`/api/chat/public` 会回退到公开知识摘要。
 
+公开助手已经生成 V2 本地知识结构：`npm run assistant:index` 会写入 `server/data/public-knowledge.json` 和 `server/data/public-knowledge-v2.json`，后者包含 docs、chunks、entities、relations 和 fallback 检索配置。部署前可运行：
+
+```text
+npm run assistant:kg-check
+```
+
+这个检查只使用本地公开数据，不会调用真实模型或中转站。
+
+外部 RAG Orchestrator 目前只是 server-side 预留合同，默认关闭：
+
+```text
+ASSISTANT_RAG_API_BASE_URL=
+ASSISTANT_RAG_API_KEY=
+ASSISTANT_RAG_TIMEOUT_MS=3000
+```
+
+这些变量不能放进 `VITE_*`。只有在本地知识导出、检索和 HTTP contract 稳定后，才由维护者手动选择 Supabase、Render Postgres、Neo4j/Aura、Cloudflare Vectorize/AI Search 或其他运行时，并在 Cloudflare Pages / Render 的私有环境变量里配置真实 endpoint 和 key。
+
 部署后先检查 `https://<站点域名>/api/health`。它应该返回 JSON，并包含 `ok: true` 与 `mode` / `modelConfigured` 这类低敏状态；如果返回的是首页 HTML，或 `POST /api/chat/public` 返回 404/405，说明当前 Pages 部署没有把 `functions/` 目录发布为 Functions。此时单独增加模型 Key 不会生效，需要先确认 Cloudflare Pages 项目使用最新 `main` 提交重新构建，或用 Wrangler 部署时确认 Functions 一起上传。
 
 ## 内部助手 API 部署
@@ -84,6 +102,9 @@ ASSISTANT_MODEL_BASE_URL=<OpenAI-compatible relay base URL, for example https://
 ASSISTANT_MODEL_API_KEY=<OpenAI 兼容中转 Key，可留空使用公开知识回退>
 ASSISTANT_MODEL_NAME=glm-5.2
 ASSISTANT_MODEL_PROVIDER=glm-compatible
+ASSISTANT_RAG_API_BASE_URL=<可选，外部 RAG Orchestrator endpoint；未批准运行时前留空>
+ASSISTANT_RAG_API_KEY=<可选，外部 RAG Orchestrator key；不要提交到仓库>
+ASSISTANT_RAG_TIMEOUT_MS=3000
 METRICS_ENABLED=false
 PORT=10000
 ```
@@ -128,7 +149,7 @@ curl -X POST "$ASSISTANT_API/auth/redeem-invite" \
 
 隐藏管理页位于 `/assistant/admin`。第一版通过手动输入并本地保存 `ADMIN_TOKEN` 调用 `GET /admin/summary` 和 `POST /admin/invites`，只用于验证轻量管理链路，不包含完整成员列表、历史记录浏览、删除/禁用、导出或私有知识源管理。
 
-当前公开助手和内部助手会先检索生成的公开站点知识；配置 `ASSISTANT_MODEL_*` 后，服务端可以在公开知识约束内调用 OpenAI-compatible 模型生成回答。未配置模型、模型服务不可用或公开知识置信度不足时，助手应回退到公开知识摘要并明确说明限制，而不是补造细节。网站博客页和项目页内容后续可以继续优化。
+当前公开助手和内部助手会先检索生成的公开站点知识；公开助手本地检索使用 docs/chunks/entities/relations 组成的轻量 Agentic Hybrid RAG 基线，覆盖意图路由、关键词/元数据/实体扩展、确定性 rerank 和 citation 边界。配置 `ASSISTANT_MODEL_*` 后，服务端可以在公开知识约束内调用 OpenAI-compatible 模型生成回答。未配置模型、模型服务不可用或公开知识置信度不足时，助手应回退到公开知识摘要并明确说明限制，而不是补造细节。网站博客页和项目页内容后续可以继续优化。
 
 ### API 健康检查
 

@@ -29,6 +29,12 @@ function hasCitation(citations: unknown[], id: string) {
   })
 }
 
+function countProjectCitations(citations: unknown[]) {
+  return citations.filter((citation) => {
+    return typeof citation === 'object' && citation !== null && 'id' in citation && typeof citation.id === 'string' && citation.id.startsWith('project:')
+  }).length
+}
+
 function snapshotModelEnv() {
   return {
     assistantModelApiKey: env.assistantModelApiKey,
@@ -152,6 +158,34 @@ try {
     siteOverviewPayload.meta.citationCount !== siteOverviewPayload.citations.length
   ) {
     throw new Error('public chat should answer current-site questions from site intro knowledge')
+  }
+
+  const techChat = await fetch(`${base}/chat/public`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: '哪些项目用了 React / Vite / Semi Design？' }),
+  })
+  if (!techChat.ok) throw new Error(`tech public chat failed: ${techChat.status}`)
+  const techPayload = (await techChat.json()) as {
+    answer?: string
+    citations?: unknown[]
+  }
+  if (!techPayload.answer || !Array.isArray(techPayload.citations) || !hasCitation(techPayload.citations, 'project:blog-semi')) {
+    throw new Error('public chat should cite BIAU Port for React / Vite / Semi Design query')
+  }
+
+  const demoChat = await fetch(`${base}/chat/public`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: '哪些项目可以演示？每个项目适合看什么？' }),
+  })
+  if (!demoChat.ok) throw new Error(`demo public chat failed: ${demoChat.status}`)
+  const demoPayload = (await demoChat.json()) as {
+    answer?: string
+    citations?: unknown[]
+  }
+  if (!demoPayload.answer || !Array.isArray(demoPayload.citations) || countProjectCitations(demoPayload.citations) < 2) {
+    throw new Error('public chat should return multiple project citations for demo-ready query')
   }
 
   try {

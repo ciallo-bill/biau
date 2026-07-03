@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "assistant:index": "tsx scripts/generate-assistant-knowledge.ts",
+    "assistant:kg-check": "tsx scripts/check-assistant-knowledge-v2.ts",
     "server:dev": "tsx watch server/src/index.ts",
     "server:build": "tsc -p server/tsconfig.json",
     "server:start": "node server/dist/index.js",

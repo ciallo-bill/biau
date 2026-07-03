@@ -25,12 +25,15 @@ npm run preview
 
 ```bash
 npm run assistant:index
+npm run assistant:kg-check
 npm run prisma:validate
 npm run server:build
 npm run server:smoke
 ```
 
-前端通过 `VITE_CHAT_API_BASE_URL` 指向助手 API；模型通道只在服务端用 `ASSISTANT_MODEL_*` 配置。未配置 API 或模型时，公开助手会使用站点本地公开知识回退。
+前端通过 `VITE_CHAT_API_BASE_URL` 指向助手 API；模型通道只在服务端用 `ASSISTANT_MODEL_*` 配置。未配置 API 或模型时，公开助手会使用站点本地公开知识回退。`assistant:index` 会生成旧版公开知识 JSON 和 V2 docs/chunks/entities/relations，`assistant:kg-check` 用确定性问题检查本地 Agentic Hybrid 检索、实体关系和敏感信息边界。
+
+外部 RAG Orchestrator 预留为 server-side 合同：`ASSISTANT_RAG_API_BASE_URL`、`ASSISTANT_RAG_API_KEY`、`ASSISTANT_RAG_TIMEOUT_MS`。这些变量默认留空，后续只有在选定 Supabase、Render Postgres、Neo4j/Aura、Cloudflare Vectorize/AI Search 等运行时后才由部署平台手动配置，不能放进 Vite 变量或提交到仓库。
 
 内部成员入口位于 `/assistant`。第一版支持输入邀请码和显示名兑换成员 token，并把 token 保存在当前浏览器的 `localStorage`；没有 API、没有 token 或数据库不可用时，页面会退回到已脱敏的公开站点知识。
 

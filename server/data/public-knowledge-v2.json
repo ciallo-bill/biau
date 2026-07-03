@@ -1,0 +1,5679 @@
+{
+  "schemaVersion": "public-assistant-knowledge-v2",
+  "public_documents": [
+    {
+      "id": "site:intro",
+      "title": "BIAU Port 站点简介",
+      "summary": "BIAU Port 泊岸是一个围绕 AI 应用、业务系统、互动体验、移动端案例与知识内容组织的展示站，强调可演示、可筛选、可落地的项目表达。",
+      "href": "/",
+      "tags": [
+        "BIAU Port",
+        "项目展示",
+        "知识库",
+        "公开站点"
+      ],
+      "visibility": "public",
+      "sourceType": "site"
+    },
+    {
+      "id": "site:status",
+      "title": "项目可靠性观察",
+      "summary": "状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 BIAU Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned。当前主站会记录 ERP 默认开放注册、各站点可见品牌外壳/标题/favicon/归属提示对齐、Pet APK 继续关闭等公开安全事实。",
+      "href": "/status",
+      "tags": [
+        "状态页",
+        "可靠性观察",
+        "公开入口",
+        "health check",
+        "synthetic",
+        "注册",
+        "品牌统一"
+      ],
+      "visibility": "public",
+      "sourceType": "status"
+    },
+    {
+      "id": "project:legal-rag",
+      "title": "Legal RAG｜法律智能机器人与合同审查",
+      "summary": "已部署的法律文档 RAG 与合同风险审查工作台，覆盖公开安全数据集导入、引用溯源问答、合同审查、质量评测和诊断面板。 Legal RAG 是已部署的全栈法律文档 RAG 与合同审查工作台，前端使用 Vue 3/Vite/TypeScript，后端使用 Express/TypeScript，共享类型包连接 Web 与 API。 系统支持公开安全数据集和文档导入，RAG pipeline 包含清洗、项目级 SHA-256 去重、章节感知 chunk、embedding、memory/pgvector 存储、query rewrite、向量+关键词混合召回、merge/filter/rerank、grounded answer 或 refusal、citations 与 diagnostics。 合同审查采用规则优先策略，规则召回付款、交付、违约责任、知识产权、争议解决和终止等风险；模型只辅助改写已召回风险的解释和建议，并在 schema 校验失败时回退到规则结果。 项目包含 RAG 与合同审查 eval fixtures、quality/evaluation 报告路由和质量面板，适合说明 AI 应用如何做引用溯源、可解释风险审查和质量评测。 Legal RAG Web 工作台的标题、favicon、登录面板和侧边栏已对齐 BIAU Port / 泊岸品牌；公开试用凭据仍只能通过低权限、可轮换、可公开的 demo 配置展示。 线上工作台入口是 https://legal-rag-web.onrender.com，有登录门禁，公开页面不会放真实后台/admin 密码；如果 Legal RAG 登录页显示公开演示凭据，访客可以使用页面给出的低权限 demo 凭据试用；如果没有显示凭据，则仍是受控演示入口。 Legal RAG 公开自助试用需要维护者同时配置 API 侧登录校验密码和 Web 侧 VITE_PUBLIC_DEMO_EMAIL / VITE_PUBLIC_DEMO_PASSWORD；VITE_PUBLIC_DEMO_PASSWORD 会进入前端包，所以只能填写可公开、低权限、可轮换的 demo 密码。 推荐公开演示顺序是：登录受保护工作台、初始化公开安全数据集、执行带 citation/diagnostics 的 RAG 问答、运行示例合同审查、查看质量面板的 runtime、citation/refusal 评测、审查召回、readiness checks、趋势和审计日志。 后续优化方向包括更完整的用户/邀请权限、更多脱敏数据集、评测趋势、OCR、rerank 模型、CI 与镜像发布。",
+      "href": "/projects/legal-rag",
+      "tags": [
+        "ai",
+        "AI 应用",
+        "main",
+        "重点展示",
+        "全栈 MVP / RAG 流程 / 合同审查工作台",
+        "Vue 3",
+        "Express",
+        "TypeScript",
+        "PostgreSQL",
+        "pgvector",
+        "RAG",
+        "公开安全数据集",
+        "Hybrid Retrieval",
+        "引用与诊断",
+        "规则优先合同审查"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "legal-rag"
+    },
+    {
+      "id": "project:pet-workspace",
+      "title": "AI 桌宠社区与生成管线",
+      "summary": "仍在推进中的 AI 桌宠工程工作区，围绕 Android 桌宠社区、Community API、生成服务、人审发布、质量门禁和 App 安全契约组织。 AI 桌宠项目是进行中的多模块工程工作区，核心包括 Android 桌宠社区 App、Node Community API、Admin Review、Pet Generator 适配层、FastAPI 风格生成规则服务、可信 Worker、QA 门禁和人工审核发布链路。 Android 侧覆盖桌宠 shell、默认桌宠资产、桌面悬浮服务、生成 UI 状态、Community API client、pet.zip 导入请求构造和社区交互，不直接调用生成内核或 Agent。 Community API 是 App 唯一后端入口，包含 health、SLA、metrics、feed、community-home、approved pets、package download descriptor、wallet、check-in、submissions、import drafts、bundle validation、admin review 和 fantasy-pet proxy 等能力。 生成规则服务负责 app-safe job 创建、轮询、artifact 索引、不透明 downloadId、人工 review decision、package plan、pet.zip 构建、worker readiness 和内部 GA/Codex/QA 证据；机器证据不能替代人工视觉 accept。 质量证据包括 Node workspace tests、Android 单元测试、Community API routes/server/store/rate-limit/metrics/SLA/logging/postgres 测试、pet package contract 测试、追踪矩阵、结构化日志、Prometheus metrics 和 SLA 文档。 项目已在主站提供 /pet-app-showcase/ 静态 App 展示与下载状态页，使用 BIAU Port / 泊岸标题与 favicon，并用真实 Android 模拟器截图展示桌宠模式、孵化桌宠、社区和个人页；APK 区域明确标注待正式签名包，debug 构建只作为内部验证信号，不提供占位下载。 最近一次 APK 发布门禁审计只找到 debug APK，没有 release APK/AAB 候选；公开下载继续关闭，后续需要正式构建、签名策略、校验摘要、版本说明、回归证据和人工确认。 当前项目应被描述为 WIP：Android 模拟器 E2E、live 私有部署验证、生产鉴权、租户隔离、Worker daemon、队列运营、Runbook、长期 SLA 和可观测告警仍是后续优化方向。",
+      "href": "/projects/pet-workspace",
+      "tags": [
+        "ai",
+        "AI 应用",
+        "main",
+        "重点展示",
+        "Android App / Community API / 生成管线 / 质量门禁 / 人审发布",
+        "Android",
+        "Node.js",
+        "FastAPI",
+        "PostgreSQL",
+        "Agent Worker",
+        "质量门禁",
+        "桌宠孵化",
+        "社区审核",
+        "不透明下载 ID",
+        "人审发布"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "pet-workspace"
+    },
+    {
+      "id": "project:ozon-erp",
+      "title": "Ozon 电商 ERP",
+      "summary": "面向小团队 Ozon 店铺运营的业务系统案例，覆盖 Vue 管理后台、Express API、Prisma/PostgreSQL、队列任务和 Chrome MV3 采集插件。 Ozon ERP 是面向小团队跨境店铺运营的业务系统，包含 Vue/Vite 管理后台、Express API、Prisma/PostgreSQL 数据模型、可选 Redis/BullMQ 队列、WXT/Chrome MV3 浏览器插件和共享计算包。 管理后台覆盖登录、注册、Owner 初始化、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等工作流，重点解决店铺授权、商品同步、采集铺货、定价利润和运营追踪。 认证入口已经补充确认密码校验、Owner 初始化提示、主站返回桥接、BIAU Port / 泊岸 favicon、登录页主品牌和登录后侧栏归属；Ozon ERP 保留为业务系统产品名。 生产自助注册已获批准并默认开放，显式设置关闭值时仍可切回受控登录。 ERP 概览页已经补充登录后首次引导，展示当前账号/角色、Owner 与协作者职责说明，并说明已有 Owner 后新注册账号默认是 operator，不自动获得 Owner 权限。 Express API 注册 auth、shops、products、selection、settings、ozon、collect、market metrics、commission rates、api.chrome、exchange rates、watermark 和 uploads 等路由。 Prisma 模型覆盖用户、店铺、Ozon 凭证、Seller 会话、商品、采集商品、草稿、导入日志、PendingAction、JobQueue、AuditLog、市场指标和佣金映射等对象。 外部平台写入通过 PendingAction 和 JobQueue 收口；当前代码和测试显示商品写入与一键铺货默认偏向队列或本地后台执行，只有显式配置 inline 才同步执行。 浏览器插件负责 Ozon/Seller 页面采集、Seller 上下文读取、跨标签页请求、ERP 路由打开和图片下载，并通过认证或扩展密钥边界接入 ERP API。 项目验证证据包括 API/shared Vitest、受保护写入测试、Ozon 同步容错测试、插件接口映射测试、smoke 脚本、交接清单、上线检查、佣金覆盖报告和依赖审计记录。 后续优化方向包括运行模式可视化、Worker/队列运维、佣金可信映射补齐、权限和审计增强、插件发布自动化、日志脱敏、备份演练和部署自动化。",
+      "href": "/projects/ozon-erp",
+      "tags": [
+        "business",
+        "业务系统",
+        "main",
+        "重点展示",
+        "业务系统 / 管理后台 / API / 数据模型 / 浏览器插件",
+        "Vue 3",
+        "Vite",
+        "Express",
+        "Prisma",
+        "PostgreSQL",
+        "Redis",
+        "BullMQ",
+        "WXT",
+        "Chrome MV3",
+        "运营后台",
+        "采集铺货",
+        "受保护写入",
+        "任务与审计闭环"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "ozon-erp"
+    },
+    {
+      "id": "project:biau-playlab",
+      "title": "BIAU Playlab｜游戏作品集与系统设计内容站",
+      "summary": "基于 Astro 的独立游戏作品集与试玩平台，整合六个已部署 Godot Web 游戏、项目详情、截图/视频、开发日志和系统设计文章。 BIAU Playlab 是已部署的 Astro 5 游戏作品集与试玩平台，整合六个 Godot Web 游戏、项目详情页、截图/视频、开发日志、系统设计文章和公开试玩入口。 游戏站已统一使用 BIAU Playlab 命名，并把 favicon、导航副标题和页脚归属对齐到 BIAU Port / 泊岸，保留 Playlab 作为游戏作品集产品名。 站点使用 Astro content collections 管理 games、devlogs、published articles 和 article workbench；games schema 包含 status、engine、platforms、screenshots、playableWeb、embedUrl、downloadLinks、repoUrl、challenge、mechanic、contribution、outcome、nextStep、milestones 和 devlogSlugs。 六个游戏包括 Tetris、Next Spacewar、intespace、Raiden、space-war 和 Spacewar II；Spacewar II 已作为第六个公开 Web 试玩项目接入，并补齐菜单、战斗和结果页真实截图。 Godot Web 试玩入口由独立试玩域名承载，首次加载可能较慢；移动端输入、横竖屏缩放、HUD 可读性和浏览器性能仍需要持续回归。 最近内容审计统计到 4 篇已发布文章、39 篇文章工作区草稿、6 个游戏项目和 5 篇开发日志，静态资源引用和内容关系检查通过。 Playlab 的质量链路包括 content:audit、Astro build、dist:audit、deploy:pages、deploy:play、play export/check/upload 和 deploy:check；公开端点检查覆盖游戏站、六个游戏详情页、六个试玩入口、RSS、sitemap、robots 和主站项目页。 当前 Playlab 应作为游戏作品集平台展示；博客和部分文章归档质量仍是后续优化方向，不应把它描述成已经完全成熟的内容产品。",
+      "href": "/projects/biau-playlab",
+      "tags": [
+        "platform",
+        "博客系统",
+        "live",
+        "已有页面",
+        "Astro 作品集 / Godot Web 试玩 / 内容审计 / Cloudflare Pages",
+        "Astro 5",
+        "Content Collections",
+        "Godot Web",
+        "Cloudflare Pages",
+        "R2",
+        "六个可试玩游戏",
+        "项目详情页",
+        "内容审计",
+        "公开端点检查"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "biau-playlab"
+    },
+    {
+      "id": "project:blog-semi",
+      "title": "React + Semi 博客系统｜当前主站",
+      "summary": "当前主站，用 React、Semi Design 和轻量助手后端组织首页、项目案例、知识文章、公开助手、SEO 数据和自动化验证。 BIAU Port 当前主站使用 React 19、Vite、TypeScript 和 Semi Design 构建，负责组织首页、项目集、项目详情、博客、公开助手、内部助手和隐藏管理页。 项目数据、博客 curation、助手建议和公开知识都存放在 `src/data/`，项目详情页通过 `detailContent` 展示案例分析，公开助手通过 `assistantContext` 和精选博客生成可检索知识。 仓库包含一个 Express/TypeScript 助手后端，配合 Prisma/PostgreSQL 支持 invite、member、chat session、message 和 usage log 等 MVP 数据结构；前端未配置 API 时会使用公开知识 fallback。 内容治理规则要求隐藏草稿不进入公开列表、详情加载、助手知识或 sitemap；公开博客由 visibility、role、priority 和 project relation 控制。 验证链路包括 assistant:index、sitemap:generate、blog:check、lint、build、check:ui 和 verify，其中 verify 会串起助手知识、Prisma、server build/smoke、前端构建、博客检查、preview 和 UI 检查。 当前边界是静态数据驱动、人工审核发布、内部助手 MVP 和公开安全事实展示；后续会继续完善项目案例、博客流水线、助手引用质量、移动端布局和部署验证。",
+      "href": "/projects/blog-semi",
+      "tags": [
+        "platform",
+        "博客系统",
+        "ongoing",
+        "建设中",
+        "React 主站 / Semi 组件体系 / 项目案例路由 / 内容治理 / 助手知识",
+        "React 19",
+        "Vite",
+        "TypeScript",
+        "Semi Design",
+        "Express",
+        "Prisma",
+        "PostgreSQL",
+        "Playwright",
+        "多视图主站",
+        "项目案例",
+        "公开助手",
+        "内容治理",
+        "UI 验证"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "blog-semi"
+    },
+    {
+      "id": "project:game-first-tetris",
+      "title": "俄罗斯方块原型｜Tetris",
+      "summary": "Godot 4 俄罗斯方块原型，包含经典计分、软降/硬降得分、combo、back-to-back、肉鸽三选一强化、触屏桥接、响应式布局和截图回归。 Tetris 是 Godot 4 俄罗斯方块原型，包含经典计分、软降/硬降得分、combo、back-to-back、肉鸽三选一强化实验、触屏桥接、响应式 UI 和 Web 试玩。 Playlab 游戏站证据显示 Tetris 使用 Godot 4.6.1，保留主菜单、Rogue 游戏画面和 Help 面板截图，并有 tetris-responsive-baseline 与 tetris-touch-controls 两篇开发日志说明多端适配和输入结构。 项目重点是把经典规则、现代计分反馈、移动触控和可展示的 Web 构建组织在一起；后续方向包括移动端触控细节、Rogue 强化平衡、截图/试玩回归和长期迭代。",
+      "href": "/projects/game-first-tetris",
+      "tags": [
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "Godot 引擎 / Web 试玩 / 触屏适配",
+        "Godot 4",
+        "Web 导出",
+        "游戏原型",
+        "经典计分",
+        "软硬降得分",
+        "combo/B2B",
+        "触屏输入"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "game-first-tetris"
+    },
+    {
+      "id": "project:game-next-spacewar",
+      "title": "太空战机｜展示构建",
+      "summary": "Godot 4.6 太空射击展示构建，补齐三波短任务、漂移/装甲目标、障碍压力、击破连击、波次奖励、主菜单、帮助、暂停、结果页和单局复盘。 Next Spacewar 是 Godot 4.6 太空射击展示构建，核心是三波短任务、漂移目标、装甲目标、障碍压力、击破连击、波次奖励、主菜单、帮助、暂停、结果页和单局复盘。 Playlab 游戏站为 Next Spacewar 提供主菜单、战斗和结果页真实截图以及 Web 试玩入口；开发日志把它定义为已经收成可展示的本地 build。 项目定位偏 showcase，适合说明如何把一个短时长战斗循环收束成可试玩作品；后续方向包括关卡密度、敌人差异、反馈节奏和更细的移动/键鼠输入体验。",
+      "href": "/projects/game-next-spacewar",
+      "tags": [
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "Godot 展示构建 / 战斗循环 / 单局复盘",
+        "Godot 4.6",
+        "太空射击",
+        "Web 导出",
+        "三波短任务",
+        "击破连击",
+        "波次奖励",
+        "结果复盘"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "game-next-spacewar"
+    },
+    {
+      "id": "project:intespace",
+      "title": "竖屏肉鸽射击｜intespace",
+      "summary": "竖屏自动射击肉鸽游戏，围绕章节推进、生存挑战、Boss 试炼、武器树、局内升级、局外成长和集成试玩收口。 intespace 是竖屏自动射击肉鸽项目，包含章节推进、生存挑战、Boss 试炼、武器树、局内升级、局外成长、玩家 hub、结果总结和集成试玩入口。 Playlab 游戏站记录 intespace 基于 Godot 4.6.1，武器系统 v1 已冻结结构，截图覆盖玩家中枢、战斗 HUD 和结果总结，当前处于统一试玩前完整流程收口。 项目重点是把移动端竖屏射击、Roguelite 成长、武器路线和 Boss 压力组合成较完整的长期迭代样本；后续方向包括平衡、试玩反馈、UI 文案、移动端体验和内容节奏优化。",
+      "href": "/projects/intespace",
+      "tags": [
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "Godot 引擎 / 肉鸽玩法 / 武器树 / 局外成长",
+        "Godot",
+        "肉鸽玩法",
+        "武器树系统",
+        "移动端优先",
+        "章节推进",
+        "生存挑战",
+        "Boss 试炼",
+        "局外成长"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "intespace"
+    },
+    {
+      "id": "project:raiden-prototype",
+      "title": "纵版弹幕射击｜垂直切片",
+      "summary": "Godot 纵版射击垂直切片，覆盖双关卡章节、火力成长、连锁击破奖励、首领相位、章节过场和试玩验证。 Raiden prototype 是 Godot 纵版弹幕射击垂直切片，覆盖双关卡章节、火力成长、连锁击破奖励、首领相位、章节过场、结果页、公开 Demo 和 Web 试玩。 Playlab 游戏站记录 Raiden Prototype 当前为 RC-0.4 稳定展示候选，推荐入口是 Chapter Run，并有 Windows 预发布下载、Web 试玩和真实运行截图。 项目适合展示纵版射击的章节节奏、Boss 阶段和奖励反馈如何被压缩成可玩的垂直切片；后续方向包括弹幕可读性、音效/手感、关卡内容、难度曲线和移动端适配。",
+      "href": "/projects/raiden-prototype",
+      "tags": [
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "Godot 引擎 / 纵版射击 / 原型验证",
+        "Godot",
+        "纵版射击",
+        "原型验证",
+        "双关卡章节",
+        "连锁击破",
+        "首领收束",
+        "试玩验证"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "raiden-prototype"
+    },
+    {
+      "id": "project:space-war",
+      "title": "复古横版射击｜space-war",
+      "summary": "复古横向太空射击完整版本，包含五个 Sector、连续击破奖励、首领战、道具、高分、结果页、程序化音效和发布文档。 space-war 是复古横版太空射击完整展示版本，受 Nokia 3310 Space Impact 风格启发，包含五个 Sector、敌机与道具、Boss、高分、连续击破奖励、结果页、程序化音效、Web/Windows 发布材料。 Playlab 游戏站记录 Space War 已经进入完整可玩、可展示、可维护阶段，保留 Windows Release、Web 试玩、真实菜单/战斗/结算截图和 v1.1.1 发布说明。 项目展示了从原型到发布版的收束：菜单、战斗、结算、截图素材、发布文档和公开试玩入口都已组织起来；后续方向包括平衡、移动端输入、音频层次、可观测试玩反馈和更多关卡变化。",
+      "href": "/projects/space-war",
+      "tags": [
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "Godot 引擎 / 复古射击 / 发布版 / 展示入口",
+        "Godot 4.6",
+        "复古射击",
+        "Web 包计划",
+        "五个 Sector",
+        "连续击破",
+        "高分结算",
+        "发布文档"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "space-war"
+    },
+    {
+      "id": "project:spacewar-ii",
+      "title": "移动纵向射击｜Spacewar II",
+      "summary": "Godot 4.6 纵向移动射击续作原型，围绕差异化敌群、Boss 阶段、多向弹幕、拾取升级、炸弹、短窗口连击、清关资源结算、紧凑 HUD 和结果页接入第六个 Web 试玩位。 Spacewar II 是 Godot 4.6 纵向移动射击续作，作为第六个游戏接入 Playlab，包含差异化敌群、Boss 阶段、多向弹幕、拾取升级、炸弹、短窗口连击、资源结算、紧凑 HUD、结果页和 Web 试玩。 Playlab 游戏站记录 Spacewar II 使用 spacewar-ii 统一 slug，已纳入游戏站内容模型、试玩域名和导出脚本，真实截图覆盖菜单、Boss 战斗和结果页。 项目重点是把移动纵向射击的敌群、弹幕、拾取和结算节奏整理成可展示版本；后续方向包括移动端触控、Boss 可读性、关卡节奏、资源成长和发布素材继续打磨。",
+      "href": "/projects/spacewar-ii",
+      "tags": [
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "Godot 引擎 / 纵向射击 / Web 试玩 / 第六项目接入",
+        "Godot 4.6",
+        "移动射击",
+        "Web 导出",
+        "差异化敌群",
+        "短窗口连击",
+        "Boss 阶段",
+        "结果结算"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "spacewar-ii"
+    },
+    {
+      "id": "project:xunqiu",
+      "title": "寻球｜移动端与现代后端重建",
+      "summary": "足球社群移动端迁移案例：旧版 App 和旧后端保留历史链路，新 64 位 Android 客户端接入 Spring Boot 3、PostgreSQL、Render 与 R2 上传链路。 寻球是足球社群移动端迁移案例，核心是旧版 App/旧 Java WAR 后端保留历史链路，新 64 位 Android 客户端接入 Spring Boot 3 现代后端。 64 位客户端是轻量单模块 Android 工程，接口集中在 ApiClient，保留旧接口路径和 response envelope，覆盖登录、动态、短视频、球队、日程、赛事、球场、球币和个人页等核心路径。 现代后端使用 Spring Boot 3、Java 17、PostgreSQL、Flyway、Docker、Render 和 Cloudflare R2，控制器覆盖账号、用户、动态、视频、球队、比赛、球场、搜索和 fallback。 短视频链路包含文件选择、大小/时长校验、封面、multipart 上传、R2 存储、列表回流、播放比例适配、点赞和评论，并针对小文件异常视频做了防护。 项目有 Android 测试矩阵、旧版入口对照、后端 MockMvc 测试、PostgreSQL/Testcontainers 测试和部署烟测脚本；支付、IM、推送、地图、分享等高副作用能力当前以安全等价或 stub 方式收口。 现代后端健康检查路径是 /free_kicker/actuator/health，smoke 脚本覆盖 health、登录、动态、短视频、球队和球场；如果公开 health 冷启动或超时，应作为运维排查信号，而不是生产 SLA 结论。 公开展示站提供产品页、技术文档和 latest-xunqiu64.apk 阶段包副本；这些入口用于展示与轻量验证，不代表完整生产发布或长期生产运营方案，也不包含旧后端 IP、测试密码、签名路径或私有云配置。 寻球静态展示站首页、技术文档页和 404 页已统一 BIAU Port / 泊岸标题与 favicon，并在页脚说明归属泊岸项目展示体系。 后续优化方向包括真实设备回归、旧 WebView 原生化、权限与审计、文件治理、监控部署、短视频播放器升级和更完整的生产化运维。",
+      "href": "/projects/xunqiu",
+      "tags": [
+        "mobile",
+        "移动端",
+        "main",
+        "重点展示",
+        "Android 64 位 / Spring Boot 3 / Render / R2",
+        "Android 64",
+        "Java 17",
+        "Spring Boot 3",
+        "PostgreSQL",
+        "Flyway",
+        "Cloudflare R2",
+        "Render",
+        "新旧链路分流",
+        "旧接口兼容",
+        "短视频上传播放",
+        "测试矩阵与烟测"
+      ],
+      "visibility": "public",
+      "sourceType": "project",
+      "projectId": "xunqiu"
+    },
+    {
+      "id": "blog:legal-rag-review",
+      "title": "合同审查 RAG 项目复盘：从可演示 MVP 到生产化路线",
+      "summary": "复盘法律智能机器人与合同审查项目的设计思路：如何从文档导入、条款切分、引用问答和风险审查，走向可解释、可复核、可迭代的 AI 应用。",
+      "href": "/blog/legal-rag-review",
+      "tags": [
+        "AI 应用",
+        "project-notes",
+        "项目总结",
+        "Project Notes",
+        "项目复盘",
+        "精选",
+        "项目案例",
+        "精选知识",
+        "Legal RAG",
+        "合同风险审查",
+        "AI 应用 MVP"
+      ],
+      "visibility": "public",
+      "sourceType": "blog"
+    },
+    {
+      "id": "blog:legal-rag-production-upgrade-plan",
+      "title": "Legal RAG 生产化改造路线：从 MVP 闭环到可交付原型",
+      "summary": "Legal RAG 已经跑通演示闭环，下一步要补文档解析、pgvector、队列、人审、评估和部署。本文把升级路线拆成可执行阶段。",
+      "href": "/blog/legal-rag-production-upgrade-plan",
+      "tags": [
+        "项目复盘",
+        "project-notes",
+        "项目总结",
+        "Project Notes",
+        "AI 应用知识库",
+        "精选",
+        "迭代路线",
+        "精选知识",
+        "项目改造清单",
+        "RAG 生产化",
+        "交付路线"
+      ],
+      "visibility": "public",
+      "sourceType": "blog"
+    },
+    {
+      "id": "blog:ozon-erp-architecture",
+      "title": "电商 ERP 架构：后台、队列、插件与审计如何协同",
+      "summary": "电商 ERP 的价值不在页面数量，而在业务对象、任务状态、平台写入和审计闭环。本文讨论后台、API、Worker、插件和数据库如何形成可运营系统。",
+      "href": "/blog/ozon-erp-architecture",
+      "tags": [
+        "全栈开发",
+        "project-notes",
+        "项目总结",
+        "Project Notes",
+        "项目案例",
+        "精选",
+        "精选知识",
+        "业务建模",
+        "异步任务",
+        "操作审计"
+      ],
+      "visibility": "public",
+      "sourceType": "blog"
+    },
+    {
+      "id": "blog:pet-workspace-pipeline",
+      "title": "AI 生成管线：任务编排、QA Gate 与 App 发布边界",
+      "summary": "生成类 AI 项目不能停在单次出图。本文讨论如何把生成任务、自动质检、人工复核、发布记录和 App API 组织成可控管线。",
+      "href": "/blog/pet-workspace-pipeline",
+      "tags": [
+        "AI 应用",
+        "project-notes",
+        "项目总结",
+        "Project Notes",
+        "项目案例",
+        "精选",
+        "精选知识",
+        "AI 生成管线",
+        "QA Gate",
+        "App API 契约"
+      ],
+      "visibility": "public",
+      "sourceType": "blog"
+    },
+    {
+      "id": "blog:xunqiu-android64-rebuild",
+      "title": "Android 历史项目重构：64 位客户端、接口复用与阶段验收",
+      "summary": "历史移动端项目的难点不只是补页面，而是识别旧依赖、接口边界和发布风险。本文讨论新建 64 位客户端、复用协议和沉淀验收证据的路线。",
+      "href": "/blog/xunqiu-android64-rebuild",
+      "tags": [
+        "移动端",
+        "project-notes",
+        "项目总结",
+        "Project Notes",
+        "项目案例",
+        "精选",
+        "精选知识",
+        "Android 64 位迁移",
+        "历史系统接手",
+        "接口脱敏"
+      ],
+      "visibility": "public",
+      "sourceType": "blog"
+    },
+    {
+      "id": "blog:game-showcase-standard",
+      "title": "游戏项目展示系统：玩法模型、试玩入口与版本证据",
+      "summary": "游戏项目展示不能只放源码和截图。本文讨论如何用玩法模型、操作说明、试玩入口、截图证据和版本状态，让原型被理解成可体验项目。",
+      "href": "/blog/game-showcase-standard",
+      "tags": [
+        "游戏项目",
+        "project-notes",
+        "项目总结",
+        "Project Notes",
+        "项目案例",
+        "精选",
+        "精选知识",
+        "互动项目展示",
+        "Godot Web 导出",
+        "版本证据"
+      ],
+      "visibility": "public",
+      "sourceType": "blog"
+    },
+    {
+      "id": "blog:content-modeling-project-site",
+      "title": "内容模型设计：项目、资源与博客如何分层",
+      "summary": "产品化展示站点不能把所有内容塞进一个页面。本文讨论如何把项目、资源、博客、案例和试玩入口拆成稳定内容模型。",
+      "href": "/blog/content-modeling-project-site",
+      "tags": [
+        "全栈开发",
+        "knowledge",
+        "知识积累",
+        "Knowledge Notes",
+        "公开站点与内容系统",
+        "精选",
+        "资源清单",
+        "精选知识",
+        "内容模型",
+        "信息架构",
+        "站点数据治理"
+      ],
+      "visibility": "public",
+      "sourceType": "blog"
+    },
+    {
+      "id": "blog:public-content-governance",
+      "title": "公开内容治理：技术案例如何脱敏、分层与版本化",
+      "summary": "公开站点既要展示能力，也要控制信息边界。本文讨论技术案例如何区分公开内容、私有复盘、运行证据和敏感配置。",
+      "href": "/blog/public-content-governance",
+      "tags": [
+        "全栈开发",
+        "knowledge",
+        "知识积累",
+        "Knowledge Notes",
+        "公开站点与内容系统",
+        "精选",
+        "资源清单",
+        "精选知识",
+        "内容治理",
+        "脱敏策略",
+        "公开信息边界"
+      ],
+      "visibility": "public",
+      "sourceType": "blog"
+    },
+    {
+      "id": "blog:static-site-release-verification",
+      "title": "静态站发布验证：构建、缓存、资源指纹与线上检查",
+      "summary": "静态站上线不只是 push 代码。本文讨论如何用构建产物、资源指纹、缓存刷新、内容扫描和线上 bundle 抽查确认发布真的生效。",
+      "href": "/blog/static-site-release-verification",
+      "tags": [
+        "全栈开发",
+        "knowledge",
+        "知识积累",
+        "Knowledge Notes",
+        "公开站点与内容系统",
+        "精选",
+        "技术方法",
+        "精选知识",
+        "静态站部署",
+        "构建验证",
+        "线上检查"
+      ],
+      "visibility": "public",
+      "sourceType": "blog"
+    },
+    {
+      "id": "blog:blog-content-system-build-log",
+      "title": "博客内容系统构建手记：从清理旧文章到栏目化流水线",
+      "summary": "复盘本站博客从批量生成内容清理、公开策展、栏目迁移，到建立内容生产 skill 的过程：先收口公开面，再把写作变成可验证的流水线。",
+      "href": "/blog/blog-content-system-build-log",
+      "tags": [
+        "构建手记",
+        "build-log",
+        "Build Log",
+        "站点构建手记",
+        "精选",
+        "技术方法",
+        "精选知识",
+        "内容系统治理",
+        "BlogColumn 栏目模型",
+        "AI 写作流水线"
+      ],
+      "visibility": "public",
+      "sourceType": "blog"
+    }
+  ],
+  "knowledge_chunks": [
+    {
+      "id": "chunk:site:intro:1",
+      "documentId": "site:intro",
+      "text": "BIAU Port 泊岸是一个围绕 AI 应用、业务系统、互动体验、移动端案例与知识内容组织的展示站，强调可演示、可筛选、可落地的项目表达。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "site",
+        "tags": [
+          "BIAU Port",
+          "项目展示",
+          "知识库",
+          "公开站点"
+        ]
+      }
+    },
+    {
+      "id": "chunk:site:status:1",
+      "documentId": "site:status",
+      "text": "状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 BIAU Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned。 当前主站会记录 ERP 默认开放注册、各站点可见品牌外壳/标题/favicon/归属提示对齐、Pet APK 继续关闭等公开安全事实。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "status",
+        "tags": [
+          "状态页",
+          "可靠性观察",
+          "公开入口",
+          "health check",
+          "synthetic",
+          "注册",
+          "品牌统一"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:legal-rag:1",
+      "documentId": "project:legal-rag",
+      "text": "已部署的法律文档 RAG 与合同风险审查工作台，覆盖公开安全数据集导入、引用溯源问答、合同审查、质量评测和诊断面板。 Legal RAG 是已部署的全栈法律文档 RAG 与合同审查工作台，前端使用 Vue 3/Vite/TypeScript，后端使用 Express/TypeScript，共享类型包连接 Web 与 API。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "legal-rag",
+        "tags": [
+          "ai",
+          "AI 应用",
+          "main",
+          "重点展示",
+          "全栈 MVP / RAG 流程 / 合同审查工作台",
+          "Vue 3",
+          "Express",
+          "TypeScript",
+          "PostgreSQL",
+          "pgvector",
+          "RAG",
+          "公开安全数据集",
+          "Hybrid Retrieval",
+          "引用与诊断",
+          "规则优先合同审查"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:legal-rag:2",
+      "documentId": "project:legal-rag",
+      "text": "系统支持公开安全数据集和文档导入，RAG pipeline 包含清洗、项目级 SHA-256 去重、章节感知 chunk、embedding、memory/pgvector 存储、query rewrite、向量+关键词混合召回、merge/filter/rerank、grounded answer 或 refusal、citations 与 diagnostics。 合同审查采用规则优先策略，规则召回付款、交付、违约责任、知识产权、争议解决和终止等风险；模型只辅助改写已召回风险的解释和建议，并在 schema 校验失败时回退到规则结果。",
+      "section": "summary-2",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "legal-rag",
+        "tags": [
+          "ai",
+          "AI 应用",
+          "main",
+          "重点展示",
+          "全栈 MVP / RAG 流程 / 合同审查工作台",
+          "Vue 3",
+          "Express",
+          "TypeScript",
+          "PostgreSQL",
+          "pgvector",
+          "RAG",
+          "公开安全数据集",
+          "Hybrid Retrieval",
+          "引用与诊断",
+          "规则优先合同审查"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:legal-rag:3",
+      "documentId": "project:legal-rag",
+      "text": "项目包含 RAG 与合同审查 eval fixtures、quality/evaluation 报告路由和质量面板，适合说明 AI 应用如何做引用溯源、可解释风险审查和质量评测。 Legal RAG Web 工作台的标题、favicon、登录面板和侧边栏已对齐 BIAU Port / 泊岸品牌；公开试用凭据仍只能通过低权限、可轮换、可公开的 demo 配置展示。 线上工作台入口是 https://legal-rag-web. onrender.",
+      "section": "summary-3",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "legal-rag",
+        "tags": [
+          "ai",
+          "AI 应用",
+          "main",
+          "重点展示",
+          "全栈 MVP / RAG 流程 / 合同审查工作台",
+          "Vue 3",
+          "Express",
+          "TypeScript",
+          "PostgreSQL",
+          "pgvector",
+          "RAG",
+          "公开安全数据集",
+          "Hybrid Retrieval",
+          "引用与诊断",
+          "规则优先合同审查"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:legal-rag:4",
+      "documentId": "project:legal-rag",
+      "text": "com，有登录门禁，公开页面不会放真实后台/admin 密码；如果 Legal RAG 登录页显示公开演示凭据，访客可以使用页面给出的低权限 demo 凭据试用；如果没有显示凭据，则仍是受控演示入口。 Legal RAG 公开自助试用需要维护者同时配置 API 侧登录校验密码和 Web 侧 VITE_PUBLIC_DEMO_EMAIL / VITE_PUBLIC_DEMO_PASSWORD；VITE_PUBLIC_DEMO_PASSWORD 会进入前端包，所以只能填写可公开、低权限、可轮换的 demo 密码。",
+      "section": "summary-4",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "legal-rag",
+        "tags": [
+          "ai",
+          "AI 应用",
+          "main",
+          "重点展示",
+          "全栈 MVP / RAG 流程 / 合同审查工作台",
+          "Vue 3",
+          "Express",
+          "TypeScript",
+          "PostgreSQL",
+          "pgvector",
+          "RAG",
+          "公开安全数据集",
+          "Hybrid Retrieval",
+          "引用与诊断",
+          "规则优先合同审查"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:legal-rag:5",
+      "documentId": "project:legal-rag",
+      "text": "推荐公开演示顺序是：登录受保护工作台、初始化公开安全数据集、执行带 citation/diagnostics 的 RAG 问答、运行示例合同审查、查看质量面板的 runtime、citation/refusal 评测、审查召回、readiness checks、趋势和审计日志。 后续优化方向包括更完整的用户/邀请权限、更多脱敏数据集、评测趋势、OCR、rerank 模型、CI 与镜像发布。",
+      "section": "summary-5",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "legal-rag",
+        "tags": [
+          "ai",
+          "AI 应用",
+          "main",
+          "重点展示",
+          "全栈 MVP / RAG 流程 / 合同审查工作台",
+          "Vue 3",
+          "Express",
+          "TypeScript",
+          "PostgreSQL",
+          "pgvector",
+          "RAG",
+          "公开安全数据集",
+          "Hybrid Retrieval",
+          "引用与诊断",
+          "规则优先合同审查"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:pet-workspace:1",
+      "documentId": "project:pet-workspace",
+      "text": "仍在推进中的 AI 桌宠工程工作区，围绕 Android 桌宠社区、Community API、生成服务、人审发布、质量门禁和 App 安全契约组织。 AI 桌宠项目是进行中的多模块工程工作区，核心包括 Android 桌宠社区 App、Node Community API、Admin Review、Pet Generator 适配层、FastAPI 风格生成规则服务、可信 Worker、QA 门禁和人工审核发布链路。 Android 侧覆盖桌宠 shell、默认桌宠资产、桌面悬浮服务、生成 UI 状态、Community API client、pet. zip 导入请求构造和社区交互，不直接调用生成内核或 Agent。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "pet-workspace",
+        "tags": [
+          "ai",
+          "AI 应用",
+          "main",
+          "重点展示",
+          "Android App / Community API / 生成管线 / 质量门禁 / 人审发布",
+          "Android",
+          "Node.js",
+          "FastAPI",
+          "PostgreSQL",
+          "Agent Worker",
+          "质量门禁",
+          "桌宠孵化",
+          "社区审核",
+          "不透明下载 ID",
+          "人审发布"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:pet-workspace:2",
+      "documentId": "project:pet-workspace",
+      "text": "Community API 是 App 唯一后端入口，包含 health、SLA、metrics、feed、community-home、approved pets、package download descriptor、wallet、check-in、submissions、import drafts、bundle validation、admin review 和 fantasy-pet proxy 等能力。 生成规则服务负责 app-safe job 创建、轮询、artifact 索引、不透明 downloadId、人工 review decision、package plan、pet.",
+      "section": "summary-2",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "pet-workspace",
+        "tags": [
+          "ai",
+          "AI 应用",
+          "main",
+          "重点展示",
+          "Android App / Community API / 生成管线 / 质量门禁 / 人审发布",
+          "Android",
+          "Node.js",
+          "FastAPI",
+          "PostgreSQL",
+          "Agent Worker",
+          "质量门禁",
+          "桌宠孵化",
+          "社区审核",
+          "不透明下载 ID",
+          "人审发布"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:pet-workspace:3",
+      "documentId": "project:pet-workspace",
+      "text": "zip 构建、worker readiness 和内部 GA/Codex/QA 证据；机器证据不能替代人工视觉 accept。 质量证据包括 Node workspace tests、Android 单元测试、Community API routes/server/store/rate-limit/metrics/SLA/logging/postgres 测试、pet package contract 测试、追踪矩阵、结构化日志、Prometheus metrics 和 SLA 文档。",
+      "section": "summary-3",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "pet-workspace",
+        "tags": [
+          "ai",
+          "AI 应用",
+          "main",
+          "重点展示",
+          "Android App / Community API / 生成管线 / 质量门禁 / 人审发布",
+          "Android",
+          "Node.js",
+          "FastAPI",
+          "PostgreSQL",
+          "Agent Worker",
+          "质量门禁",
+          "桌宠孵化",
+          "社区审核",
+          "不透明下载 ID",
+          "人审发布"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:pet-workspace:4",
+      "documentId": "project:pet-workspace",
+      "text": "项目已在主站提供 /pet-app-showcase/ 静态 App 展示与下载状态页，使用 BIAU Port / 泊岸标题与 favicon，并用真实 Android 模拟器截图展示桌宠模式、孵化桌宠、社区和个人页；APK 区域明确标注待正式签名包，debug 构建只作为内部验证信号，不提供占位下载。 最近一次 APK 发布门禁审计只找到 debug APK，没有 release APK/AAB 候选；公开下载继续关闭，后续需要正式构建、签名策略、校验摘要、版本说明、回归证据和人工确认。",
+      "section": "summary-4",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "pet-workspace",
+        "tags": [
+          "ai",
+          "AI 应用",
+          "main",
+          "重点展示",
+          "Android App / Community API / 生成管线 / 质量门禁 / 人审发布",
+          "Android",
+          "Node.js",
+          "FastAPI",
+          "PostgreSQL",
+          "Agent Worker",
+          "质量门禁",
+          "桌宠孵化",
+          "社区审核",
+          "不透明下载 ID",
+          "人审发布"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:pet-workspace:5",
+      "documentId": "project:pet-workspace",
+      "text": "当前项目应被描述为 WIP：Android 模拟器 E2E、live 私有部署验证、生产鉴权、租户隔离、Worker daemon、队列运营、Runbook、长期 SLA 和可观测告警仍是后续优化方向。",
+      "section": "summary-5",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "pet-workspace",
+        "tags": [
+          "ai",
+          "AI 应用",
+          "main",
+          "重点展示",
+          "Android App / Community API / 生成管线 / 质量门禁 / 人审发布",
+          "Android",
+          "Node.js",
+          "FastAPI",
+          "PostgreSQL",
+          "Agent Worker",
+          "质量门禁",
+          "桌宠孵化",
+          "社区审核",
+          "不透明下载 ID",
+          "人审发布"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:ozon-erp:1",
+      "documentId": "project:ozon-erp",
+      "text": "面向小团队 Ozon 店铺运营的业务系统案例，覆盖 Vue 管理后台、Express API、Prisma/PostgreSQL、队列任务和 Chrome MV3 采集插件。 Ozon ERP 是面向小团队跨境店铺运营的业务系统，包含 Vue/Vite 管理后台、Express API、Prisma/PostgreSQL 数据模型、可选 Redis/BullMQ 队列、WXT/Chrome MV3 浏览器插件和共享计算包。 管理后台覆盖登录、注册、Owner 初始化、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等工作流，重点解决店铺授权、商品同步、采集铺货、定价利润和运营追踪。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "ozon-erp",
+        "tags": [
+          "business",
+          "业务系统",
+          "main",
+          "重点展示",
+          "业务系统 / 管理后台 / API / 数据模型 / 浏览器插件",
+          "Vue 3",
+          "Vite",
+          "Express",
+          "Prisma",
+          "PostgreSQL",
+          "Redis",
+          "BullMQ",
+          "WXT",
+          "Chrome MV3",
+          "运营后台",
+          "采集铺货",
+          "受保护写入",
+          "任务与审计闭环"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:ozon-erp:2",
+      "documentId": "project:ozon-erp",
+      "text": "认证入口已经补充确认密码校验、Owner 初始化提示、主站返回桥接、BIAU Port / 泊岸 favicon、登录页主品牌和登录后侧栏归属；Ozon ERP 保留为业务系统产品名。 生产自助注册已获批准并默认开放，显式设置关闭值时仍可切回受控登录。 ERP 概览页已经补充登录后首次引导，展示当前账号/角色、Owner 与协作者职责说明，并说明已有 Owner 后新注册账号默认是 operator，不自动获得 Owner 权限。",
+      "section": "summary-2",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "ozon-erp",
+        "tags": [
+          "business",
+          "业务系统",
+          "main",
+          "重点展示",
+          "业务系统 / 管理后台 / API / 数据模型 / 浏览器插件",
+          "Vue 3",
+          "Vite",
+          "Express",
+          "Prisma",
+          "PostgreSQL",
+          "Redis",
+          "BullMQ",
+          "WXT",
+          "Chrome MV3",
+          "运营后台",
+          "采集铺货",
+          "受保护写入",
+          "任务与审计闭环"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:ozon-erp:3",
+      "documentId": "project:ozon-erp",
+      "text": "Express API 注册 auth、shops、products、selection、settings、ozon、collect、market metrics、commission rates、api. chrome、exchange rates、watermark 和 uploads 等路由。 Prisma 模型覆盖用户、店铺、Ozon 凭证、Seller 会话、商品、采集商品、草稿、导入日志、PendingAction、JobQueue、AuditLog、市场指标和佣金映射等对象。",
+      "section": "summary-3",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "ozon-erp",
+        "tags": [
+          "business",
+          "业务系统",
+          "main",
+          "重点展示",
+          "业务系统 / 管理后台 / API / 数据模型 / 浏览器插件",
+          "Vue 3",
+          "Vite",
+          "Express",
+          "Prisma",
+          "PostgreSQL",
+          "Redis",
+          "BullMQ",
+          "WXT",
+          "Chrome MV3",
+          "运营后台",
+          "采集铺货",
+          "受保护写入",
+          "任务与审计闭环"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:ozon-erp:4",
+      "documentId": "project:ozon-erp",
+      "text": "外部平台写入通过 PendingAction 和 JobQueue 收口；当前代码和测试显示商品写入与一键铺货默认偏向队列或本地后台执行，只有显式配置 inline 才同步执行。 浏览器插件负责 Ozon/Seller 页面采集、Seller 上下文读取、跨标签页请求、ERP 路由打开和图片下载，并通过认证或扩展密钥边界接入 ERP API。 项目验证证据包括 API/shared Vitest、受保护写入测试、Ozon 同步容错测试、插件接口映射测试、smoke 脚本、交接清单、上线检查、佣金覆盖报告和依赖审计记录。",
+      "section": "summary-4",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "ozon-erp",
+        "tags": [
+          "business",
+          "业务系统",
+          "main",
+          "重点展示",
+          "业务系统 / 管理后台 / API / 数据模型 / 浏览器插件",
+          "Vue 3",
+          "Vite",
+          "Express",
+          "Prisma",
+          "PostgreSQL",
+          "Redis",
+          "BullMQ",
+          "WXT",
+          "Chrome MV3",
+          "运营后台",
+          "采集铺货",
+          "受保护写入",
+          "任务与审计闭环"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:ozon-erp:5",
+      "documentId": "project:ozon-erp",
+      "text": "后续优化方向包括运行模式可视化、Worker/队列运维、佣金可信映射补齐、权限和审计增强、插件发布自动化、日志脱敏、备份演练和部署自动化。",
+      "section": "summary-5",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "ozon-erp",
+        "tags": [
+          "business",
+          "业务系统",
+          "main",
+          "重点展示",
+          "业务系统 / 管理后台 / API / 数据模型 / 浏览器插件",
+          "Vue 3",
+          "Vite",
+          "Express",
+          "Prisma",
+          "PostgreSQL",
+          "Redis",
+          "BullMQ",
+          "WXT",
+          "Chrome MV3",
+          "运营后台",
+          "采集铺货",
+          "受保护写入",
+          "任务与审计闭环"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:biau-playlab:1",
+      "documentId": "project:biau-playlab",
+      "text": "基于 Astro 的独立游戏作品集与试玩平台，整合六个已部署 Godot Web 游戏、项目详情、截图/视频、开发日志和系统设计文章。 BIAU Playlab 是已部署的 Astro 5 游戏作品集与试玩平台，整合六个 Godot Web 游戏、项目详情页、截图/视频、开发日志、系统设计文章和公开试玩入口。 游戏站已统一使用 BIAU Playlab 命名，并把 favicon、导航副标题和页脚归属对齐到 BIAU Port / 泊岸，保留 Playlab 作为游戏作品集产品名。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "biau-playlab",
+        "tags": [
+          "platform",
+          "博客系统",
+          "live",
+          "已有页面",
+          "Astro 作品集 / Godot Web 试玩 / 内容审计 / Cloudflare Pages",
+          "Astro 5",
+          "Content Collections",
+          "Godot Web",
+          "Cloudflare Pages",
+          "R2",
+          "六个可试玩游戏",
+          "项目详情页",
+          "内容审计",
+          "公开端点检查"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:biau-playlab:2",
+      "documentId": "project:biau-playlab",
+      "text": "站点使用 Astro content collections 管理 games、devlogs、published articles 和 article workbench；games schema 包含 status、engine、platforms、screenshots、playableWeb、embedUrl、downloadLinks、repoUrl、challenge、mechanic、contribution、outcome、nextStep、milestones 和 devlogSlugs。",
+      "section": "summary-2",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "biau-playlab",
+        "tags": [
+          "platform",
+          "博客系统",
+          "live",
+          "已有页面",
+          "Astro 作品集 / Godot Web 试玩 / 内容审计 / Cloudflare Pages",
+          "Astro 5",
+          "Content Collections",
+          "Godot Web",
+          "Cloudflare Pages",
+          "R2",
+          "六个可试玩游戏",
+          "项目详情页",
+          "内容审计",
+          "公开端点检查"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:biau-playlab:3",
+      "documentId": "project:biau-playlab",
+      "text": "六个游戏包括 Tetris、Next Spacewar、intespace、Raiden、space-war 和 Spacewar II；Spacewar II 已作为第六个公开 Web 试玩项目接入，并补齐菜单、战斗和结果页真实截图。 Godot Web 试玩入口由独立试玩域名承载，首次加载可能较慢；移动端输入、横竖屏缩放、HUD 可读性和浏览器性能仍需要持续回归。 最近内容审计统计到 4 篇已发布文章、39 篇文章工作区草稿、6 个游戏项目和 5 篇开发日志，静态资源引用和内容关系检查通过。",
+      "section": "summary-3",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "biau-playlab",
+        "tags": [
+          "platform",
+          "博客系统",
+          "live",
+          "已有页面",
+          "Astro 作品集 / Godot Web 试玩 / 内容审计 / Cloudflare Pages",
+          "Astro 5",
+          "Content Collections",
+          "Godot Web",
+          "Cloudflare Pages",
+          "R2",
+          "六个可试玩游戏",
+          "项目详情页",
+          "内容审计",
+          "公开端点检查"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:biau-playlab:4",
+      "documentId": "project:biau-playlab",
+      "text": "Playlab 的质量链路包括 content:audit、Astro build、dist:audit、deploy:pages、deploy:play、play export/check/upload 和 deploy:check；公开端点检查覆盖游戏站、六个游戏详情页、六个试玩入口、RSS、sitemap、robots 和主站项目页。 当前 Playlab 应作为游戏作品集平台展示；博客和部分文章归档质量仍是后续优化方向，不应把它描述成已经完全成熟的内容产品。",
+      "section": "summary-4",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "biau-playlab",
+        "tags": [
+          "platform",
+          "博客系统",
+          "live",
+          "已有页面",
+          "Astro 作品集 / Godot Web 试玩 / 内容审计 / Cloudflare Pages",
+          "Astro 5",
+          "Content Collections",
+          "Godot Web",
+          "Cloudflare Pages",
+          "R2",
+          "六个可试玩游戏",
+          "项目详情页",
+          "内容审计",
+          "公开端点检查"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:blog-semi:1",
+      "documentId": "project:blog-semi",
+      "text": "当前主站，用 React、Semi Design 和轻量助手后端组织首页、项目案例、知识文章、公开助手、SEO 数据和自动化验证。 BIAU Port 当前主站使用 React 19、Vite、TypeScript 和 Semi Design 构建，负责组织首页、项目集、项目详情、博客、公开助手、内部助手和隐藏管理页。 项目数据、博客 curation、助手建议和公开知识都存放在 `src/data/`，项目详情页通过 `detailContent` 展示案例分析，公开助手通过 `assistantContext` 和精选博客生成可检索知识。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "blog-semi",
+        "tags": [
+          "platform",
+          "博客系统",
+          "ongoing",
+          "建设中",
+          "React 主站 / Semi 组件体系 / 项目案例路由 / 内容治理 / 助手知识",
+          "React 19",
+          "Vite",
+          "TypeScript",
+          "Semi Design",
+          "Express",
+          "Prisma",
+          "PostgreSQL",
+          "Playwright",
+          "多视图主站",
+          "项目案例",
+          "公开助手",
+          "内容治理",
+          "UI 验证"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:blog-semi:2",
+      "documentId": "project:blog-semi",
+      "text": "仓库包含一个 Express/TypeScript 助手后端，配合 Prisma/PostgreSQL 支持 invite、member、chat session、message 和 usage log 等 MVP 数据结构；前端未配置 API 时会使用公开知识 fallback。 内容治理规则要求隐藏草稿不进入公开列表、详情加载、助手知识或 sitemap；公开博客由 visibility、role、priority 和 project relation 控制。",
+      "section": "summary-2",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "blog-semi",
+        "tags": [
+          "platform",
+          "博客系统",
+          "ongoing",
+          "建设中",
+          "React 主站 / Semi 组件体系 / 项目案例路由 / 内容治理 / 助手知识",
+          "React 19",
+          "Vite",
+          "TypeScript",
+          "Semi Design",
+          "Express",
+          "Prisma",
+          "PostgreSQL",
+          "Playwright",
+          "多视图主站",
+          "项目案例",
+          "公开助手",
+          "内容治理",
+          "UI 验证"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:blog-semi:3",
+      "documentId": "project:blog-semi",
+      "text": "验证链路包括 assistant:index、sitemap:generate、blog:check、lint、build、check:ui 和 verify，其中 verify 会串起助手知识、Prisma、server build/smoke、前端构建、博客检查、preview 和 UI 检查。 当前边界是静态数据驱动、人工审核发布、内部助手 MVP 和公开安全事实展示；后续会继续完善项目案例、博客流水线、助手引用质量、移动端布局和部署验证。",
+      "section": "summary-3",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "blog-semi",
+        "tags": [
+          "platform",
+          "博客系统",
+          "ongoing",
+          "建设中",
+          "React 主站 / Semi 组件体系 / 项目案例路由 / 内容治理 / 助手知识",
+          "React 19",
+          "Vite",
+          "TypeScript",
+          "Semi Design",
+          "Express",
+          "Prisma",
+          "PostgreSQL",
+          "Playwright",
+          "多视图主站",
+          "项目案例",
+          "公开助手",
+          "内容治理",
+          "UI 验证"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:game-first-tetris:1",
+      "documentId": "project:game-first-tetris",
+      "text": "Godot 4 俄罗斯方块原型，包含经典计分、软降/硬降得分、combo、back-to-back、肉鸽三选一强化、触屏桥接、响应式布局和截图回归。 Tetris 是 Godot 4 俄罗斯方块原型，包含经典计分、软降/硬降得分、combo、back-to-back、肉鸽三选一强化实验、触屏桥接、响应式 UI 和 Web 试玩。 Playlab 游戏站证据显示 Tetris 使用 Godot 4. 6. 1，保留主菜单、Rogue 游戏画面和 Help 面板截图，并有 tetris-responsive-baseline 与 tetris-touch-controls 两篇开发日志说明多端适配和输入结构。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "game-first-tetris",
+        "tags": [
+          "interactive",
+          "互动体验",
+          "live",
+          "已有页面",
+          "Godot 引擎 / Web 试玩 / 触屏适配",
+          "Godot 4",
+          "Web 导出",
+          "游戏原型",
+          "经典计分",
+          "软硬降得分",
+          "combo/B2B",
+          "触屏输入"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:game-first-tetris:2",
+      "documentId": "project:game-first-tetris",
+      "text": "项目重点是把经典规则、现代计分反馈、移动触控和可展示的 Web 构建组织在一起；后续方向包括移动端触控细节、Rogue 强化平衡、截图/试玩回归和长期迭代。",
+      "section": "summary-2",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "game-first-tetris",
+        "tags": [
+          "interactive",
+          "互动体验",
+          "live",
+          "已有页面",
+          "Godot 引擎 / Web 试玩 / 触屏适配",
+          "Godot 4",
+          "Web 导出",
+          "游戏原型",
+          "经典计分",
+          "软硬降得分",
+          "combo/B2B",
+          "触屏输入"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:game-next-spacewar:1",
+      "documentId": "project:game-next-spacewar",
+      "text": "Godot 4. 6 太空射击展示构建，补齐三波短任务、漂移/装甲目标、障碍压力、击破连击、波次奖励、主菜单、帮助、暂停、结果页和单局复盘。 Next Spacewar 是 Godot 4. 6 太空射击展示构建，核心是三波短任务、漂移目标、装甲目标、障碍压力、击破连击、波次奖励、主菜单、帮助、暂停、结果页和单局复盘。 Playlab 游戏站为 Next Spacewar 提供主菜单、战斗和结果页真实截图以及 Web 试玩入口；开发日志把它定义为已经收成可展示的本地 build。 项目定位偏 showcase，适合说明如何把一个短时长战斗循环收束成可试玩作品；后续方向包括关卡密度、敌人差异、反馈节奏和更细的移动/键鼠输入体验。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "game-next-spacewar",
+        "tags": [
+          "interactive",
+          "互动体验",
+          "live",
+          "已有页面",
+          "Godot 展示构建 / 战斗循环 / 单局复盘",
+          "Godot 4.6",
+          "太空射击",
+          "Web 导出",
+          "三波短任务",
+          "击破连击",
+          "波次奖励",
+          "结果复盘"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:intespace:1",
+      "documentId": "project:intespace",
+      "text": "竖屏自动射击肉鸽游戏，围绕章节推进、生存挑战、Boss 试炼、武器树、局内升级、局外成长和集成试玩收口。 intespace 是竖屏自动射击肉鸽项目，包含章节推进、生存挑战、Boss 试炼、武器树、局内升级、局外成长、玩家 hub、结果总结和集成试玩入口。 Playlab 游戏站记录 intespace 基于 Godot 4. 6. 1，武器系统 v1 已冻结结构，截图覆盖玩家中枢、战斗 HUD 和结果总结，当前处于统一试玩前完整流程收口。 项目重点是把移动端竖屏射击、Roguelite 成长、武器路线和 Boss 压力组合成较完整的长期迭代样本；后续方向包括平衡、试玩反馈、UI 文案、移动端体验和内容节奏优化。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "intespace",
+        "tags": [
+          "interactive",
+          "互动体验",
+          "live",
+          "已有页面",
+          "Godot 引擎 / 肉鸽玩法 / 武器树 / 局外成长",
+          "Godot",
+          "肉鸽玩法",
+          "武器树系统",
+          "移动端优先",
+          "章节推进",
+          "生存挑战",
+          "Boss 试炼",
+          "局外成长"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:raiden-prototype:1",
+      "documentId": "project:raiden-prototype",
+      "text": "Godot 纵版射击垂直切片，覆盖双关卡章节、火力成长、连锁击破奖励、首领相位、章节过场和试玩验证。 Raiden prototype 是 Godot 纵版弹幕射击垂直切片，覆盖双关卡章节、火力成长、连锁击破奖励、首领相位、章节过场、结果页、公开 Demo 和 Web 试玩。 Playlab 游戏站记录 Raiden Prototype 当前为 RC-0. 4 稳定展示候选，推荐入口是 Chapter Run，并有 Windows 预发布下载、Web 试玩和真实运行截图。 项目适合展示纵版射击的章节节奏、Boss 阶段和奖励反馈如何被压缩成可玩的垂直切片；后续方向包括弹幕可读性、音效/手感、关卡内容、难度曲线和移动端适配。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "raiden-prototype",
+        "tags": [
+          "interactive",
+          "互动体验",
+          "live",
+          "已有页面",
+          "Godot 引擎 / 纵版射击 / 原型验证",
+          "Godot",
+          "纵版射击",
+          "原型验证",
+          "双关卡章节",
+          "连锁击破",
+          "首领收束",
+          "试玩验证"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:space-war:1",
+      "documentId": "project:space-war",
+      "text": "复古横向太空射击完整版本，包含五个 Sector、连续击破奖励、首领战、道具、高分、结果页、程序化音效和发布文档。 space-war 是复古横版太空射击完整展示版本，受 Nokia 3310 Space Impact 风格启发，包含五个 Sector、敌机与道具、Boss、高分、连续击破奖励、结果页、程序化音效、Web/Windows 发布材料。 Playlab 游戏站记录 Space War 已经进入完整可玩、可展示、可维护阶段，保留 Windows Release、Web 试玩、真实菜单/战斗/结算截图和 v1. 1. 1 发布说明。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "space-war",
+        "tags": [
+          "interactive",
+          "互动体验",
+          "live",
+          "已有页面",
+          "Godot 引擎 / 复古射击 / 发布版 / 展示入口",
+          "Godot 4.6",
+          "复古射击",
+          "Web 包计划",
+          "五个 Sector",
+          "连续击破",
+          "高分结算",
+          "发布文档"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:space-war:2",
+      "documentId": "project:space-war",
+      "text": "项目展示了从原型到发布版的收束：菜单、战斗、结算、截图素材、发布文档和公开试玩入口都已组织起来；后续方向包括平衡、移动端输入、音频层次、可观测试玩反馈和更多关卡变化。",
+      "section": "summary-2",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "space-war",
+        "tags": [
+          "interactive",
+          "互动体验",
+          "live",
+          "已有页面",
+          "Godot 引擎 / 复古射击 / 发布版 / 展示入口",
+          "Godot 4.6",
+          "复古射击",
+          "Web 包计划",
+          "五个 Sector",
+          "连续击破",
+          "高分结算",
+          "发布文档"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:spacewar-ii:1",
+      "documentId": "project:spacewar-ii",
+      "text": "Godot 4. 6 纵向移动射击续作原型，围绕差异化敌群、Boss 阶段、多向弹幕、拾取升级、炸弹、短窗口连击、清关资源结算、紧凑 HUD 和结果页接入第六个 Web 试玩位。 Spacewar II 是 Godot 4. 6 纵向移动射击续作，作为第六个游戏接入 Playlab，包含差异化敌群、Boss 阶段、多向弹幕、拾取升级、炸弹、短窗口连击、资源结算、紧凑 HUD、结果页和 Web 试玩。 Playlab 游戏站记录 Spacewar II 使用 spacewar-ii 统一 slug，已纳入游戏站内容模型、试玩域名和导出脚本，真实截图覆盖菜单、Boss 战斗和结果页。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "spacewar-ii",
+        "tags": [
+          "interactive",
+          "互动体验",
+          "live",
+          "已有页面",
+          "Godot 引擎 / 纵向射击 / Web 试玩 / 第六项目接入",
+          "Godot 4.6",
+          "移动射击",
+          "Web 导出",
+          "差异化敌群",
+          "短窗口连击",
+          "Boss 阶段",
+          "结果结算"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:spacewar-ii:2",
+      "documentId": "project:spacewar-ii",
+      "text": "项目重点是把移动纵向射击的敌群、弹幕、拾取和结算节奏整理成可展示版本；后续方向包括移动端触控、Boss 可读性、关卡节奏、资源成长和发布素材继续打磨。",
+      "section": "summary-2",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "spacewar-ii",
+        "tags": [
+          "interactive",
+          "互动体验",
+          "live",
+          "已有页面",
+          "Godot 引擎 / 纵向射击 / Web 试玩 / 第六项目接入",
+          "Godot 4.6",
+          "移动射击",
+          "Web 导出",
+          "差异化敌群",
+          "短窗口连击",
+          "Boss 阶段",
+          "结果结算"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:xunqiu:1",
+      "documentId": "project:xunqiu",
+      "text": "足球社群移动端迁移案例：旧版 App 和旧后端保留历史链路，新 64 位 Android 客户端接入 Spring Boot 3、PostgreSQL、Render 与 R2 上传链路。 寻球是足球社群移动端迁移案例，核心是旧版 App/旧 Java WAR 后端保留历史链路，新 64 位 Android 客户端接入 Spring Boot 3 现代后端。 64 位客户端是轻量单模块 Android 工程，接口集中在 ApiClient，保留旧接口路径和 response envelope，覆盖登录、动态、短视频、球队、日程、赛事、球场、球币和个人页等核心路径。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "xunqiu",
+        "tags": [
+          "mobile",
+          "移动端",
+          "main",
+          "重点展示",
+          "Android 64 位 / Spring Boot 3 / Render / R2",
+          "Android 64",
+          "Java 17",
+          "Spring Boot 3",
+          "PostgreSQL",
+          "Flyway",
+          "Cloudflare R2",
+          "Render",
+          "新旧链路分流",
+          "旧接口兼容",
+          "短视频上传播放",
+          "测试矩阵与烟测"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:xunqiu:2",
+      "documentId": "project:xunqiu",
+      "text": "现代后端使用 Spring Boot 3、Java 17、PostgreSQL、Flyway、Docker、Render 和 Cloudflare R2，控制器覆盖账号、用户、动态、视频、球队、比赛、球场、搜索和 fallback。 短视频链路包含文件选择、大小/时长校验、封面、multipart 上传、R2 存储、列表回流、播放比例适配、点赞和评论，并针对小文件异常视频做了防护。 项目有 Android 测试矩阵、旧版入口对照、后端 MockMvc 测试、PostgreSQL/Testcontainers 测试和部署烟测脚本；支付、IM、推送、地图、分享等高副作用能力当前以安全等价或 stub 方式收口。",
+      "section": "summary-2",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "xunqiu",
+        "tags": [
+          "mobile",
+          "移动端",
+          "main",
+          "重点展示",
+          "Android 64 位 / Spring Boot 3 / Render / R2",
+          "Android 64",
+          "Java 17",
+          "Spring Boot 3",
+          "PostgreSQL",
+          "Flyway",
+          "Cloudflare R2",
+          "Render",
+          "新旧链路分流",
+          "旧接口兼容",
+          "短视频上传播放",
+          "测试矩阵与烟测"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:xunqiu:3",
+      "documentId": "project:xunqiu",
+      "text": "现代后端健康检查路径是 /free_kicker/actuator/health，smoke 脚本覆盖 health、登录、动态、短视频、球队和球场；如果公开 health 冷启动或超时，应作为运维排查信号，而不是生产 SLA 结论。 公开展示站提供产品页、技术文档和 latest-xunqiu64. apk 阶段包副本；这些入口用于展示与轻量验证，不代表完整生产发布或长期生产运营方案，也不包含旧后端 IP、测试密码、签名路径或私有云配置。 寻球静态展示站首页、技术文档页和 404 页已统一 BIAU Port / 泊岸标题与 favicon，并在页脚说明归属泊岸项目展示体系。",
+      "section": "summary-3",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "xunqiu",
+        "tags": [
+          "mobile",
+          "移动端",
+          "main",
+          "重点展示",
+          "Android 64 位 / Spring Boot 3 / Render / R2",
+          "Android 64",
+          "Java 17",
+          "Spring Boot 3",
+          "PostgreSQL",
+          "Flyway",
+          "Cloudflare R2",
+          "Render",
+          "新旧链路分流",
+          "旧接口兼容",
+          "短视频上传播放",
+          "测试矩阵与烟测"
+        ]
+      }
+    },
+    {
+      "id": "chunk:project:xunqiu:4",
+      "documentId": "project:xunqiu",
+      "text": "后续优化方向包括真实设备回归、旧 WebView 原生化、权限与审计、文件治理、监控部署、短视频播放器升级和更完整的生产化运维。",
+      "section": "summary-4",
+      "metadata": {
+        "sourceType": "project",
+        "projectId": "xunqiu",
+        "tags": [
+          "mobile",
+          "移动端",
+          "main",
+          "重点展示",
+          "Android 64 位 / Spring Boot 3 / Render / R2",
+          "Android 64",
+          "Java 17",
+          "Spring Boot 3",
+          "PostgreSQL",
+          "Flyway",
+          "Cloudflare R2",
+          "Render",
+          "新旧链路分流",
+          "旧接口兼容",
+          "短视频上传播放",
+          "测试矩阵与烟测"
+        ]
+      }
+    },
+    {
+      "id": "chunk:blog:legal-rag-review:1",
+      "documentId": "blog:legal-rag-review",
+      "text": "复盘法律智能机器人与合同审查项目的设计思路：如何从文档导入、条款切分、引用问答和风险审查，走向可解释、可复核、可迭代的 AI 应用。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "blog",
+        "tags": [
+          "AI 应用",
+          "project-notes",
+          "项目总结",
+          "Project Notes",
+          "项目复盘",
+          "精选",
+          "项目案例",
+          "精选知识",
+          "Legal RAG",
+          "合同风险审查",
+          "AI 应用 MVP"
+        ]
+      }
+    },
+    {
+      "id": "chunk:blog:legal-rag-production-upgrade-plan:1",
+      "documentId": "blog:legal-rag-production-upgrade-plan",
+      "text": "Legal RAG 已经跑通演示闭环，下一步要补文档解析、pgvector、队列、人审、评估和部署。 本文把升级路线拆成可执行阶段。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "blog",
+        "tags": [
+          "项目复盘",
+          "project-notes",
+          "项目总结",
+          "Project Notes",
+          "AI 应用知识库",
+          "精选",
+          "迭代路线",
+          "精选知识",
+          "项目改造清单",
+          "RAG 生产化",
+          "交付路线"
+        ]
+      }
+    },
+    {
+      "id": "chunk:blog:ozon-erp-architecture:1",
+      "documentId": "blog:ozon-erp-architecture",
+      "text": "电商 ERP 的价值不在页面数量，而在业务对象、任务状态、平台写入和审计闭环。 本文讨论后台、API、Worker、插件和数据库如何形成可运营系统。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "blog",
+        "tags": [
+          "全栈开发",
+          "project-notes",
+          "项目总结",
+          "Project Notes",
+          "项目案例",
+          "精选",
+          "精选知识",
+          "业务建模",
+          "异步任务",
+          "操作审计"
+        ]
+      }
+    },
+    {
+      "id": "chunk:blog:pet-workspace-pipeline:1",
+      "documentId": "blog:pet-workspace-pipeline",
+      "text": "生成类 AI 项目不能停在单次出图。 本文讨论如何把生成任务、自动质检、人工复核、发布记录和 App API 组织成可控管线。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "blog",
+        "tags": [
+          "AI 应用",
+          "project-notes",
+          "项目总结",
+          "Project Notes",
+          "项目案例",
+          "精选",
+          "精选知识",
+          "AI 生成管线",
+          "QA Gate",
+          "App API 契约"
+        ]
+      }
+    },
+    {
+      "id": "chunk:blog:xunqiu-android64-rebuild:1",
+      "documentId": "blog:xunqiu-android64-rebuild",
+      "text": "历史移动端项目的难点不只是补页面，而是识别旧依赖、接口边界和发布风险。 本文讨论新建 64 位客户端、复用协议和沉淀验收证据的路线。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "blog",
+        "tags": [
+          "移动端",
+          "project-notes",
+          "项目总结",
+          "Project Notes",
+          "项目案例",
+          "精选",
+          "精选知识",
+          "Android 64 位迁移",
+          "历史系统接手",
+          "接口脱敏"
+        ]
+      }
+    },
+    {
+      "id": "chunk:blog:game-showcase-standard:1",
+      "documentId": "blog:game-showcase-standard",
+      "text": "游戏项目展示不能只放源码和截图。 本文讨论如何用玩法模型、操作说明、试玩入口、截图证据和版本状态，让原型被理解成可体验项目。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "blog",
+        "tags": [
+          "游戏项目",
+          "project-notes",
+          "项目总结",
+          "Project Notes",
+          "项目案例",
+          "精选",
+          "精选知识",
+          "互动项目展示",
+          "Godot Web 导出",
+          "版本证据"
+        ]
+      }
+    },
+    {
+      "id": "chunk:blog:content-modeling-project-site:1",
+      "documentId": "blog:content-modeling-project-site",
+      "text": "产品化展示站点不能把所有内容塞进一个页面。 本文讨论如何把项目、资源、博客、案例和试玩入口拆成稳定内容模型。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "blog",
+        "tags": [
+          "全栈开发",
+          "knowledge",
+          "知识积累",
+          "Knowledge Notes",
+          "公开站点与内容系统",
+          "精选",
+          "资源清单",
+          "精选知识",
+          "内容模型",
+          "信息架构",
+          "站点数据治理"
+        ]
+      }
+    },
+    {
+      "id": "chunk:blog:public-content-governance:1",
+      "documentId": "blog:public-content-governance",
+      "text": "公开站点既要展示能力，也要控制信息边界。 本文讨论技术案例如何区分公开内容、私有复盘、运行证据和敏感配置。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "blog",
+        "tags": [
+          "全栈开发",
+          "knowledge",
+          "知识积累",
+          "Knowledge Notes",
+          "公开站点与内容系统",
+          "精选",
+          "资源清单",
+          "精选知识",
+          "内容治理",
+          "脱敏策略",
+          "公开信息边界"
+        ]
+      }
+    },
+    {
+      "id": "chunk:blog:static-site-release-verification:1",
+      "documentId": "blog:static-site-release-verification",
+      "text": "静态站上线不只是 push 代码。 本文讨论如何用构建产物、资源指纹、缓存刷新、内容扫描和线上 bundle 抽查确认发布真的生效。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "blog",
+        "tags": [
+          "全栈开发",
+          "knowledge",
+          "知识积累",
+          "Knowledge Notes",
+          "公开站点与内容系统",
+          "精选",
+          "技术方法",
+          "精选知识",
+          "静态站部署",
+          "构建验证",
+          "线上检查"
+        ]
+      }
+    },
+    {
+      "id": "chunk:blog:blog-content-system-build-log:1",
+      "documentId": "blog:blog-content-system-build-log",
+      "text": "复盘本站博客从批量生成内容清理、公开策展、栏目迁移，到建立内容生产 skill 的过程：先收口公开面，再把写作变成可验证的流水线。",
+      "section": "summary",
+      "metadata": {
+        "sourceType": "blog",
+        "tags": [
+          "构建手记",
+          "build-log",
+          "Build Log",
+          "站点构建手记",
+          "精选",
+          "技术方法",
+          "精选知识",
+          "内容系统治理",
+          "BlogColumn 栏目模型",
+          "AI 写作流水线"
+        ]
+      }
+    }
+  ],
+  "entities": [
+    {
+      "id": "blog:blog-content-system-build-log",
+      "type": "blog-post",
+      "name": "博客内容系统构建手记：从清理旧文章到栏目化流水线",
+      "aliases": [
+        "博客内容系统构建手记：从清理旧文章到栏目化流水线",
+        "构建手记",
+        "build-log",
+        "build log",
+        "站点构建手记",
+        "精选",
+        "技术方法",
+        "精选知识",
+        "内容系统治理",
+        "blogcolumn 栏目模型",
+        "ai 写作流水线"
+      ],
+      "metadata": {
+        "documentId": "blog:blog-content-system-build-log",
+        "href": "/blog/blog-content-system-build-log"
+      }
+    },
+    {
+      "id": "blog:content-modeling-project-site",
+      "type": "blog-post",
+      "name": "内容模型设计：项目、资源与博客如何分层",
+      "aliases": [
+        "内容模型设计：项目、资源与博客如何分层",
+        "全栈开发",
+        "knowledge",
+        "知识积累",
+        "knowledge notes",
+        "公开站点与内容系统",
+        "精选",
+        "资源清单",
+        "精选知识",
+        "内容模型",
+        "信息架构",
+        "站点数据治理"
+      ],
+      "metadata": {
+        "documentId": "blog:content-modeling-project-site",
+        "href": "/blog/content-modeling-project-site"
+      }
+    },
+    {
+      "id": "blog:game-showcase-standard",
+      "type": "blog-post",
+      "name": "游戏项目展示系统：玩法模型、试玩入口与版本证据",
+      "aliases": [
+        "游戏项目展示系统：玩法模型、试玩入口与版本证据",
+        "游戏项目",
+        "project-notes",
+        "项目总结",
+        "project notes",
+        "项目案例",
+        "精选",
+        "精选知识",
+        "互动项目展示",
+        "godot web 导出",
+        "版本证据"
+      ],
+      "metadata": {
+        "documentId": "blog:game-showcase-standard",
+        "href": "/blog/game-showcase-standard"
+      }
+    },
+    {
+      "id": "blog:legal-rag-production-upgrade-plan",
+      "type": "blog-post",
+      "name": "Legal RAG 生产化改造路线：从 MVP 闭环到可交付原型",
+      "aliases": [
+        "legal rag 生产化改造路线：从 mvp 闭环到可交付原型",
+        "项目复盘",
+        "project-notes",
+        "项目总结",
+        "project notes",
+        "ai 应用知识库",
+        "精选",
+        "迭代路线",
+        "精选知识",
+        "项目改造清单",
+        "rag 生产化",
+        "交付路线"
+      ],
+      "metadata": {
+        "documentId": "blog:legal-rag-production-upgrade-plan",
+        "href": "/blog/legal-rag-production-upgrade-plan"
+      }
+    },
+    {
+      "id": "blog:legal-rag-review",
+      "type": "blog-post",
+      "name": "合同审查 RAG 项目复盘：从可演示 MVP 到生产化路线",
+      "aliases": [
+        "合同审查 rag 项目复盘：从可演示 mvp 到生产化路线",
+        "ai 应用",
+        "project-notes",
+        "项目总结",
+        "project notes",
+        "项目复盘",
+        "精选",
+        "项目案例",
+        "精选知识",
+        "legal rag",
+        "合同风险审查",
+        "ai 应用 mvp"
+      ],
+      "metadata": {
+        "documentId": "blog:legal-rag-review",
+        "href": "/blog/legal-rag-review"
+      }
+    },
+    {
+      "id": "blog:ozon-erp-architecture",
+      "type": "blog-post",
+      "name": "电商 ERP 架构：后台、队列、插件与审计如何协同",
+      "aliases": [
+        "电商 erp 架构：后台、队列、插件与审计如何协同",
+        "全栈开发",
+        "project-notes",
+        "项目总结",
+        "project notes",
+        "项目案例",
+        "精选",
+        "精选知识",
+        "业务建模",
+        "异步任务",
+        "操作审计"
+      ],
+      "metadata": {
+        "documentId": "blog:ozon-erp-architecture",
+        "href": "/blog/ozon-erp-architecture"
+      }
+    },
+    {
+      "id": "blog:pet-workspace-pipeline",
+      "type": "blog-post",
+      "name": "AI 生成管线：任务编排、QA Gate 与 App 发布边界",
+      "aliases": [
+        "ai 生成管线：任务编排、qa gate 与 app 发布边界",
+        "ai 应用",
+        "project-notes",
+        "项目总结",
+        "project notes",
+        "项目案例",
+        "精选",
+        "精选知识",
+        "ai 生成管线",
+        "qa gate",
+        "app api 契约"
+      ],
+      "metadata": {
+        "documentId": "blog:pet-workspace-pipeline",
+        "href": "/blog/pet-workspace-pipeline"
+      }
+    },
+    {
+      "id": "blog:public-content-governance",
+      "type": "blog-post",
+      "name": "公开内容治理：技术案例如何脱敏、分层与版本化",
+      "aliases": [
+        "公开内容治理：技术案例如何脱敏、分层与版本化",
+        "全栈开发",
+        "knowledge",
+        "知识积累",
+        "knowledge notes",
+        "公开站点与内容系统",
+        "精选",
+        "资源清单",
+        "精选知识",
+        "内容治理",
+        "脱敏策略",
+        "公开信息边界"
+      ],
+      "metadata": {
+        "documentId": "blog:public-content-governance",
+        "href": "/blog/public-content-governance"
+      }
+    },
+    {
+      "id": "blog:static-site-release-verification",
+      "type": "blog-post",
+      "name": "静态站发布验证：构建、缓存、资源指纹与线上检查",
+      "aliases": [
+        "静态站发布验证：构建、缓存、资源指纹与线上检查",
+        "全栈开发",
+        "knowledge",
+        "知识积累",
+        "knowledge notes",
+        "公开站点与内容系统",
+        "精选",
+        "技术方法",
+        "精选知识",
+        "静态站部署",
+        "构建验证",
+        "线上检查"
+      ],
+      "metadata": {
+        "documentId": "blog:static-site-release-verification",
+        "href": "/blog/static-site-release-verification"
+      }
+    },
+    {
+      "id": "blog:xunqiu-android64-rebuild",
+      "type": "blog-post",
+      "name": "Android 历史项目重构：64 位客户端、接口复用与阶段验收",
+      "aliases": [
+        "android 历史项目重构：64 位客户端、接口复用与阶段验收",
+        "移动端",
+        "project-notes",
+        "项目总结",
+        "project notes",
+        "项目案例",
+        "精选",
+        "精选知识",
+        "android 64 位迁移",
+        "历史系统接手",
+        "接口脱敏"
+      ],
+      "metadata": {
+        "documentId": "blog:xunqiu-android64-rebuild",
+        "href": "/blog/xunqiu-android64-rebuild"
+      }
+    },
+    {
+      "id": "demo:biau-playlab",
+      "type": "demo",
+      "name": "BIAU Playlab 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "游戏站",
+        "源码仓库",
+        "展示标准文章"
+      ],
+      "metadata": {
+        "projectId": "biau-playlab",
+        "href": "/projects/biau-playlab"
+      }
+    },
+    {
+      "id": "demo:blog-semi",
+      "type": "demo",
+      "name": "React + Semi 博客系统 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "内容模型文章",
+        "公开内容治理",
+        "静态站验证",
+        "构建手记"
+      ],
+      "metadata": {
+        "projectId": "blog-semi",
+        "href": "/projects/blog-semi"
+      }
+    },
+    {
+      "id": "demo:game-first-tetris",
+      "type": "demo",
+      "name": "俄罗斯方块原型 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "游戏站详情",
+        "web 试玩"
+      ],
+      "metadata": {
+        "projectId": "game-first-tetris",
+        "href": "/projects/game-first-tetris"
+      }
+    },
+    {
+      "id": "demo:game-next-spacewar",
+      "type": "demo",
+      "name": "太空战机 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "游戏站详情",
+        "web 试玩"
+      ],
+      "metadata": {
+        "projectId": "game-next-spacewar",
+        "href": "/projects/game-next-spacewar"
+      }
+    },
+    {
+      "id": "demo:intespace",
+      "type": "demo",
+      "name": "竖屏肉鸽射击 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "游戏站详情",
+        "web 试玩"
+      ],
+      "metadata": {
+        "projectId": "intespace",
+        "href": "/projects/intespace"
+      }
+    },
+    {
+      "id": "demo:legal-rag",
+      "type": "demo",
+      "name": "Legal RAG 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "在线工作台",
+        "api health",
+        "项目复盘",
+        "生产化路线"
+      ],
+      "metadata": {
+        "projectId": "legal-rag",
+        "href": "/projects/legal-rag"
+      }
+    },
+    {
+      "id": "demo:ozon-erp",
+      "type": "demo",
+      "name": "Ozon 电商 ERP 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "访问 erp",
+        "架构文章"
+      ],
+      "metadata": {
+        "projectId": "ozon-erp",
+        "href": "/projects/ozon-erp"
+      }
+    },
+    {
+      "id": "demo:pet-workspace",
+      "type": "demo",
+      "name": "AI 桌宠社区与生成管线 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "app 展示页",
+        "展示页源码",
+        "生成管线文章"
+      ],
+      "metadata": {
+        "projectId": "pet-workspace",
+        "href": "/projects/pet-workspace"
+      }
+    },
+    {
+      "id": "demo:raiden-prototype",
+      "type": "demo",
+      "name": "纵版弹幕射击 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "游戏站详情",
+        "web 试玩"
+      ],
+      "metadata": {
+        "projectId": "raiden-prototype",
+        "href": "/projects/raiden-prototype"
+      }
+    },
+    {
+      "id": "demo:space-war",
+      "type": "demo",
+      "name": "复古横版射击 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "游戏站详情",
+        "web 试玩"
+      ],
+      "metadata": {
+        "projectId": "space-war",
+        "href": "/projects/space-war"
+      }
+    },
+    {
+      "id": "demo:spacewar-ii",
+      "type": "demo",
+      "name": "移动纵向射击 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "游戏站详情",
+        "web 试玩"
+      ],
+      "metadata": {
+        "projectId": "spacewar-ii",
+        "href": "/projects/spacewar-ii"
+      }
+    },
+    {
+      "id": "demo:xunqiu",
+      "type": "demo",
+      "name": "寻球 演示入口",
+      "aliases": [
+        "演示",
+        "入口",
+        "demo",
+        "产品展示页",
+        "技术文档",
+        "阶段 apk",
+        "新后端仓库",
+        "迁移复盘文章"
+      ],
+      "metadata": {
+        "projectId": "xunqiu",
+        "href": "/projects/xunqiu"
+      }
+    },
+    {
+      "id": "feature:biau-playlab:item",
+      "type": "feature",
+      "name": "六个可试玩游戏",
+      "aliases": [
+        "六个可试玩游戏"
+      ],
+      "metadata": {
+        "projectId": "biau-playlab"
+      }
+    },
+    {
+      "id": "feature:blog-semi:item",
+      "type": "feature",
+      "name": "多视图主站",
+      "aliases": [
+        "多视图主站"
+      ],
+      "metadata": {
+        "projectId": "blog-semi"
+      }
+    },
+    {
+      "id": "feature:blog-semi:ui",
+      "type": "feature",
+      "name": "UI 验证",
+      "aliases": [
+        "ui 验证"
+      ],
+      "metadata": {
+        "projectId": "blog-semi"
+      }
+    },
+    {
+      "id": "feature:game-first-tetris:combo-b2b",
+      "type": "feature",
+      "name": "combo/B2B",
+      "aliases": [
+        "combo/b2b"
+      ],
+      "metadata": {
+        "projectId": "game-first-tetris"
+      }
+    },
+    {
+      "id": "feature:game-first-tetris:item",
+      "type": "feature",
+      "name": "经典计分",
+      "aliases": [
+        "经典计分"
+      ],
+      "metadata": {
+        "projectId": "game-first-tetris"
+      }
+    },
+    {
+      "id": "feature:game-next-spacewar:item",
+      "type": "feature",
+      "name": "三波短任务",
+      "aliases": [
+        "三波短任务"
+      ],
+      "metadata": {
+        "projectId": "game-next-spacewar"
+      }
+    },
+    {
+      "id": "feature:intespace:boss",
+      "type": "feature",
+      "name": "Boss 试炼",
+      "aliases": [
+        "boss 试炼"
+      ],
+      "metadata": {
+        "projectId": "intespace"
+      }
+    },
+    {
+      "id": "feature:intespace:item",
+      "type": "feature",
+      "name": "章节推进",
+      "aliases": [
+        "章节推进"
+      ],
+      "metadata": {
+        "projectId": "intespace"
+      }
+    },
+    {
+      "id": "feature:legal-rag:hybrid-retrieval",
+      "type": "feature",
+      "name": "Hybrid Retrieval",
+      "aliases": [
+        "hybrid retrieval"
+      ],
+      "metadata": {
+        "projectId": "legal-rag"
+      }
+    },
+    {
+      "id": "feature:legal-rag:item",
+      "type": "feature",
+      "name": "公开安全数据集",
+      "aliases": [
+        "公开安全数据集"
+      ],
+      "metadata": {
+        "projectId": "legal-rag"
+      }
+    },
+    {
+      "id": "feature:ozon-erp:item",
+      "type": "feature",
+      "name": "运营后台",
+      "aliases": [
+        "运营后台"
+      ],
+      "metadata": {
+        "projectId": "ozon-erp"
+      }
+    },
+    {
+      "id": "feature:pet-workspace:id",
+      "type": "feature",
+      "name": "不透明下载 ID",
+      "aliases": [
+        "不透明下载 id"
+      ],
+      "metadata": {
+        "projectId": "pet-workspace"
+      }
+    },
+    {
+      "id": "feature:pet-workspace:item",
+      "type": "feature",
+      "name": "桌宠孵化",
+      "aliases": [
+        "桌宠孵化"
+      ],
+      "metadata": {
+        "projectId": "pet-workspace"
+      }
+    },
+    {
+      "id": "feature:raiden-prototype:item",
+      "type": "feature",
+      "name": "双关卡章节",
+      "aliases": [
+        "双关卡章节"
+      ],
+      "metadata": {
+        "projectId": "raiden-prototype"
+      }
+    },
+    {
+      "id": "feature:space-war:item",
+      "type": "feature",
+      "name": "连续击破",
+      "aliases": [
+        "连续击破"
+      ],
+      "metadata": {
+        "projectId": "space-war"
+      }
+    },
+    {
+      "id": "feature:space-war:sector",
+      "type": "feature",
+      "name": "五个 Sector",
+      "aliases": [
+        "五个 sector"
+      ],
+      "metadata": {
+        "projectId": "space-war"
+      }
+    },
+    {
+      "id": "feature:spacewar-ii:boss",
+      "type": "feature",
+      "name": "Boss 阶段",
+      "aliases": [
+        "boss 阶段"
+      ],
+      "metadata": {
+        "projectId": "spacewar-ii"
+      }
+    },
+    {
+      "id": "feature:spacewar-ii:item",
+      "type": "feature",
+      "name": "差异化敌群",
+      "aliases": [
+        "差异化敌群"
+      ],
+      "metadata": {
+        "projectId": "spacewar-ii"
+      }
+    },
+    {
+      "id": "feature:xunqiu:item",
+      "type": "feature",
+      "name": "新旧链路分流",
+      "aliases": [
+        "新旧链路分流"
+      ],
+      "metadata": {
+        "projectId": "xunqiu"
+      }
+    },
+    {
+      "id": "limitation:biau-playlab",
+      "type": "limitation",
+      "name": "BIAU Playlab 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "biau-playlab",
+        "documentId": "project:biau-playlab"
+      }
+    },
+    {
+      "id": "limitation:blog-semi",
+      "type": "limitation",
+      "name": "React + Semi 博客系统 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "blog-semi",
+        "documentId": "project:blog-semi"
+      }
+    },
+    {
+      "id": "limitation:game-first-tetris",
+      "type": "limitation",
+      "name": "俄罗斯方块原型 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "game-first-tetris",
+        "documentId": "project:game-first-tetris"
+      }
+    },
+    {
+      "id": "limitation:game-next-spacewar",
+      "type": "limitation",
+      "name": "太空战机 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "game-next-spacewar",
+        "documentId": "project:game-next-spacewar"
+      }
+    },
+    {
+      "id": "limitation:intespace",
+      "type": "limitation",
+      "name": "竖屏肉鸽射击 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "intespace",
+        "documentId": "project:intespace"
+      }
+    },
+    {
+      "id": "limitation:legal-rag",
+      "type": "limitation",
+      "name": "Legal RAG 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "legal-rag",
+        "documentId": "project:legal-rag"
+      }
+    },
+    {
+      "id": "limitation:ozon-erp",
+      "type": "limitation",
+      "name": "Ozon 电商 ERP 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "ozon-erp",
+        "documentId": "project:ozon-erp"
+      }
+    },
+    {
+      "id": "limitation:pet-workspace",
+      "type": "limitation",
+      "name": "AI 桌宠社区与生成管线 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "pet-workspace",
+        "documentId": "project:pet-workspace"
+      }
+    },
+    {
+      "id": "limitation:raiden-prototype",
+      "type": "limitation",
+      "name": "纵版弹幕射击 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "raiden-prototype",
+        "documentId": "project:raiden-prototype"
+      }
+    },
+    {
+      "id": "limitation:space-war",
+      "type": "limitation",
+      "name": "复古横版射击 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "space-war",
+        "documentId": "project:space-war"
+      }
+    },
+    {
+      "id": "limitation:spacewar-ii",
+      "type": "limitation",
+      "name": "移动纵向射击 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "spacewar-ii",
+        "documentId": "project:spacewar-ii"
+      }
+    },
+    {
+      "id": "limitation:xunqiu",
+      "type": "limitation",
+      "name": "寻球 当前边界",
+      "aliases": [
+        "边界",
+        "限制",
+        "风险",
+        "当前边界"
+      ],
+      "metadata": {
+        "projectId": "xunqiu",
+        "documentId": "project:xunqiu"
+      }
+    },
+    {
+      "id": "project:biau-playlab",
+      "type": "project",
+      "name": "BIAU Playlab｜游戏作品集与系统设计内容站",
+      "aliases": [
+        "biau playlab｜游戏作品集与系统设计内容站",
+        "biau-playlab",
+        "platform",
+        "博客系统",
+        "live",
+        "已有页面",
+        "astro 作品集 / godot web 试玩 / 内容审计 / cloudflare pages",
+        "astro 5",
+        "content collections",
+        "godot web",
+        "cloudflare pages",
+        "r2",
+        "六个可试玩游戏",
+        "项目详情页",
+        "内容审计",
+        "公开端点检查"
+      ],
+      "metadata": {
+        "documentId": "project:biau-playlab",
+        "href": "/projects/biau-playlab",
+        "category": "platform",
+        "status": "live"
+      }
+    },
+    {
+      "id": "project:blog-semi",
+      "type": "project",
+      "name": "React + Semi 博客系统｜当前主站",
+      "aliases": [
+        "react + semi 博客系统｜当前主站",
+        "blog-semi",
+        "platform",
+        "博客系统",
+        "ongoing",
+        "建设中",
+        "react 主站 / semi 组件体系 / 项目案例路由 / 内容治理 / 助手知识",
+        "react 19",
+        "vite",
+        "typescript",
+        "semi design",
+        "express",
+        "prisma",
+        "postgresql",
+        "playwright",
+        "多视图主站",
+        "项目案例",
+        "公开助手",
+        "内容治理",
+        "ui 验证"
+      ],
+      "metadata": {
+        "documentId": "project:blog-semi",
+        "href": "/projects/blog-semi",
+        "category": "platform",
+        "status": "ongoing"
+      }
+    },
+    {
+      "id": "project:game-first-tetris",
+      "type": "project",
+      "name": "俄罗斯方块原型｜Tetris",
+      "aliases": [
+        "俄罗斯方块原型｜tetris",
+        "game-first-tetris",
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "godot 引擎 / web 试玩 / 触屏适配",
+        "godot 4",
+        "web 导出",
+        "游戏原型",
+        "经典计分",
+        "软硬降得分",
+        "combo/b2b",
+        "触屏输入"
+      ],
+      "metadata": {
+        "documentId": "project:game-first-tetris",
+        "href": "/projects/game-first-tetris",
+        "category": "interactive",
+        "status": "live"
+      }
+    },
+    {
+      "id": "project:game-next-spacewar",
+      "type": "project",
+      "name": "太空战机｜展示构建",
+      "aliases": [
+        "太空战机｜展示构建",
+        "game-next-spacewar",
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "godot 展示构建 / 战斗循环 / 单局复盘",
+        "godot 4.6",
+        "太空射击",
+        "web 导出",
+        "三波短任务",
+        "击破连击",
+        "波次奖励",
+        "结果复盘"
+      ],
+      "metadata": {
+        "documentId": "project:game-next-spacewar",
+        "href": "/projects/game-next-spacewar",
+        "category": "interactive",
+        "status": "live"
+      }
+    },
+    {
+      "id": "project:intespace",
+      "type": "project",
+      "name": "竖屏肉鸽射击｜intespace",
+      "aliases": [
+        "竖屏肉鸽射击｜intespace",
+        "intespace",
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "godot 引擎 / 肉鸽玩法 / 武器树 / 局外成长",
+        "godot",
+        "肉鸽玩法",
+        "武器树系统",
+        "移动端优先",
+        "章节推进",
+        "生存挑战",
+        "boss 试炼",
+        "局外成长"
+      ],
+      "metadata": {
+        "documentId": "project:intespace",
+        "href": "/projects/intespace",
+        "category": "interactive",
+        "status": "live"
+      }
+    },
+    {
+      "id": "project:legal-rag",
+      "type": "project",
+      "name": "Legal RAG｜法律智能机器人与合同审查",
+      "aliases": [
+        "legal rag｜法律智能机器人与合同审查",
+        "legal-rag",
+        "ai",
+        "ai 应用",
+        "main",
+        "重点展示",
+        "全栈 mvp / rag 流程 / 合同审查工作台",
+        "vue 3",
+        "express",
+        "typescript",
+        "postgresql",
+        "pgvector",
+        "rag",
+        "公开安全数据集",
+        "hybrid retrieval",
+        "引用与诊断",
+        "规则优先合同审查"
+      ],
+      "metadata": {
+        "documentId": "project:legal-rag",
+        "href": "/projects/legal-rag",
+        "category": "ai",
+        "status": "main"
+      }
+    },
+    {
+      "id": "project:ozon-erp",
+      "type": "project",
+      "name": "Ozon 电商 ERP",
+      "aliases": [
+        "ozon 电商 erp",
+        "ozon-erp",
+        "business",
+        "业务系统",
+        "main",
+        "重点展示",
+        "业务系统 / 管理后台 / api / 数据模型 / 浏览器插件",
+        "vue 3",
+        "vite",
+        "express",
+        "prisma",
+        "postgresql",
+        "redis",
+        "bullmq",
+        "wxt",
+        "chrome mv3",
+        "运营后台",
+        "采集铺货",
+        "受保护写入",
+        "任务与审计闭环"
+      ],
+      "metadata": {
+        "documentId": "project:ozon-erp",
+        "href": "/projects/ozon-erp",
+        "category": "business",
+        "status": "main"
+      }
+    },
+    {
+      "id": "project:pet-workspace",
+      "type": "project",
+      "name": "AI 桌宠社区与生成管线",
+      "aliases": [
+        "ai 桌宠社区与生成管线",
+        "pet-workspace",
+        "ai",
+        "ai 应用",
+        "main",
+        "重点展示",
+        "android app / community api / 生成管线 / 质量门禁 / 人审发布",
+        "android",
+        "node.js",
+        "fastapi",
+        "postgresql",
+        "agent worker",
+        "质量门禁",
+        "桌宠孵化",
+        "社区审核",
+        "不透明下载 id",
+        "人审发布"
+      ],
+      "metadata": {
+        "documentId": "project:pet-workspace",
+        "href": "/projects/pet-workspace",
+        "category": "ai",
+        "status": "main"
+      }
+    },
+    {
+      "id": "project:raiden-prototype",
+      "type": "project",
+      "name": "纵版弹幕射击｜垂直切片",
+      "aliases": [
+        "纵版弹幕射击｜垂直切片",
+        "raiden-prototype",
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "godot 引擎 / 纵版射击 / 原型验证",
+        "godot",
+        "纵版射击",
+        "原型验证",
+        "双关卡章节",
+        "连锁击破",
+        "首领收束",
+        "试玩验证"
+      ],
+      "metadata": {
+        "documentId": "project:raiden-prototype",
+        "href": "/projects/raiden-prototype",
+        "category": "interactive",
+        "status": "live"
+      }
+    },
+    {
+      "id": "project:space-war",
+      "type": "project",
+      "name": "复古横版射击｜space-war",
+      "aliases": [
+        "复古横版射击｜space-war",
+        "space-war",
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "godot 引擎 / 复古射击 / 发布版 / 展示入口",
+        "godot 4.6",
+        "复古射击",
+        "web 包计划",
+        "五个 sector",
+        "连续击破",
+        "高分结算",
+        "发布文档"
+      ],
+      "metadata": {
+        "documentId": "project:space-war",
+        "href": "/projects/space-war",
+        "category": "interactive",
+        "status": "live"
+      }
+    },
+    {
+      "id": "project:spacewar-ii",
+      "type": "project",
+      "name": "移动纵向射击｜Spacewar II",
+      "aliases": [
+        "移动纵向射击｜spacewar ii",
+        "spacewar-ii",
+        "interactive",
+        "互动体验",
+        "live",
+        "已有页面",
+        "godot 引擎 / 纵向射击 / web 试玩 / 第六项目接入",
+        "godot 4.6",
+        "移动射击",
+        "web 导出",
+        "差异化敌群",
+        "短窗口连击",
+        "boss 阶段",
+        "结果结算"
+      ],
+      "metadata": {
+        "documentId": "project:spacewar-ii",
+        "href": "/projects/spacewar-ii",
+        "category": "interactive",
+        "status": "live"
+      }
+    },
+    {
+      "id": "project:xunqiu",
+      "type": "project",
+      "name": "寻球｜移动端与现代后端重建",
+      "aliases": [
+        "寻球｜移动端与现代后端重建",
+        "xunqiu",
+        "mobile",
+        "移动端",
+        "main",
+        "重点展示",
+        "android 64 位 / spring boot 3 / render / r2",
+        "android 64",
+        "java 17",
+        "spring boot 3",
+        "postgresql",
+        "flyway",
+        "cloudflare r2",
+        "render",
+        "新旧链路分流",
+        "旧接口兼容",
+        "短视频上传播放",
+        "测试矩阵与烟测"
+      ],
+      "metadata": {
+        "documentId": "project:xunqiu",
+        "href": "/projects/xunqiu",
+        "category": "mobile",
+        "status": "main"
+      }
+    },
+    {
+      "id": "roadmap:biau-playlab",
+      "type": "roadmap",
+      "name": "BIAU Playlab 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "biau-playlab",
+        "documentId": "project:biau-playlab"
+      }
+    },
+    {
+      "id": "roadmap:blog-semi",
+      "type": "roadmap",
+      "name": "React + Semi 博客系统 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "blog-semi",
+        "documentId": "project:blog-semi"
+      }
+    },
+    {
+      "id": "roadmap:game-first-tetris",
+      "type": "roadmap",
+      "name": "俄罗斯方块原型 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "game-first-tetris",
+        "documentId": "project:game-first-tetris"
+      }
+    },
+    {
+      "id": "roadmap:game-next-spacewar",
+      "type": "roadmap",
+      "name": "太空战机 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "game-next-spacewar",
+        "documentId": "project:game-next-spacewar"
+      }
+    },
+    {
+      "id": "roadmap:intespace",
+      "type": "roadmap",
+      "name": "竖屏肉鸽射击 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "intespace",
+        "documentId": "project:intespace"
+      }
+    },
+    {
+      "id": "roadmap:legal-rag",
+      "type": "roadmap",
+      "name": "Legal RAG 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "下一轮版本迭代方向"
+      ],
+      "metadata": {
+        "projectId": "legal-rag",
+        "documentId": "project:legal-rag"
+      }
+    },
+    {
+      "id": "roadmap:ozon-erp",
+      "type": "roadmap",
+      "name": "Ozon 电商 ERP 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "ozon-erp",
+        "documentId": "project:ozon-erp"
+      }
+    },
+    {
+      "id": "roadmap:pet-workspace",
+      "type": "roadmap",
+      "name": "AI 桌宠社区与生成管线 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "pet-workspace",
+        "documentId": "project:pet-workspace"
+      }
+    },
+    {
+      "id": "roadmap:raiden-prototype",
+      "type": "roadmap",
+      "name": "纵版弹幕射击 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "raiden-prototype",
+        "documentId": "project:raiden-prototype"
+      }
+    },
+    {
+      "id": "roadmap:space-war",
+      "type": "roadmap",
+      "name": "复古横版射击 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "space-war",
+        "documentId": "project:space-war"
+      }
+    },
+    {
+      "id": "roadmap:spacewar-ii",
+      "type": "roadmap",
+      "name": "移动纵向射击 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "spacewar-ii",
+        "documentId": "project:spacewar-ii"
+      }
+    },
+    {
+      "id": "roadmap:xunqiu",
+      "type": "roadmap",
+      "name": "寻球 后续优化",
+      "aliases": [
+        "后续",
+        "路线",
+        "roadmap",
+        "后续优化方向"
+      ],
+      "metadata": {
+        "projectId": "xunqiu",
+        "documentId": "project:xunqiu"
+      }
+    },
+    {
+      "id": "site:biau-port",
+      "type": "site",
+      "name": "BIAU Port 泊岸",
+      "aliases": [
+        "泊岸",
+        "biau port",
+        "biau",
+        "主站",
+        "当前网站"
+      ],
+      "metadata": {
+        "documentId": "site:intro",
+        "href": "/"
+      }
+    },
+    {
+      "id": "status:biau-playlab",
+      "type": "status-check",
+      "name": "BIAU Playlab 状态检查",
+      "aliases": [
+        "biau playlab｜游戏作品集与系统设计内容站",
+        "biau-playlab",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "biau-playlab",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:blog-semi",
+      "type": "status-check",
+      "name": "React + Semi 博客系统 状态检查",
+      "aliases": [
+        "react + semi 博客系统｜当前主站",
+        "blog-semi",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "blog-semi",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:game-first-tetris",
+      "type": "status-check",
+      "name": "俄罗斯方块原型 状态检查",
+      "aliases": [
+        "俄罗斯方块原型｜tetris",
+        "game-first-tetris",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "game-first-tetris",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:game-next-spacewar",
+      "type": "status-check",
+      "name": "太空战机 状态检查",
+      "aliases": [
+        "太空战机｜展示构建",
+        "game-next-spacewar",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "game-next-spacewar",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:intespace",
+      "type": "status-check",
+      "name": "竖屏肉鸽射击 状态检查",
+      "aliases": [
+        "竖屏肉鸽射击｜intespace",
+        "intespace",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "intespace",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:legal-rag",
+      "type": "status-check",
+      "name": "Legal RAG 状态检查",
+      "aliases": [
+        "legal rag｜法律智能机器人与合同审查",
+        "legal-rag",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "legal-rag",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:ozon-erp",
+      "type": "status-check",
+      "name": "Ozon 电商 ERP 状态检查",
+      "aliases": [
+        "ozon 电商 erp",
+        "ozon-erp",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "ozon-erp",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:pet-workspace",
+      "type": "status-check",
+      "name": "AI 桌宠社区与生成管线 状态检查",
+      "aliases": [
+        "ai 桌宠社区与生成管线",
+        "pet-workspace",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "pet-workspace",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:raiden-prototype",
+      "type": "status-check",
+      "name": "纵版弹幕射击 状态检查",
+      "aliases": [
+        "纵版弹幕射击｜垂直切片",
+        "raiden-prototype",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "raiden-prototype",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:site-status",
+      "type": "status-check",
+      "name": "项目可靠性观察",
+      "aliases": [
+        "状态页",
+        "可靠性观察",
+        "health check",
+        "synthetic"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:space-war",
+      "type": "status-check",
+      "name": "复古横版射击 状态检查",
+      "aliases": [
+        "复古横版射击｜space-war",
+        "space-war",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "space-war",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:spacewar-ii",
+      "type": "status-check",
+      "name": "移动纵向射击 状态检查",
+      "aliases": [
+        "移动纵向射击｜spacewar ii",
+        "spacewar-ii",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "spacewar-ii",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "status:xunqiu",
+      "type": "status-check",
+      "name": "寻球 状态检查",
+      "aliases": [
+        "寻球｜移动端与现代后端重建",
+        "xunqiu",
+        "状态",
+        "可靠性",
+        "health"
+      ],
+      "metadata": {
+        "documentId": "site:status",
+        "projectId": "xunqiu",
+        "href": "/status"
+      }
+    },
+    {
+      "id": "tech:agent-worker",
+      "type": "tech",
+      "name": "Agent Worker",
+      "aliases": [
+        "agent worker",
+        "agentworker"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:android",
+      "type": "tech",
+      "name": "Android",
+      "aliases": [
+        "android"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:android-64",
+      "type": "tech",
+      "name": "Android 64",
+      "aliases": [
+        "android 64",
+        "android64"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:astro-5",
+      "type": "tech",
+      "name": "Astro 5",
+      "aliases": [
+        "astro 5",
+        "astro5"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:bullmq",
+      "type": "tech",
+      "name": "BullMQ",
+      "aliases": [
+        "bullmq"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:chrome-mv3",
+      "type": "tech",
+      "name": "Chrome MV3",
+      "aliases": [
+        "chrome mv3",
+        "chromemv3"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:cloudflare-pages",
+      "type": "tech",
+      "name": "Cloudflare Pages",
+      "aliases": [
+        "cloudflare pages",
+        "cloudflarepages"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:cloudflare-r2",
+      "type": "tech",
+      "name": "Cloudflare R2",
+      "aliases": [
+        "cloudflare r2",
+        "cloudflarer2"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:content-collections",
+      "type": "tech",
+      "name": "Content Collections",
+      "aliases": [
+        "content collections",
+        "contentcollections"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:express",
+      "type": "tech",
+      "name": "Express",
+      "aliases": [
+        "express"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:fastapi",
+      "type": "tech",
+      "name": "FastAPI",
+      "aliases": [
+        "fastapi"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:flyway",
+      "type": "tech",
+      "name": "Flyway",
+      "aliases": [
+        "flyway"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:godot",
+      "type": "tech",
+      "name": "Godot",
+      "aliases": [
+        "godot"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:godot-4",
+      "type": "tech",
+      "name": "Godot 4",
+      "aliases": [
+        "godot 4",
+        "godot4"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:godot-4.6",
+      "type": "tech",
+      "name": "Godot 4.6",
+      "aliases": [
+        "godot 4.6",
+        "godot4.6"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:godot-web",
+      "type": "tech",
+      "name": "Godot Web",
+      "aliases": [
+        "godot web",
+        "godotweb"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:item",
+      "type": "tech",
+      "name": "质量门禁",
+      "aliases": [
+        "质量门禁"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:java-17",
+      "type": "tech",
+      "name": "Java 17",
+      "aliases": [
+        "java 17",
+        "java17"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:node.js",
+      "type": "tech",
+      "name": "Node.js",
+      "aliases": [
+        "node.js"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:pgvector",
+      "type": "tech",
+      "name": "pgvector",
+      "aliases": [
+        "pgvector"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:playwright",
+      "type": "tech",
+      "name": "Playwright",
+      "aliases": [
+        "playwright"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:postgresql",
+      "type": "tech",
+      "name": "PostgreSQL",
+      "aliases": [
+        "postgresql"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:prisma",
+      "type": "tech",
+      "name": "Prisma",
+      "aliases": [
+        "prisma"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:r2",
+      "type": "tech",
+      "name": "R2",
+      "aliases": [
+        "r2"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:rag",
+      "type": "tech",
+      "name": "RAG",
+      "aliases": [
+        "rag"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:react-19",
+      "type": "tech",
+      "name": "React 19",
+      "aliases": [
+        "react 19",
+        "react19"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:redis",
+      "type": "tech",
+      "name": "Redis",
+      "aliases": [
+        "redis"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:render",
+      "type": "tech",
+      "name": "Render",
+      "aliases": [
+        "render"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:semi-design",
+      "type": "tech",
+      "name": "Semi Design",
+      "aliases": [
+        "semi design",
+        "semidesign"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:spring-boot-3",
+      "type": "tech",
+      "name": "Spring Boot 3",
+      "aliases": [
+        "spring boot 3",
+        "springboot3"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:typescript",
+      "type": "tech",
+      "name": "TypeScript",
+      "aliases": [
+        "typescript"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:vite",
+      "type": "tech",
+      "name": "Vite",
+      "aliases": [
+        "vite"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:vue-3",
+      "type": "tech",
+      "name": "Vue 3",
+      "aliases": [
+        "vue 3",
+        "vue3"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:web",
+      "type": "tech",
+      "name": "Web 导出",
+      "aliases": [
+        "web 导出",
+        "web导出"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "tech:wxt",
+      "type": "tech",
+      "name": "WXT",
+      "aliases": [
+        "wxt"
+      ],
+      "metadata": {}
+    }
+  ],
+  "relations": [
+    {
+      "id": "contains:site:biau-port->project:biau-playlab",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:biau-playlab",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:biau-playlab"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:blog-semi",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:blog-semi",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:game-first-tetris",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:game-first-tetris",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:game-next-spacewar",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:game-next-spacewar",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:intespace",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:intespace",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:legal-rag",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:legal-rag",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:ozon-erp",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:ozon-erp",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:pet-workspace",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:pet-workspace",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:raiden-prototype",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:raiden-prototype",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:space-war",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:space-war",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:spacewar-ii",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:spacewar-ii",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->project:xunqiu",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "project:xunqiu",
+      "type": "contains",
+      "weight": 1,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "contains:site:biau-port->status:site-status",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "status:site-status",
+      "type": "contains",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "site:status"
+      ]
+    },
+    {
+      "id": "documentedBy:site:biau-port->blog:blog-content-system-build-log",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "blog:blog-content-system-build-log",
+      "type": "documentedBy",
+      "weight": 0.6,
+      "evidenceDocumentIds": [
+        "blog:blog-content-system-build-log"
+      ]
+    },
+    {
+      "id": "documentedBy:site:biau-port->blog:content-modeling-project-site",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "blog:content-modeling-project-site",
+      "type": "documentedBy",
+      "weight": 0.6,
+      "evidenceDocumentIds": [
+        "blog:content-modeling-project-site"
+      ]
+    },
+    {
+      "id": "documentedBy:site:biau-port->blog:game-showcase-standard",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "blog:game-showcase-standard",
+      "type": "documentedBy",
+      "weight": 0.6,
+      "evidenceDocumentIds": [
+        "blog:game-showcase-standard"
+      ]
+    },
+    {
+      "id": "documentedBy:site:biau-port->blog:legal-rag-production-upgrade-plan",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "blog:legal-rag-production-upgrade-plan",
+      "type": "documentedBy",
+      "weight": 0.6,
+      "evidenceDocumentIds": [
+        "blog:legal-rag-production-upgrade-plan"
+      ]
+    },
+    {
+      "id": "documentedBy:site:biau-port->blog:legal-rag-review",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "blog:legal-rag-review",
+      "type": "documentedBy",
+      "weight": 0.6,
+      "evidenceDocumentIds": [
+        "blog:legal-rag-review"
+      ]
+    },
+    {
+      "id": "documentedBy:site:biau-port->blog:ozon-erp-architecture",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "blog:ozon-erp-architecture",
+      "type": "documentedBy",
+      "weight": 0.6,
+      "evidenceDocumentIds": [
+        "blog:ozon-erp-architecture"
+      ]
+    },
+    {
+      "id": "documentedBy:site:biau-port->blog:pet-workspace-pipeline",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "blog:pet-workspace-pipeline",
+      "type": "documentedBy",
+      "weight": 0.6,
+      "evidenceDocumentIds": [
+        "blog:pet-workspace-pipeline"
+      ]
+    },
+    {
+      "id": "documentedBy:site:biau-port->blog:public-content-governance",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "blog:public-content-governance",
+      "type": "documentedBy",
+      "weight": 0.6,
+      "evidenceDocumentIds": [
+        "blog:public-content-governance"
+      ]
+    },
+    {
+      "id": "documentedBy:site:biau-port->blog:static-site-release-verification",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "blog:static-site-release-verification",
+      "type": "documentedBy",
+      "weight": 0.6,
+      "evidenceDocumentIds": [
+        "blog:static-site-release-verification"
+      ]
+    },
+    {
+      "id": "documentedBy:site:biau-port->blog:xunqiu-android64-rebuild",
+      "fromEntityId": "site:biau-port",
+      "toEntityId": "blog:xunqiu-android64-rebuild",
+      "type": "documentedBy",
+      "weight": 0.6,
+      "evidenceDocumentIds": [
+        "blog:xunqiu-android64-rebuild"
+      ]
+    },
+    {
+      "id": "hasDemo:project:biau-playlab->demo:biau-playlab",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "demo:biau-playlab",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:biau-playlab"
+      ]
+    },
+    {
+      "id": "hasDemo:project:blog-semi->demo:blog-semi",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "demo:blog-semi",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "hasDemo:project:game-first-tetris->demo:game-first-tetris",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "demo:game-first-tetris",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris"
+      ]
+    },
+    {
+      "id": "hasDemo:project:game-next-spacewar->demo:game-next-spacewar",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "demo:game-next-spacewar",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar"
+      ]
+    },
+    {
+      "id": "hasDemo:project:intespace->demo:intespace",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "demo:intespace",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "hasDemo:project:legal-rag->demo:legal-rag",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "demo:legal-rag",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "hasDemo:project:ozon-erp->demo:ozon-erp",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "demo:ozon-erp",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "hasDemo:project:pet-workspace->demo:pet-workspace",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "demo:pet-workspace",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "hasDemo:project:raiden-prototype->demo:raiden-prototype",
+      "fromEntityId": "project:raiden-prototype",
+      "toEntityId": "demo:raiden-prototype",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "hasDemo:project:space-war->demo:space-war",
+      "fromEntityId": "project:space-war",
+      "toEntityId": "demo:space-war",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "hasDemo:project:spacewar-ii->demo:spacewar-ii",
+      "fromEntityId": "project:spacewar-ii",
+      "toEntityId": "demo:spacewar-ii",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "hasDemo:project:xunqiu->demo:xunqiu",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "demo:xunqiu",
+      "type": "hasDemo",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:biau-playlab->limitation:biau-playlab",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "limitation:biau-playlab",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:biau-playlab"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:blog-semi->limitation:blog-semi",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "limitation:blog-semi",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:game-first-tetris->limitation:game-first-tetris",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "limitation:game-first-tetris",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:game-next-spacewar->limitation:game-next-spacewar",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "limitation:game-next-spacewar",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:intespace->limitation:intespace",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "limitation:intespace",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:legal-rag->limitation:legal-rag",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "limitation:legal-rag",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:ozon-erp->limitation:ozon-erp",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "limitation:ozon-erp",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:pet-workspace->limitation:pet-workspace",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "limitation:pet-workspace",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:raiden-prototype->limitation:raiden-prototype",
+      "fromEntityId": "project:raiden-prototype",
+      "toEntityId": "limitation:raiden-prototype",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:space-war->limitation:space-war",
+      "fromEntityId": "project:space-war",
+      "toEntityId": "limitation:space-war",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:spacewar-ii->limitation:spacewar-ii",
+      "fromEntityId": "project:spacewar-ii",
+      "toEntityId": "limitation:spacewar-ii",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "hasLimitation:project:xunqiu->limitation:xunqiu",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "limitation:xunqiu",
+      "type": "hasLimitation",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:biau-playlab->roadmap:biau-playlab",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "roadmap:biau-playlab",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:biau-playlab"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:blog-semi->roadmap:blog-semi",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "roadmap:blog-semi",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:game-first-tetris->roadmap:game-first-tetris",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "roadmap:game-first-tetris",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:game-next-spacewar->roadmap:game-next-spacewar",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "roadmap:game-next-spacewar",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:intespace->roadmap:intespace",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "roadmap:intespace",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:legal-rag->roadmap:legal-rag",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "roadmap:legal-rag",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:ozon-erp->roadmap:ozon-erp",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "roadmap:ozon-erp",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:pet-workspace->roadmap:pet-workspace",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "roadmap:pet-workspace",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:raiden-prototype->roadmap:raiden-prototype",
+      "fromEntityId": "project:raiden-prototype",
+      "toEntityId": "roadmap:raiden-prototype",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:space-war->roadmap:space-war",
+      "fromEntityId": "project:space-war",
+      "toEntityId": "roadmap:space-war",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:spacewar-ii->roadmap:spacewar-ii",
+      "fromEntityId": "project:spacewar-ii",
+      "toEntityId": "roadmap:spacewar-ii",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "hasRoadmap:project:xunqiu->roadmap:xunqiu",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "roadmap:xunqiu",
+      "type": "hasRoadmap",
+      "weight": 0.65,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "implements:project:biau-playlab->feature:biau-playlab:item",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "feature:biau-playlab:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:biau-playlab"
+      ]
+    },
+    {
+      "id": "implements:project:blog-semi->feature:blog-semi:item",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "feature:blog-semi:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "implements:project:blog-semi->feature:blog-semi:ui",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "feature:blog-semi:ui",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "implements:project:game-first-tetris->feature:game-first-tetris:combo-b2b",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "feature:game-first-tetris:combo-b2b",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris"
+      ]
+    },
+    {
+      "id": "implements:project:game-first-tetris->feature:game-first-tetris:item",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "feature:game-first-tetris:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris"
+      ]
+    },
+    {
+      "id": "implements:project:game-next-spacewar->feature:game-next-spacewar:item",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "feature:game-next-spacewar:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar"
+      ]
+    },
+    {
+      "id": "implements:project:intespace->feature:intespace:boss",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "feature:intespace:boss",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "implements:project:intespace->feature:intespace:item",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "feature:intespace:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "implements:project:legal-rag->feature:legal-rag:hybrid-retrieval",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "feature:legal-rag:hybrid-retrieval",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "implements:project:legal-rag->feature:legal-rag:item",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "feature:legal-rag:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "implements:project:ozon-erp->feature:ozon-erp:item",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "feature:ozon-erp:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "implements:project:pet-workspace->feature:pet-workspace:id",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "feature:pet-workspace:id",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "implements:project:pet-workspace->feature:pet-workspace:item",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "feature:pet-workspace:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "implements:project:raiden-prototype->feature:raiden-prototype:item",
+      "fromEntityId": "project:raiden-prototype",
+      "toEntityId": "feature:raiden-prototype:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "implements:project:space-war->feature:space-war:item",
+      "fromEntityId": "project:space-war",
+      "toEntityId": "feature:space-war:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "implements:project:space-war->feature:space-war:sector",
+      "fromEntityId": "project:space-war",
+      "toEntityId": "feature:space-war:sector",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "implements:project:spacewar-ii->feature:spacewar-ii:boss",
+      "fromEntityId": "project:spacewar-ii",
+      "toEntityId": "feature:spacewar-ii:boss",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "implements:project:spacewar-ii->feature:spacewar-ii:item",
+      "fromEntityId": "project:spacewar-ii",
+      "toEntityId": "feature:spacewar-ii:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "implements:project:xunqiu->feature:xunqiu:item",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "feature:xunqiu:item",
+      "type": "implements",
+      "weight": 0.7,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:biau-playlab->status:biau-playlab",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "status:biau-playlab",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:biau-playlab",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:blog-semi->status:blog-semi",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "status:blog-semi",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:blog-semi",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:game-first-tetris->status:game-first-tetris",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "status:game-first-tetris",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:game-next-spacewar->status:game-next-spacewar",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "status:game-next-spacewar",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:intespace->status:intespace",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "status:intespace",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:intespace",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:legal-rag->status:legal-rag",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "status:legal-rag",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:legal-rag",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:ozon-erp->status:ozon-erp",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "status:ozon-erp",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:ozon-erp",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:pet-workspace->status:pet-workspace",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "status:pet-workspace",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:pet-workspace",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:raiden-prototype->status:raiden-prototype",
+      "fromEntityId": "project:raiden-prototype",
+      "toEntityId": "status:raiden-prototype",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:raiden-prototype",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:space-war->status:space-war",
+      "fromEntityId": "project:space-war",
+      "toEntityId": "status:space-war",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:space-war",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:spacewar-ii->status:spacewar-ii",
+      "fromEntityId": "project:spacewar-ii",
+      "toEntityId": "status:spacewar-ii",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:spacewar-ii",
+        "site:status"
+      ]
+    },
+    {
+      "id": "monitoredBy:project:xunqiu->status:xunqiu",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "status:xunqiu",
+      "type": "monitoredBy",
+      "weight": 0.8,
+      "evidenceDocumentIds": [
+        "project:xunqiu",
+        "site:status"
+      ]
+    },
+    {
+      "id": "relatedTo:project:biau-playlab->project:blog-semi",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "project:blog-semi",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:biau-playlab",
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "relatedTo:project:biau-playlab->project:game-first-tetris",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "project:game-first-tetris",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:biau-playlab",
+        "project:game-first-tetris"
+      ]
+    },
+    {
+      "id": "relatedTo:project:biau-playlab->project:game-next-spacewar",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "project:game-next-spacewar",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:biau-playlab",
+        "project:game-next-spacewar"
+      ]
+    },
+    {
+      "id": "relatedTo:project:biau-playlab->project:intespace",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "project:intespace",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:biau-playlab",
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "relatedTo:project:biau-playlab->project:raiden-prototype",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "project:raiden-prototype",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:biau-playlab",
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "relatedTo:project:biau-playlab->project:space-war",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "project:space-war",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:biau-playlab",
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "relatedTo:project:biau-playlab->project:spacewar-ii",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "project:spacewar-ii",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:biau-playlab",
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "relatedTo:project:blog-semi->project:legal-rag",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "project:legal-rag",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:blog-semi",
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "relatedTo:project:blog-semi->project:ozon-erp",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "project:ozon-erp",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:blog-semi",
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "relatedTo:project:game-first-tetris->project:game-next-spacewar",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "project:game-next-spacewar",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris",
+        "project:game-next-spacewar"
+      ]
+    },
+    {
+      "id": "relatedTo:project:game-first-tetris->project:intespace",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "project:intespace",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris",
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "relatedTo:project:game-first-tetris->project:raiden-prototype",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "project:raiden-prototype",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris",
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "relatedTo:project:game-first-tetris->project:space-war",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "project:space-war",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris",
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "relatedTo:project:game-first-tetris->project:spacewar-ii",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "project:spacewar-ii",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris",
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "relatedTo:project:game-next-spacewar->project:intespace",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "project:intespace",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar",
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "relatedTo:project:game-next-spacewar->project:raiden-prototype",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "project:raiden-prototype",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar",
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "relatedTo:project:game-next-spacewar->project:space-war",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "project:space-war",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar",
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "relatedTo:project:game-next-spacewar->project:spacewar-ii",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "project:spacewar-ii",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar",
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "relatedTo:project:intespace->project:raiden-prototype",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "project:raiden-prototype",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:intespace",
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "relatedTo:project:intespace->project:space-war",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "project:space-war",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:intespace",
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "relatedTo:project:intespace->project:spacewar-ii",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "project:spacewar-ii",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:intespace",
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "relatedTo:project:legal-rag->project:ozon-erp",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "project:ozon-erp",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:legal-rag",
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "relatedTo:project:legal-rag->project:pet-workspace",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "project:pet-workspace",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:legal-rag",
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "relatedTo:project:legal-rag->project:xunqiu",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "project:xunqiu",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:legal-rag",
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "relatedTo:project:ozon-erp->project:pet-workspace",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "project:pet-workspace",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:ozon-erp",
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "relatedTo:project:ozon-erp->project:xunqiu",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "project:xunqiu",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:ozon-erp",
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "relatedTo:project:pet-workspace->project:xunqiu",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "project:xunqiu",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:pet-workspace",
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "relatedTo:project:raiden-prototype->project:space-war",
+      "fromEntityId": "project:raiden-prototype",
+      "toEntityId": "project:space-war",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:raiden-prototype",
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "relatedTo:project:raiden-prototype->project:spacewar-ii",
+      "fromEntityId": "project:raiden-prototype",
+      "toEntityId": "project:spacewar-ii",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:raiden-prototype",
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "relatedTo:project:space-war->project:spacewar-ii",
+      "fromEntityId": "project:space-war",
+      "toEntityId": "project:spacewar-ii",
+      "type": "relatedTo",
+      "weight": 0.45,
+      "evidenceDocumentIds": [
+        "project:space-war",
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "uses:project:biau-playlab->tech:astro-5",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "tech:astro-5",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:biau-playlab"
+      ]
+    },
+    {
+      "id": "uses:project:biau-playlab->tech:cloudflare-pages",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "tech:cloudflare-pages",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:biau-playlab"
+      ]
+    },
+    {
+      "id": "uses:project:biau-playlab->tech:content-collections",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "tech:content-collections",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:biau-playlab"
+      ]
+    },
+    {
+      "id": "uses:project:biau-playlab->tech:godot-web",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "tech:godot-web",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:biau-playlab"
+      ]
+    },
+    {
+      "id": "uses:project:biau-playlab->tech:r2",
+      "fromEntityId": "project:biau-playlab",
+      "toEntityId": "tech:r2",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:biau-playlab"
+      ]
+    },
+    {
+      "id": "uses:project:blog-semi->tech:express",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "tech:express",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "uses:project:blog-semi->tech:playwright",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "tech:playwright",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "uses:project:blog-semi->tech:postgresql",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "tech:postgresql",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "uses:project:blog-semi->tech:prisma",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "tech:prisma",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "uses:project:blog-semi->tech:react-19",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "tech:react-19",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "uses:project:blog-semi->tech:semi-design",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "tech:semi-design",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "uses:project:blog-semi->tech:typescript",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "tech:typescript",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "uses:project:blog-semi->tech:vite",
+      "fromEntityId": "project:blog-semi",
+      "toEntityId": "tech:vite",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:blog-semi"
+      ]
+    },
+    {
+      "id": "uses:project:game-first-tetris->tech:godot-4",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "tech:godot-4",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris"
+      ]
+    },
+    {
+      "id": "uses:project:game-first-tetris->tech:item",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "tech:item",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris"
+      ]
+    },
+    {
+      "id": "uses:project:game-first-tetris->tech:web",
+      "fromEntityId": "project:game-first-tetris",
+      "toEntityId": "tech:web",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:game-first-tetris"
+      ]
+    },
+    {
+      "id": "uses:project:game-next-spacewar->tech:godot-4.6",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "tech:godot-4.6",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar"
+      ]
+    },
+    {
+      "id": "uses:project:game-next-spacewar->tech:item",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "tech:item",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar"
+      ]
+    },
+    {
+      "id": "uses:project:game-next-spacewar->tech:web",
+      "fromEntityId": "project:game-next-spacewar",
+      "toEntityId": "tech:web",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:game-next-spacewar"
+      ]
+    },
+    {
+      "id": "uses:project:intespace->tech:godot",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "tech:godot",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "uses:project:intespace->tech:item",
+      "fromEntityId": "project:intespace",
+      "toEntityId": "tech:item",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:intespace"
+      ]
+    },
+    {
+      "id": "uses:project:legal-rag->tech:express",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "tech:express",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "uses:project:legal-rag->tech:pgvector",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "tech:pgvector",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "uses:project:legal-rag->tech:postgresql",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "tech:postgresql",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "uses:project:legal-rag->tech:rag",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "tech:rag",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "uses:project:legal-rag->tech:typescript",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "tech:typescript",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "uses:project:legal-rag->tech:vue-3",
+      "fromEntityId": "project:legal-rag",
+      "toEntityId": "tech:vue-3",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:legal-rag"
+      ]
+    },
+    {
+      "id": "uses:project:ozon-erp->tech:bullmq",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "tech:bullmq",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "uses:project:ozon-erp->tech:chrome-mv3",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "tech:chrome-mv3",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "uses:project:ozon-erp->tech:express",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "tech:express",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "uses:project:ozon-erp->tech:postgresql",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "tech:postgresql",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "uses:project:ozon-erp->tech:prisma",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "tech:prisma",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "uses:project:ozon-erp->tech:redis",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "tech:redis",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "uses:project:ozon-erp->tech:vite",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "tech:vite",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "uses:project:ozon-erp->tech:vue-3",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "tech:vue-3",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "uses:project:ozon-erp->tech:wxt",
+      "fromEntityId": "project:ozon-erp",
+      "toEntityId": "tech:wxt",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:ozon-erp"
+      ]
+    },
+    {
+      "id": "uses:project:pet-workspace->tech:agent-worker",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "tech:agent-worker",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "uses:project:pet-workspace->tech:android",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "tech:android",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "uses:project:pet-workspace->tech:fastapi",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "tech:fastapi",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "uses:project:pet-workspace->tech:item",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "tech:item",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "uses:project:pet-workspace->tech:node.js",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "tech:node.js",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "uses:project:pet-workspace->tech:postgresql",
+      "fromEntityId": "project:pet-workspace",
+      "toEntityId": "tech:postgresql",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:pet-workspace"
+      ]
+    },
+    {
+      "id": "uses:project:raiden-prototype->tech:godot",
+      "fromEntityId": "project:raiden-prototype",
+      "toEntityId": "tech:godot",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "uses:project:raiden-prototype->tech:item",
+      "fromEntityId": "project:raiden-prototype",
+      "toEntityId": "tech:item",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:raiden-prototype"
+      ]
+    },
+    {
+      "id": "uses:project:space-war->tech:godot-4.6",
+      "fromEntityId": "project:space-war",
+      "toEntityId": "tech:godot-4.6",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "uses:project:space-war->tech:item",
+      "fromEntityId": "project:space-war",
+      "toEntityId": "tech:item",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "uses:project:space-war->tech:web",
+      "fromEntityId": "project:space-war",
+      "toEntityId": "tech:web",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:space-war"
+      ]
+    },
+    {
+      "id": "uses:project:spacewar-ii->tech:godot-4.6",
+      "fromEntityId": "project:spacewar-ii",
+      "toEntityId": "tech:godot-4.6",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "uses:project:spacewar-ii->tech:item",
+      "fromEntityId": "project:spacewar-ii",
+      "toEntityId": "tech:item",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "uses:project:spacewar-ii->tech:web",
+      "fromEntityId": "project:spacewar-ii",
+      "toEntityId": "tech:web",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:spacewar-ii"
+      ]
+    },
+    {
+      "id": "uses:project:xunqiu->tech:android-64",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "tech:android-64",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "uses:project:xunqiu->tech:cloudflare-r2",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "tech:cloudflare-r2",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "uses:project:xunqiu->tech:flyway",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "tech:flyway",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "uses:project:xunqiu->tech:java-17",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "tech:java-17",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "uses:project:xunqiu->tech:postgresql",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "tech:postgresql",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "uses:project:xunqiu->tech:render",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "tech:render",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    },
+    {
+      "id": "uses:project:xunqiu->tech:spring-boot-3",
+      "fromEntityId": "project:xunqiu",
+      "toEntityId": "tech:spring-boot-3",
+      "type": "uses",
+      "weight": 0.9,
+      "evidenceDocumentIds": [
+        "project:xunqiu"
+      ]
+    }
+  ],
+  "fallback_bundle": {
+    "searchKeywords": [
+      "站点",
+      "网站",
+      "当前网站",
+      "公开内容",
+      "项目方向",
+      "能力",
+      "ai",
+      "rag",
+      "知识库",
+      "可靠性",
+      "状态",
+      "状态页",
+      "健康检查",
+      "外链",
+      "合同审查",
+      "合同",
+      "法律",
+      "引用",
+      "游戏",
+      "互动体验",
+      "godot",
+      "试玩",
+      "部署",
+      "入口",
+      "演示",
+      "登录",
+      "注册",
+      "operator",
+      "密码",
+      "凭据",
+      "playlab",
+      "biau",
+      "泊岸",
+      "pet",
+      "桌宠",
+      "完成",
+      "wip",
+      "ozon",
+      "erp",
+      "电商",
+      "架构",
+      "实现",
+      "技术栈",
+      "寻球",
+      "xunqiu",
+      "足球",
+      "android",
+      "后端",
+      "优化",
+      "后续",
+      "路线",
+      "生成管线",
+      "人审",
+      "社区",
+      "移动端",
+      "react",
+      "vite",
+      "semi",
+      "semi design",
+      "typescript",
+      "express",
+      "prisma",
+      "postgresql",
+      "pgvector"
+    ],
+    "searchAliases": [
+      {
+        "triggers": [
+          "rag",
+          "知识库",
+          "合同审查",
+          "合同",
+          "法律"
+        ],
+        "terms": [
+          "legal rag",
+          "引用溯源",
+          "合同审查",
+          "风险审查",
+          "hybrid retrieval",
+          "pgvector"
+        ]
+      },
+      {
+        "triggers": [
+          "登录",
+          "密码",
+          "凭据",
+          "演示",
+          "入口",
+          "demo",
+          "login"
+        ],
+        "terms": [
+          "legal rag",
+          "登录门禁",
+          "公开演示凭据",
+          "受控演示",
+          "demo 凭据",
+          "公开入口"
+        ]
+      },
+      {
+        "triggers": [
+          "状态",
+          "状态页",
+          "可靠性",
+          "健康检查",
+          "外链"
+        ],
+        "terms": [
+          "项目可靠性观察",
+          "状态页",
+          "health",
+          "synthetic",
+          "公开入口",
+          "监控"
+        ]
+      },
+      {
+        "triggers": [
+          "游戏",
+          "互动体验",
+          "试玩",
+          "godot",
+          "playlab"
+        ],
+        "terms": [
+          "biau playlab",
+          "godot web",
+          "web 试玩",
+          "互动体验"
+        ]
+      },
+      {
+        "triggers": [
+          "pet",
+          "桌宠",
+          "宠物"
+        ],
+        "terms": [
+          "pet-workspace",
+          "ai 桌宠",
+          "生成管线",
+          "质量门禁",
+          "apk"
+        ]
+      },
+      {
+        "triggers": [
+          "ozon",
+          "erp",
+          "电商",
+          "注册",
+          "operator"
+        ],
+        "terms": [
+          "ozon erp",
+          "业务系统",
+          "运营后台",
+          "浏览器插件",
+          "默认开放注册",
+          "operator"
+        ]
+      },
+      {
+        "triggers": [
+          "寻球",
+          "xunqiu",
+          "足球",
+          "android",
+          "移动端"
+        ],
+        "terms": [
+          "xunqiu",
+          "寻球",
+          "android 64",
+          "spring boot"
+        ]
+      },
+      {
+        "triggers": [
+          "ai",
+          "人工智能"
+        ],
+        "terms": [
+          "ai 应用",
+          "legal rag",
+          "ai 桌宠",
+          "公开助手"
+        ]
+      },
+      {
+        "triggers": [
+          "react",
+          "vite",
+          "semi",
+          "semi design",
+          "typescript",
+          "技术栈",
+          "架构",
+          "实现"
+        ],
+        "terms": [
+          "react 19",
+          "vite",
+          "semi design",
+          "typescript",
+          "express",
+          "prisma",
+          "架构"
+        ]
+      }
+    ],
+    "defaultLimit": 4
+  }
+}

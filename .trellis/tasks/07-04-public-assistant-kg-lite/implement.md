@@ -2,12 +2,27 @@
 
 ## Current Phase
 
-Planning. Do not start implementation until the user reviews the PRD/design and
-approves `task.py start`.
+Implementation complete for the local/public-assistant MVP. The task was started
+with `task.py start` and the implemented scope deliberately stops before any
+external RAG runtime provisioning, real model validation, or production endpoint
+verification.
 
-Current user priority: finish the public assistant first. Implementation should
-target the local/public-assistant MVP before any external RAG runtime, real
-model validation, or production deployment verification.
+Current result:
+
+- Public assistant answer style now treats citation cards as the source UI and
+  avoids raw paths/source-log prose in answer bodies.
+- `assistant:index` now generates both the existing `public-knowledge.json` and
+  `public-knowledge-v2.json`.
+- V2 knowledge export includes docs, chunks, entities, relations, and a static
+  fallback bundle.
+- Browser fallback, Express API, and Cloudflare Pages Function use the same V2
+  knowledge direction: intent routing, query term expansion, lightweight
+  entity/relation expansion, and deterministic rerank.
+- `assistant:kg-check` validates V2 freshness, entity/relation coverage,
+  site-overview, Legal RAG, demo-ready, status, and React/Vite/Semi queries.
+- `ASSISTANT_RAG_*` is documented and parsed as a server-only, default-empty
+  contract. Real external RAG runtime selection, credentials, and live checks
+  remain manual gates.
 
 ## Human Decision Gates
 
@@ -139,8 +154,11 @@ npm.cmd run build
   - `ASSISTANT_RAG_API_BASE_URL`
   - `ASSISTANT_RAG_API_KEY`
   - `ASSISTANT_RAG_TIMEOUT_MS`
-- Add an adapter that calls external RAG API only from server/Function code.
-- Add strict timeout and fallback to local retrieval.
+- MVP implemented a default-empty server-side config contract and deployment
+  documentation. The actual external API call adapter remains intentionally
+  unprovisioned until the user chooses the runtime and approves secrets.
+- Future adapter must call external RAG API only from server/Function code.
+- Future adapter must add strict timeout and fallback to local retrieval.
 - Do not expose RAG API details to browser bundle.
 - Mock this adapter in tests; do not call live model/provider channels during
   ordinary verification.
@@ -232,7 +250,8 @@ Decision rule:
 
 ## Required Final Checks
 
-Run before commit:
+Run before commit. Latest local result: all passed, except Vite emitted only the
+existing `INEFFECTIVE_DYNAMIC_IMPORT` build warnings.
 
 ```powershell
 npm.cmd run assistant:index
@@ -240,12 +259,17 @@ npm.cmd run assistant:kg-check
 npm.cmd run cf-assistant:smoke
 npm.cmd run server:smoke
 npm.cmd run server:build
+npm.cmd run prisma:validate
 npm.cmd run lint
 npm.cmd run build
 git diff --check
 ```
 
-Run a sensitive scan on changed files for:
+Sensitive scan result: no real model key, relay domain, private endpoint, DB URL,
+or private key was found. The only `Bearer ...` matches are local smoke-test
+tokens in mock tests.
+
+Scan changed files for:
 
 - API keys
 - bearer tokens

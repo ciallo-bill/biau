@@ -18,8 +18,9 @@
   - Cloudflare Pages Function：`functions/_shared/assistant.ts`
   - Express API：`server/src/model.ts`、`server/src/knowledge.ts`
   - 浏览器本地 fallback：`src/data/assistant.ts`
-- 当前检索主要依赖 `SEARCH_KEYWORDS`、`SEARCH_ALIASES` 和 `scoreKnowledgeItem`，数据形态是扁平 `KnowledgeItem`。
-- `scripts/generate-assistant-knowledge.ts` 只把 `src/data/assistant.ts` 的 `publicKnowledgeBase` 写入 `server/data/public-knowledge.json`。
+- 旧检索主要依赖 `SEARCH_KEYWORDS`、`SEARCH_ALIASES` 和 `scoreKnowledgeItem`，数据形态是扁平 `KnowledgeItem`。
+- 当前实现已新增 `src/data/assistantKnowledge.ts` 和 `server/data/public-knowledge-v2.json`，在不破坏旧 `public-knowledge.json` 的前提下生成 docs、chunks、entities、relations 和 fallback bundle。
+- `scripts/generate-assistant-knowledge.ts` 会同时写入旧版公开知识和 V2 知识结构；`scripts/check-assistant-knowledge-v2.ts` 负责确定性检查。
 - 项目事实已集中在 `src/data/portfolio.ts`，并通过 `getProjectAssistantSummary` / `getProjectAssistantTags` 投射到助手知识。
 - 站点可靠性事实集中在 `src/data/statusTargets.ts`，包含 `siteStatusTargets`、`reliabilityProjects`、`checks`、`gates`、`nextActions`。
 - 博客公开范围集中在 `src/data/blogCuration.ts`，栏目元信息在 `src/data/blogShared.ts`，公开助手文章选择使用 `getAssistantBlogPosts()`。
@@ -143,19 +144,19 @@ References:
 
 ## Acceptance Criteria
 
-- [ ] 公开助手打开后不默认显示大段说明文字；空状态短、清楚，并保留高价值建议问题。
-- [ ] 对“我想问一下关于当前网站的问题”的回答不再复述路径或生硬 citation，能自然说明泊岸是什么、可看什么、建议下一步。
-- [ ] 对“Legal RAG 怎么体验”的回答能同时提到项目页/演示入口、登录或受控演示边界、状态/可靠性检查方向。
-- [ ] 对“哪些项目用了 React / Vite / Semi Design”这类技术问题，能从图谱关系找到相关项目或说明资料不足。
-- [ ] 对“哪些项目可以演示”这类体验问题，能综合项目 external link 和状态入口回答，并返回相关 citations。
-- [ ] 公开知识 V2 生成 docs / chunks / entities / relations，并且不破坏现有 `server/data/public-knowledge.json`。
-- [ ] 外部 RAG API 适配是 server-only、默认关闭、可超时回退，不把密钥或私有端点暴露给浏览器。
-- [ ] 设计文档明确 RAG Orchestrator、检索索引、可选图谱、主站 Functions、本地 fallback 的边界和降级链路。
-- [ ] 设计文档明确前沿 RAG 技术组合的选型结论，以及 Supabase / Render / Neo4j / Cloudflare 之间的角色分工、迁移与回滚路径。
-- [ ] `npm.cmd run cf-assistant:smoke` 覆盖至少一个图谱增强的站点概览或项目体验问题。
-- [ ] `npm.cmd run server:smoke` 覆盖至少一个图谱增强的站点概览或项目体验问题。
-- [ ] `npm.cmd run lint` 和 `npm.cmd run build` 通过。
-- [ ] `git diff --check` 通过，敏感信息扫描未发现密钥、真实中转 URL 或私有地址。
+- [x] 公开助手打开后不默认显示大段说明文字；空状态短、清楚，并保留高价值建议问题。
+- [x] 对“我想问一下关于当前网站的问题”的回答不再复述路径或生硬 citation，能自然说明泊岸是什么、可看什么、建议下一步。
+- [x] 对“Legal RAG 怎么体验”的回答能同时提到项目页/演示入口、登录或受控演示边界、状态/可靠性检查方向。
+- [x] 对“哪些项目用了 React / Vite / Semi Design”这类技术问题，能从图谱关系找到相关项目或说明资料不足。
+- [x] 对“哪些项目可以演示”这类体验问题，能综合项目 external link 和状态入口回答，并返回相关 citations。
+- [x] 公开知识 V2 生成 docs / chunks / entities / relations，并且不破坏现有 `server/data/public-knowledge.json`。
+- [x] 外部 RAG server-only 合同默认关闭，配置只存在于 `ASSISTANT_RAG_*` 服务端变量和部署文档中，不把密钥或私有端点暴露给浏览器；真实 adapter 调用等运行时选择后再做。
+- [x] 设计文档明确 RAG Orchestrator、检索索引、可选图谱、主站 Functions、本地 fallback 的边界和降级链路。
+- [x] 设计文档明确前沿 RAG 技术组合的选型结论，以及 Supabase / Render / Neo4j / Cloudflare 之间的角色分工、迁移与回滚路径。
+- [x] `npm.cmd run cf-assistant:smoke` 覆盖至少一个图谱增强的站点概览或项目体验问题。
+- [x] `npm.cmd run server:smoke` 覆盖至少一个图谱增强的站点概览或项目体验问题。
+- [x] `npm.cmd run lint` 和 `npm.cmd run build` 通过。
+- [x] `git diff --check` 通过，敏感信息扫描未发现密钥、真实中转 URL 或私有地址。
 
 ## Out Of Scope For MVP
 

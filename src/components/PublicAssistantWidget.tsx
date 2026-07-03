@@ -3,6 +3,7 @@ import { IconClose, IconSend } from '@douyinfe/semi-icons'
 import { Link } from 'react-router-dom'
 import {
   publicAssistantSuggestions,
+  buildPublicKnowledgeFallbackAnswer,
   normalizeAssistantCitations,
   searchPublicKnowledge,
   type AssistantKnowledgeItem,
@@ -88,12 +89,6 @@ function formatProviderDiagnostic(diagnostic?: ProviderDiagnostic) {
   return ''
 }
 
-function compactSummary(summary: string, maxLength = 104) {
-  const normalized = summary.replace(/\s+/g, ' ').trim()
-  if (normalized.length <= maxLength) return normalized
-  return `${normalized.slice(0, maxLength - 1)}…`
-}
-
 function compactAnswerContent(content: string, maxLength: number) {
   const normalized = content
     .replace(/[ \t]+\n/g, '\n')
@@ -103,28 +98,15 @@ function compactAnswerContent(content: string, maxLength: number) {
   return `${normalized.slice(0, maxLength - 1).trim()}…`
 }
 
-function getFallbackIntro(reason?: AssistantFallbackReason) {
-  if (reason === 'provider_error') return '模型通道暂时失败，我先用站内公开资料给你一个方向：'
-  if (reason === 'empty_response') return '模型没有返回有效内容，我先用站内公开资料给你一个方向：'
-  if (reason === 'request_error') return '公开助手 API 暂时不可用，我先用本地公开知识给你一个方向：'
-  if (reason === 'no_public_context') return '这个问题暂时没有命中公开资料。'
-  return '模型还没有接入当前公开助手，我先用站内公开资料给你一个方向：'
-}
-
-function buildLocalKnowledgeAnswer(citations: AssistantKnowledgeItem[], reason?: AssistantFallbackReason) {
-  if (citations.length === 0) {
-    return `${getFallbackIntro(reason)}我不会补造结论；可以换成项目名、技术词，或先看项目页与状态页。`
-  }
-
-  const lines = citations.slice(0, 3).map((item) => `- ${item.title}：${compactSummary(item.summary)}`)
-  return compactAnswerContent(`${getFallbackIntro(reason)}\n${lines.join('\n')}\n可以点下面来源继续看。`, MAX_FALLBACK_ANSWER_LENGTH)
+function buildLocalKnowledgeAnswer(question: string, citations: AssistantKnowledgeItem[], reason?: AssistantFallbackReason) {
+  return buildPublicKnowledgeFallbackAnswer(question, citations, { reason, maxLength: MAX_FALLBACK_ANSWER_LENGTH })
 }
 
 async function requestPublicAnswer(question: string, apiBase: string | null): Promise<PublicAnswerResult> {
   if (!apiBase) {
     const citations = searchPublicKnowledge(question)
     return {
-      content: buildLocalKnowledgeAnswer(citations),
+      content: buildLocalKnowledgeAnswer(question, citations),
       citations,
       meta: {
         mode: 'fallback' as const,
@@ -157,7 +139,7 @@ async function requestPublicAnswer(question: string, apiBase: string | null): Pr
   const diagnostic = readProviderDiagnostic(rawMeta?.diagnostic)
   const citationCount = typeof rawMeta?.citationCount === 'number' ? rawMeta.citationCount : citations.length
 
-  const fallbackContent = buildLocalKnowledgeAnswer(citations, reason)
+  const fallbackContent = buildLocalKnowledgeAnswer(question, citations, reason)
   const displayContent =
     mode === 'model'
       ? compactAnswerContent(
@@ -315,7 +297,7 @@ export function PublicAssistantWidget() {
         {
           id: createMessageId('assistant'),
           role: 'assistant',
-          content: buildLocalKnowledgeAnswer(citations, 'request_error'),
+          content: buildLocalKnowledgeAnswer(trimmed, citations, 'request_error'),
           citations,
           meta: {
             mode: 'fallback',

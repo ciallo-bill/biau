@@ -3,7 +3,7 @@
   "name": "public-assistant-kg-lite",
   "title": "Public assistant frontier RAG / agentic knowledge upgrade",
   "description": "",
-  "status": "planning",
+  "status": "completed",
   "dev_type": null,
   "scope": null,
   "package": null,
@@ -11,7 +11,7 @@
   "creator": "zhang",
   "assignee": "zhang",
   "createdAt": "2026-07-04",
-  "completedAt": null,
+  "completedAt": "2026-07-04",
   "branch": null,
   "base_branch": "main",
   "worktree_path": null,
@@ -21,6 +21,6 @@
   "children": [],
   "parent": "07-04-biau-port-continuous-improvement",
   "relatedFiles": [],
-  "notes": "Current user priority: finish the public assistant local MVP first; keep production model/RAG/deployment validation behind manual gates.",
+  "notes": "Local public assistant MVP implemented: Agentic Hybrid retrieval baseline, V2 knowledge export, product-guide fallback style, and deterministic checks. Production model/RAG/deployment validation remains behind manual gates.",
   "meta": {}
 }

@@ -14,6 +14,9 @@ const assistantModelApiKey = readFirstEnv('ASSISTANT_MODEL_API_KEY', 'OPENAI_API
 const assistantModelBaseUrl = normalizeBaseUrl(readFirstEnv('ASSISTANT_MODEL_BASE_URL', 'OPENAI_BASE_URL'))
 const assistantModelName = readFirstEnv('ASSISTANT_MODEL_NAME', 'OPENAI_MODEL') || 'gpt-4.1-mini'
 const assistantModelProvider = readFirstEnv('ASSISTANT_MODEL_PROVIDER', 'OPENAI_PROVIDER') || 'openai-compatible'
+const assistantRagApiBaseUrl = readFirstEnv('ASSISTANT_RAG_API_BASE_URL')
+const assistantRagApiKey = readFirstEnv('ASSISTANT_RAG_API_KEY')
+const assistantRagTimeoutMs = readPositiveInteger(process.env.ASSISTANT_RAG_TIMEOUT_MS, 3000)
 
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
@@ -24,6 +27,9 @@ export const env = {
   assistantModelBaseUrl,
   assistantModelName,
   assistantModelProvider,
+  assistantRagApiBaseUrl,
+  assistantRagApiKey,
+  assistantRagTimeoutMs,
   openaiApiKey: process.env.OPENAI_API_KEY?.trim() || assistantModelApiKey,
   openaiBaseUrl: normalizeBaseUrl(process.env.OPENAI_BASE_URL?.trim() || assistantModelBaseUrl),
   openaiModel: process.env.OPENAI_MODEL?.trim() || assistantModelName,
@@ -42,4 +48,10 @@ export function hasModelProvider() {
 function readBoolean(value: string | undefined) {
   const normalized = value?.trim().toLowerCase()
   return normalized === 'true' || normalized === '1' || normalized === 'yes' || normalized === 'on'
+}
+
+function readPositiveInteger(value: string | undefined, fallback: number) {
+  const parsed = Number(value)
+  if (!Number.isInteger(parsed) || parsed < 1) return fallback
+  return parsed
 }
