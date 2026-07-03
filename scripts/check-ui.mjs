@@ -236,6 +236,9 @@ await publicAssistantPage.locator('.public-assistant__trigger').click()
 if (!(await publicAssistantPage.locator('.public-assistant__panel').isVisible())) {
   failures.push('/blog public assistant: expected panel to open')
 }
+if ((await publicAssistantPage.locator('.public-assistant__citation').count()) !== 0) {
+  failures.push('/blog public assistant: expected initial panel to stay concise without citation cards')
+}
 await publicAssistantPage.locator('.public-assistant__suggestion').first().click()
 await publicAssistantPage.waitForTimeout(150)
 if ((await publicAssistantPage.locator('.public-assistant__message.is-user').count()) < 1) {

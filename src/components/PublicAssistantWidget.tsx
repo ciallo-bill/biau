@@ -3,7 +3,6 @@ import { IconClose, IconSend } from '@douyinfe/semi-icons'
 import { Link } from 'react-router-dom'
 import {
   publicAssistantSuggestions,
-  publicKnowledgeBase,
   normalizeAssistantCitations,
   searchPublicKnowledge,
   type AssistantKnowledgeItem,
@@ -26,7 +25,7 @@ interface AssistantAnswerMeta {
   citationCount: number
 }
 
-type AssistantFallbackReason = 'not_configured' | 'provider_error' | 'empty_response' | 'request_error'
+type AssistantFallbackReason = 'not_configured' | 'provider_error' | 'empty_response' | 'no_public_context' | 'request_error'
 type AssistantServiceState = 'api-ready' | 'local' | 'model' | 'fallback' | 'error'
 
 const API_BASE = import.meta.env.VITE_CHAT_API_BASE_URL?.trim()
@@ -35,8 +34,7 @@ const MAX_MESSAGE_LENGTH = 500
 const introMessage: WidgetMessage = {
   id: 'intro',
   role: 'assistant',
-  content: '你好，我是泊岸公开助手。我只使用本站公开项目、文章和能力说明来回答，适合快速了解案例、技术方向和后续路线。',
-  citations: publicKnowledgeBase.slice(0, 2),
+  content: '问我项目、文章或技术方向就行。我只看本站公开内容，回答后会附上可继续查看的引用。',
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -50,7 +48,7 @@ interface PublicAnswerResult {
 }
 
 function isAssistantFallbackReason(value: unknown): value is AssistantFallbackReason {
-  return value === 'not_configured' || value === 'provider_error' || value === 'empty_response'
+  return value === 'not_configured' || value === 'provider_error' || value === 'empty_response' || value === 'no_public_context'
 }
 
 async function requestPublicAnswer(question: string): Promise<PublicAnswerResult> {
@@ -72,11 +70,12 @@ async function requestPublicAnswer(question: string): Promise<PublicAnswerResult
     }
 
     const summary = citations
-      .map((item) => `${item.title}：${item.summary}`)
-      .join(' ')
+      .slice(0, 3)
+      .map((item) => `- ${item.title}：${item.summary}`)
+      .join('\n')
 
     return {
-      content: `根据当前公开内容，我优先找到了这些信息：${summary}`,
+      content: `我先按浏览器里的公开知识给你一个方向：\n${summary}`,
       citations,
       meta: {
         mode: 'fallback' as const,
@@ -126,14 +125,15 @@ async function requestPublicAnswer(question: string): Promise<PublicAnswerResult
 function getFallbackLabel(reason?: AssistantFallbackReason) {
   if (reason === 'provider_error') return '模型通道失败，已回退'
   if (reason === 'empty_response') return '模型无内容，已回退'
+  if (reason === 'no_public_context') return '未命中公开资料'
   if (reason === 'request_error') return '站内 API 暂不可用'
   return '公开知识兜底'
 }
 
 function formatAnswerMeta(meta?: AssistantAnswerMeta) {
   if (!meta) return ''
-  const modeLabel = meta.mode === 'model' ? 'AI 辅助' : getFallbackLabel(meta.reason)
-  return [modeLabel, meta.provider, meta.model, `${meta.citationCount} 条引用`].filter(Boolean).join(' · ')
+  const modeLabel = meta.mode === 'model' ? '模型增强回答' : getFallbackLabel(meta.reason)
+  return [modeLabel, `${meta.citationCount} 条公开引用`].filter(Boolean).join(' · ')
 }
 
 function getServiceStatus(state: AssistantServiceState) {
@@ -263,8 +263,8 @@ export function PublicAssistantWidget() {
           </header>
 
           <p className="public-assistant__hint">
-            用于查找本站项目、文章和公开能力边界；不访问私有仓库、后台、账号或未公开部署。
-            <Link to="/assistant">内部成员入口</Link>
+            只检索公开项目与文章；私有仓库、后台账号和未公开部署不进入回答。
+            <Link to="/assistant">内部入口</Link>
           </p>
 
           <div className="public-assistant__messages" ref={scrollRef}>

@@ -1,11 +1,12 @@
-import { createServer } from 'node:net'
+import { createServer as createHttpServer } from 'node:http'
+import { createServer as createTcpServer } from 'node:net'
 import { createApp } from '../src/app.js'
 import { env } from '../src/env.js'
 
 function findAvailablePort(startPort: number) {
   return new Promise<number>((resolve, reject) => {
     const tryPort = (port: number) => {
-      const server = createServer()
+      const server = createTcpServer()
       server.once('error', (error: NodeJS.ErrnoException) => {
         if (error.code === 'EADDRINUSE') {
           tryPort(port + 1)
@@ -53,6 +54,33 @@ function restoreModelEnv(snapshot: ReturnType<typeof snapshotModelEnv>) {
 function forceNoModelProvider() {
   env.assistantModelApiKey = ''
   env.openaiApiKey = ''
+}
+
+function startMockModelServer(port: number) {
+  const server = createHttpServer((req, res) => {
+    if (req.method !== 'POST' || req.url !== '/chat/completions' || req.headers.authorization !== 'Bearer smoke-model-key') {
+      res.writeHead(404, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ error: 'not-found' }))
+      return
+    }
+
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(
+      JSON.stringify({
+        choices: [
+          {
+            message: {
+              content: '模型增强回答：Legal RAG 是本站公开展示的法律文档 RAG 与合同审查工作台。',
+            },
+          },
+        ],
+      }),
+    )
+  })
+
+  return new Promise<ReturnType<typeof createHttpServer>>((resolve) => {
+    server.listen(port, '127.0.0.1', () => resolve(server))
+  })
 }
 
 const port = await findAvailablePort(8977)
@@ -105,6 +133,42 @@ try {
   }
 
   try {
+    const mockModelPort = await findAvailablePort(9077)
+    const mockModelServer = await startMockModelServer(mockModelPort)
+    try {
+      env.assistantModelApiKey = 'smoke-model-key'
+      env.assistantModelBaseUrl = `http://127.0.0.1:${mockModelPort}`
+      env.assistantModelName = 'glm-smoke-model'
+      env.assistantModelProvider = 'glm-compatible'
+      env.openaiApiKey = ''
+      env.openaiBaseUrl = ''
+      env.openaiModel = ''
+      const modelChat = await fetch(`${base}/chat/public`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'RAG 项目' }),
+      })
+      if (!modelChat.ok) throw new Error(`model chat failed: ${modelChat.status}`)
+      const modelPayload = (await modelChat.json()) as {
+        answer?: string
+        citations?: unknown[]
+        meta?: { mode?: string; model?: string; provider?: string; reason?: string; citationCount?: number }
+      }
+      if (
+        !modelPayload.answer?.includes('模型增强回答') ||
+        !Array.isArray(modelPayload.citations) ||
+        modelPayload.meta?.mode !== 'model' ||
+        modelPayload.meta.model !== 'glm-smoke-model' ||
+        modelPayload.meta.provider !== 'glm-compatible' ||
+        modelPayload.meta.citationCount !== modelPayload.citations.length
+      ) {
+        throw new Error('public chat did not use configured OpenAI-compatible model provider')
+      }
+    } finally {
+      await new Promise<void>((resolve) => mockModelServer.close(() => resolve()))
+      restoreModelEnv(originalModelEnv)
+    }
+
     env.assistantModelApiKey = 'smoke-test-key'
     env.assistantModelBaseUrl = base
     env.assistantModelName = 'smoke-test-model'

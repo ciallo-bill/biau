@@ -2695,6 +2695,13 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   gap: 4px;
 }
 
+.public-assistant__citation span {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .assistant-suggestions button,
 .public-assistant__suggestion,
 .assistant-auth button,
@@ -2969,6 +2976,7 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 
 .public-assistant__message p {
   margin: 0;
+  white-space: pre-line;
 }
 
 .public-assistant__message.is-user {

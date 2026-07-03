@@ -67,15 +67,15 @@ Render 环境变量：
 DATABASE_URL=postgresql://...
 CORS_ORIGIN=https://biau.playlab.eu.cc
 ADMIN_TOKEN=<生成一个长随机字符串>
-ASSISTANT_MODEL_BASE_URL=https://api.openai.com/v1
+ASSISTANT_MODEL_BASE_URL=<OpenAI-compatible relay base URL, for example https://.../v1>
 ASSISTANT_MODEL_API_KEY=<OpenAI 兼容中转 Key，可留空使用公开知识回退>
-ASSISTANT_MODEL_NAME=gpt-4.1-mini
-ASSISTANT_MODEL_PROVIDER=openai-compatible
+ASSISTANT_MODEL_NAME=glm-5.2
+ASSISTANT_MODEL_PROVIDER=glm-compatible
 METRICS_ENABLED=false
 PORT=10000
 ```
 
-公开助手的模型接入点在服务端，不在前端。前端只配置 `VITE_CHAT_API_BASE_URL` 指向助手 API；真实模型 Key、Base URL 和模型名只放在 Render/Aiven/本地 `.env.local` 等私有环境里。旧的 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 仍兼容，但新部署建议统一使用 `ASSISTANT_MODEL_*`。
+公开助手的模型接入点在服务端，不在前端。前端只配置 `VITE_CHAT_API_BASE_URL` 指向助手 API；真实模型 Key、Base URL 和模型名只放在 Render/Aiven/本地 `.env.local` 等私有环境里。公开助手推荐使用 GLM-5.2 这类中文表达更稳的 OpenAI-compatible 模型；旧的 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 仍兼容，但新部署建议统一使用 `ASSISTANT_MODEL_*`。
 
 本地后端开发：
 

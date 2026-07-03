@@ -24,7 +24,7 @@ export interface ChatPayload {
 }
 
 export type ChatAnswerMode = 'model' | 'fallback'
-export type ChatFallbackReason = 'not_configured' | 'provider_error' | 'empty_response'
+export type ChatFallbackReason = 'not_configured' | 'provider_error' | 'empty_response' | 'no_public_context'
 
 export interface ChatResponse {
   answer: string

@@ -36,6 +36,69 @@ Use `server/src/env.ts` as the single place for reading environment variables. K
 
 Do not read `.env`, `.env.local`, `.env.*.local`, private key files, or SSH files into task context. Use `.env.example` when documenting expected shape.
 
+## Scenario: Public Assistant Model Provider
+
+### 1. Scope / Trigger
+
+- Trigger: `/chat/public` adds or changes an OpenAI-compatible model provider, model fallback behavior, or model-related environment keys.
+
+### 2. Signatures
+
+- `POST /chat/public` accepts `{ message: string }`.
+- The response remains `ChatResponse`: `{ answer, citations, meta }`.
+- `meta.mode` is `'model' | 'fallback'`.
+- `meta.reason` for fallback can be `'not_configured'`, `'provider_error'`, `'empty_response'`, or `'no_public_context'`.
+
+### 3. Contracts
+
+- Model environment keys are server-only: `ASSISTANT_MODEL_BASE_URL`, `ASSISTANT_MODEL_API_KEY`, `ASSISTANT_MODEL_NAME`, and `ASSISTANT_MODEL_PROVIDER`.
+- Legacy `OPENAI_BASE_URL`, `OPENAI_API_KEY`, and `OPENAI_MODEL` may remain supported, but new docs should prefer `ASSISTANT_MODEL_*`.
+- The frontend only uses `VITE_CHAT_API_BASE_URL`; never expose model base URLs or API keys through Vite variables.
+- Public-scope model calls must be grounded in public citations from `server/data/public-knowledge.json`.
+- If public search returns zero citations, return fallback with `reason: 'no_public_context'` and do not call the provider.
+
+### 4. Validation & Error Matrix
+
+- Missing model key or base URL -> `meta.mode: 'fallback'`, `reason: 'not_configured'`.
+- Provider network failure, non-OK response, or timeout -> `meta.mode: 'fallback'`, `reason: 'provider_error'`.
+- Provider returns no message content -> `meta.mode: 'fallback'`, `reason: 'empty_response'`.
+- Public question has no matching public citations -> `meta.mode: 'fallback'`, `reason: 'no_public_context'`.
+- Public chat should not return raw provider errors, tokens, base URLs, stack traces, or prompt text.
+
+### 5. Good/Base/Bad Cases
+
+- Good: a GLM-compatible relay is configured in deployment env, `/chat/public` returns a concise model answer plus public citations, and the frontend labels it as model-enhanced without showing provider details.
+- Base: no provider env is configured; `/chat/public` still answers from sanitized public knowledge.
+- Bad: the browser bundle contains `ASSISTANT_MODEL_API_KEY`, a real relay URL, or a fallback path that calls the provider with no public context.
+
+### 6. Tests Required
+
+- `server:smoke` must cover configured OpenAI-compatible success, unconfigured fallback, provider failure fallback, `/health`, and protected internal auth behavior.
+- `check:ui` should assert the public assistant opens in a concise default state before citations appear.
+- Run `assistant:index`, `server:build`, `server:smoke`, `lint`, `build`, `prisma:validate`, `git diff --check`, and a sensitive-value scan after model-provider work.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+fetch(`${import.meta.env.VITE_ASSISTANT_MODEL_BASE_URL}/chat/completions`, {
+  headers: { Authorization: `Bearer ${import.meta.env.VITE_ASSISTANT_MODEL_API_KEY}` },
+})
+```
+
+This puts the model channel in the browser and risks exposing private credentials.
+
+#### Correct
+
+```ts
+const response = await fetch(`${modelConfig.baseUrl}/chat/completions`, {
+  headers: { Authorization: `Bearer ${modelConfig.apiKey}` },
+})
+```
+
+The server reads private env, applies public-citation grounding, and returns only sanitized `ChatResponse` fields to the frontend.
+
 ## API Review Checklist
 
 - Inputs are trimmed, required fields are checked, and strings stored as names/titles are length-capped.
