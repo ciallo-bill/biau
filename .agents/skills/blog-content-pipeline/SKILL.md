@@ -87,6 +87,9 @@ Codex evidence pack -> Codex scaffold -> strong profile draft -> review profile 
   script may try `primary -> fallback-1 -> fallback-2` serially after a channel
   failure. Fallback never crosses roles: `review` fallback channels stay under
   `review`, and do not silently switch to `strong` or `fast`.
+- Namespaced relay model IDs such as `deepseek-ai/deepseek-v4-pro` should be
+  compared by their canonical model ID, so they are treated as equivalent to
+  `deepseek-v4-pro` when the final segment matches.
 - Use `npm.cmd run blog:model -- setup --profile <profile> --fallback` to add
   a fallback channel later. `status` and default `doctor` must show fallback
   readiness with masked base URL/API-key status only.

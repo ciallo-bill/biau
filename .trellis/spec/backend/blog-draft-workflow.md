@@ -71,6 +71,10 @@ model channel contract. Read this before changing `scripts/generate-blog-draft.m
   `--polish-from` runs try the primary channel first, then fallback channels in
   numeric order after a channel failure. Fallback is serial and same-role only;
   a failed `review` run must not silently switch to `strong` or `fast`.
+- Fallback model-id comparison must canonicalize relay namespaces by comparing
+  the final slash-delimited model segment. For example,
+  `deepseek-ai/deepseek-v4-pro` and `deepseek-v4-pro` are the same model ID for
+  fallback warning purposes, while different canonical IDs should still warn.
 - Fields are `BASE_URL`, `API_KEY`, `MODEL`, `PROVIDER`, and `TEMPERATURE`.
   `TEMPERATURE` is an advanced optional setup field; internal defaults remain
   active when it is not configured.

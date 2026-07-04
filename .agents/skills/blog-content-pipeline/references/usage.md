@@ -160,6 +160,12 @@ channel fails to produce valid content. Fallback is serial and same-role only:
 `review` can use `BLOG_DRAFT_REVIEW_FALLBACK_1_*`, but it must not silently use
 `strong` or `fast`.
 
+The setup/status tooling should compare fallback model IDs by canonical model
+name. Relay-specific namespaces are acceptable when the final model segment
+matches: `deepseek-ai/deepseek-v4-pro` is equivalent to `deepseek-v4-pro`.
+Only warn when the canonical model IDs differ, because that may be an
+intentional but separate same-role fallback.
+
 ## Typical Commands
 
 For projects that include `scripts/generate-blog-draft.mjs`:

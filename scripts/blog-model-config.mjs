@@ -302,6 +302,23 @@ export function hasUsableValue(value) {
   return String(value ?? '').trim().length > 0
 }
 
+export function canonicalModelId(value) {
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/\\/g, '/')
+  if (!normalized) return ''
+
+  const segments = normalized.split('/').filter(Boolean)
+  return segments.at(-1) ?? normalized
+}
+
+export function areEquivalentModelIds(left, right) {
+  const canonicalLeft = canonicalModelId(left)
+  const canonicalRight = canonicalModelId(right)
+  return Boolean(canonicalLeft && canonicalRight && canonicalLeft === canonicalRight)
+}
+
 export function validateDraftModelChannel(config) {
   const issues = []
   if (!hasUsableValue(config.baseUrl)) {
@@ -332,7 +349,7 @@ export function validateDraftModelConfig(config) {
 export function buildModelChannelStatus(config, primaryModel = '') {
   const issues = validateDraftModelChannel(config)
   const warnings = []
-  if (config.role === 'fallback' && primaryModel && config.model && config.model !== primaryModel) {
+  if (config.role === 'fallback' && primaryModel && config.model && !areEquivalentModelIds(config.model, primaryModel)) {
     warnings.push(`fallback model differs from primary model (${primaryModel}). Confirm this is an equivalent same-role channel.`)
   }
   return {
