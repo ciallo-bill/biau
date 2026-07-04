@@ -2,6 +2,7 @@ import { createServer as createHttpServer } from 'node:http'
 import { createServer as createTcpServer } from 'node:net'
 import { createApp } from '../src/app.js'
 import { env } from '../src/env.js'
+import { planAssistantAnswer } from '../src/model.js'
 
 function findAvailablePort(startPort: number) {
   return new Promise<number>((resolve, reject) => {
@@ -161,6 +162,21 @@ const base = `http://127.0.0.1:${port}`
 const originalModelEnv = snapshotModelEnv()
 
 try {
+  const creativePlan = planAssistantAnswer('您能不能生成一首七言古诗', 'internal')
+  if (creativePlan.intent !== 'creative' || creativePlan.grounding !== 'none' || creativePlan.useRetrieval !== false) {
+    throw new Error('internal creative requests should bypass RAG grounding')
+  }
+
+  const projectWritingPlan = planAssistantAnswer('帮我写一段 Legal RAG 项目介绍', 'internal')
+  if (projectWritingPlan.intent !== 'creative' || projectWritingPlan.grounding !== 'background' || projectWritingPlan.useRetrieval !== true) {
+    throw new Error('project writing requests should use site knowledge as background context')
+  }
+
+  const publicPlan = planAssistantAnswer('您能不能生成一首七言古诗', 'public')
+  if (publicPlan.intent !== 'site_qa' || publicPlan.grounding !== 'strict' || publicPlan.useRetrieval !== true) {
+    throw new Error('public assistant should keep strict public-knowledge grounding')
+  }
+
   const health = await fetch(`${base}/health`)
   if (!health.ok) throw new Error(`health failed: ${health.status}`)
 

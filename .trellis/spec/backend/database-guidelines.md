@@ -28,6 +28,19 @@ Deployment migrations use:
 npm.cmd run prisma:migrate
 ```
 
+When deploying to Render with Supabase Postgres / Supavisor pooler, keep the real
+connection string in platform environment variables and include the Prisma 7
+`@prisma/adapter-pg` compatibility query parameters:
+
+```text
+?sslmode=require&uselibpqcompat=true
+```
+
+If the URI already has query parameters, append them with `&`. Without
+`uselibpqcompat=true`, Prisma can fail database writes with `P1011` and
+`self-signed certificate in certificate chain` even when `/health` reports that
+`DATABASE_URL` is present.
+
 ## Query Patterns
 
 Keep route queries explicit and scoped to the authenticated subject. `server/src/app.ts` uses `findFirst({ where: { id: sessionId, memberId: member.id } })` for internal chat session reuse so one member cannot attach to another member's session.

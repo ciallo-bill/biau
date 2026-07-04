@@ -1,6 +1,8 @@
 export type AssistantVisibility = 'public' | 'internal'
 export type AssistantScope = 'public' | 'internal'
 export type AssistantServiceMode = 'all' | 'public' | 'internal' | 'rag'
+export type AssistantAnswerIntent = 'site_qa' | 'creative' | 'planning' | 'general'
+export type AssistantGroundingMode = 'strict' | 'background' | 'none'
 
 export interface KnowledgeItem {
   id: string
@@ -69,6 +71,8 @@ export interface ChatResponse {
     reason?: ChatFallbackReason
     diagnostic?: ProviderDiagnostic
     retrieval?: AssistantRetrievalMeta
+    intent?: AssistantAnswerIntent
+    grounding?: AssistantGroundingMode
   }
   sessionId?: string
   messageId?: string

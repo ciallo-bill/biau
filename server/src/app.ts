@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client'
 import { env, hasDatabase, hasModelProvider } from './env.js'
 import { sha256 } from './crypto.js'
 import { issueMemberToken, readBearerMember, requireDatabase } from './auth.js'
-import { generateAnswer } from './model.js'
+import { generateAnswer, planAssistantAnswer } from './model.js'
 import { createMetricsMiddleware, renderPrometheusMetrics } from './metrics.js'
 import { retrieveAssistantContext, retrievePublicAssistantContext } from './ragClient.js'
 import { createRagOrchestratorRouter } from './ragRoutes.js'
@@ -200,9 +200,14 @@ function registerInternalAssistantRoutes(app: express.Express) {
         },
       })
 
-      const context = await retrieveAssistantContext(question, 'internal')
-      const citations = context.citations
-      const generated = await generateAnswer(question, citations, 'internal', { chunks: context.chunks })
+      const answerPlan = planAssistantAnswer(question, 'internal')
+      const context = answerPlan.useRetrieval ? await retrieveAssistantContext(question, 'internal') : null
+      const citations = context?.citations ?? []
+      const generated = await generateAnswer(question, citations, 'internal', {
+        chunks: context?.chunks ?? [],
+        intent: answerPlan.intent,
+        grounding: answerPlan.grounding,
+      })
       const reply = await prisma.chatMessage.create({
         data: {
           memberId: member.id,
@@ -230,7 +235,9 @@ function registerInternalAssistantRoutes(app: express.Express) {
           reason: generated.reason,
           diagnostic: generated.diagnostic,
           citationCount: citations.length,
-          retrieval: context.retrieval,
+          retrieval: context?.retrieval,
+          intent: answerPlan.intent,
+          grounding: answerPlan.grounding,
         },
         sessionId: activeSession.id,
         messageId: reply.id,

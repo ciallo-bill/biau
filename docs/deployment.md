@@ -141,6 +141,14 @@ METRICS_ENABLED=false
 PORT=10000
 ```
 
+如果使用 Supabase Postgres / Supavisor pooler 作为内部助手数据库，`DATABASE_URL` 建议使用 Session pooler URI，并在 query 参数里显式加上 Prisma 7 / `@prisma/adapter-pg` 兼容参数：
+
+```text
+?sslmode=require&uselibpqcompat=true
+```
+
+如果连接串已经有其他参数，用 `&` 追加。缺少 `uselibpqcompat=true` 时，Render 上可能在创建邀请码或读写会话时出现 `P1011` / `self-signed certificate in certificate chain`。
+
 ### RAG Orchestrator
 
 ```text
