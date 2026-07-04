@@ -24,12 +24,14 @@
 
 ## Acceptance Criteria
 
-- [ ] 记录 Legal RAG 当前公开演示状态：open-demo、credential-required、blocked-by-login、degraded 或 offline。
-- [ ] 明确用户需要手动完成的 demo 账号/密码配置，不提交真实密码。
+- [x] 记录 Legal RAG 当前公开演示状态：open-demo、credential-required、blocked-by-login、degraded 或 offline。
+- [x] 明确用户需要手动完成的 demo 账号/密码配置，不提交真实密码。
 - [ ] synthetic 或手动流程能验证法律问答是否正常。
-- [ ] 主站 Legal RAG 项目详情、状态页和演示说明一致。
-- [ ] 合同审查/质量面板如不能公开，必须说明原因和替代展示路径。
+- [x] 主站 Legal RAG 项目详情、状态页和演示说明一致。
+- [x] 合同审查/质量面板如不能公开，必须说明原因和替代展示路径。
 
 ## Notes
 
 - 推荐第一步：先检查线上入口是否仍被登录挡住；如果是，优先决定公开 demo 凭据策略，而不是绕过登录。
+- 2026-07-04 UTC synthetic evidence: API health returned `ok=true`; auth is enabled; no synthetic credentials were configured, so protected QA, contract review, and quality report checks stayed `unchecked`; `public/status/legal-rag-synthetic.json` records `demoAccessStatus=credential-required`.
+- Remaining gate: a low-permission, revokable public demo account must be created/approved before Codex can run credentialed QA and contract-review synthetic checks.

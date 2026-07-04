@@ -12,6 +12,13 @@ const CHECK_IDS = [
   'legal-rag-contract-review',
   'legal-rag-observability',
 ]
+const DEMO_ACCESS_STATUS = {
+  OPEN_DEMO: 'open-demo',
+  CREDENTIAL_REQUIRED: 'credential-required',
+  BLOCKED_BY_LOGIN: 'blocked-by-login',
+  DEGRADED: 'degraded',
+  OFFLINE: 'offline',
+}
 
 const SAMPLE_QUESTION = '技术服务合同里，验收标准不明确会带来什么风险？'
 const SAMPLE_CONTRACT = [
@@ -150,6 +157,23 @@ function checkFromResponse(id, response, ok, summary, fallbackIssue = '') {
   }
 }
 
+function demoAccessSummary(status) {
+  switch (status) {
+    case DEMO_ACCESS_STATUS.OPEN_DEMO:
+      return 'Protected demo flow is reachable and the latest synthetic checks confirmed the public-safe flow.'
+    case DEMO_ACCESS_STATUS.CREDENTIAL_REQUIRED:
+      return 'Auth is enabled; protected demo checks require a low-permission public demo account.'
+    case DEMO_ACCESS_STATUS.BLOCKED_BY_LOGIN:
+      return 'Credentials were supplied, but login failed before protected demo checks could run.'
+    case DEMO_ACCESS_STATUS.DEGRADED:
+      return 'The demo gate was reached, but one or more protected Legal RAG checks did not pass.'
+    case DEMO_ACCESS_STATUS.OFFLINE:
+      return 'The API health check or API base configuration did not confirm a reachable Legal RAG demo backend.'
+    default:
+      return 'Legal RAG demo access status is not available.'
+  }
+}
+
 async function waitForSeedJob(baseUrl, jobId, timeoutMs, cookieJar) {
   if (!jobId) return { ok: true, status: 200, durationMs: 0, json: null, error: '' }
   const startedAt = Date.now()
@@ -180,22 +204,66 @@ async function main() {
 
   if (!baseUrl) {
     checks.push(...CHECK_IDS.map((id) => emptyCheck(id, 'LEGAL_RAG_API_BASE_URL is not configured')))
-    await writeReport({ checkedAt, apiBaseConfigured: false, hasCredentials, checks })
+    await writeReport({
+      checkedAt,
+      apiBaseConfigured: false,
+      hasCredentials,
+      demoAccessStatus: DEMO_ACCESS_STATUS.OFFLINE,
+      checks,
+    })
     console.log('Legal RAG synthetic report generated without API base URL; all live checks are unchecked.')
     return
   }
 
   const health = await requestJson(baseUrl, '/api/health', {}, args.timeoutMs, cookieJar)
+  const healthOk = health.ok && health.json?.ok === true
   checks.push(
     checkFromResponse(
       'legal-rag-health',
       health,
-      health.ok && health.json?.ok === true,
-      health.ok && health.json?.ok === true ? 'API health returned ok=true' : 'API health did not confirm ok=true',
+      healthOk,
+      healthOk ? 'API health returned ok=true' : 'API health did not confirm ok=true',
     ),
   )
+  if (!healthOk) {
+    checks.push(
+      emptyCheck('legal-rag-qa', 'API health did not pass; protected RAG query checks were skipped'),
+      emptyCheck('legal-rag-contract-review', 'API health did not pass; contract review checks were skipped'),
+      emptyCheck('legal-rag-observability', 'API health did not pass; quality report checks were skipped'),
+    )
+    await writeReport({
+      checkedAt,
+      apiBaseConfigured: true,
+      hasCredentials,
+      demoAccessStatus: statusFromResponse(health, false) === 'offline' ? DEMO_ACCESS_STATUS.OFFLINE : DEMO_ACCESS_STATUS.DEGRADED,
+      checks,
+    })
+    console.log('Legal RAG API health did not pass; protected checks skipped.')
+    if (args.strict && checks.some((check) => check.status === 'offline')) process.exitCode = 1
+    return
+  }
 
   const authStatus = await requestJson(baseUrl, '/api/auth/status', {}, args.timeoutMs, cookieJar)
+  const authStatusKnown = authStatus.ok && typeof authStatus.json?.enabled === 'boolean'
+  if (!authStatusKnown) {
+    checks.push(
+      emptyCheck('legal-rag-qa', 'Auth status did not confirm the demo gate; RAG query checks were skipped', [
+        authStatus.error || issueFromResponse(authStatus) || 'auth status unavailable',
+      ]),
+      emptyCheck('legal-rag-contract-review', 'Auth status did not confirm the demo gate; contract review checks were skipped'),
+      emptyCheck('legal-rag-observability', 'Auth status did not confirm the demo gate; quality report checks were skipped'),
+    )
+    await writeReport({
+      checkedAt,
+      apiBaseConfigured: true,
+      hasCredentials,
+      demoAccessStatus: DEMO_ACCESS_STATUS.DEGRADED,
+      checks,
+    })
+    console.log('Legal RAG health checked; auth status did not confirm the demo gate.')
+    if (args.strict) process.exitCode = 1
+    return
+  }
   const authEnabled = authStatus.json?.enabled === true
   const alreadyAuthenticated = authStatus.json?.authenticated === true
 
@@ -205,7 +273,13 @@ async function main() {
       emptyCheck('legal-rag-contract-review', 'Auth is enabled; credentials are required for contract review checks'),
       emptyCheck('legal-rag-observability', 'Auth is enabled; credentials are required for quality report checks'),
     )
-    await writeReport({ checkedAt, apiBaseConfigured: true, hasCredentials, checks })
+    await writeReport({
+      checkedAt,
+      apiBaseConfigured: true,
+      hasCredentials,
+      demoAccessStatus: DEMO_ACCESS_STATUS.CREDENTIAL_REQUIRED,
+      checks,
+    })
     console.log('Legal RAG health checked; protected checks skipped because credentials are not configured.')
     if (args.strict && checks.some((check) => check.status === 'offline')) process.exitCode = 1
     return
@@ -230,7 +304,13 @@ async function main() {
         { ...failed, id: 'legal-rag-contract-review' },
         { ...failed, id: 'legal-rag-observability' },
       )
-      await writeReport({ checkedAt, apiBaseConfigured: true, hasCredentials, checks })
+      await writeReport({
+        checkedAt,
+        apiBaseConfigured: true,
+        hasCredentials,
+        demoAccessStatus: DEMO_ACCESS_STATUS.BLOCKED_BY_LOGIN,
+        checks,
+      })
       console.log('Legal RAG health checked; protected checks failed at login.')
       if (args.strict) process.exitCode = 1
       return
@@ -316,7 +396,10 @@ async function main() {
     ),
   )
 
-  await writeReport({ checkedAt, apiBaseConfigured: true, hasCredentials, checks })
+  const demoAccessStatus = checks.every((check) => check.status === 'online')
+    ? DEMO_ACCESS_STATUS.OPEN_DEMO
+    : DEMO_ACCESS_STATUS.DEGRADED
+  await writeReport({ checkedAt, apiBaseConfigured: true, hasCredentials, demoAccessStatus, checks })
   console.log(
     `Legal RAG synthetic report generated: online=${checks.filter((check) => check.status === 'online').length} unchecked=${checks.filter((check) => check.status === 'unchecked').length} offline=${checks.filter((check) => check.status === 'offline').length}`,
   )
@@ -329,6 +412,8 @@ async function writeReport(report) {
     checkedAt: report.checkedAt,
     apiBaseConfigured: report.apiBaseConfigured,
     hasCredentials: report.hasCredentials,
+    demoAccessStatus: report.demoAccessStatus,
+    demoAccessSummary: demoAccessSummary(report.demoAccessStatus),
     ok: report.checks.every((check) => check.status !== 'offline'),
     checks: report.checks,
   }

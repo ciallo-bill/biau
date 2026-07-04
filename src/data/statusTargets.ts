@@ -218,6 +218,7 @@ export const reliabilityProjects: ReliabilityProject[] = [
       },
     ],
     gates: [
+      '当前公开 demo 状态由 `public/status/legal-rag-synthetic.json` 的 `demoAccessStatus` 记录；没有低权限 demo 凭据时应保持 `credential-required`，不能写入真实后台密码。',
       '公开 demo 凭据必须可回收且经人工确认；真实后台管理员密码不能写入文章、项目页或状态页。',
       'Web 登录页只有在部署环境配置 VITE_PUBLIC_DEMO_EMAIL / VITE_PUBLIC_DEMO_PASSWORD 后才会展示公开演示凭据。',
     ],

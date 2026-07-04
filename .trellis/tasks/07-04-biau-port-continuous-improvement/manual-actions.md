@@ -40,7 +40,7 @@ queue when the user is available.
 ### M5. Confirm Legal RAG public demo access policy
 
 - Related task: `07-03-legal-rag-demo-access-qa-closure`
-- Needed from user: decide what demo credentials, if any, may be shown publicly and how they can be revoked.
+- Needed from user: create or approve a low-permission public demo account, configure the API-side login password, configure `VITE_PUBLIC_DEMO_EMAIL` / `VITE_PUBLIC_DEMO_PASSWORD` in the Legal RAG Web deployment if the credentials may be shown publicly, then approve a credentialed synthetic check.
 - Why manual: public credentials and legal demo access policy need owner approval.
 - Codex can continue meanwhile: yes, with public wording, gated UI, and mock/safe checks.
 
