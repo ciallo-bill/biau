@@ -75,6 +75,7 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
 - Script output path: `public/status/<project>-synthetic.json`.
 - Status aggregation: `npm.cmd run site:status` loads every `public/status/*-synthetic.json` file and merges checks by `id`.
 - Static showcase example: `npm.cmd run pet:synthetic` writes `public/status/pet-gamer-synthetic.json` and updates the `pet-showcase` check only; release gates such as `pet-apk-gate` remain static `planned` until human approval.
+- Public synthetic reports may include low-sensitive gate metadata such as `apkGate` when it helps the status page explain why a capability is not open yet. Gate metadata must be public-safe and must not include absolute local paths, signing paths, private bucket URLs, release tokens, unapproved APK URLs, or hidden deployment endpoints.
 
 ### 3. Contracts
 
@@ -88,6 +89,7 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
   - `checks: Array<{ id, status, httpStatus, durationMs, checkedAt, summary, issues }>`
 - Allowed statuses are `online`, `degraded`, `offline`, and `unchecked`. Static data may still use `planned`.
 - A synthetic script must update only the check ids it can actually verify. Do not promote adjacent human gates such as APK release, production registration, or credential publication from `planned` to `online`.
+- Adjacent human gates can be mirrored as explanatory metadata, but their public status remains `planned`, `unchecked`, or `degraded` until the exact release credential, account, APK, or production configuration has been approved and verified.
 - If a live payload contains a business gate such as `registrationEnabled`,
   `demoEnabled`, `modelConfigured`, or `downloadApproved`, distinguish payload
   shape from gate state. HTTP 200 plus a well-formed boolean proves the endpoint
@@ -117,8 +119,10 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
   so the synthetic report records API health as `online` and auth/registration
   policy as `degraded`.
 - Base: no environment configured; script records only `unchecked` placeholders so fresh clones still build.
+- Base: a Pet showcase synthetic report records `apkGate.releaseCandidateFound=false` and a sanitized artifact summary, while `pet-apk-gate` remains `planned`.
 - Bad: report includes real hostnames, tokens, account names, raw response
   bodies, SKU/order metrics, or provider keys.
+- Bad: report includes a local Gradle output absolute path, signing keystore path, R2 private URL, or direct debug APK download link before public approval.
 - Bad: auth bootstrap returns `registrationEnabled=false`, but the check is
   marked `online` because the response shape was valid.
 
