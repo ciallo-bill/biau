@@ -58,6 +58,9 @@ model channel contract. Read this before changing `scripts/generate-blog-draft.m
 - `--polish-from` is also a live model request. It must only run after explicit
   approval, must preserve the existing evidence scaffold, and must replace only
   the visitor-readable body under `## Draft Body`.
+- `--polish-from` must also update frontmatter/model-strategy evidence and
+  review-gate wording so a polished draft never still claims `model channel:
+  none` or "No live blog model generation or polish happened".
 - Model calls use OpenAI-compatible chat completions. The script accepts either
   a relay root URL or a URL ending in `/v1` and calls the corresponding
   `/chat/completions` endpoint without duplicating `/v1`.

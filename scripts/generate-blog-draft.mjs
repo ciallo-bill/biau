@@ -502,6 +502,42 @@ function appendModelStrategyNote(content, note) {
   return `${content.slice(0, reviewHeadingIndex).replace(/\s*$/, '')}\n${line}\n\n${content.slice(reviewHeadingIndex + 1)}`
 }
 
+function modelChannelLabel(config) {
+  return `${config.profile}/${config.label} (${config.provider} / ${config.model})`
+}
+
+function markPolishedDraftMetadata(content, config) {
+  const channel = modelChannelLabel(config)
+  return content
+    .replace(
+      /^- Writing mode: .*$/m,
+      '- Writing mode: Model-assisted draft/rewrite (review polish pass).',
+    )
+    .replace(
+      /^- Blog model channel: .*$/m,
+      `- Blog model channel: ${channel}. This pass called \`blog:draft -- --polish-from ... --profile ${config.profile}\` and only rewrote \`## Draft Body\`.`,
+    )
+    .replace(
+      /^- Baseline version: .*$/m,
+      '- Baseline version: Codex-only scaffold/review; this file is a model-assisted polish pass over that baseline.',
+    )
+    .replace(
+      /^- Selected model channel: .*$/m,
+      `- Selected model channel: ${channel}.`,
+    )
+    .replace(
+      /^- \[x\] No live blog model generation or polish happened\.$/m,
+      [
+        '- [x] Live model polish happened and is recorded in Model Strategy.',
+        '- [ ] Codex final fact/safety review after polish is required before promotion.',
+      ].join('\n'),
+    )
+    .replace(
+      /^- \[ \] Human review should compare this baseline against a future model-polished version before final editorial lock\.$/m,
+      '- [ ] Human review should compare this model-polished version against the baseline before final editorial lock.',
+    )
+}
+
 function replaceDraftBodyContent(content, nextBody) {
   const pattern = /(^|\r?\n)## Draft Body\s*\r?\n[\s\S]*$/m
   if (!pattern.test(content)) throw new Error('待润色草稿缺少 ## Draft Body，不能安全写入润色正文。')
@@ -570,7 +606,9 @@ async function writePolishedDraft(topic, outputPath, existingDraft, polishedCont
   let content = updateDraftFrontmatter(existingDraft, {
     generatedBy,
     generatedAt: new Date().toISOString(),
+    modelStrategy: `Model-assisted polish via ${modelChannelLabel(config)}; source evidence remains Codex-reviewed; Codex final fact/safety review required.`,
   })
+  content = markPolishedDraftMetadata(content, config)
   content = appendModelStrategyNote(content, `Review/polish stage used the \`${config.profile}\` profile \`${config.label}\` channel (${config.provider} / ${config.model}).`)
   content = appendModelStrategyNote(content, 'Codex final fact/safety review is still required before promotion.')
   content = replaceDraftBodyContent(content, polishedContent)
