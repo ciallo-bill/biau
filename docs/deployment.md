@@ -44,10 +44,11 @@ NODE_VERSION=22
 前端如果要让公开助手优先走同域 Cloudflare Pages Functions，建议在 Cloudflare Pages 环境变量中增加：
 
 ```text
-VITE_CHAT_API_BASE_URL=/api
+VITE_PUBLIC_ASSISTANT_API_BASE_URL=/api
+VITE_INTERNAL_ASSISTANT_API_BASE_URL=https://biau-internal-assistant-api.onrender.com
 ```
 
-公开助手前端也会在打开时自动探测同域 `/api/health`；如果 Functions 未部署或未配置模型，会使用本地公开知识回退。内部助手页面如需使用邀请码、数据库和管理能力，仍建议额外部署下面的独立助手 API，并把 `VITE_CHAT_API_BASE_URL` 指向该 API。
+公开助手前端也会在打开时自动探测同域 `/api/health`；如果 Functions 未部署或未配置模型，会使用本地公开知识回退。内部助手页面如需使用邀请码、数据库和管理能力，必须把 `VITE_INTERNAL_ASSISTANT_API_BASE_URL` 指向独立的 internal API。旧的 `VITE_CHAT_API_BASE_URL` 仍可作为兼容回退，但三服务部署不要只配置这一个变量，否则公开助手和内部管理页会误打到同一个服务。
 
 Cloudflare Pages Functions 需要在 Pages 的运行时环境变量中配置模型通道：
 
@@ -120,7 +121,7 @@ METRICS_ENABLED=false
 PORT=10000
 ```
 
-公开助手的模型接入点在服务端，不在前端。前端只配置 `VITE_CHAT_API_BASE_URL` 指向公开助手 API 或同域 `/api` facade；真实模型 Key、Base URL 和模型名只放在 Render / Cloudflare Pages Functions / 本地 `.env.local` 等私有环境里。`ASSISTANT_MODEL_BASE_URL` 推荐填写 `/v1` base URL，也可以填写完整 `/chat/completions` endpoint。旧的 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 仍兼容，但新部署建议统一使用 `ASSISTANT_MODEL_*`。
+公开助手的模型接入点在服务端，不在前端。前端只配置 `VITE_PUBLIC_ASSISTANT_API_BASE_URL` 指向公开助手 API 或同域 `/api` facade，`VITE_INTERNAL_ASSISTANT_API_BASE_URL` 指向内部助手 API；真实模型 Key、Base URL 和模型名只放在 Render / Cloudflare Pages Functions / 本地 `.env.local` 等私有环境里。`ASSISTANT_MODEL_BASE_URL` 推荐填写 `/v1` base URL，也可以填写完整 `/chat/completions` endpoint。旧的 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 仍兼容，但新部署建议统一使用 `ASSISTANT_MODEL_*`。
 
 ### Internal Assistant API
 

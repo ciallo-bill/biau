@@ -31,7 +31,7 @@ npm run server:build
 npm run server:smoke
 ```
 
-前端通过 `VITE_CHAT_API_BASE_URL` 指向助手 API；模型通道只在服务端用 `ASSISTANT_MODEL_*` 配置。未配置 API 或模型时，公开助手会使用站点本地公开知识回退。`assistant:index` 会生成旧版公开知识 JSON 和 V2 docs/chunks/entities/relations，`assistant:kg-check` 用确定性问题检查本地 Agentic Hybrid 检索、实体关系和敏感信息边界。
+前端通过 `VITE_PUBLIC_ASSISTANT_API_BASE_URL` 指向公开助手 API，通过 `VITE_INTERNAL_ASSISTANT_API_BASE_URL` 指向内部助手 API；旧的 `VITE_CHAT_API_BASE_URL` 仍作为兼容回退。模型通道只在服务端用 `ASSISTANT_MODEL_*` 配置。未配置 API 或模型时，公开助手会使用站点本地公开知识回退。`assistant:index` 会生成旧版公开知识 JSON 和 V2 docs/chunks/entities/relations，`assistant:kg-check` 用确定性问题检查本地 Agentic Hybrid 检索、实体关系和敏感信息边界。
 
 外部 RAG Orchestrator 预留为 server-side 合同：`ASSISTANT_RAG_API_BASE_URL`、`ASSISTANT_RAG_API_KEY`、`ASSISTANT_RAG_TIMEOUT_MS`。这些变量默认留空，后续只有在选定 Supabase、Render Postgres、Neo4j/Aura、Cloudflare Vectorize/AI Search 等运行时后才由部署平台手动配置，不能放进 Vite 变量或提交到仓库。
 

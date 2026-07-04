@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { ASSISTANT_STORAGE_KEYS } from '../data/assistant'
+import { ASSISTANT_API_ENV_NAMES, INTERNAL_ASSISTANT_API_BASE } from '../utils/assistantApi'
 
-const API_BASE = import.meta.env.VITE_CHAT_API_BASE_URL?.trim()
+const API_BASE = INTERNAL_ASSISTANT_API_BASE
 
 interface AdminSummary {
   members: number
@@ -99,7 +100,7 @@ export function AssistantAdminPage() {
 
   const loadSummary = async () => {
     if (!API_BASE) {
-      setSummaryStatus('当前没有配置 VITE_CHAT_API_BASE_URL，无法调用管理 API。')
+      setSummaryStatus(`当前没有配置 ${ASSISTANT_API_ENV_NAMES.internal}，无法调用管理 API。`)
       return
     }
     if (!adminToken) {
@@ -146,7 +147,7 @@ export function AssistantAdminPage() {
       return
     }
     if (!API_BASE) {
-      setInviteStatus('当前没有配置 VITE_CHAT_API_BASE_URL，无法创建邀请码。')
+      setInviteStatus(`当前没有配置 ${ASSISTANT_API_ENV_NAMES.internal}，无法创建邀请码。`)
       return
     }
     if (!adminToken) {

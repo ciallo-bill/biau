@@ -8,6 +8,7 @@ import {
   searchPublicKnowledge,
   type AssistantKnowledgeItem,
 } from '../data/assistant'
+import { PUBLIC_ASSISTANT_API_BASE, SAME_ORIGIN_ASSISTANT_API_BASE } from '../utils/assistantApi'
 import { trackAnalyticsEvent } from '../utils/analytics'
 
 interface WidgetMessage {
@@ -44,8 +45,7 @@ interface ProviderDiagnostic {
   timeoutMs: number
 }
 
-const CONFIGURED_API_BASE = import.meta.env.VITE_CHAT_API_BASE_URL?.trim().replace(/\/+$/, '')
-const SAME_ORIGIN_API_BASE = '/api'
+const CONFIGURED_API_BASE = PUBLIC_ASSISTANT_API_BASE
 const MAX_MESSAGE_LENGTH = 500
 const MAX_MODEL_ANSWER_LENGTH = 620
 const MAX_FALLBACK_ANSWER_LENGTH = 360
@@ -233,7 +233,7 @@ export function PublicAssistantWidget() {
   useEffect(() => {
     if (!isOpen) return
     let cancelled = false
-    const candidateApiBase = CONFIGURED_API_BASE || SAME_ORIGIN_API_BASE
+    const candidateApiBase = CONFIGURED_API_BASE || SAME_ORIGIN_ASSISTANT_API_BASE
 
     async function refreshServiceHealth() {
       try {

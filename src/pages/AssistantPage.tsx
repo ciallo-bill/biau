@@ -13,8 +13,9 @@ import {
   type AssistantMemberProfile,
   type AssistantMessage,
 } from '../data/assistant'
+import { ASSISTANT_API_ENV_NAMES, INTERNAL_ASSISTANT_API_BASE } from '../utils/assistantApi'
 
-const API_BASE = import.meta.env.VITE_CHAT_API_BASE_URL?.trim()
+const API_BASE = INTERNAL_ASSISTANT_API_BASE
 const MAX_MESSAGE_LENGTH = 1000
 
 interface AssistantResponse {
@@ -185,7 +186,7 @@ export function AssistantPage() {
     const name = memberName.trim() || '内部成员'
 
     if (!API_BASE) {
-      setInviteStatus('当前没有配置 VITE_CHAT_API_BASE_URL，无法兑换邀请码；聊天会继续使用本地公开知识回退。')
+      setInviteStatus(`当前没有配置 ${ASSISTANT_API_ENV_NAMES.internal}，无法兑换邀请码；聊天会继续使用本地公开知识回退。`)
       return
     }
 
