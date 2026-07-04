@@ -23,7 +23,8 @@
     "07-03-cross-project-release-readiness-round-3",
     "07-04-public-assistant-rag-orchestrator-phase-2",
     "07-04-public-assistant-rag-production-config",
-    "07-04-qdrant-rag-adapter"
+    "07-04-qdrant-rag-adapter",
+    "07-05-project-detail-rich-case-study-visuals"
   ],
   "parent": null,
   "relatedFiles": [],
