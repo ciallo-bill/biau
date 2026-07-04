@@ -22,7 +22,8 @@
     "07-04-public-assistant-kg-lite",
     "07-03-cross-project-release-readiness-round-3",
     "07-04-public-assistant-rag-orchestrator-phase-2",
-    "07-04-public-assistant-rag-production-config"
+    "07-04-public-assistant-rag-production-config",
+    "07-04-qdrant-rag-adapter"
   ],
   "parent": null,
   "relatedFiles": [],

@@ -68,7 +68,7 @@ npm run assistant:kg-check
 
 这个检查只使用本地公开数据，不会调用真实模型或中转站。
 
-外部 RAG Orchestrator 是最终形态的一部分，由单独的 Render 服务承载。Cloudflare Pages Functions 或公开助手 API 只保存 Orchestrator endpoint 和服务端 token，不直接连接 Supabase / pgvector：
+外部 RAG Orchestrator 是最终形态的一部分，由单独的 Render 服务承载。Cloudflare Pages Functions 或公开助手 API 只保存 Orchestrator endpoint 和服务端 token，不直接连接 Qdrant、Supabase、模型中转或 embedding provider：
 
 ```text
 ASSISTANT_RAG_API_BASE_URL=
@@ -76,7 +76,7 @@ ASSISTANT_RAG_API_KEY=
 ASSISTANT_RAG_TIMEOUT_MS=3000
 ```
 
-这些变量不能放进 `VITE_*`。最终推荐使用下面的 `biau-rag-orchestrator` 服务连接 Supabase Postgres + pgvector；如果暂时清空 `ASSISTANT_RAG_API_BASE_URL`，公开助手会退回本地公开知识，但这只是可靠性降级，不是最终目标架构。
+这些变量不能放进 `VITE_*`。最终推荐使用下面的 `biau-rag-orchestrator` 服务连接 Qdrant Cloud；如果暂时清空 `ASSISTANT_RAG_API_BASE_URL`，公开助手会退回本地公开知识，但这只是可靠性降级，不是最终目标架构。
 
 部署后先检查 `https://<站点域名>/api/health`。它应该返回 JSON，并包含 `ok: true` 与 `mode` / `modelConfigured` 这类低敏状态；如果返回的是首页 HTML，或 `POST /api/chat/public` 返回 404/405，说明当前 Pages 部署没有把 `functions/` 目录发布为 Functions。此时单独增加模型 Key 不会生效，需要先确认 Cloudflare Pages 项目使用最新 `main` 提交重新构建，或用 Wrangler 部署时确认 Functions 一起上传。
 
@@ -90,7 +90,7 @@ biau-internal-assistant-api  ASSISTANT_SERVICE_MODE=internal
 biau-rag-orchestrator        ASSISTANT_SERVICE_MODE=rag
 ```
 
-这样可以复用同一套 TypeScript 类型、模型客户端、RAG contract 和测试，同时让公开接口、内部接口和检索服务拥有独立路由、密钥、日志、扩容和故障范围。不要把模型 key、RAG key、Supabase service role、数据库 URL 或 admin token 放进 `VITE_*`。
+这样可以复用同一套 TypeScript 类型、模型客户端、RAG contract 和测试，同时让公开接口、内部接口和检索服务拥有独立路由、密钥、日志、扩容和故障范围。不要把模型 key、RAG key、Qdrant key、Supabase service role、数据库 URL 或 admin token 放进 `VITE_*`。
 
 Render 配置建议：
 
@@ -144,16 +144,18 @@ PORT=10000
 
 ```text
 ASSISTANT_SERVICE_MODE=rag
-RAG_STORE_PROVIDER=supabase
-RAG_DATABASE_URL=<Supabase pooled Postgres connection string with pgvector enabled>
-SUPABASE_URL=<Supabase project URL，可选用于后续管理 API>
-SUPABASE_SERVICE_ROLE_KEY=<Supabase service role key，可选用于后续管理 API>
+RAG_STORE_PROVIDER=qdrant
+QDRANT_URL=<Qdrant Cloud HTTPS endpoint>
+QDRANT_API_KEY=<Qdrant API key>
+QDRANT_PUBLIC_COLLECTION=biau_public_chunks
+QDRANT_INTERNAL_COLLECTION=biau_internal_chunks
 RAG_PUBLIC_API_KEY=<公开助手调用 retrieve 的服务端 token>
 RAG_INTERNAL_API_KEY=<内部助手调用 retrieve 的服务端 token>
-RAG_SYNC_TOKEN=<同步 public knowledge 到 pgvector 的服务端 token>
-EMBEDDING_BASE_URL=<OpenAI-compatible embedding /v1 base URL，可留空使用 deterministic local embedding>
-EMBEDDING_API_KEY=<embedding key，可留空>
-EMBEDDING_MODEL=deterministic-local
+RAG_SYNC_TOKEN=<同步 public knowledge 到 Qdrant 的服务端 token>
+EMBEDDING_BASE_URL=<OpenAI-compatible embedding /v1 base URL>
+EMBEDDING_API_KEY=<embedding key>
+EMBEDDING_MODEL=qwen3-embedding-8b
+EMBEDDING_DIMENSION=4096
 EMBEDDING_TIMEOUT_MS=20000
 RERANKER_BASE_URL=<可选 reranker base URL>
 RERANKER_API_KEY=<可选 reranker key>
@@ -162,13 +164,14 @@ METRICS_ENABLED=false
 PORT=10000
 ```
 
-Supabase 需要先启用 `vector` 与 `pgcrypto`，再运行仓库里的公开安全 schema：
+Qdrant collection 已按最终向量路径创建：
 
 ```text
-server/sql/rag-store-pgvector.sql
+biau_public_chunks    4096 / Cosine
+biau_internal_chunks  4096 / Cosine
 ```
 
-`RAG_DATABASE_URL` 是 Orchestrator 连接 pgvector 的主要运行时变量；`SUPABASE_URL` 和 `SUPABASE_SERVICE_ROLE_KEY` 只作为后续管理 API / 平台操作预留，不进入前端。
+`QDRANT_URL`、`QDRANT_API_KEY`、embedding key 和 RAG token 只放在 Render 的 `biau-rag-orchestrator` 环境变量中。Supabase / Postgres 仍可用于内部助手的成员、会话、邀请码和管理数据；它不再是最终向量检索主路径。
 
 本地后端开发：
 

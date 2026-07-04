@@ -17,7 +17,10 @@ server/
 │   ├── model.ts       # model-provider integration and fallback answer behavior
 │   ├── ragAdapters.ts # deterministic local embedding/vector/reranker adapters
 │   ├── ragClient.ts   # server-side optional RAG Orchestrator adapter with local fallback
+│   ├── ragEmbeddings.ts # shared OpenAI-compatible / deterministic embedding helpers
 │   ├── ragOrchestrator.ts # local/mock RAG retrieval contract and diagnostics
+│   ├── ragPostgresStore.ts # optional Supabase/pgvector RAG store compatibility
+│   ├── ragQdrantStore.ts # Qdrant Cloud RAG store for final vector retrieval path
 │   ├── ragRoutes.ts   # RAG Orchestrator HTTP router mounted under /rag
 │   └── types.ts       # API/data payload types
 ├── scripts/
@@ -25,7 +28,7 @@ server/
 │   ├── rag-smoke.ts   # local/mock RAG Orchestrator HTTP contract smoke
 │   └── rag-sync-local.ts # public knowledge V2 sync plan / validation
 ├── sql/
-│   └── rag-store-pgvector.sql # Supabase/Render Postgres + pgvector schema template
+│   └── rag-store-pgvector.sql # Supabase/Render Postgres + pgvector compatibility schema template
 └── data/
     └── public-knowledge.json
 
@@ -38,7 +41,7 @@ prisma/
 
 Keep route registration, middleware, and response shaping in `server/src/app.ts`. Move reusable concerns into narrow modules: environment in `env.ts`, database access setup in `db.ts`, auth/token lookup in `auth.ts`, model calls in `model.ts`, and knowledge search in `knowledge.ts`.
 
-RAG Orchestrator code should stay split between `ragAdapters.ts` for deterministic local embedding/vector/reranker adapters, `ragClient.ts` for the main-site adapter / external HTTP fallback logic, `ragOrchestrator.ts` for local/mock retrieval contract shaping, and `ragRoutes.ts` for HTTP validation. The current in-repo mock router is mounted under `/rag` so it does not replace the assistant API's root `/health`; a future standalone Orchestrator can mount the same router at its root.
+RAG Orchestrator code should stay split between `ragAdapters.ts` for deterministic local vector helpers, `ragEmbeddings.ts` for shared embedding-provider integration, `ragClient.ts` for the main-site adapter / external HTTP fallback logic, `ragOrchestrator.ts` for provider selection and retrieval contract shaping, store-specific modules such as `ragQdrantStore.ts` / `ragPostgresStore.ts`, and `ragRoutes.ts` for HTTP validation. The current in-repo mock router is mounted under `/rag` so it does not replace the assistant API's root `/health`; standalone Orchestrator mode mounts the same router at its root.
 
 Provider-neutral storage templates live under `server/sql/`, and local sync validation scripts live under `server/scripts/`. These files must remain public-safe: schema placeholders and table names are fine, but real connection strings, service role keys, cloud hostnames, private endpoints, or embedding/reranker credentials do not belong there.
 

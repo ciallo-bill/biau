@@ -75,12 +75,16 @@ services:
       - key: ASSISTANT_SERVICE_MODE
         value: rag
       - key: RAG_STORE_PROVIDER
-        value: supabase
+        value: qdrant
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: QDRANT_PUBLIC_COLLECTION
+        value: biau_public_chunks
+      - key: QDRANT_INTERNAL_COLLECTION
+        value: biau_internal_chunks
       - key: RAG_DATABASE_URL
-        sync: false
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
       - key: RAG_PUBLIC_API_KEY
         sync: false
@@ -93,7 +97,9 @@ services:
       - key: EMBEDDING_API_KEY
         sync: false
       - key: EMBEDDING_MODEL
-        value: deterministic-local
+        sync: false
+      - key: EMBEDDING_DIMENSION
+        value: "4096"
       - key: EMBEDDING_TIMEOUT_MS
         value: "20000"
       - key: RERANKER_BASE_URL

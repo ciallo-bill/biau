@@ -127,7 +127,7 @@ export interface RagRetrieveResponse {
 
 export interface RagSyncResponse {
   ok: true
-  mode: 'local-readonly' | 'postgres'
+  mode: 'local-readonly' | 'postgres' | 'qdrant'
   accepted: boolean
   health: RagHealthResponse
   diagnostics?: {

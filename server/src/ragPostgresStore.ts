@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { Pool, type PoolClient } from 'pg'
 import { env } from './env.js'
 import { publicKnowledgeV2, retrieveKnowledge } from './knowledge.js'
-import { createDeterministicEmbeddingProvider } from './ragAdapters.js'
+import { embedText, formatVector } from './ragEmbeddings.js'
 import type { AssistantScope, Citation, RagChunkCitation, RagHealthResponse, RagRetrievePayload, RagRetrieveResponse, RagSyncResponse } from './types.js'
 
 interface CandidateRow {
@@ -28,16 +28,8 @@ interface RelationRow {
   evidence_document_ids: string[]
 }
 
-interface RagEmbeddingResult {
-  vector: number[]
-  model: string
-  dimensions: number
-  modelCalls: number
-}
-
 const SERVICE_NAME = 'biau-rag-orchestrator'
 const POSTGRES_STORE_NAME = 'supabase-pgvector'
-const deterministicEmbeddingProvider = createDeterministicEmbeddingProvider()
 let ragPool: Pool | null = null
 
 export function isPostgresRagStoreConfigured() {
@@ -513,78 +505,6 @@ function buildCitations(candidates: ReturnType<typeof mergeCandidates>, limit: n
   return citations
 }
 
-async function embedText(text: string): Promise<RagEmbeddingResult> {
-  if (env.embeddingApiKey && env.embeddingBaseUrl && env.embeddingModel !== 'deterministic-local') {
-    const vector = await requestEmbedding(text)
-    return {
-      vector,
-      model: env.embeddingModel,
-      dimensions: vector.length,
-      modelCalls: 1,
-    }
-  }
-  const vector = deterministicEmbeddingProvider.embed(text)
-  return {
-    vector,
-    model: deterministicEmbeddingProvider.kind,
-    dimensions: deterministicEmbeddingProvider.dimensions,
-    modelCalls: 0,
-  }
-}
-
-async function requestEmbedding(text: string) {
-  const endpoints = getEmbeddingEndpoints(env.embeddingBaseUrl)
-  let response: Response | null = null
-  for (const endpoint of endpoints) {
-    const attempt = await requestEmbeddingEndpoint(endpoint, text)
-    response = attempt
-    if (response?.ok) break
-    if (!response || ![404, 405].includes(response.status)) break
-  }
-  if (!response?.ok) throw new Error('embedding-provider-error')
-  const payload = (await response.json().catch(() => null)) as unknown
-  const embedding = readEmbedding(payload)
-  if (!embedding) throw new Error('embedding-empty-response')
-  return embedding
-}
-
-async function requestEmbeddingEndpoint(endpoint: string, text: string) {
-  const abort = new AbortController()
-  const timeout = setTimeout(() => abort.abort(), env.embeddingTimeoutMs)
-  try {
-    return await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${env.embeddingApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      signal: abort.signal,
-      body: JSON.stringify({
-        model: env.embeddingModel,
-        input: text,
-      }),
-    })
-  } finally {
-    clearTimeout(timeout)
-  }
-}
-
-function readEmbedding(value: unknown) {
-  if (!isRecord(value) || !Array.isArray(value.data)) return null
-  const first = value.data[0]
-  if (!isRecord(first) || !Array.isArray(first.embedding)) return null
-  const vector = first.embedding.filter((item): item is number => typeof item === 'number' && Number.isFinite(item))
-  return vector.length === first.embedding.length && vector.length > 0 ? vector : null
-}
-
-function getEmbeddingEndpoints(baseUrl: string) {
-  const normalized = baseUrl.replace(/\/+$/, '')
-  if (!normalized) return []
-  if (normalized.endsWith('/embeddings')) return [normalized]
-  if (normalized.endsWith('/v1')) return [`${normalized}/embeddings`]
-  return Array.from(new Set([`${normalized}/embeddings`, `${normalized}/v1/embeddings`]))
-}
-
 function getRagPool() {
   if (!env.ragDatabaseUrl) return null
   ragPool ??= new Pool({
@@ -654,18 +574,10 @@ function hashJson(value: unknown) {
   return createHash('sha256').update(JSON.stringify(value)).digest('hex')
 }
 
-function formatVector(vector: number[]) {
-  return `[${vector.map((value) => Number(value.toFixed(6))).join(',')}]`
-}
-
 function escapeLike(value: string) {
   return value.trim().toLowerCase().replace(/[\\%_]/g, (match) => `\\${match}`)
 }
 
 function uniqueTerms(values: string[]) {
   return Array.from(new Set(values.map((value) => value.trim().toLowerCase()).filter(Boolean)))
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
 }

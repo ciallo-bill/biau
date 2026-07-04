@@ -1,7 +1,7 @@
 import { createServer as createTcpServer } from 'node:net'
 import { createApp } from '../src/app.js'
 import { env } from '../src/env.js'
-import type { AssistantServiceMode } from '../src/types.js'
+import type { AssistantServiceMode, RagRetrieveResponse } from '../src/types.js'
 
 interface EnvSnapshot {
   assistantServiceMode: AssistantServiceMode
@@ -12,6 +12,11 @@ interface EnvSnapshot {
   ragPublicApiKey: string
   ragInternalApiKey: string
   ragSyncToken: string
+  ragStoreProvider: string
+  qdrantUrl: string
+  qdrantApiKey: string
+  qdrantPublicCollection: string
+  qdrantInternalCollection: string
 }
 
 let nextServicePort = 9577
@@ -46,6 +51,11 @@ function snapshotEnv(): EnvSnapshot {
     ragPublicApiKey: env.ragPublicApiKey,
     ragInternalApiKey: env.ragInternalApiKey,
     ragSyncToken: env.ragSyncToken,
+    ragStoreProvider: env.ragStoreProvider,
+    qdrantUrl: env.qdrantUrl,
+    qdrantApiKey: env.qdrantApiKey,
+    qdrantPublicCollection: env.qdrantPublicCollection,
+    qdrantInternalCollection: env.qdrantInternalCollection,
   }
 }
 
@@ -58,6 +68,11 @@ function restoreEnv(snapshot: EnvSnapshot) {
   env.ragPublicApiKey = snapshot.ragPublicApiKey
   env.ragInternalApiKey = snapshot.ragInternalApiKey
   env.ragSyncToken = snapshot.ragSyncToken
+  env.ragStoreProvider = snapshot.ragStoreProvider
+  env.qdrantUrl = snapshot.qdrantUrl
+  env.qdrantApiKey = snapshot.qdrantApiKey
+  env.qdrantPublicCollection = snapshot.qdrantPublicCollection
+  env.qdrantInternalCollection = snapshot.qdrantInternalCollection
 }
 
 async function withService(mode: AssistantServiceMode, run: (base: string) => Promise<void>) {
@@ -69,6 +84,11 @@ async function withService(mode: AssistantServiceMode, run: (base: string) => Pr
   env.ragPublicApiKey = 'public-rag-smoke-key'
   env.ragInternalApiKey = 'internal-rag-smoke-key'
   env.ragSyncToken = 'sync-rag-smoke-token'
+  env.ragStoreProvider = 'local'
+  env.qdrantUrl = ''
+  env.qdrantApiKey = ''
+  env.qdrantPublicCollection = 'biau_public_chunks'
+  env.qdrantInternalCollection = 'biau_internal_chunks'
 
   const port = await findAvailablePort(nextServicePort)
   nextServicePort = port + 20
@@ -157,6 +177,21 @@ try {
 
     const sync = await postJson(`${base}/v1/sync`, {}, 'sync-rag-smoke-token')
     if (!sync.response.ok) throw new Error(`rag mode sync failed: ${sync.response.status}`)
+
+    env.ragStoreProvider = 'qdrant'
+    const qdrantHealth = await getJson<{ store?: string; vectorReady?: boolean }>(`${base}/health`)
+    if (!qdrantHealth.response.ok || qdrantHealth.payload?.store !== 'qdrant' || qdrantHealth.payload.vectorReady !== false) {
+      throw new Error('rag mode qdrant health without config should be low-sensitive and not ready')
+    }
+
+    const qdrantFallbackRetrieve = await postJson<RagRetrieveResponse>(
+      `${base}/v1/retrieve`,
+      { query: 'Legal RAG 怎么体验？', scope: 'public' },
+      'public-rag-smoke-key',
+    )
+    if (!qdrantFallbackRetrieve.response.ok || qdrantFallbackRetrieve.payload?.meta.store !== 'local') {
+      throw new Error('rag mode qdrant without config should fall back to local retrieval')
+    }
   })
 
   console.log('Assistant service mode smoke passed')

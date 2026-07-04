@@ -1,12 +1,14 @@
 import { publicKnowledgeV2, retrieveKnowledge } from './knowledge.js'
 import { createLocalVectorStore, rerankChunksWithVector } from './ragAdapters.js'
 import { getPostgresRagHealth, isPostgresRagStoreConfigured, retrievePostgresRagContext, syncPostgresRagStore } from './ragPostgresStore.js'
+import { getQdrantRagHealth, isQdrantRagStoreSelected, retrieveQdrantRagContext, syncQdrantRagStore } from './ragQdrantStore.js'
 import type { RagHealthResponse, RagRetrievePayload, RagRetrieveResponse, RagSyncResponse } from './types.js'
 
 const SERVICE_NAME = 'biau-rag-orchestrator'
 const localVectorStore = createLocalVectorStore()
 
 export async function getRagOrchestratorHealth(): Promise<RagHealthResponse> {
+  if (isQdrantRagStoreSelected()) return getQdrantRagHealth()
   if (isPostgresRagStoreConfigured()) return getPostgresRagHealth()
   return {
     ok: true,
@@ -26,6 +28,11 @@ export async function getRagOrchestratorHealth(): Promise<RagHealthResponse> {
 export async function retrieveRagContext(
   payload: Required<Pick<RagRetrievePayload, 'query' | 'scope'>> & Omit<RagRetrievePayload, 'query' | 'scope'>,
 ): Promise<RagRetrieveResponse> {
+  if (isQdrantRagStoreSelected()) {
+    const qdrantRetrieval = await retrieveQdrantRagContext(payload)
+    if (qdrantRetrieval) return qdrantRetrieval
+  }
+
   if (isPostgresRagStoreConfigured()) {
     const postgresRetrieval = await retrievePostgresRagContext(payload)
     if (postgresRetrieval) return postgresRetrieval
@@ -62,6 +69,11 @@ export async function retrieveRagContext(
 }
 
 export async function syncRagStore(): Promise<RagSyncResponse> {
+  if (isQdrantRagStoreSelected()) {
+    const syncResult = await syncQdrantRagStore()
+    if (syncResult) return syncResult
+  }
+
   if (isPostgresRagStoreConfigured()) {
     const syncResult = await syncPostgresRagStore()
     if (syncResult) return syncResult

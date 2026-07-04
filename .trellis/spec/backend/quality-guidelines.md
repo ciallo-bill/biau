@@ -142,12 +142,12 @@ The server reads private env, applies public-citation grounding, and returns onl
 - Do not make lint pass by adding broad disables.
 - Do not use destructive git commands or push without an explicit user request.
 
-## Scenario: Assistant Service Modes And Scoped Pgvector RAG
+## Scenario: Assistant Service Modes And Scoped External RAG Stores
 
 ### 1. Scope / Trigger
 
-- Trigger: changing assistant backend runtime boundaries, Render deployment contracts, RAG Orchestrator auth/scope, pgvector storage, sync, or retrieval code.
-- Use this whenever editing `ASSISTANT_SERVICE_MODE`, `RAG_*`, `EMBEDDING_*`, `server/src/app.ts`, `server/src/ragRoutes.ts`, `server/src/ragOrchestrator.ts`, `server/src/ragPostgresStore.ts`, `server/sql/rag-store-pgvector.sql`, or related smoke scripts.
+- Trigger: changing assistant backend runtime boundaries, Render deployment contracts, RAG Orchestrator auth/scope, external vector storage, sync, or retrieval code.
+- Use this whenever editing `ASSISTANT_SERVICE_MODE`, `RAG_*`, `QDRANT_*`, `EMBEDDING_*`, `server/src/app.ts`, `server/src/ragRoutes.ts`, `server/src/ragOrchestrator.ts`, `server/src/ragQdrantStore.ts`, `server/src/ragPostgresStore.ts`, `server/sql/rag-store-pgvector.sql`, or related smoke scripts.
 
 ### 2. Signatures
 
@@ -185,7 +185,8 @@ The server reads private env, applies public-citation grounding, and returns onl
 - `POST /v1/retrieve` accepts `{ query: string, scope?: "public" | "internal", limit?: number, locale?: string }`.
 - Public RAG key can retrieve only `scope: "public"`. Internal RAG key can retrieve only `scope: "internal"`.
 - `POST /v1/sync` requires `RAG_SYNC_TOKEN` in standalone RAG mode.
-- Supabase pgvector runtime uses `RAG_STORE_PROVIDER=supabase` plus `RAG_DATABASE_URL`; `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are server-only optional future-management variables.
+- Final vector runtime uses `RAG_STORE_PROVIDER=qdrant` plus `QDRANT_URL`, `QDRANT_API_KEY`, `QDRANT_PUBLIC_COLLECTION`, `QDRANT_INTERNAL_COLLECTION`, `EMBEDDING_MODEL`, and `EMBEDDING_DIMENSION`.
+- Supabase pgvector compatibility runtime may still use `RAG_STORE_PROVIDER=supabase` plus `RAG_DATABASE_URL`; `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are server-only optional future-management variables.
 - Public retrieval queries only `visibility='public'`; internal retrieval may query `visibility in ('public','internal')`.
 - All keys, database URLs, provider URLs, and tokens are server-only and must not appear in `VITE_*`.
 
@@ -197,7 +198,7 @@ The server reads private env, applies public-citation grounding, and returns onl
 - RAG mode retrieve with no configured key for requested scope -> `503 { error: "rag-auth-not-configured" }`.
 - RAG mode sync without matching sync token -> `401 { error: "missing-or-invalid-sync-token" }`.
 - RAG mode sync with no configured sync token -> `503 { error: "rag-sync-not-configured" }`.
-- Supabase store unset or unavailable in local/all mode -> use deterministic local retrieval for tests and safe fallback.
+- Qdrant/Supabase store unset or unavailable in local/all mode -> use deterministic local retrieval for tests and safe fallback.
 - Public mode request to `/chat/internal` or `/rag/health` -> route not mounted.
 - Internal mode request to `/chat/public` or `/rag/health` -> route not mounted.
 - RAG mode request to `/chat/public` -> route not mounted.
@@ -207,7 +208,8 @@ The server reads private env, applies public-citation grounding, and returns onl
 - Good: `assistant:service-modes-smoke` proves each service mode exposes only its route group.
 - Good: standalone RAG mode rejects a public key for `scope: "internal"`.
 - Good: `assistant:rag-smoke` still validates local `/rag/*` contract without external credentials.
-- Base: fresh clone with no `RAG_DATABASE_URL` still passes local deterministic checks.
+- Good: Qdrant config stays server-only and public scope queries only the public collection.
+- Base: fresh clone with no `QDRANT_URL`, `QDRANT_API_KEY`, or `RAG_DATABASE_URL` still passes local deterministic checks.
 - Bad: one Render service exposes public chat, internal admin, and RAG sync with the same secrets.
 - Bad: frontend code reads `ASSISTANT_RAG_API_KEY`, `RAG_DATABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `EMBEDDING_API_KEY`, or `RAG_SYNC_TOKEN`.
 - Bad: public retrieval returns a citation with `visibility: "internal"`.
