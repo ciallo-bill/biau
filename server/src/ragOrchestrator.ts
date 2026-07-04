@@ -1,11 +1,13 @@
 import { publicKnowledgeV2, retrieveKnowledge } from './knowledge.js'
 import { createLocalVectorStore, rerankChunksWithVector } from './ragAdapters.js'
+import { getPostgresRagHealth, isPostgresRagStoreConfigured, retrievePostgresRagContext, syncPostgresRagStore } from './ragPostgresStore.js'
 import type { RagHealthResponse, RagRetrievePayload, RagRetrieveResponse, RagSyncResponse } from './types.js'
 
 const SERVICE_NAME = 'biau-rag-orchestrator'
 const localVectorStore = createLocalVectorStore()
 
-export function getRagOrchestratorHealth(): RagHealthResponse {
+export async function getRagOrchestratorHealth(): Promise<RagHealthResponse> {
+  if (isPostgresRagStoreConfigured()) return getPostgresRagHealth()
   return {
     ok: true,
     service: SERVICE_NAME,
@@ -21,7 +23,14 @@ export function getRagOrchestratorHealth(): RagHealthResponse {
   }
 }
 
-export function retrieveRagContext(payload: Required<Pick<RagRetrievePayload, 'query'>> & Omit<RagRetrievePayload, 'query'>): RagRetrieveResponse {
+export async function retrieveRagContext(
+  payload: Required<Pick<RagRetrievePayload, 'query' | 'scope'>> & Omit<RagRetrievePayload, 'query' | 'scope'>,
+): Promise<RagRetrieveResponse> {
+  if (isPostgresRagStoreConfigured()) {
+    const postgresRetrieval = await retrievePostgresRagContext(payload)
+    if (postgresRetrieval) return postgresRetrieval
+  }
+
   const limit = normalizeRetrieveLimit(payload.limit)
   const retrieval = retrieveKnowledge(payload.query, limit)
   const vectorCandidates = localVectorStore.search(payload.query, limit * 4)
@@ -52,12 +61,17 @@ export function retrieveRagContext(payload: Required<Pick<RagRetrievePayload, 'q
   }
 }
 
-export function syncLocalRagStore(): RagSyncResponse {
+export async function syncRagStore(): Promise<RagSyncResponse> {
+  if (isPostgresRagStoreConfigured()) {
+    const syncResult = await syncPostgresRagStore()
+    if (syncResult) return syncResult
+  }
+
   return {
     ok: true,
     mode: 'local-readonly',
     accepted: false,
-    health: getRagOrchestratorHealth(),
+    health: await getRagOrchestratorHealth(),
   }
 }
 

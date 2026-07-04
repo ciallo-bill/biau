@@ -68,7 +68,7 @@ npm run assistant:kg-check
 
 这个检查只使用本地公开数据，不会调用真实模型或中转站。
 
-外部 RAG Orchestrator 目前只是 server-side 预留合同，默认关闭：
+外部 RAG Orchestrator 是最终形态的一部分，由单独的 Render 服务承载。Cloudflare Pages Functions 或公开助手 API 只保存 Orchestrator endpoint 和服务端 token，不直接连接 Supabase / pgvector：
 
 ```text
 ASSISTANT_RAG_API_BASE_URL=
@@ -76,40 +76,99 @@ ASSISTANT_RAG_API_KEY=
 ASSISTANT_RAG_TIMEOUT_MS=3000
 ```
 
-这些变量不能放进 `VITE_*`。只有在本地知识导出、检索和 HTTP contract 稳定后，才由维护者手动选择 Supabase、Render Postgres、Neo4j/Aura、Cloudflare Vectorize/AI Search 或其他运行时，并在 Cloudflare Pages / Render 的私有环境变量里配置真实 endpoint 和 key。
+这些变量不能放进 `VITE_*`。最终推荐使用下面的 `biau-rag-orchestrator` 服务连接 Supabase Postgres + pgvector；如果暂时清空 `ASSISTANT_RAG_API_BASE_URL`，公开助手会退回本地公开知识，但这只是可靠性降级，不是最终目标架构。
 
 部署后先检查 `https://<站点域名>/api/health`。它应该返回 JSON，并包含 `ok: true` 与 `mode` / `modelConfigured` 这类低敏状态；如果返回的是首页 HTML，或 `POST /api/chat/public` 返回 404/405，说明当前 Pages 部署没有把 `functions/` 目录发布为 Functions。此时单独增加模型 Key 不会生效，需要先确认 Cloudflare Pages 项目使用最新 `main` 提交重新构建，或用 Wrangler 部署时确认 Functions 一起上传。
 
-## 内部助手 API 部署
+## 助手后端与 RAG Orchestrator 部署
 
-助手后端位于当前仓库的 `server/`，和静态前端独立部署。它仍是内部助手、邀请码、数据库、管理页和完整 Express API 的推荐路线；如果只需要公开助手接入 GLM，同域 Cloudflare Pages Functions 可以先覆盖 `/api/health` 与 `/api/chat/public`。
+助手后端位于当前仓库的 `server/`，和静态前端独立部署。最终形态使用同一个 GitHub 仓库创建三个 Render Web Service，通过 `ASSISTANT_SERVICE_MODE` 明确运行边界：
+
+```text
+biau-public-assistant-api    ASSISTANT_SERVICE_MODE=public
+biau-internal-assistant-api  ASSISTANT_SERVICE_MODE=internal
+biau-rag-orchestrator        ASSISTANT_SERVICE_MODE=rag
+```
+
+这样可以复用同一套 TypeScript 类型、模型客户端、RAG contract 和测试，同时让公开接口、内部接口和检索服务拥有独立路由、密钥、日志、扩容和故障范围。不要把模型 key、RAG key、Supabase service role、数据库 URL 或 admin token 放进 `VITE_*`。
 
 Render 配置建议：
 
 ```text
 Runtime: Node
 Build Command: npm ci && npm run assistant:index && npm run prisma:generate && npm run server:build
-Start Command: npm run prisma:migrate && npm run server:start
+Start Command:
+  public/rag: npm run server:start
+  internal: npm run prisma:migrate && npm run server:start
 ```
 
-Render 环境变量：
+仓库根目录提供了 `render.yaml` Blueprint，可直接作为三服务配置参考；其中所有真实密钥、数据库 URL 和 provider endpoint 都使用 `sync: false`，需要在 Render 后台手动填写。
+
+### Public Assistant API
 
 ```text
-DATABASE_URL=postgresql://...
+ASSISTANT_SERVICE_MODE=public
 CORS_ORIGIN=https://biau.playlab.eu.cc
-ADMIN_TOKEN=<生成一个长随机字符串>
 ASSISTANT_MODEL_BASE_URL=<OpenAI-compatible relay base URL, for example https://.../v1>
 ASSISTANT_MODEL_API_KEY=<OpenAI 兼容中转 Key，可留空使用公开知识回退>
-ASSISTANT_MODEL_NAME=glm-5.2
-ASSISTANT_MODEL_PROVIDER=glm-compatible
-ASSISTANT_RAG_API_BASE_URL=<可选，外部 RAG Orchestrator endpoint；未批准运行时前留空>
-ASSISTANT_RAG_API_KEY=<可选，外部 RAG Orchestrator key；不要提交到仓库>
+ASSISTANT_MODEL_NAME=<mimo 或其他 OpenAI-compatible 模型名>
+ASSISTANT_MODEL_PROVIDER=mimo-compatible
+ASSISTANT_RAG_API_BASE_URL=<biau-rag-orchestrator 的 Render URL>
+ASSISTANT_RAG_API_KEY=<只允许 public scope 的 RAG key>
 ASSISTANT_RAG_TIMEOUT_MS=3000
 METRICS_ENABLED=false
 PORT=10000
 ```
 
-公开助手的模型接入点在服务端，不在前端。前端只配置 `VITE_CHAT_API_BASE_URL` 指向助手 API；真实模型 Key、Base URL 和模型名只放在 Render/Aiven/本地 `.env.local` 等私有环境里。公开助手推荐使用 GLM-5.2 这类中文表达更稳的 OpenAI-compatible 模型；`ASSISTANT_MODEL_BASE_URL` 推荐填写 `/v1` base URL，也可以填写完整 `/chat/completions` endpoint。旧的 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 仍兼容，但新部署建议统一使用 `ASSISTANT_MODEL_*`。
+公开助手的模型接入点在服务端，不在前端。前端只配置 `VITE_CHAT_API_BASE_URL` 指向公开助手 API 或同域 `/api` facade；真实模型 Key、Base URL 和模型名只放在 Render / Cloudflare Pages Functions / 本地 `.env.local` 等私有环境里。`ASSISTANT_MODEL_BASE_URL` 推荐填写 `/v1` base URL，也可以填写完整 `/chat/completions` endpoint。旧的 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`OPENAI_MODEL` 仍兼容，但新部署建议统一使用 `ASSISTANT_MODEL_*`。
+
+### Internal Assistant API
+
+```text
+ASSISTANT_SERVICE_MODE=internal
+CORS_ORIGIN=https://biau.playlab.eu.cc
+DATABASE_URL=<内部助手成员/会话/邀请码数据库 URL>
+ADMIN_TOKEN=<生成一个长随机字符串>
+ASSISTANT_MODEL_BASE_URL=<OpenAI-compatible relay base URL, for example https://.../v1>
+ASSISTANT_MODEL_API_KEY=<OpenAI 兼容中转 Key>
+ASSISTANT_MODEL_NAME=<mimo 或其他 OpenAI-compatible 模型名>
+ASSISTANT_MODEL_PROVIDER=mimo-compatible
+ASSISTANT_RAG_API_BASE_URL=<biau-rag-orchestrator 的 Render URL>
+ASSISTANT_RAG_API_KEY=<只允许 internal scope 的 RAG key>
+ASSISTANT_RAG_TIMEOUT_MS=3000
+METRICS_ENABLED=false
+PORT=10000
+```
+
+### RAG Orchestrator
+
+```text
+ASSISTANT_SERVICE_MODE=rag
+RAG_STORE_PROVIDER=supabase
+RAG_DATABASE_URL=<Supabase pooled Postgres connection string with pgvector enabled>
+SUPABASE_URL=<Supabase project URL，可选用于后续管理 API>
+SUPABASE_SERVICE_ROLE_KEY=<Supabase service role key，可选用于后续管理 API>
+RAG_PUBLIC_API_KEY=<公开助手调用 retrieve 的服务端 token>
+RAG_INTERNAL_API_KEY=<内部助手调用 retrieve 的服务端 token>
+RAG_SYNC_TOKEN=<同步 public knowledge 到 pgvector 的服务端 token>
+EMBEDDING_BASE_URL=<OpenAI-compatible embedding /v1 base URL，可留空使用 deterministic local embedding>
+EMBEDDING_API_KEY=<embedding key，可留空>
+EMBEDDING_MODEL=deterministic-local
+EMBEDDING_TIMEOUT_MS=20000
+RERANKER_BASE_URL=<可选 reranker base URL>
+RERANKER_API_KEY=<可选 reranker key>
+RERANKER_MODEL=<可选 reranker model>
+METRICS_ENABLED=false
+PORT=10000
+```
+
+Supabase 需要先启用 `vector` 与 `pgcrypto`，再运行仓库里的公开安全 schema：
+
+```text
+server/sql/rag-store-pgvector.sql
+```
+
+`RAG_DATABASE_URL` 是 Orchestrator 连接 pgvector 的主要运行时变量；`SUPABASE_URL` 和 `SUPABASE_SERVICE_ROLE_KEY` 只作为后续管理 API / 平台操作预留，不进入前端。
 
 本地后端开发：
 

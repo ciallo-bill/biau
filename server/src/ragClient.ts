@@ -1,6 +1,7 @@
 import { env } from './env.js'
 import { retrieveKnowledge } from './knowledge.js'
 import type {
+  AssistantScope,
   AssistantRetrievalMeta,
   Citation,
   RagAdapterDiagnostic,
@@ -21,6 +22,10 @@ interface RagAttempt {
 }
 
 export async function retrievePublicAssistantContext(query: string, limit = 4): Promise<PublicAssistantContext> {
+  return retrieveAssistantContext(query, 'public', limit)
+}
+
+export async function retrieveAssistantContext(query: string, scope: AssistantScope, limit = 4): Promise<PublicAssistantContext> {
   const endpoints = getRagRetrieveEndpoints(env.assistantRagApiBaseUrl)
   if (endpoints.length === 0) return retrieveLocalContext(query, limit, 'not_configured')
 
@@ -30,7 +35,7 @@ export async function retrievePublicAssistantContext(query: string, limit = 4): 
     attemptedEndpoints += 1
     const attempt = await requestRagRetrieve(endpoint, {
       query,
-      scope: 'public',
+      scope,
       limit,
       locale: 'zh-CN',
     })

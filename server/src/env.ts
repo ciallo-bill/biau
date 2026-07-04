@@ -1,3 +1,5 @@
+import type { AssistantServiceMode } from './types.js'
+
 function readFirstEnv(...keys: string[]) {
   for (const key of keys) {
     const value = process.env[key]?.trim()
@@ -17,10 +19,12 @@ const assistantModelProvider = readFirstEnv('ASSISTANT_MODEL_PROVIDER', 'OPENAI_
 const assistantRagApiBaseUrl = readFirstEnv('ASSISTANT_RAG_API_BASE_URL')
 const assistantRagApiKey = readFirstEnv('ASSISTANT_RAG_API_KEY')
 const assistantRagTimeoutMs = readPositiveInteger(process.env.ASSISTANT_RAG_TIMEOUT_MS, 3000)
+const assistantServiceMode = readServiceMode(process.env.ASSISTANT_SERVICE_MODE)
 
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: Number(process.env.PORT ?? 8787),
+  assistantServiceMode,
   databaseUrl: process.env.DATABASE_URL?.trim() ?? '',
   corsOrigin: process.env.CORS_ORIGIN?.trim() ?? '*',
   assistantModelApiKey,
@@ -35,6 +39,20 @@ export const env = {
   openaiModel: process.env.OPENAI_MODEL?.trim() || assistantModelName,
   adminToken: process.env.ADMIN_TOKEN?.trim() ?? '',
   metricsEnabled: readBoolean(process.env.METRICS_ENABLED),
+  ragStoreProvider: readFirstEnv('RAG_STORE_PROVIDER') || 'local',
+  ragDatabaseUrl: readFirstEnv('RAG_DATABASE_URL', 'SUPABASE_DATABASE_URL', 'SUPABASE_DB_URL'),
+  supabaseUrl: readFirstEnv('SUPABASE_URL'),
+  supabaseServiceRoleKey: readFirstEnv('SUPABASE_SERVICE_ROLE_KEY'),
+  ragPublicApiKey: readFirstEnv('RAG_PUBLIC_API_KEY'),
+  ragInternalApiKey: readFirstEnv('RAG_INTERNAL_API_KEY'),
+  ragSyncToken: readFirstEnv('RAG_SYNC_TOKEN'),
+  embeddingBaseUrl: normalizeOptionalBaseUrl(readFirstEnv('EMBEDDING_BASE_URL')),
+  embeddingApiKey: readFirstEnv('EMBEDDING_API_KEY'),
+  embeddingModel: readFirstEnv('EMBEDDING_MODEL') || 'deterministic-local',
+  embeddingTimeoutMs: readPositiveInteger(process.env.EMBEDDING_TIMEOUT_MS, 20000),
+  rerankerBaseUrl: normalizeOptionalBaseUrl(readFirstEnv('RERANKER_BASE_URL')),
+  rerankerApiKey: readFirstEnv('RERANKER_API_KEY'),
+  rerankerModel: readFirstEnv('RERANKER_MODEL'),
 }
 
 export function hasDatabase() {
@@ -50,8 +68,18 @@ function readBoolean(value: string | undefined) {
   return normalized === 'true' || normalized === '1' || normalized === 'yes' || normalized === 'on'
 }
 
+function readServiceMode(value: string | undefined): AssistantServiceMode {
+  const normalized = value?.trim().toLowerCase()
+  if (normalized === 'public' || normalized === 'internal' || normalized === 'rag') return normalized
+  return 'all'
+}
+
 function readPositiveInteger(value: string | undefined, fallback: number) {
   const parsed = Number(value)
   if (!Number.isInteger(parsed) || parsed < 1) return fallback
   return parsed
+}
+
+function normalizeOptionalBaseUrl(value: string) {
+  return value ? value.replace(/\/$/, '') : ''
 }

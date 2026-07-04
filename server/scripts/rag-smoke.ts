@@ -99,7 +99,7 @@ try {
 
   const { response: unsupportedScopeResponse } = await postJson<{ error?: string }>(`${base}/rag/v1/retrieve`, {
     query: 'Legal RAG',
-    scope: 'internal',
+    scope: 'private',
   })
   if (unsupportedScopeResponse.status !== 400) {
     throw new Error(`unsupported scope should return 400, got ${unsupportedScopeResponse.status}`)

@@ -1,4 +1,6 @@
 export type AssistantVisibility = 'public' | 'internal'
+export type AssistantScope = 'public' | 'internal'
+export type AssistantServiceMode = 'all' | 'public' | 'internal' | 'rag'
 
 export interface KnowledgeItem {
   id: string
@@ -91,7 +93,7 @@ export interface RagHealthResponse {
 
 export interface RagRetrievePayload {
   query?: string
-  scope?: 'public'
+  scope?: AssistantScope
   limit?: number
   locale?: string
 }
@@ -119,13 +121,22 @@ export interface RagRetrieveResponse {
     fallbackReason: 'private-credential' | 'no_public_context' | null
     citationCount: number
     expandedEntityCount: number
-    modelCalls: 0
+    modelCalls: number
   }
 }
 
 export interface RagSyncResponse {
   ok: true
-  mode: 'local-readonly'
-  accepted: false
+  mode: 'local-readonly' | 'postgres'
+  accepted: boolean
   health: RagHealthResponse
+  diagnostics?: {
+    sourceName?: string
+    sourceChecksum?: string
+    documentCount?: number
+    chunkCount?: number
+    entityCount?: number
+    relationCount?: number
+    issueCount?: number
+  }
 }

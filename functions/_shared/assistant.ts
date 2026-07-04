@@ -119,7 +119,7 @@ interface RagRetrieveResponse {
     fallbackReason: 'private-credential' | 'no_public_context' | null
     citationCount: number
     expandedEntityCount: number
-    modelCalls: 0
+    modelCalls: number
   }
 }
 
@@ -577,7 +577,7 @@ function readRagRetrieveResponse(value: unknown): RagRetrieveResponse | null {
       fallbackReason: readRagFallbackReason(value.meta.fallbackReason),
       citationCount: readNumber(value.meta.citationCount, citations.length),
       expandedEntityCount: readNumber(value.meta.expandedEntityCount, 0),
-      modelCalls: 0,
+      modelCalls: readNumber(value.meta.modelCalls, 0),
     },
   }
 }

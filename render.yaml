@@ -1,0 +1,106 @@
+services:
+  - type: web
+    name: biau-public-assistant-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run assistant:index && npm run prisma:generate && npm run server:build
+    startCommand: npm run server:start
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ASSISTANT_SERVICE_MODE
+        value: public
+      - key: CORS_ORIGIN
+        value: https://biau.playlab.eu.cc
+      - key: ASSISTANT_MODEL_BASE_URL
+        sync: false
+      - key: ASSISTANT_MODEL_API_KEY
+        sync: false
+      - key: ASSISTANT_MODEL_NAME
+        sync: false
+      - key: ASSISTANT_MODEL_PROVIDER
+        value: mimo-compatible
+      - key: ASSISTANT_RAG_API_BASE_URL
+        sync: false
+      - key: ASSISTANT_RAG_API_KEY
+        sync: false
+      - key: ASSISTANT_RAG_TIMEOUT_MS
+        value: "3000"
+      - key: METRICS_ENABLED
+        value: "false"
+
+  - type: web
+    name: biau-internal-assistant-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run assistant:index && npm run prisma:generate && npm run server:build
+    startCommand: npm run prisma:migrate && npm run server:start
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ASSISTANT_SERVICE_MODE
+        value: internal
+      - key: CORS_ORIGIN
+        value: https://biau.playlab.eu.cc
+      - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: ASSISTANT_MODEL_BASE_URL
+        sync: false
+      - key: ASSISTANT_MODEL_API_KEY
+        sync: false
+      - key: ASSISTANT_MODEL_NAME
+        sync: false
+      - key: ASSISTANT_MODEL_PROVIDER
+        value: mimo-compatible
+      - key: ASSISTANT_RAG_API_BASE_URL
+        sync: false
+      - key: ASSISTANT_RAG_API_KEY
+        sync: false
+      - key: ASSISTANT_RAG_TIMEOUT_MS
+        value: "3000"
+      - key: METRICS_ENABLED
+        value: "false"
+
+  - type: web
+    name: biau-rag-orchestrator
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run assistant:index && npm run prisma:generate && npm run server:build
+    startCommand: npm run server:start
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ASSISTANT_SERVICE_MODE
+        value: rag
+      - key: RAG_STORE_PROVIDER
+        value: supabase
+      - key: RAG_DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: RAG_PUBLIC_API_KEY
+        sync: false
+      - key: RAG_INTERNAL_API_KEY
+        sync: false
+      - key: RAG_SYNC_TOKEN
+        sync: false
+      - key: EMBEDDING_BASE_URL
+        sync: false
+      - key: EMBEDDING_API_KEY
+        sync: false
+      - key: EMBEDDING_MODEL
+        value: deterministic-local
+      - key: EMBEDDING_TIMEOUT_MS
+        value: "20000"
+      - key: RERANKER_BASE_URL
+        sync: false
+      - key: RERANKER_API_KEY
+        sync: false
+      - key: RERANKER_MODEL
+        sync: false
+      - key: METRICS_ENABLED
+        value: "false"

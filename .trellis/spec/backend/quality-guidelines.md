@@ -142,6 +142,110 @@ The server reads private env, applies public-citation grounding, and returns onl
 - Do not make lint pass by adding broad disables.
 - Do not use destructive git commands or push without an explicit user request.
 
+## Scenario: Assistant Service Modes And Scoped Pgvector RAG
+
+### 1. Scope / Trigger
+
+- Trigger: changing assistant backend runtime boundaries, Render deployment contracts, RAG Orchestrator auth/scope, pgvector storage, sync, or retrieval code.
+- Use this whenever editing `ASSISTANT_SERVICE_MODE`, `RAG_*`, `EMBEDDING_*`, `server/src/app.ts`, `server/src/ragRoutes.ts`, `server/src/ragOrchestrator.ts`, `server/src/ragPostgresStore.ts`, `server/sql/rag-store-pgvector.sql`, or related smoke scripts.
+
+### 2. Signatures
+
+- Runtime modes:
+  - `ASSISTANT_SERVICE_MODE=public`
+  - `ASSISTANT_SERVICE_MODE=internal`
+  - `ASSISTANT_SERVICE_MODE=rag`
+  - empty/unknown local default: `all`
+- Public API mode:
+  - `GET /health`
+  - `POST /chat/public`
+- Internal API mode:
+  - `GET /health`
+  - `POST /auth/redeem-invite`
+  - `POST /chat/internal`
+  - `GET /admin/summary`
+  - `POST /admin/invites`
+- RAG mode:
+  - `GET /health`
+  - `POST /v1/retrieve`
+  - `POST /v1/sync`
+- Local all mode keeps compatibility:
+  - public/internal assistant routes at root
+  - mock/local Orchestrator under `/rag/*`
+
+### 3. Contracts
+
+- Render final shape is one repository deployed as three Web Services:
+  - `biau-public-assistant-api` with `ASSISTANT_SERVICE_MODE=public`.
+  - `biau-internal-assistant-api` with `ASSISTANT_SERVICE_MODE=internal`.
+  - `biau-rag-orchestrator` with `ASSISTANT_SERVICE_MODE=rag`.
+- Public API must not mount internal/admin/RAG routes.
+- Internal API must not mount public chat or RAG routes; internal chat remains member-token protected.
+- RAG API must not mount chat/auth/admin routes.
+- `POST /v1/retrieve` accepts `{ query: string, scope?: "public" | "internal", limit?: number, locale?: string }`.
+- Public RAG key can retrieve only `scope: "public"`. Internal RAG key can retrieve only `scope: "internal"`.
+- `POST /v1/sync` requires `RAG_SYNC_TOKEN` in standalone RAG mode.
+- Supabase pgvector runtime uses `RAG_STORE_PROVIDER=supabase` plus `RAG_DATABASE_URL`; `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are server-only optional future-management variables.
+- Public retrieval queries only `visibility='public'`; internal retrieval may query `visibility in ('public','internal')`.
+- All keys, database URLs, provider URLs, and tokens are server-only and must not appear in `VITE_*`.
+
+### 4. Validation & Error Matrix
+
+- Missing `query` -> `400 { error: "missing-query" }`.
+- Unsupported scope -> `400 { error: "unsupported-scope" }`.
+- RAG mode retrieve without matching key -> `401 { error: "missing-or-invalid-rag-key" }`.
+- RAG mode retrieve with no configured key for requested scope -> `503 { error: "rag-auth-not-configured" }`.
+- RAG mode sync without matching sync token -> `401 { error: "missing-or-invalid-sync-token" }`.
+- RAG mode sync with no configured sync token -> `503 { error: "rag-sync-not-configured" }`.
+- Supabase store unset or unavailable in local/all mode -> use deterministic local retrieval for tests and safe fallback.
+- Public mode request to `/chat/internal` or `/rag/health` -> route not mounted.
+- Internal mode request to `/chat/public` or `/rag/health` -> route not mounted.
+- RAG mode request to `/chat/public` -> route not mounted.
+
+### 5. Good/Base/Bad Cases
+
+- Good: `assistant:service-modes-smoke` proves each service mode exposes only its route group.
+- Good: standalone RAG mode rejects a public key for `scope: "internal"`.
+- Good: `assistant:rag-smoke` still validates local `/rag/*` contract without external credentials.
+- Base: fresh clone with no `RAG_DATABASE_URL` still passes local deterministic checks.
+- Bad: one Render service exposes public chat, internal admin, and RAG sync with the same secrets.
+- Bad: frontend code reads `ASSISTANT_RAG_API_KEY`, `RAG_DATABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `EMBEDDING_API_KEY`, or `RAG_SYNC_TOKEN`.
+- Bad: public retrieval returns a citation with `visibility: "internal"`.
+
+### 6. Tests Required
+
+- Run `npm.cmd run assistant:service-modes-smoke` after service mode or route-boundary changes.
+- Run `npm.cmd run assistant:rag-smoke` after RAG route, auth, retrieval, or response-shape changes.
+- Run `npm.cmd run assistant:rag-sync-local` after schema/sync/public-knowledge mapping changes.
+- Run `npm.cmd run assistant:eval` after retrieval scoring, entity expansion, or citation behavior changes.
+- Run `npm.cmd run server:build`, `npm.cmd run server:smoke`, `npm.cmd run cf-assistant:smoke`, `npm.cmd run lint`, `npm.cmd run build`, and `git diff --check`.
+- Sensitive scan changed files for key/token/database URL patterns; only placeholders are acceptable.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+app.use('/rag', createRagOrchestratorRouter())
+app.post('/chat/internal', internalChatHandler)
+app.post('/chat/public', publicChatHandler)
+```
+
+This mounts every route in every production runtime, so public and internal secrets can accidentally share the same blast radius.
+
+#### Correct
+
+```typescript
+if (env.assistantServiceMode === 'rag') {
+  app.use(createRagOrchestratorRouter({ requireAuth: true }))
+} else {
+  if (env.assistantServiceMode === 'public') registerPublicAssistantRoutes(app)
+  if (env.assistantServiceMode === 'internal') registerInternalAssistantRoutes(app)
+}
+```
+
+Each Render service exposes only its own route group, while the repository can still share code and tests.
+
 ## Scenario: Public Assistant RAG Orchestrator Contract
 
 ### 1. Scope / Trigger

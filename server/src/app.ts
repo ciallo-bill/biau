@@ -5,18 +5,17 @@ import { env, hasDatabase, hasModelProvider } from './env.js'
 import { sha256 } from './crypto.js'
 import { issueMemberToken, readBearerMember, requireDatabase } from './auth.js'
 import { generateAnswer } from './model.js'
-import { searchKnowledge } from './knowledge.js'
 import { createMetricsMiddleware, renderPrometheusMetrics } from './metrics.js'
-import { retrievePublicAssistantContext } from './ragClient.js'
+import { retrieveAssistantContext, retrievePublicAssistantContext } from './ragClient.js'
 import { createRagOrchestratorRouter } from './ragRoutes.js'
-import type { ChatPayload, ChatResponse } from './types.js'
+import type { AssistantServiceMode, ChatPayload, ChatResponse } from './types.js'
 
 export function createApp() {
   const app = express()
   app.use(cors({ origin: env.corsOrigin === '*' ? true : env.corsOrigin }))
   app.use(express.json({ limit: '1mb' }))
   if (env.metricsEnabled) app.use(createMetricsMiddleware())
-  app.use('/rag', createRagOrchestratorRouter())
+  const serviceMode = env.assistantServiceMode
 
   app.get('/metrics', (_req, res) => {
     if (!env.metricsEnabled) {
@@ -27,18 +26,80 @@ export function createApp() {
     res.type('text/plain; version=0.0.4; charset=utf-8').send(renderPrometheusMetrics())
   })
 
-  app.get('/health', (_req, res) => {
-    res.json({
-      ok: true,
-      service: 'biau-assistant-api',
-      database: hasDatabase(),
-      mode: hasModelProvider() ? 'model' : 'fallback',
-      modelConfigured: hasModelProvider(),
-      model: hasModelProvider() ? env.assistantModelName : 'fallback',
-      provider: hasModelProvider() ? env.assistantModelProvider : 'local-public-knowledge',
+  if (serviceMode === 'rag') {
+    app.use(createRagOrchestratorRouter({ requireAuth: true }))
+  } else {
+    app.get('/health', (_req, res) => {
+      res.json(buildAssistantHealth(serviceMode))
     })
+
+    if (serviceMode === 'all' || serviceMode === 'public') registerPublicAssistantRoutes(app)
+    if (serviceMode === 'all' || serviceMode === 'internal') registerInternalAssistantRoutes(app)
+    if (serviceMode === 'all') app.use('/rag', createRagOrchestratorRouter({ requireAuth: false }))
+  }
+
+  app.use((error: unknown, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+    void next
+    const name = error instanceof Error ? error.name : ''
+    const message = error instanceof Error ? error.message : 'unknown-error'
+    if (name === 'DatabaseNotConfigured') {
+      res.status(503).json({ error: message })
+      return
+    }
+    console.error(error)
+    res.status(500).json({ error: 'assistant-api-error' })
   })
 
+  return app
+}
+
+function buildAssistantHealth(serviceMode: AssistantServiceMode) {
+  return {
+    ok: true,
+    service: serviceMode === 'public' ? 'biau-public-assistant-api' : serviceMode === 'internal' ? 'biau-internal-assistant-api' : 'biau-assistant-api',
+    serviceMode,
+    database: hasDatabase(),
+    mode: hasModelProvider() ? 'model' : 'fallback',
+    modelConfigured: hasModelProvider(),
+    model: hasModelProvider() ? env.assistantModelName : 'fallback',
+    provider: hasModelProvider() ? env.assistantModelProvider : 'local-public-knowledge',
+  }
+}
+
+function registerPublicAssistantRoutes(app: express.Express) {
+  app.post('/chat/public', async (req, res, next) => {
+    try {
+      const { message } = req.body as ChatPayload
+      const question = message?.trim()
+      if (!question) {
+        res.status(400).json({ error: 'missing-message' })
+        return
+      }
+
+      const context = await retrievePublicAssistantContext(question)
+      const citations = context.citations
+      const generated = await generateAnswer(question, citations, 'public', { chunks: context.chunks })
+      const response: ChatResponse = {
+        answer: generated.answer,
+        citations,
+        meta: {
+          mode: generated.mode,
+          model: generated.model,
+          provider: generated.provider,
+          reason: generated.reason,
+          diagnostic: generated.diagnostic,
+          citationCount: citations.length,
+          retrieval: context.retrieval,
+        },
+      }
+      res.json(response)
+    } catch (error) {
+      next(error)
+    }
+  })
+}
+
+function registerInternalAssistantRoutes(app: express.Express) {
   app.post('/auth/redeem-invite', async (req, res, next) => {
     try {
       const code = String(req.body?.code ?? '').trim()
@@ -95,37 +156,6 @@ export function createApp() {
     }
   })
 
-  app.post('/chat/public', async (req, res, next) => {
-    try {
-      const { message } = req.body as ChatPayload
-      const question = message?.trim()
-      if (!question) {
-        res.status(400).json({ error: 'missing-message' })
-        return
-      }
-
-      const context = await retrievePublicAssistantContext(question)
-      const citations = context.citations
-      const generated = await generateAnswer(question, citations, 'public', { chunks: context.chunks })
-      const response: ChatResponse = {
-        answer: generated.answer,
-        citations,
-        meta: {
-          mode: generated.mode,
-          model: generated.model,
-          provider: generated.provider,
-          reason: generated.reason,
-          diagnostic: generated.diagnostic,
-          citationCount: citations.length,
-          retrieval: context.retrieval,
-        },
-      }
-      res.json(response)
-    } catch (error) {
-      next(error)
-    }
-  })
-
   app.post('/chat/internal', async (req, res, next) => {
     try {
       const member = await readBearerMember(req)
@@ -170,8 +200,9 @@ export function createApp() {
         },
       })
 
-      const citations = searchKnowledge(question)
-      const generated = await generateAnswer(question, citations, 'internal')
+      const context = await retrieveAssistantContext(question, 'internal')
+      const citations = context.citations
+      const generated = await generateAnswer(question, citations, 'internal', { chunks: context.chunks })
       const reply = await prisma.chatMessage.create({
         data: {
           memberId: member.id,
@@ -199,6 +230,7 @@ export function createApp() {
           reason: generated.reason,
           diagnostic: generated.diagnostic,
           citationCount: citations.length,
+          retrieval: context.retrieval,
         },
         sessionId: activeSession.id,
         messageId: reply.id,
@@ -257,20 +289,6 @@ export function createApp() {
       next(error)
     }
   })
-
-  app.use((error: unknown, _req: express.Request, res: express.Response, next: express.NextFunction) => {
-    void next
-    const name = error instanceof Error ? error.name : ''
-    const message = error instanceof Error ? error.message : 'unknown-error'
-    if (name === 'DatabaseNotConfigured') {
-      res.status(503).json({ error: message })
-      return
-    }
-    console.error(error)
-    res.status(500).json({ error: 'assistant-api-error' })
-  })
-
-  return app
 }
 
 function isAdminRequest(header: string | undefined) {
