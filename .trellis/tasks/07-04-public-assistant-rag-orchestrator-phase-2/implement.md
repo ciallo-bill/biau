@@ -108,24 +108,26 @@ npm.cmd run assistant:eval
 
 ### 4. Storage Schema And Sync
 
-- Add provider-neutral schema documentation or SQL for:
-  - documents;
-  - chunks;
-  - entities;
-  - relations;
-  - embeddings;
-  - sync runs;
-  - eval runs.
-- Prefer Supabase Postgres + pgvector for first external store.
-- Keep Render Postgres + pgvector as an alternate.
-- Do not commit real connection strings or service role keys.
-- Add sync script that can run locally against mock/local store first.
+Status: provider-neutral Postgres/pgvector schema template and local readonly sync plan are complete.
+
+- [x] Add provider-neutral schema documentation or SQL for:
+  - [x] documents;
+  - [x] chunks;
+  - [x] entities;
+  - [x] relations;
+  - [x] embeddings;
+  - [x] sync runs;
+  - [x] eval runs.
+- [x] Prefer Supabase Postgres + pgvector for first external store.
+- [x] Keep Render Postgres + pgvector as an alternate.
+- [x] Do not commit real connection strings or service role keys.
+- [x] Add sync script that can run locally against mock/local store first.
 
 Validation:
 
 ```powershell
 npm.cmd run assistant:index
-<local sync command>
+npm.cmd run assistant:rag-sync-local
 npm.cmd run assistant:eval
 ```
 
@@ -213,6 +215,7 @@ npm.cmd run assistant:index
 npm.cmd run assistant:kg-check
 npm.cmd run assistant:eval
 npm.cmd run assistant:rag-smoke
+npm.cmd run assistant:rag-sync-local
 npm.cmd run cf-assistant:smoke
 npm.cmd run server:smoke
 npm.cmd run server:build

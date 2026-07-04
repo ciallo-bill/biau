@@ -163,6 +163,7 @@ The server reads private env, applies public-citation grounding, and returns onl
   - `POST /v1/retrieve`
   - `POST /v1/sync`
 - `npm.cmd run assistant:rag-smoke` starts the local Express app and validates the mock Orchestrator contract without calling live models or cloud resources.
+- `npm.cmd run assistant:rag-sync-local` validates that `server/data/public-knowledge-v2.json` can be mapped into the provider-neutral RAG store plan without external credentials.
 
 ### 3. Contracts
 
@@ -187,6 +188,7 @@ The server reads private env, applies public-citation grounding, and returns onl
 - Local/mock sync is readonly and returns current knowledge counts; production sync tokens and external stores are manual-gated.
 - Public chat keeps the response shape `{ answer, citations, meta }`. Retrieval diagnostics live under `meta.retrieval` and may include `source`, `retrievalMode`, `store`, `candidateCount`, `citationCount`, `sufficiency`, `fallbackReason`, `modelCalls`, and sanitized `diagnostic`.
 - Adapter diagnostics must not include endpoint URLs, API keys, database URLs, raw prompts, request bodies, vector table names, stack traces, or provider payloads. Use `httpStatusClass`, `attemptedEndpoints`, and `timeoutMs` instead of leaking exact URLs or response bodies.
+- Storage templates may define `rag_documents`, `rag_chunks`, `rag_entities`, `rag_relations`, `rag_sync_runs`, and `rag_eval_runs`, but must not contain deployment-specific connection strings, hosts, credentials, model relay URLs, or private table names.
 
 ### 4. Validation & Error Matrix
 
@@ -208,6 +210,7 @@ The server reads private env, applies public-citation grounding, and returns onl
 ### 6. Tests Required
 
 - Run `npm.cmd run assistant:rag-smoke` after Orchestrator contract changes.
+- Run `npm.cmd run assistant:rag-sync-local` after changing public knowledge V2, storage schemas, or sync planning.
 - Run `npm.cmd run assistant:eval` to keep the fixed public-question baseline green.
 - Run `npm.cmd run server:smoke` to prove existing `/chat/public`, model fallback, mock Orchestrator success/fallback, and protected internal routes still work.
 - Run `npm.cmd run cf-assistant:smoke` when Cloudflare Function behavior or shared public assistant retrieval changes; it should cover mock Orchestrator success/fallback without calling live providers.
