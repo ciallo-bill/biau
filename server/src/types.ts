@@ -48,3 +48,61 @@ export interface ChatResponse {
   sessionId?: string
   messageId?: string
 }
+
+export type RagStoreProvider = 'local' | 'supabase' | 'render-postgres' | 'cloudflare-vectorize' | 'neo4j'
+export type RagRetrievalMode = 'local-agentic-hybrid'
+
+export interface RagHealthResponse {
+  ok: true
+  service: 'biau-rag-orchestrator'
+  store: RagStoreProvider
+  vectorReady: boolean
+  keywordReady: boolean
+  rerankerReady: boolean
+  lastSyncAt: string | null
+  documentCount: number
+  chunkCount: number
+  entityCount: number
+  relationCount: number
+}
+
+export interface RagRetrievePayload {
+  query?: string
+  scope?: 'public'
+  limit?: number
+  locale?: string
+}
+
+export interface RagChunkCitation {
+  id: string
+  documentId: string
+  text: string
+  section: string
+  score: number
+  reason: string
+}
+
+export interface RagRetrieveResponse {
+  intent: string
+  citations: Citation[]
+  chunks: RagChunkCitation[]
+  meta: {
+    retrievalMode: RagRetrievalMode
+    store: RagStoreProvider
+    candidateCount: number
+    reranked: boolean
+    sufficient: boolean
+    sufficiency: 'enough' | 'weak' | 'none'
+    fallbackReason: 'private-credential' | 'no_public_context' | null
+    citationCount: number
+    expandedEntityCount: number
+    modelCalls: 0
+  }
+}
+
+export interface RagSyncResponse {
+  ok: true
+  mode: 'local-readonly'
+  accepted: false
+  health: RagHealthResponse
+}

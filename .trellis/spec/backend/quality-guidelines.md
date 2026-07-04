@@ -141,3 +141,99 @@ The server reads private env, applies public-citation grounding, and returns onl
 - Do not spread raw `req.body` into Prisma writes.
 - Do not make lint pass by adding broad disables.
 - Do not use destructive git commands or push without an explicit user request.
+
+## Scenario: Public Assistant RAG Orchestrator Contract
+
+### 1. Scope / Trigger
+
+- Trigger: adding or changing the public assistant RAG Orchestrator, retrieval contract, local/mock RAG adapter, external RAG adapter, vector/reranker adapter, or RAG health/sync endpoints.
+- The Orchestrator is a server-side boundary. Frontend code must keep calling the existing assistant API shape and must never connect directly to vector stores, graph databases, embedding providers, reranker providers, or model relay URLs.
+
+### 2. Signatures
+
+- Current in-repo mock mount:
+  - `GET /rag/health`
+  - `POST /rag/v1/retrieve`
+  - `POST /rag/v1/sync`
+- Standalone future mount:
+  - `GET /health`
+  - `POST /v1/retrieve`
+  - `POST /v1/sync`
+- `npm.cmd run assistant:rag-smoke` starts the local Express app and validates the mock Orchestrator contract without calling live models or cloud resources.
+
+### 3. Contracts
+
+- Retrieve request: `{ query: string, scope?: "public", limit?: number, locale?: string }`.
+- Missing or blank `query` -> `400 { error: "missing-query" }`.
+- Non-public scope -> `400 { error: "unsupported-scope" }`.
+- Retrieve response:
+  - `intent`
+  - `citations` in the same public citation shape used by `/chat/public`
+  - `chunks` with `{ id, documentId, text, section, score, reason }`
+  - `meta.retrievalMode`
+  - `meta.store`
+  - `meta.candidateCount`
+  - `meta.reranked`
+  - `meta.sufficient`
+  - `meta.sufficiency`
+  - `meta.fallbackReason`
+  - `meta.citationCount`
+  - `meta.expandedEntityCount`
+  - `meta.modelCalls`
+- Health response must stay low-sensitive: no provider endpoint, database URL, token fingerprint, table name, raw prompt, request body, or model relay detail.
+- Local/mock sync is readonly and returns current knowledge counts; production sync tokens and external stores are manual-gated.
+
+### 4. Validation & Error Matrix
+
+- Valid public query -> `200` with citations, chunks, local retrieval diagnostics, and `modelCalls: 0`.
+- Private credential request such as "后台密码" or "模型 key" -> `200` with no citations/chunks and `fallbackReason: "private-credential"`.
+- Missing query -> `400 { error: "missing-query" }`.
+- Unsupported scope -> `400 { error: "unsupported-scope" }`.
+- External Orchestrator unavailable in later phases -> assistant must fall back to local Agentic Hybrid retrieval, not fail public chat.
+- Vector/reranker unavailable in later phases -> Orchestrator must fall back to keyword/entity retrieval and deterministic rerank.
+
+### 5. Good/Base/Bad Cases
+
+- Good: `/rag/v1/retrieve` for Legal RAG cites `project:legal-rag`, returns at least one chunk, marks `retrievalMode: "local-agentic-hybrid"`, and reports `modelCalls: 0`.
+- Base: no external RAG env exists; local/mock Orchestrator still passes `assistant:rag-smoke`.
+- Bad: a route logs raw chat questions, request bodies, API keys, model provider URLs, database URLs, vector table names, or stack traces.
+- Bad: a browser bundle reads `ASSISTANT_RAG_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, embedding keys, reranker keys, or direct vector database URLs.
+
+### 6. Tests Required
+
+- Run `npm.cmd run assistant:rag-smoke` after Orchestrator contract changes.
+- Run `npm.cmd run assistant:eval` to keep the fixed public-question baseline green.
+- Run `npm.cmd run server:smoke` to prove existing `/chat/public`, model fallback, and protected internal routes still work.
+- Run `npm.cmd run cf-assistant:smoke` when Cloudflare Function behavior or shared public assistant retrieval changes.
+- Run `npm.cmd run server:build`, `npm.cmd run lint`, `npm.cmd run build`, `git diff --check`, and a sensitive scan over changed files.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```typescript
+app.post('/v1/retrieve', async (req, res) => {
+  console.log(req.body)
+  const result = await fetch(`${process.env.SUPABASE_URL}/rest/v1/chunks`, {
+    headers: { apikey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '' },
+  })
+  res.json(await result.json())
+})
+```
+
+This leaks request bodies into logs, couples the route directly to one storage provider, and risks exposing provider-shaped payloads.
+
+#### Correct
+
+```typescript
+router.post('/v1/retrieve', (req, res) => {
+  const query = typeof req.body?.query === 'string' ? req.body.query.trim() : ''
+  if (!query) {
+    res.status(400).json({ error: 'missing-query' })
+    return
+  }
+  res.json(retrieveRagContext({ query, scope: 'public' }))
+})
+```
+
+The route validates public input, delegates retrieval to the Orchestrator boundary, and returns only the stable public contract.

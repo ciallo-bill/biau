@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import type { KnowledgeItem } from './types.js'
 
 type SourceType = 'site' | 'project' | 'blog' | 'status'
-type RetrievalIntent =
+export type RetrievalIntent =
   | 'site-overview'
   | 'project-experience'
   | 'demo-access'
@@ -32,8 +32,21 @@ interface KnowledgeRelation {
   evidenceDocumentIds: string[]
 }
 
+interface KnowledgeChunk {
+  id: string
+  documentId: string
+  text: string
+  section: string
+  metadata: {
+    sourceType: SourceType
+    projectId?: string
+    tags: string[]
+  }
+}
+
 interface PublicKnowledgeV2 {
   public_documents: Array<KnowledgeItem & { sourceType: SourceType; projectId?: string }>
+  knowledge_chunks: KnowledgeChunk[]
   entities: KnowledgeEntity[]
   relations: KnowledgeRelation[]
   fallback_bundle: {
@@ -41,6 +54,25 @@ interface PublicKnowledgeV2 {
     searchAliases: SearchAliasGroup[]
     defaultLimit: number
   }
+}
+
+export interface KnowledgeChunkResult {
+  id: string
+  documentId: string
+  text: string
+  section: string
+  score: number
+  reason: string
+}
+
+export interface KnowledgeRetrievalResult {
+  citations: KnowledgeItem[]
+  chunks: KnowledgeChunkResult[]
+  intent: RetrievalIntent
+  terms: string[]
+  expandedEntityIds: string[]
+  sufficiency: 'enough' | 'weak' | 'none'
+  candidateCount: number
 }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -86,26 +118,56 @@ function loadKnowledgeV2(): PublicKnowledgeV2 | null {
 }
 
 export const publicKnowledge = loadKnowledge()
-const publicKnowledgeV2 = loadKnowledgeV2()
+export const publicKnowledgeV2 = loadKnowledgeV2()
 
 export function searchKnowledge(query: string, limit = publicKnowledgeV2?.fallback_bundle.defaultLimit ?? 4) {
-  const normalized = normalizeText(query)
-  if (!normalized) return publicKnowledge.slice(0, limit)
+  return retrieveKnowledge(query, limit).citations
+}
 
+export function retrieveKnowledge(query: string, limit = publicKnowledgeV2?.fallback_bundle.defaultLimit ?? 4): KnowledgeRetrievalResult {
+  const normalized = normalizeText(query)
   const intent = classifyIntent(query)
-  if (intent === 'private-credential') return []
+  const normalizedLimit = normalizeLimit(limit)
+  if (intent === 'private-credential') return emptyRetrieval(intent)
+  if (!normalized) {
+    const citations = publicKnowledge.slice(0, normalizedLimit)
+    return {
+      citations,
+      chunks: buildChunkResults(citations, new Map(), new Set(), 1),
+      intent,
+      terms: [],
+      expandedEntityIds: [],
+      sufficiency: citations.length > 0 ? 'weak' : 'none',
+      candidateCount: publicKnowledge.length,
+    }
+  }
+
   const terms = extractQueryTerms(query, publicKnowledgeV2)
   const expanded = publicKnowledgeV2 ? expandEntities(publicKnowledgeV2, normalized, terms) : createEmptyExpansion()
 
-  return publicKnowledge
+  const scored = publicKnowledge
     .map((item) => ({
       item,
       score: scoreKnowledgeItem(item, normalized, terms, intent, expanded.documentIds.has(item.id)),
     }))
     .filter((entry) => entry.score > 0)
     .sort((a, b) => b.score - a.score || a.item.title.localeCompare(b.item.title, 'zh-CN'))
-    .slice(0, limit)
-    .map((entry) => entry.item)
+
+  const citations = scored.slice(0, normalizedLimit).map((entry) => entry.item)
+  const diversity = new Set(citations.map((item) => inferSourceType(item))).size
+  const sufficiency = citations.length === 0 ? 'none' : citations.length >= 2 || diversity >= 2 ? 'enough' : 'weak'
+  const scoreByDocument = new Map(scored.map((entry) => [entry.item.id, entry.score]))
+  const topScore = scored[0]?.score ?? 1
+
+  return {
+    citations,
+    chunks: buildChunkResults(citations, scoreByDocument, expanded.documentIds, topScore),
+    intent,
+    terms,
+    expandedEntityIds: Array.from(expanded.entityIds),
+    sufficiency,
+    candidateCount: scored.length,
+  }
 }
 
 function classifyIntent(query: string): RetrievalIntent {
@@ -169,6 +231,45 @@ function createEmptyExpansion() {
   return { entityIds: new Set<string>(), documentIds: new Set<string>() }
 }
 
+function emptyRetrieval(intent: RetrievalIntent): KnowledgeRetrievalResult {
+  return {
+    citations: [],
+    chunks: [],
+    intent,
+    terms: [],
+    expandedEntityIds: [],
+    sufficiency: 'none',
+    candidateCount: 0,
+  }
+}
+
+function buildChunkResults(
+  citations: KnowledgeItem[],
+  scoreByDocument: Map<string, number>,
+  expandedDocumentIds: Set<string>,
+  topScore: number,
+) {
+  if (!publicKnowledgeV2) return []
+  const citationIds = new Set(citations.map((citation) => citation.id))
+  return publicKnowledgeV2.knowledge_chunks
+    .filter((chunk) => citationIds.has(chunk.documentId))
+    .map((chunk): KnowledgeChunkResult => {
+      const documentScore = scoreByDocument.get(chunk.documentId) ?? 1
+      const normalizedScore = Math.max(0.001, Math.min(1, documentScore / Math.max(1, topScore)))
+      const reason = expandedDocumentIds.has(chunk.documentId) ? 'keyword+metadata+entity' : 'keyword+metadata'
+      return {
+        id: chunk.id,
+        documentId: chunk.documentId,
+        text: chunk.text,
+        section: chunk.section,
+        score: Number(normalizedScore.toFixed(3)),
+        reason,
+      }
+    })
+    .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id, 'zh-CN'))
+    .slice(0, Math.max(1, citations.length))
+}
+
 function scoreKnowledgeItem(
   item: KnowledgeItem,
   normalized: string,
@@ -214,6 +315,11 @@ function inferSourceType(item: Pick<KnowledgeItem, 'id' | 'href'>): SourceType {
 
 function normalizeText(value: string) {
   return value.trim().toLowerCase()
+}
+
+function normalizeLimit(value: number) {
+  if (!Number.isFinite(value)) return publicKnowledgeV2?.fallback_bundle.defaultLimit ?? 4
+  return Math.min(8, Math.max(1, Math.trunc(value)))
 }
 
 function isPrivateCredentialRequest(normalized: string) {

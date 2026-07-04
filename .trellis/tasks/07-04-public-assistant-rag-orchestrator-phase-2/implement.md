@@ -21,7 +21,7 @@
 
 ### 1. Evaluation Harness First
 
-Status: first local baseline complete.`npm.cmd run assistant:eval currently passes 9/9 deterministic cases with modelCalls=0.
+Status: first local baseline complete. `npm.cmd run assistant:eval` currently passes 9/9 deterministic cases with `modelCalls=0`.
 
 Build quality measurement before adding more infrastructure.
 
@@ -58,20 +58,25 @@ npm.cmd run assistant:eval
 
 ### 2. Orchestrator Contract With Local/Mock Adapter
 
-- Add in-repo Orchestrator module or service scaffold.
-- Implement local store adapter reading `server/data/public-knowledge-v2.json`.
-- Implement routes or callable functions for:
-  - `GET /health`
-  - `POST /v1/retrieve`
-  - optional `POST /v1/chat/public`
-  - `POST /v1/sync`
-- Keep response compatible with existing citation shape.
-- Add tests/smoke using local/mock adapters only.
+Status: local/mock contract complete under the current assistant API prefix:
+`GET /rag/health`, `POST /rag/v1/retrieve`, and `POST /rag/v1/sync`.
+The router can be reused later as a root router for a standalone Orchestrator service.
+
+- [x] Add in-repo Orchestrator module or service scaffold.
+- [x] Implement local store adapter reading `server/data/public-knowledge-v2.json`.
+- [x] Implement routes or callable functions for:
+  - [x] `GET /health` contract, mounted locally as `GET /rag/health`
+  - [x] `POST /v1/retrieve` contract, mounted locally as `POST /rag/v1/retrieve`
+  - [ ] optional `POST /v1/chat/public`
+  - [x] `POST /v1/sync` contract, mounted locally as `POST /rag/v1/sync`
+- [x] Keep response compatible with existing citation shape.
+- [x] Add tests/smoke using local/mock adapters only.
 
 Validation:
 
 ```powershell
 npm.cmd run server:build
+npm.cmd run assistant:rag-smoke
 npm.cmd run server:smoke
 npm.cmd run assistant:eval
 ```
@@ -203,6 +208,7 @@ Minimum implementation gate for code changes:
 npm.cmd run assistant:index
 npm.cmd run assistant:kg-check
 npm.cmd run assistant:eval
+npm.cmd run assistant:rag-smoke
 npm.cmd run cf-assistant:smoke
 npm.cmd run server:smoke
 npm.cmd run server:build

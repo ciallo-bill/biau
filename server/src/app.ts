@@ -7,6 +7,7 @@ import { issueMemberToken, readBearerMember, requireDatabase } from './auth.js'
 import { generateAnswer } from './model.js'
 import { searchKnowledge } from './knowledge.js'
 import { createMetricsMiddleware, renderPrometheusMetrics } from './metrics.js'
+import { createRagOrchestratorRouter } from './ragRoutes.js'
 import type { ChatPayload, ChatResponse } from './types.js'
 
 export function createApp() {
@@ -14,6 +15,7 @@ export function createApp() {
   app.use(cors({ origin: env.corsOrigin === '*' ? true : env.corsOrigin }))
   app.use(express.json({ limit: '1mb' }))
   if (env.metricsEnabled) app.use(createMetricsMiddleware())
+  app.use('/rag', createRagOrchestratorRouter())
 
   app.get('/metrics', (_req, res) => {
     if (!env.metricsEnabled) {

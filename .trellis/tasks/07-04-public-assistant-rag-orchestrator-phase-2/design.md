@@ -40,6 +40,7 @@ Public Assistant UI
 - Consumes public knowledge export from this repository.
 - Returns evidence context and public citation metadata, not private internals.
 - Can start as in-repo Node/TypeScript service code, then deploy as a separate Render service when production credentials are ready.
+- During the in-repo mock phase, the Orchestrator router is mounted under the current assistant API's `/rag` prefix (`/rag/health`, `/rag/v1/retrieve`, `/rag/v1/sync`) so it does not replace the existing assistant `/health`. The same router can later be mounted at the root of a standalone Orchestrator service.
 
 ### Storage Providers
 
@@ -53,6 +54,8 @@ Public Assistant UI
 ### `GET /health`
 
 Returns low-sensitive readiness:
+
+Current in-repo mock mount: `GET /rag/health`.
 
 ```json
 {
@@ -71,6 +74,8 @@ No private endpoint, database URL, key fingerprint, table name that reveals infr
 ### `POST /v1/retrieve`
 
 Input:
+
+Current in-repo mock mount: `POST /rag/v1/retrieve`.
 
 ```json
 {
@@ -134,6 +139,8 @@ Optional convenience endpoint. It may produce answer context or a full answer, b
 ### `POST /v1/sync`
 
 Accepts generated public knowledge V2 or fetches it from a known public artifact. Requires a sync token in production. Local/mock sync can read `server/data/public-knowledge-v2.json`.
+
+Current in-repo mock mount: `POST /rag/v1/sync`, implemented as local readonly sync status until a real external store is approved.
 
 ## Data Model
 
