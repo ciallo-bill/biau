@@ -125,7 +125,7 @@ export const publicKnowledgeBase: AssistantKnowledgeItem[] = [
     id: 'site:status',
     title: '项目可靠性观察',
     summary:
-      '状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 BIAU Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned。当前主站会记录 ERP 默认开放注册、各站点可见品牌外壳/标题/favicon/归属提示对齐、Pet APK 继续关闭等公开安全事实。',
+      '状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 BIAU Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned。当前主站会记录 ERP bootstrap 注册策略、各站点可见品牌外壳/标题/favicon/归属提示对齐、Pet APK 继续关闭等公开安全事实。',
     href: '/status',
     tags: ['状态页', '可靠性观察', '公开入口', 'health check', 'synthetic', '注册', '品牌统一'],
     visibility: 'public',

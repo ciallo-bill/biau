@@ -190,7 +190,7 @@ export const ASSISTANT_SEARCH_ALIASES: AssistantSearchAliasGroup[] = [
   },
   {
     triggers: ['ozon', 'erp', '电商', '注册', 'operator'],
-    terms: ['ozon erp', '业务系统', '运营后台', '浏览器插件', '默认开放注册', 'operator'],
+    terms: ['ozon erp', '业务系统', '运营后台', '浏览器插件', '注册策略', '受控登录', 'operator'],
   },
   {
     triggers: ['寻球', 'xunqiu', '足球', 'android', '移动端'],

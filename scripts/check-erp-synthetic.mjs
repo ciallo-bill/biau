@@ -114,11 +114,11 @@ function dataFromWrappedResponse(response) {
   return payload
 }
 
-function checkFromResponse(id, response, ok, summary, fallbackIssue = '') {
-  const issue = ok ? '' : response.error || issueFromResponse(response, fallbackIssue)
+function checkFromResponse(id, response, ok, summary, fallbackIssue = '', statusOverride = '') {
+  const issue = fallbackIssue || (ok ? '' : response.error || issueFromResponse(response, fallbackIssue))
   return {
     id,
-    status: statusFromResponse(response, ok),
+    status: statusOverride || statusFromResponse(response, ok),
     httpStatus: response.status,
     durationMs: response.durationMs,
     checkedAt: new Date().toISOString(),
@@ -170,18 +170,26 @@ async function main() {
     bootstrap.ok &&
     typeof bootstrapData?.needsSetup === 'boolean' &&
     typeof bootstrapData?.registrationEnabled === 'boolean'
+  const registrationEnabled = bootstrapOk ? bootstrapData.registrationEnabled === true : null
+  const registrationClosedIssue =
+    bootstrapOk && registrationEnabled === false ? 'production registration is currently closed or the deployment is stale' : ''
+  const registrationSummary = bootstrapOk
+    ? `Auth bootstrap returned registrationEnabled=${registrationEnabled ? 'true' : 'false'}`
+    : 'Auth bootstrap payload is incomplete'
 
   if (!hasCredentials) {
     checks.push(
       checkFromResponse(
         'ozon-erp-auth',
         bootstrap,
-        bootstrapOk,
-        bootstrapOk ? 'Auth bootstrap returned registration policy booleans' : 'Auth bootstrap payload is incomplete',
+        bootstrapOk && registrationEnabled === true,
+        registrationSummary,
+        registrationClosedIssue,
+        bootstrapOk && registrationEnabled === false ? 'degraded' : '',
       ),
     )
     checks.push(emptyCheck('ozon-erp-plugin-sync', 'Credentials are required before plugin or sync smoke checks'))
-    await writeReport({ checkedAt, apiBaseConfigured: true, hasCredentials, checks })
+    await writeReport({ checkedAt, apiBaseConfigured: true, hasCredentials, registrationEnabled, checks })
     console.log('ERP health and auth bootstrap checked; login-dependent checks skipped because credentials are not configured.')
     if (args.strict && checks.some((check) => check.status === 'offline')) process.exitCode = 1
     return
@@ -198,14 +206,18 @@ async function main() {
   )
   const loginData = dataFromWrappedResponse(login)
   const loginOk = login.ok && hasLoginShape(loginData)
-  const authOk = bootstrapOk && loginOk
+  const authOk = bootstrapOk && loginOk && registrationEnabled === true
+  const authIssue = registrationClosedIssue || (loginOk ? 'auth bootstrap failed before login smoke' : 'authentication failed or login payload is incomplete')
   checks.push(
     checkFromResponse(
       'ozon-erp-auth',
       login,
       authOk,
-      authOk ? 'Auth bootstrap and login returned expected low-sensitive structures' : 'Auth bootstrap or login payload is incomplete',
-      loginOk ? 'auth bootstrap failed before login smoke' : 'authentication failed or login payload is incomplete',
+      authOk
+        ? 'Auth bootstrap returned registrationEnabled=true and login returned expected low-sensitive structures'
+        : `Auth bootstrap/login checked; registrationEnabled=${registrationEnabled === true ? 'true' : 'false'}`,
+      authIssue,
+      bootstrapOk && loginOk && registrationEnabled === false ? 'degraded' : '',
     ),
   )
   checks.push(
@@ -218,7 +230,7 @@ async function main() {
     ),
   )
 
-  await writeReport({ checkedAt, apiBaseConfigured: true, hasCredentials, checks })
+  await writeReport({ checkedAt, apiBaseConfigured: true, hasCredentials, registrationEnabled, checks })
   console.log(
     `ERP synthetic report generated: online=${checks.filter((check) => check.status === 'online').length} unchecked=${checks.filter((check) => check.status === 'unchecked').length} offline=${checks.filter((check) => check.status === 'offline').length}`,
   )
@@ -231,6 +243,7 @@ async function writeReport(report) {
     checkedAt: report.checkedAt,
     apiBaseConfigured: report.apiBaseConfigured,
     hasCredentials: report.hasCredentials,
+    registrationEnabled: typeof report.registrationEnabled === 'boolean' ? report.registrationEnabled : null,
     ok: report.checks.every((check) => check.status !== 'offline'),
     checks: report.checks,
   }

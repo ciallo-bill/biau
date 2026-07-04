@@ -18,7 +18,7 @@
     {
       "id": "site:status",
       "title": "项目可靠性观察",
-      "summary": "状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 BIAU Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned。当前主站会记录 ERP 默认开放注册、各站点可见品牌外壳/标题/favicon/归属提示对齐、Pet APK 继续关闭等公开安全事实。",
+      "summary": "状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 BIAU Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned。当前主站会记录 ERP bootstrap 注册策略、各站点可见品牌外壳/标题/favicon/归属提示对齐、Pet APK 继续关闭等公开安全事实。",
       "href": "/status",
       "tags": [
         "状态页",
@@ -87,7 +87,7 @@
     {
       "id": "project:ozon-erp",
       "title": "Ozon 电商 ERP",
-      "summary": "面向小团队 Ozon 店铺运营的业务系统案例，覆盖 Vue 管理后台、Express API、Prisma/PostgreSQL、队列任务和 Chrome MV3 采集插件。 Ozon ERP 是面向小团队跨境店铺运营的业务系统，包含 Vue/Vite 管理后台、Express API、Prisma/PostgreSQL 数据模型、可选 Redis/BullMQ 队列、WXT/Chrome MV3 浏览器插件和共享计算包。 管理后台覆盖登录、注册、Owner 初始化、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等工作流，重点解决店铺授权、商品同步、采集铺货、定价利润和运营追踪。 认证入口已经补充确认密码校验、Owner 初始化提示、主站返回桥接、BIAU Port / 泊岸 favicon、登录页主品牌和登录后侧栏归属；Ozon ERP 保留为业务系统产品名。 生产自助注册已获批准并默认开放，显式设置关闭值时仍可切回受控登录。 ERP 概览页已经补充登录后首次引导，展示当前账号/角色、Owner 与协作者职责说明，并说明已有 Owner 后新注册账号默认是 operator，不自动获得 Owner 权限。 Express API 注册 auth、shops、products、selection、settings、ozon、collect、market metrics、commission rates、api.chrome、exchange rates、watermark 和 uploads 等路由。 Prisma 模型覆盖用户、店铺、Ozon 凭证、Seller 会话、商品、采集商品、草稿、导入日志、PendingAction、JobQueue、AuditLog、市场指标和佣金映射等对象。 外部平台写入通过 PendingAction 和 JobQueue 收口；当前代码和测试显示商品写入与一键铺货默认偏向队列或本地后台执行，只有显式配置 inline 才同步执行。 浏览器插件负责 Ozon/Seller 页面采集、Seller 上下文读取、跨标签页请求、ERP 路由打开和图片下载，并通过认证或扩展密钥边界接入 ERP API。 项目验证证据包括 API/shared Vitest、受保护写入测试、Ozon 同步容错测试、插件接口映射测试、smoke 脚本、交接清单、上线检查、佣金覆盖报告和依赖审计记录。 后续优化方向包括运行模式可视化、Worker/队列运维、佣金可信映射补齐、权限和审计增强、插件发布自动化、日志脱敏、备份演练和部署自动化。",
+      "summary": "面向小团队 Ozon 店铺运营的业务系统案例，覆盖 Vue 管理后台、Express API、Prisma/PostgreSQL、队列任务和 Chrome MV3 采集插件。 Ozon ERP 是面向小团队跨境店铺运营的业务系统，包含 Vue/Vite 管理后台、Express API、Prisma/PostgreSQL 数据模型、可选 Redis/BullMQ 队列、WXT/Chrome MV3 浏览器插件和共享计算包。 管理后台覆盖登录、注册、Owner 初始化、概览、店铺、商品、商品草稿、导入历史、工具、选品规则、商品编辑和设置等工作流，重点解决店铺授权、商品同步、采集铺货、定价利润和运营追踪。 认证入口已经补充确认密码校验、Owner 初始化提示、主站返回桥接、BIAU Port / 泊岸 favicon、登录页主品牌和登录后侧栏归属；Ozon ERP 保留为业务系统产品名。 代码侧已经支持生产普通自助注册默认开放；线上是否正在开放以 /api/auth/bootstrap 与状态页 synthetic 结果为准，状态异常时应先复查部署提交与 ERP_REGISTRATION_ENABLED 开关。 ERP 概览页已经补充登录后首次引导，展示当前账号/角色、Owner 与协作者职责说明，并说明已有 Owner 后新注册账号默认是 operator，不自动获得 Owner 权限。 Express API 注册 auth、shops、products、selection、settings、ozon、collect、market metrics、commission rates、api.chrome、exchange rates、watermark 和 uploads 等路由。 Prisma 模型覆盖用户、店铺、Ozon 凭证、Seller 会话、商品、采集商品、草稿、导入日志、PendingAction、JobQueue、AuditLog、市场指标和佣金映射等对象。 外部平台写入通过 PendingAction 和 JobQueue 收口；当前代码和测试显示商品写入与一键铺货默认偏向队列或本地后台执行，只有显式配置 inline 才同步执行。 浏览器插件负责 Ozon/Seller 页面采集、Seller 上下文读取、跨标签页请求、ERP 路由打开和图片下载，并通过认证或扩展密钥边界接入 ERP API。 项目验证证据包括 API/shared Vitest、受保护写入测试、Ozon 同步容错测试、插件接口映射测试、smoke 脚本、交接清单、上线检查、佣金覆盖报告和依赖审计记录。 后续优化方向包括运行模式可视化、Worker/队列运维、佣金可信映射补齐、权限和审计增强、插件发布自动化、日志脱敏、备份演练和部署自动化。",
       "href": "/projects/ozon-erp",
       "tags": [
         "business",
@@ -558,7 +558,7 @@
     {
       "id": "chunk:site:status:1",
       "documentId": "site:status",
-      "text": "状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 BIAU Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned。 当前主站会记录 ERP 默认开放注册、各站点可见品牌外壳/标题/favicon/归属提示对齐、Pet APK 继续关闭等公开安全事实。",
+      "text": "状态页汇总主站、Legal RAG、Ozon ERP、寻球、Pet 和 BIAU Playlab 等公开入口与可靠性检查，区分 online、degraded、offline、unchecked 与 planned。 当前主站会记录 ERP bootstrap 注册策略、各站点可见品牌外壳/标题/favicon/归属提示对齐、Pet APK 继续关闭等公开安全事实。",
       "section": "summary",
       "metadata": {
         "sourceType": "status",
@@ -876,7 +876,7 @@
     {
       "id": "chunk:project:ozon-erp:2",
       "documentId": "project:ozon-erp",
-      "text": "认证入口已经补充确认密码校验、Owner 初始化提示、主站返回桥接、BIAU Port / 泊岸 favicon、登录页主品牌和登录后侧栏归属；Ozon ERP 保留为业务系统产品名。 生产自助注册已获批准并默认开放，显式设置关闭值时仍可切回受控登录。 ERP 概览页已经补充登录后首次引导，展示当前账号/角色、Owner 与协作者职责说明，并说明已有 Owner 后新注册账号默认是 operator，不自动获得 Owner 权限。",
+      "text": "认证入口已经补充确认密码校验、Owner 初始化提示、主站返回桥接、BIAU Port / 泊岸 favicon、登录页主品牌和登录后侧栏归属；Ozon ERP 保留为业务系统产品名。 代码侧已经支持生产普通自助注册默认开放；线上是否正在开放以 /api/auth/bootstrap 与状态页 synthetic 结果为准，状态异常时应先复查部署提交与 ERP_REGISTRATION_ENABLED 开关。 ERP 概览页已经补充登录后首次引导，展示当前账号/角色、Owner 与协作者职责说明，并说明已有 Owner 后新注册账号默认是 operator，不自动获得 Owner 权限。",
       "section": "summary-2",
       "metadata": {
         "sourceType": "project",
@@ -5621,7 +5621,8 @@
           "业务系统",
           "运营后台",
           "浏览器插件",
-          "默认开放注册",
+          "注册策略",
+          "受控登录",
           "operator"
         ]
       },

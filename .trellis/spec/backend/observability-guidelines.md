@@ -88,6 +88,10 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
   - `checks: Array<{ id, status, httpStatus, durationMs, checkedAt, summary, issues }>`
 - Allowed statuses are `online`, `degraded`, `offline`, and `unchecked`. Static data may still use `planned`.
 - A synthetic script must update only the check ids it can actually verify. Do not promote adjacent human gates such as APK release, production registration, or credential publication from `planned` to `online`.
+- If a live payload contains a business gate such as `registrationEnabled`,
+  `demoEnabled`, `modelConfigured`, or `downloadApproved`, distinguish payload
+  shape from gate state. HTTP 200 plus a well-formed boolean proves the endpoint
+  works; it does not prove the business capability is open.
 - Do not persist API base URLs, usernames, passwords, bearer tokens, private dashboard links, shop/SKU/order data, exact business metrics, or model-provider secrets.
 
 ### 4. Validation & Error Matrix
@@ -101,13 +105,22 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
   local Function smoke passes -> write the check as `offline` and point the next
   action at Pages deployment / Functions enablement before model env setup.
 - Failed attempted request -> check becomes `offline` or `degraded` based on HTTP status; `--strict` may exit non-zero.
+- Well-formed bootstrap payload with `registrationEnabled=false` -> auth or
+  registration check becomes `degraded`, with a short issue such as deployment
+  stale or registration closed; health can remain `online`.
 - Malformed synthetic JSON -> `site:status` ignores that file and keeps static status data.
 
 ### 5. Good/Base/Bad Cases
 
 - Good: health endpoint returns a wrapped low-sensitive payload; script records status, HTTP status, duration, and a short summary.
+- Good: ERP bootstrap returns `{ needsSetup: false, registrationEnabled: false }`,
+  so the synthetic report records API health as `online` and auth/registration
+  policy as `degraded`.
 - Base: no environment configured; script records only `unchecked` placeholders so fresh clones still build.
-- Bad: report includes real hostnames, tokens, account names, raw response bodies, SKU/order metrics, or provider keys.
+- Bad: report includes real hostnames, tokens, account names, raw response
+  bodies, SKU/order metrics, or provider keys.
+- Bad: auth bootstrap returns `registrationEnabled=false`, but the check is
+  marked `online` because the response shape was valid.
 
 ### 6. Tests Required
 
@@ -115,6 +128,9 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
 - For static showcase pages with a public default base URL, run the synthetic script and assert required page text plus public asset URLs are reachable.
 - Use an ephemeral local API to verify configured-base paths when adding protected smoke logic.
 - Run `npm.cmd run site:status` and confirm `/status` receives merged check statuses.
+- For business-gate checks, assert both the open and closed boolean paths. The
+  closed path should be `degraded` or `planned` according to the feature gate,
+  not `online`.
 - Run `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run check:ui`, `git diff --check`, and a sensitive scan over changed files.
 
 ### 7. Wrong vs Correct
@@ -127,6 +143,14 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
   "token": "real-token",
   "checks": [{ "id": "erp", "rawResponse": { "orders": 12345 } }]
 }
+```
+
+```javascript
+const bootstrapOk =
+  response.ok &&
+  typeof bootstrapData?.needsSetup === 'boolean' &&
+  typeof bootstrapData?.registrationEnabled === 'boolean'
+checks.push(checkFromResponse('ozon-erp-auth', response, bootstrapOk, 'Auth bootstrap returned booleans'))
 ```
 
 #### Correct
@@ -147,6 +171,24 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
     }
   ]
 }
+```
+
+```javascript
+const bootstrapOk =
+  response.ok &&
+  typeof bootstrapData?.needsSetup === 'boolean' &&
+  typeof bootstrapData?.registrationEnabled === 'boolean'
+const registrationOpen = bootstrapOk && bootstrapData.registrationEnabled === true
+checks.push(
+  checkFromResponse(
+    'ozon-erp-auth',
+    response,
+    registrationOpen,
+    `Auth bootstrap returned registrationEnabled=${registrationOpen ? 'true' : 'false'}`,
+    registrationOpen ? '' : 'production registration is currently closed or the deployment is stale',
+    bootstrapOk && !registrationOpen ? 'degraded' : '',
+  ),
+)
 ```
 
 ## Scenario: External Demo Quality Fixtures

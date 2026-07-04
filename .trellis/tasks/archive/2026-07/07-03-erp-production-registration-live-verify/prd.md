@@ -29,3 +29,19 @@
 ## Notes
 
 - 推荐第一步：确认 ERP 部署平台监听的分支。当前本地最新工作在 `codex/ozon-plugin-parity`，需要确认线上是否已经使用包含注册开放提交的分支。
+
+## Evidence 2026-07-04
+
+- Current online status: `deploy-stale` / `registration-degraded`.
+- Live ERP entry returned HTTP 200 and the app shell loaded.
+- Live `GET /api/health` returned `status=ok`, `nodeEnv=production`, and a public git commit that is an ancestor of local `codex/ozon-plugin-parity`.
+- Local ERP branch `codex/ozon-plugin-parity` contains later registration commits, including `e461f6c feat(auth): open erp self registration by default`.
+- Live `GET /api/auth/bootstrap` returned `needsSetup=false` and `registrationEnabled=false`; therefore the current production login page will stay in controlled-login mode and will not show the registration switch.
+- `npm.cmd run erp:synthetic` with a temporary shell-only API base URL now records `ozon-erp-health=online`, `ozon-erp-auth=degraded`, and `ozon-erp-plugin-sync=unchecked`.
+- `npm.cmd run site:status` merges the ERP auth check as `degraded` instead of incorrectly treating a structurally valid bootstrap response as registration-open.
+
+## Manual Follow-Up
+
+- Redeploy ERP from the latest `codex/ozon-plugin-parity` / `origin/main` state, then rerun `npm.cmd run erp:synthetic` with `ERP_SYNTHETIC_API_BASE_URL`.
+- If registration is still closed after redeploy, inspect the deployment platform value of `ERP_REGISTRATION_ENABLED`; do not put platform secrets or account credentials in this repository.
+- Only after `registrationEnabled=true` should a disposable visitor account be registered to verify the new user role is `operator`.

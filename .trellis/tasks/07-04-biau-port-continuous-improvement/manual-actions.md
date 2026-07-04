@@ -32,9 +32,10 @@ queue when the user is available.
 ### M4. Confirm ERP live production registration behavior
 
 - Related task: `07-03-erp-production-registration-live-verify`
-- Needed from user: verify live ERP deployment shows registration and that new users have safe default permissions, or provide safe demo credentials/check instructions.
-- Why manual: production site access and account policy are external to this repo.
-- Codex can continue meanwhile: yes, with local/main-site data and documentation updates.
+- Current evidence: live ERP entry and API health are online, but `/api/auth/bootstrap` returns `registrationEnabled=false`; live health reports a commit that predates the latest local registration-open commits.
+- Needed from user: redeploy ERP from the latest branch, then confirm whether registration appears; if it still does not, inspect `ERP_REGISTRATION_ENABLED` in the deployment platform.
+- Why manual: production deployment controls and account policy are external to this repo.
+- Codex can continue meanwhile: yes, with main-site status/data updates and repeatable synthetic checks.
 
 ### M5. Confirm Legal RAG public demo access policy
 
