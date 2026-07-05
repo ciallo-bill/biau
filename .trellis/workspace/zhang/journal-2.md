@@ -548,3 +548,36 @@ Closed the cross-project release readiness round after Legal RAG open-demo verif
 ### Next Steps
 
 - None - task complete
+
+
+## Session 64: Enrich core project case studies
+
+**Date**: 2026-07-06
+**Task**: Enrich core project case studies
+**Branch**: `main`
+
+### Summary
+
+Completed first-batch project case-study content upgrade for Legal RAG, Ozon ERP, Pet Workspace, Xunqiu, BIAU Playlab, and Blog Semi. Added evidence matrix, tightened public-safe boundaries, refreshed assistant knowledge, and validated with assistant:index, kg-check, lint, build, check:ui, asset check, diff check, and sensitive scan.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `00508b3` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

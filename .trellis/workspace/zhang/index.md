@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-2.md`
-- **Total Sessions**: 63
-- **Last Active**: 2026-07-05
+- **Total Sessions**: 64
+- **Last Active**: 2026-07-06
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-2.md` | ~550 | Active |
+| `journal-2.md` | ~583 | Active |
 | `journal-1.md` | ~1981 | Archived |
 <!-- @@@/auto:active-documents -->
 
@@ -30,6 +30,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 64 | 2026-07-06 | Enrich core project case studies | `00508b3` | `main` |
 | 63 | 2026-07-05 | Studio page editing extension | `a1ac417`, `404cede`, `c53a3d9` | `main` |
 | 62 | 2026-07-05 | Release readiness round 3 closure | `1a2e958` | `main` |
 | 61 | 2026-07-05 | Legal RAG open demo verification | `34de741`, `1a2e958` | `main` |
