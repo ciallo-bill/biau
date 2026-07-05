@@ -134,6 +134,7 @@ ASSISTANT_MODEL_BASE_URL=<OpenAI-compatible relay base URL, for example https://
 ASSISTANT_MODEL_API_KEY=<OpenAI 兼容中转 Key>
 ASSISTANT_MODEL_NAME=<mimo 或其他 OpenAI-compatible 模型名>
 ASSISTANT_MODEL_PROVIDER=mimo-compatible
+ASSISTANT_MODEL_CHANNELS_JSON=<可选，内部成员专用多渠道 JSON>
 ASSISTANT_RAG_API_BASE_URL=<biau-rag-orchestrator 的 Render URL>
 ASSISTANT_RAG_API_KEY=<只允许 internal scope 的 RAG key>
 ASSISTANT_RAG_TIMEOUT_MS=3000
@@ -148,6 +149,33 @@ PORT=10000
 ```
 
 如果连接串已经有其他参数，用 `&` 追加。缺少 `uselibpqcompat=true` 时，Render 上可能在创建邀请码或读写会话时出现 `P1011` / `self-signed certificate in certificate chain`。
+
+内部助手支持给不同成员分配不同模型渠道。推荐把 `ASSISTANT_MODEL_*`
+作为默认/兜底通道，再用 `ASSISTANT_MODEL_CHANNELS_JSON` 定义可分配渠道：
+
+```json
+[
+  {
+    "id": "mimo",
+    "label": "Mimo member channel",
+    "provider": "mimo-compatible",
+    "baseUrl": "<OpenAI-compatible relay base URL>",
+    "apiKey": "<server-only key>",
+    "model": "mimo-chat"
+  },
+  {
+    "id": "deepseek",
+    "label": "DeepSeek review channel",
+    "provider": "deepseek-compatible",
+    "baseUrl": "<OpenAI-compatible relay base URL>",
+    "apiKey": "<server-only key>",
+    "model": "deepseek-ai/deepseek-v4-pro"
+  }
+]
+```
+
+成员表只保存 `modelChannelId`；`/assistant/admin` 只展示渠道
+`id/label/provider/model/configured`，不会展示 `apiKey` 或 `baseUrl`。如果成员未分配渠道或渠道不存在，内部聊天会回到默认通道；如果默认通道也未配置，则使用本地 fallback。
 
 ### RAG Orchestrator
 

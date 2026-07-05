@@ -2,7 +2,7 @@ import { createServer as createHttpServer } from 'node:http'
 import { createServer as createTcpServer } from 'node:net'
 import { createApp } from '../src/app.js'
 import { env } from '../src/env.js'
-import { planAssistantAnswer } from '../src/model.js'
+import { generateAnswer, planAssistantAnswer } from '../src/model.js'
 
 function findAvailablePort(startPort: number) {
   return new Promise<number>((resolve, reject) => {
@@ -42,6 +42,7 @@ function snapshotModelEnv() {
     assistantModelBaseUrl: env.assistantModelBaseUrl,
     assistantModelName: env.assistantModelName,
     assistantModelProvider: env.assistantModelProvider,
+    assistantModelChannelsJson: env.assistantModelChannelsJson,
     assistantRagApiBaseUrl: env.assistantRagApiBaseUrl,
     assistantRagApiKey: env.assistantRagApiKey,
     assistantRagTimeoutMs: env.assistantRagTimeoutMs,
@@ -56,6 +57,7 @@ function restoreModelEnv(snapshot: ReturnType<typeof snapshotModelEnv>) {
   env.assistantModelBaseUrl = snapshot.assistantModelBaseUrl
   env.assistantModelName = snapshot.assistantModelName
   env.assistantModelProvider = snapshot.assistantModelProvider
+  env.assistantModelChannelsJson = snapshot.assistantModelChannelsJson
   env.assistantRagApiBaseUrl = snapshot.assistantRagApiBaseUrl
   env.assistantRagApiKey = snapshot.assistantRagApiKey
   env.assistantRagTimeoutMs = snapshot.assistantRagTimeoutMs
@@ -569,6 +571,44 @@ try {
       throw new Error('provider failure did not fall back to public knowledge')
     }
   } finally {
+    restoreModelEnv(originalModelEnv)
+  }
+
+  const mockMemberChannelPort = await findAvailablePort(9377)
+  const mockMemberChannelServer = await startMockModelServer(
+    mockMemberChannelPort,
+    '/chat/completions',
+    '成员渠道回答：这个回答来自被分配的 Mimo smoke 通道。',
+  )
+  try {
+    env.assistantModelApiKey = ''
+    env.openaiApiKey = ''
+    env.assistantModelChannelsJson = JSON.stringify([
+      {
+        id: 'mimo',
+        label: 'Mimo smoke',
+        provider: 'mimo-compatible',
+        baseUrl: `http://127.0.0.1:${mockMemberChannelPort}`,
+        apiKey: 'smoke-model-key',
+        model: 'mimo-smoke-model',
+      },
+    ])
+    const channelAnswer = await generateAnswer('请写一句内部助手欢迎语', [], 'internal', {
+      intent: 'creative',
+      grounding: 'none',
+      modelChannelId: 'mimo',
+    })
+    if (
+      channelAnswer.mode !== 'model' ||
+      channelAnswer.model !== 'mimo-smoke-model' ||
+      channelAnswer.provider !== 'mimo-compatible' ||
+      channelAnswer.modelChannel?.id !== 'mimo' ||
+      !channelAnswer.answer.includes('成员渠道回答')
+    ) {
+      throw new Error('member model channel assignment did not select the configured channel')
+    }
+  } finally {
+    await new Promise<void>((resolve) => mockMemberChannelServer.close(() => resolve()))
     restoreModelEnv(originalModelEnv)
   }
 

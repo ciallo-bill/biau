@@ -191,6 +191,98 @@ The server reads private env, applies public-citation grounding, and returns onl
 - Error responses use stable error codes and do not leak internals.
 - Tokens and invite codes are hashed before persistence.
 
+## Scenario: Internal Assistant Member Model Channels
+
+### 1. Scope / Trigger
+
+- Trigger: adding or changing per-member model routing, model-channel admin UI, assistant model env parsing, internal chat generation, member APIs, or the `Member.modelChannelId` database field.
+- Goal: let owner/admin assign different OpenAI-compatible model channels to internal members without storing provider secrets in the database or browser.
+
+### 2. Signatures
+
+- Env:
+  - Default channel: `ASSISTANT_MODEL_BASE_URL`, `ASSISTANT_MODEL_API_KEY`, `ASSISTANT_MODEL_NAME`, `ASSISTANT_MODEL_PROVIDER`.
+  - Extra channels: `ASSISTANT_MODEL_CHANNELS_JSON`.
+- DB:
+  - `Member.modelChannelId String?` stores only a safe channel id.
+- Internal chat:
+  - `POST /chat/internal` reads the authenticated member and passes `member.modelChannelId` to `generateAnswer()`.
+- Admin API:
+  - `GET /admin/model-channels`
+  - `GET /admin/members`
+  - `PATCH /admin/members/:id` with optional `{ modelChannelId?: string | null, status?: "ACTIVE" | "DISABLED" }`.
+- Frontend:
+  - `/assistant/admin` displays channel summaries and submits selected channel ids.
+
+### 3. Contracts
+
+- `ASSISTANT_MODEL_CHANNELS_JSON` accepts either an array or `{ "channels": [...] }`.
+- Each channel item uses `{ id, label, provider, baseUrl, apiKey, model }`.
+- Channel `id` must be a low-sensitive slug matching lowercase alphanumeric plus `_` / `-`; `default` is reserved for existing `ASSISTANT_MODEL_*`.
+- API responses expose only `{ id, label, provider, model, configured, isDefault }`.
+- API responses must never include `apiKey`, `baseUrl`, raw env JSON, endpoint URLs, request headers, or provider responses.
+- Unknown channel ids fall back to the default channel for generation; admin assignment rejects unknown ids with a stable error.
+- Selecting the default channel may persist `null` so default routing remains environment-driven.
+
+### 4. Validation & Error Matrix
+
+- Missing admin token -> `401 { error: "missing-admin-token" }`.
+- Missing database for member routes -> `503 { error: "database-not-configured" }`.
+- Unknown member id -> `404 { error: "member-not-found" }`.
+- Unknown `modelChannelId` in admin patch -> `400 { error: "unsupported-model-channel" }`.
+- Unsupported member status -> `400 { error: "unsupported-member-status" }`.
+- Assigned channel lacks a key/base/model -> `generateAnswer()` returns fallback with `reason: "not_configured"` and sanitized `modelChannel`.
+- Provider failure for assigned channel -> fallback with sanitized diagnostic only.
+
+### 5. Good/Base/Bad Cases
+
+- Good: admin assigns member A to `mimo` and member B to `deepseek`; internal chat responses include model/provider/channel summaries but no endpoint or key.
+- Good: production env rotates a provider key without touching member rows because only `modelChannelId` is stored.
+- Base: no `ASSISTANT_MODEL_CHANNELS_JSON`; all members use the default `ASSISTANT_MODEL_*` channel or local fallback.
+- Bad: storing per-member API keys or relay URLs in `Member`, `ChatMessage`, `UsageLog`, frontend state, or public docs.
+- Bad: exposing raw `ASSISTANT_MODEL_CHANNELS_JSON` from `/health` or admin APIs.
+
+### 6. Tests Required
+
+- Run `npm.cmd run prisma:validate` and `npm.cmd run prisma:generate` after schema changes.
+- Run `npm.cmd run server:build` after changing model-channel parsing, app routes, or types.
+- Run `npm.cmd run server:smoke`; it must use only a local mock model server to assert channel selection.
+- Run `npm.cmd run assistant:service-modes-smoke` after route additions to keep public/internal/rag/studio isolation.
+- Run `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run check:ui` after `/assistant/admin` or payload-normalizer changes.
+- Sensitive scan changed files for real model keys, relay URLs, database URLs, member tokens, admin tokens, invite codes, and raw channel JSON.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```prisma
+model Member {
+  id             String @id @default(cuid())
+  modelApiKey    String
+  modelBaseUrl   String
+  modelName      String
+}
+```
+
+This puts provider secrets into application data and makes admin/member payloads easy to leak.
+
+#### Correct
+
+```prisma
+model Member {
+  id             String  @id @default(cuid())
+  modelChannelId String?
+}
+```
+
+```ts
+await generateAnswer(question, citations, 'internal', {
+  modelChannelId: member.modelChannelId,
+})
+```
+
+The database stores only a safe channel id; the server resolves keys and endpoints from private environment variables.
+
 ## Avoid
 
 - Do not instantiate Prisma per request.

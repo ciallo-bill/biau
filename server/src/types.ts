@@ -39,6 +39,15 @@ export interface ProviderDiagnostic {
   timeoutMs: number
 }
 
+export interface AssistantModelChannelSummary {
+  id: string
+  label: string
+  provider: string
+  model: string
+  configured: boolean
+  isDefault: boolean
+}
+
 export interface RagAdapterDiagnostic {
   kind: RagAdapterDiagnosticKind
   httpStatusClass?: `${number}xx`
@@ -70,6 +79,7 @@ export interface ChatResponse {
     provider?: string
     reason?: ChatFallbackReason
     diagnostic?: ProviderDiagnostic
+    modelChannel?: AssistantModelChannelSummary
     retrieval?: AssistantRetrievalMeta
     intent?: AssistantAnswerIntent
     grounding?: AssistantGroundingMode

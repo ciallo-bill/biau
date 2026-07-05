@@ -1,7 +1,8 @@
-import { env, hasModelProvider } from './env.js'
+import { env } from './env.js'
 import type {
   AssistantAnswerIntent,
   AssistantGroundingMode,
+  AssistantModelChannelSummary,
   AssistantScope,
   Citation,
   ProviderDiagnostic,
@@ -22,20 +23,28 @@ export interface GeneratedAnswer {
   provider: string
   reason?: AssistantFallbackReason
   diagnostic?: ProviderDiagnostic
+  modelChannel?: AssistantModelChannelSummary
 }
 
 const MODEL_REQUEST_TIMEOUT_MS = 20000
+const DEFAULT_MODEL_CHANNEL_ID = 'default'
 
 interface GenerateAnswerOptions {
   chunks?: RagChunkCitation[]
   intent?: AssistantAnswerIntent
   grounding?: AssistantGroundingMode
+  modelChannelId?: string | null
 }
 
 export interface AssistantAnswerPlan {
   intent: AssistantAnswerIntent
   grounding: AssistantGroundingMode
   useRetrieval: boolean
+}
+
+interface AssistantModelChannelConfig extends AssistantModelChannelSummary {
+  apiKey: string
+  baseUrl: string
 }
 
 function buildFallbackAnswer(
@@ -69,13 +78,116 @@ function buildFallbackAnswer(
   return compactSummary(`${intro}${buildIntentAnswerBody(question, titleList)}详情和路径放在来源卡片里，建议从 ${titleList} 开始看。`, 420)
 }
 
-function readModelConfig() {
+function readDefaultModelChannel(): AssistantModelChannelConfig {
   return {
+    id: DEFAULT_MODEL_CHANNEL_ID,
+    label: '默认模型通道',
     apiKey: env.assistantModelApiKey || env.openaiApiKey,
     baseUrl: env.assistantModelBaseUrl || env.openaiBaseUrl,
     model: env.assistantModelName || env.openaiModel,
     provider: env.assistantModelProvider || 'openai-compatible',
+    configured: Boolean(env.assistantModelApiKey || env.openaiApiKey),
+    isDefault: true,
   }
+}
+
+export function listModelChannels(): AssistantModelChannelConfig[] {
+  const channels = [readDefaultModelChannel()]
+  const seen = new Set(channels.map((channel) => channel.id))
+
+  for (const channel of readExtraModelChannels()) {
+    if (seen.has(channel.id)) continue
+    channels.push(channel)
+    seen.add(channel.id)
+  }
+
+  return channels
+}
+
+export function listSafeModelChannels(): AssistantModelChannelSummary[] {
+  return listModelChannels().map(toSafeModelChannel)
+}
+
+export function resolveModelChannel(channelId?: string | null): AssistantModelChannelConfig {
+  const normalized = normalizeChannelId(channelId)
+  const channels = listModelChannels()
+  const selected = normalized ? channels.find((channel) => channel.id === normalized) : null
+  return selected ?? channels[0]
+}
+
+export function hasConfiguredModelChannel(channelId?: string | null) {
+  if (channelId) return isModelChannelConfigured(resolveModelChannel(channelId))
+  return listModelChannels().some(isModelChannelConfigured)
+}
+
+function readExtraModelChannels(): AssistantModelChannelConfig[] {
+  const raw = env.assistantModelChannelsJson.trim()
+  if (!raw) return []
+
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    return []
+  }
+
+  const items = Array.isArray(parsed) ? parsed : isRecord(parsed) && Array.isArray(parsed.channels) ? parsed.channels : []
+  return items.map(readModelChannelConfig).filter((channel): channel is AssistantModelChannelConfig => channel !== null)
+}
+
+function readModelChannelConfig(value: unknown): AssistantModelChannelConfig | null {
+  if (!isRecord(value)) return null
+  const id = normalizeChannelId(value.id)
+  if (!id || id === DEFAULT_MODEL_CHANNEL_ID) return null
+
+  const model = readString(value.model, 120)
+  const apiKey = readString(value.apiKey, 400)
+  if (!model) return null
+
+  return {
+    id,
+    label: readString(value.label, 80) || id,
+    provider: readString(value.provider, 80) || 'openai-compatible',
+    model,
+    baseUrl: normalizeChannelBaseUrl(readString(value.baseUrl, 400)),
+    apiKey,
+    configured: Boolean(apiKey),
+    isDefault: false,
+  }
+}
+
+function toSafeModelChannel(channel: AssistantModelChannelConfig): AssistantModelChannelSummary {
+  return {
+    id: channel.id,
+    label: channel.label,
+    provider: channel.provider,
+    model: channel.model,
+    configured: isModelChannelConfigured(channel),
+    isDefault: channel.isDefault,
+  }
+}
+
+function isModelChannelConfigured(channel: Pick<AssistantModelChannelConfig, 'apiKey' | 'baseUrl' | 'model'>) {
+  return Boolean(channel.apiKey && channel.baseUrl && channel.model && getChatCompletionEndpoints(channel.baseUrl).length > 0)
+}
+
+function normalizeChannelId(value: unknown) {
+  if (typeof value !== 'string') return ''
+  const normalized = value.trim().toLowerCase()
+  if (!/^[a-z0-9][a-z0-9_-]{0,63}$/.test(normalized)) return ''
+  return normalized
+}
+
+function normalizeChannelBaseUrl(value: string) {
+  return (value || 'https://api.openai.com/v1').replace(/\/+$/, '')
+}
+
+function readString(value: unknown, maxLength: number) {
+  return typeof value === 'string' ? value.trim().slice(0, maxLength) : ''
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }
 
 function fallbackResult(
@@ -87,6 +199,7 @@ function fallbackResult(
   provider = 'local-public-knowledge',
   diagnostic?: ProviderDiagnostic,
   options: Pick<GenerateAnswerOptions, 'intent' | 'grounding'> = {},
+  modelChannel?: AssistantModelChannelSummary,
 ): GeneratedAnswer {
   return {
     answer: buildFallbackAnswer(question, citations, scope, options),
@@ -95,6 +208,7 @@ function fallbackResult(
     provider,
     reason,
     diagnostic,
+    modelChannel,
   }
 }
 
@@ -281,14 +395,51 @@ export async function generateAnswer(
     intent: options.intent ?? defaultPlan.intent,
     grounding: options.grounding ?? defaultPlan.grounding,
   }
-  if (scope === 'public' && citations.length === 0) return fallbackResult(question, citations, scope, 'no_public_context', 'fallback', 'local-public-knowledge', undefined, answerPlan)
-  if (!hasModelProvider()) return fallbackResult(question, citations, scope, 'not_configured', 'fallback', 'local-public-knowledge', undefined, answerPlan)
+  const modelConfig = resolveModelChannel(options.modelChannelId)
+  const safeModelChannel = toSafeModelChannel(modelConfig)
 
-  const modelConfig = readModelConfig()
-  if (!modelConfig.apiKey) return fallbackResult(question, citations, scope, 'not_configured', 'fallback', 'local-public-knowledge', undefined, answerPlan)
+  if (scope === 'public' && citations.length === 0) {
+    return fallbackResult(
+      question,
+      citations,
+      scope,
+      'no_public_context',
+      'fallback',
+      'local-public-knowledge',
+      undefined,
+      answerPlan,
+      safeModelChannel,
+    )
+  }
+
+  if (!isModelChannelConfigured(modelConfig)) {
+    return fallbackResult(
+      question,
+      citations,
+      scope,
+      'not_configured',
+      'fallback',
+      'local-public-knowledge',
+      undefined,
+      answerPlan,
+      safeModelChannel,
+    )
+  }
 
   const endpoints = getChatCompletionEndpoints(modelConfig.baseUrl)
-  if (endpoints.length === 0) return fallbackResult(question, citations, scope, 'not_configured', 'fallback', 'local-public-knowledge', undefined, answerPlan)
+  if (endpoints.length === 0) {
+    return fallbackResult(
+      question,
+      citations,
+      scope,
+      'not_configured',
+      'fallback',
+      'local-public-knowledge',
+      undefined,
+      answerPlan,
+      safeModelChannel,
+    )
+  }
 
   const shouldUseGrounding = answerPlan.grounding !== 'none' && citations.length > 0
   const context = shouldUseGrounding
@@ -345,7 +496,7 @@ export async function generateAnswer(
   }
 
   if (!response?.ok) {
-    return fallbackResult(question, citations, scope, 'provider_error', modelConfig.model, modelConfig.provider, diagnostic, answerPlan)
+    return fallbackResult(question, citations, scope, 'provider_error', modelConfig.model, modelConfig.provider, diagnostic, answerPlan, safeModelChannel)
   }
 
   const payload = (await response.json().catch(() => null)) as OpenAIResponse | null
@@ -355,10 +506,10 @@ export async function generateAnswer(
       kind: 'empty_response',
       attemptedEndpoints,
       timeoutMs: MODEL_REQUEST_TIMEOUT_MS,
-    }, answerPlan)
+    }, answerPlan, safeModelChannel)
   }
   if (!passesDeterministicSelfCheck(answer, citations, scope)) {
-    return fallbackResult(question, citations, scope, 'self_check_failed', modelConfig.model, modelConfig.provider, undefined, answerPlan)
+    return fallbackResult(question, citations, scope, 'self_check_failed', modelConfig.model, modelConfig.provider, undefined, answerPlan, safeModelChannel)
   }
 
   return {
@@ -366,6 +517,7 @@ export async function generateAnswer(
     mode: 'model',
     model: modelConfig.model,
     provider: modelConfig.provider,
+    modelChannel: safeModelChannel,
   }
 }
 

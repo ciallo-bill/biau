@@ -293,6 +293,7 @@ export function AssistantPage() {
                 <p className="assistant-panel__eyebrow">MEMBER</p>
                 <strong>{member.name}</strong>
                 <span>{member.role} · {member.dailyQuota} / day</span>
+                <span>模型渠道：{member.modelChannel?.label ?? '默认模型通道'}</span>
                 <button type="button" onClick={clearMember}>
                   清除本地 token
                 </button>

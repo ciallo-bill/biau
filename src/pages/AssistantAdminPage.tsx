@@ -1,14 +1,22 @@
 import { useState, type FormEvent } from 'react'
-import { ASSISTANT_STORAGE_KEYS } from '../data/assistant'
+import {
+  ASSISTANT_STORAGE_KEYS,
+  normalizeAssistantMember,
+  normalizeAssistantModelChannels,
+  type AssistantMemberProfile,
+  type AssistantModelChannelSummary,
+} from '../data/assistant'
 import { ASSISTANT_API_ENV_NAMES, INTERNAL_ASSISTANT_API_BASE } from '../utils/assistantApi'
 
 const API_BASE = INTERNAL_ASSISTANT_API_BASE
 
 interface AdminSummary {
   members: number
+  disabledMembers: number
   invites: number
   messages: number
   usage: number
+  modelChannels: AssistantModelChannelSummary[]
 }
 
 interface InviteFormState {
@@ -21,9 +29,11 @@ interface InviteFormState {
 
 const emptySummary: AdminSummary = {
   members: 0,
+  disabledMembers: 0,
   invites: 0,
   messages: 0,
   usage: 0,
+  modelChannels: [],
 }
 
 const defaultInviteForm: InviteFormState = {
@@ -45,7 +55,7 @@ function readStoredAdminToken() {
 
 function normalizeSummary(value: unknown): AdminSummary | null {
   if (!isRecord(value)) return null
-  const { members, invites, messages, usage } = value
+  const { members, disabledMembers, invites, messages, usage, modelChannels } = value
   if (
     typeof members !== 'number' ||
     typeof invites !== 'number' ||
@@ -54,7 +64,21 @@ function normalizeSummary(value: unknown): AdminSummary | null {
   ) {
     return null
   }
-  return { members, invites, messages, usage }
+  return {
+    members,
+    disabledMembers: typeof disabledMembers === 'number' ? disabledMembers : 0,
+    invites,
+    messages,
+    usage,
+    modelChannels: normalizeAssistantModelChannels(modelChannels),
+  }
+}
+
+function normalizeMembers(value: unknown): AssistantMemberProfile[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .map((item) => normalizeAssistantMember(item))
+    .filter((item): item is AssistantMemberProfile => item !== null)
 }
 
 function getErrorCode(value: unknown) {
@@ -65,6 +89,8 @@ function explainAdminError(status: number, errorCode: string) {
   if (status === 401 || errorCode === 'missing-admin-token') return 'admin token 缺失或不匹配。'
   if (status === 503 || errorCode === 'database-not-configured') return '后端数据库尚未配置，管理接口暂不可用。'
   if (errorCode === 'missing-code') return '请输入邀请码。'
+  if (errorCode === 'unsupported-model-channel') return '模型渠道不存在或未在服务端配置。'
+  if (errorCode === 'member-not-found') return '成员不存在或已被删除。'
   return `管理接口返回 ${status}，请检查 API 服务。`
 }
 
@@ -74,9 +100,14 @@ export function AssistantAdminPage() {
   const [summary, setSummary] = useState<AdminSummary>(emptySummary)
   const [summaryStatus, setSummaryStatus] = useState('')
   const [inviteStatus, setInviteStatus] = useState('')
+  const [membersStatus, setMembersStatus] = useState('')
   const [isLoadingSummary, setIsLoadingSummary] = useState(false)
   const [isCreatingInvite, setIsCreatingInvite] = useState(false)
+  const [isLoadingMembers, setIsLoadingMembers] = useState(false)
+  const [updatingMemberId, setUpdatingMemberId] = useState('')
   const [inviteForm, setInviteForm] = useState<InviteFormState>(defaultInviteForm)
+  const [members, setMembers] = useState<AssistantMemberProfile[]>([])
+  const [modelChannels, setModelChannels] = useState<AssistantModelChannelSummary[]>([])
 
   const saveAdminToken = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -127,11 +158,92 @@ export function AssistantAdminPage() {
       }
 
       setSummary(nextSummary)
+      setModelChannels(nextSummary.modelChannels)
       setSummaryStatus('摘要已更新。')
     } catch {
       setSummaryStatus('无法连接管理 API。')
     } finally {
       setIsLoadingSummary(false)
+    }
+  }
+
+  const loadMembers = async () => {
+    if (!API_BASE) {
+      setMembersStatus(`当前没有配置 ${ASSISTANT_API_ENV_NAMES.internal}，无法调用成员 API。`)
+      return
+    }
+    if (!adminToken) {
+      setMembersStatus('请先保存 admin token。')
+      return
+    }
+
+    setIsLoadingMembers(true)
+    setMembersStatus('')
+    try {
+      const response = await fetch(`${API_BASE}/admin/members`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const payload = (await response.json().catch(() => ({}))) as unknown
+      if (!response.ok) {
+        setMembersStatus(explainAdminError(response.status, getErrorCode(payload)))
+        return
+      }
+
+      if (!isRecord(payload)) {
+        setMembersStatus('成员 API 返回格式不完整。')
+        return
+      }
+
+      setMembers(normalizeMembers(payload.members))
+      setModelChannels(normalizeAssistantModelChannels(payload.modelChannels))
+      setMembersStatus('成员列表已更新。')
+    } catch {
+      setMembersStatus('无法连接成员 API。')
+    } finally {
+      setIsLoadingMembers(false)
+    }
+  }
+
+  const updateMemberModelChannel = async (memberId: string, modelChannelId: string) => {
+    if (!API_BASE || !adminToken) {
+      setMembersStatus('请先保存 admin token 并确认 API base 已配置。')
+      return
+    }
+
+    setUpdatingMemberId(memberId)
+    setMembersStatus('')
+    try {
+      const response = await fetch(`${API_BASE}/admin/members/${memberId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ modelChannelId }),
+      })
+      const payload = (await response.json().catch(() => ({}))) as unknown
+      if (!response.ok) {
+        setMembersStatus(explainAdminError(response.status, getErrorCode(payload)))
+        return
+      }
+      if (!isRecord(payload)) {
+        setMembersStatus('成员更新 API 返回格式不完整。')
+        return
+      }
+
+      const updated = normalizeAssistantMember(payload.member)
+      if (!updated) {
+        setMembersStatus('成员更新 API 返回的成员格式不完整。')
+        return
+      }
+
+      setMembers((current) => current.map((member) => (member.id === updated.id ? updated : member)))
+      setModelChannels(normalizeAssistantModelChannels(payload.modelChannels))
+      setMembersStatus(`已为 ${updated.name} 分配模型渠道：${updated.modelChannel?.label ?? '默认模型通道'}`)
+    } catch {
+      setMembersStatus('无法连接成员更新 API。')
+    } finally {
+      setUpdatingMemberId('')
     }
   }
 
@@ -239,6 +351,10 @@ export function AssistantAdminPage() {
                 成员
               </span>
               <span>
+                <strong>{summary.disabledMembers}</strong>
+                已禁用
+              </span>
+              <span>
                 <strong>{summary.invites}</strong>
                 邀请码
               </span>
@@ -317,12 +433,53 @@ export function AssistantAdminPage() {
           </article>
 
           <article className="assistant-admin-card">
-            <h2>MVP 边界</h2>
-            <p>这个页面只证明管理 API 链路可用，完整后台放到后续任务。</p>
+            <h2>成员模型渠道</h2>
+            <p>为每个内部成员分配服务端已配置的模型渠道；这里只显示渠道名称、模型和 provider，不展示 key 或 base URL。</p>
+            <div className="assistant-admin-actions">
+              <button type="button" onClick={() => void loadMembers()} disabled={isLoadingMembers || !adminToken}>
+                {isLoadingMembers ? '读取中…' : '刷新成员'}
+              </button>
+            </div>
+            {membersStatus && <p className="assistant-status-text">{membersStatus}</p>}
+            <div className="assistant-admin-table" aria-label="成员模型渠道列表">
+              {members.map((member) => (
+                <div key={member.id} className="assistant-admin-row assistant-admin-row--member">
+                  <div>
+                    <strong>{member.name}</strong>
+                    <span>
+                      {member.role} · {member.status ?? 'ACTIVE'} · {member.dailyQuota} / day
+                    </span>
+                    <span>
+                      当前渠道：{member.modelChannel?.label ?? '默认模型通道'} / {member.modelChannel?.model ?? 'fallback'}
+                    </span>
+                  </div>
+                  <label className="assistant-field assistant-field--compact">
+                    <span>模型渠道</span>
+                    <select
+                      value={member.modelChannel?.id ?? 'default'}
+                      disabled={updatingMemberId === member.id || modelChannels.length === 0}
+                      onChange={(event) => void updateMemberModelChannel(member.id, event.target.value)}
+                    >
+                      {modelChannels.map((channel) => (
+                        <option key={channel.id} value={channel.id}>
+                          {channel.label} · {channel.model}{channel.configured ? '' : '（未配置）'}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              ))}
+              {members.length === 0 && <p className="assistant-status-text">刷新后会显示已兑换邀请码的内部成员。</p>}
+            </div>
+          </article>
+
+          <article className="assistant-admin-card">
+            <h2>安全边界</h2>
+            <p>模型渠道密钥和服务地址只在服务端环境变量中维护；成员表只保存渠道 id。</p>
             <ul className="assistant-admin-list">
-              <li>不展示完整成员列表和历史消息。</li>
-              <li>不提供删除、禁用、导出和分析面板。</li>
-              <li>admin token 本地保存只是 MVP 方案。</li>
+              <li>页面不会展示模型 key、base URL、token hash 或邀请码 hash。</li>
+              <li>成员被分配到未配置渠道时，后端会安全回退并返回低敏状态。</li>
+              <li>后续还需要补齐完整历史消息、禁用/导出和内部知识源管理。</li>
               <li>生产环境必须继续依赖后端 `ADMIN_TOKEN` 校验。</li>
             </ul>
           </article>

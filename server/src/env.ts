@@ -22,6 +22,7 @@ const assistantModelApiKey = readFirstEnv('ASSISTANT_MODEL_API_KEY', 'OPENAI_API
 const assistantModelBaseUrl = normalizeBaseUrl(readFirstEnv('ASSISTANT_MODEL_BASE_URL', 'OPENAI_BASE_URL'))
 const assistantModelName = readFirstEnv('ASSISTANT_MODEL_NAME', 'OPENAI_MODEL') || 'gpt-4.1-mini'
 const assistantModelProvider = readFirstEnv('ASSISTANT_MODEL_PROVIDER', 'OPENAI_PROVIDER') || 'openai-compatible'
+const assistantModelChannelsJson = readFirstEnv('ASSISTANT_MODEL_CHANNELS_JSON')
 const assistantRagApiBaseUrl = readFirstEnv('ASSISTANT_RAG_API_BASE_URL')
 const assistantRagApiKey = readFirstEnv('ASSISTANT_RAG_API_KEY')
 const assistantRagTimeoutMs = readPositiveInteger(process.env.ASSISTANT_RAG_TIMEOUT_MS, 3000)
@@ -39,6 +40,7 @@ export const env = {
   assistantModelBaseUrl,
   assistantModelName,
   assistantModelProvider,
+  assistantModelChannelsJson,
   assistantRagApiBaseUrl,
   assistantRagApiKey,
   assistantRagTimeoutMs,

@@ -6,6 +6,7 @@ import type { AssistantServiceMode, RagRetrieveResponse } from '../src/types.js'
 interface EnvSnapshot {
   assistantServiceMode: AssistantServiceMode
   assistantModelApiKey: string
+  assistantModelChannelsJson: string
   assistantRagApiBaseUrl: string
   assistantRagApiKey: string
   openaiApiKey: string
@@ -47,6 +48,7 @@ function snapshotEnv(): EnvSnapshot {
   return {
     assistantServiceMode: env.assistantServiceMode,
     assistantModelApiKey: env.assistantModelApiKey,
+    assistantModelChannelsJson: env.assistantModelChannelsJson,
     assistantRagApiBaseUrl: env.assistantRagApiBaseUrl,
     assistantRagApiKey: env.assistantRagApiKey,
     openaiApiKey: env.openaiApiKey,
@@ -66,6 +68,7 @@ function snapshotEnv(): EnvSnapshot {
 function restoreEnv(snapshot: EnvSnapshot) {
   env.assistantServiceMode = snapshot.assistantServiceMode
   env.assistantModelApiKey = snapshot.assistantModelApiKey
+  env.assistantModelChannelsJson = snapshot.assistantModelChannelsJson
   env.assistantRagApiBaseUrl = snapshot.assistantRagApiBaseUrl
   env.assistantRagApiKey = snapshot.assistantRagApiKey
   env.openaiApiKey = snapshot.openaiApiKey
@@ -84,6 +87,7 @@ function restoreEnv(snapshot: EnvSnapshot) {
 async function withService(mode: AssistantServiceMode, run: (base: string) => Promise<void>) {
   env.assistantServiceMode = mode
   env.assistantModelApiKey = ''
+  env.assistantModelChannelsJson = ''
   env.openaiApiKey = ''
   env.assistantRagApiBaseUrl = ''
   env.assistantRagApiKey = ''

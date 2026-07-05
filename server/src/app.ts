@@ -1,10 +1,10 @@
 import cors from 'cors'
 import express from 'express'
-import { Prisma } from '@prisma/client'
-import { env, hasDatabase, hasModelProvider } from './env.js'
+import { Prisma, type Member } from '@prisma/client'
+import { env, hasDatabase } from './env.js'
 import { sha256 } from './crypto.js'
 import { issueMemberToken, readBearerMember, requireDatabase } from './auth.js'
-import { generateAnswer, planAssistantAnswer } from './model.js'
+import { generateAnswer, hasConfiguredModelChannel, listSafeModelChannels, resolveModelChannel, planAssistantAnswer } from './model.js'
 import { createMetricsMiddleware, renderPrometheusMetrics } from './metrics.js'
 import { retrieveAssistantContext, retrievePublicAssistantContext } from './ragClient.js'
 import { createRagOrchestratorRouter } from './ragRoutes.js'
@@ -71,15 +71,17 @@ function buildStudioHealth() {
 }
 
 function buildAssistantHealth(serviceMode: AssistantServiceMode) {
+  const defaultModelChannel = listSafeModelChannels()[0]
+  const modelConfigured = hasConfiguredModelChannel()
   return {
     ok: true,
     service: serviceMode === 'public' ? 'biau-public-assistant-api' : serviceMode === 'internal' ? 'biau-internal-assistant-api' : 'biau-assistant-api',
     serviceMode,
     database: hasDatabase(),
-    mode: hasModelProvider() ? 'model' : 'fallback',
-    modelConfigured: hasModelProvider(),
-    model: hasModelProvider() ? env.assistantModelName : 'fallback',
-    provider: hasModelProvider() ? env.assistantModelProvider : 'local-public-knowledge',
+    mode: modelConfigured ? 'model' : 'fallback',
+    modelConfigured,
+    model: defaultModelChannel?.configured ? defaultModelChannel.model : 'fallback',
+    provider: defaultModelChannel?.configured ? defaultModelChannel.provider : 'local-public-knowledge',
   }
 }
 
@@ -105,6 +107,7 @@ function registerPublicAssistantRoutes(app: express.Express) {
           provider: generated.provider,
           reason: generated.reason,
           diagnostic: generated.diagnostic,
+          modelChannel: generated.modelChannel,
           citationCount: citations.length,
           retrieval: context.retrieval,
         },
@@ -117,6 +120,33 @@ function registerPublicAssistantRoutes(app: express.Express) {
 }
 
 function registerInternalAssistantRoutes(app: express.Express) {
+  app.get('/me', async (req, res, next) => {
+    try {
+      const member = await readBearerMember(req)
+      if (!member) {
+        res.status(401).json({ error: 'missing-or-invalid-token' })
+        return
+      }
+      if (!isActiveMember(member)) {
+        res.status(403).json({ error: 'member-disabled' })
+        return
+      }
+      if (!isActiveMember(member)) {
+        res.status(403).json({ error: 'member-disabled' })
+        return
+      }
+
+      const prisma = requireDatabase()
+      const updated = await prisma.member.update({
+        where: { id: member.id },
+        data: { lastSeenAt: new Date() },
+      })
+      res.json({ member: serializeMember(updated) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.post('/auth/redeem-invite', async (req, res, next) => {
     try {
       const code = String(req.body?.code ?? '').trim()
@@ -130,7 +160,7 @@ function registerInternalAssistantRoutes(app: express.Express) {
       const issued = issueMemberToken()
       const member = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const invite = await tx.invite.findUnique({ where: { codeHash: sha256(code) } })
-        if (!invite || invite.usedCount >= invite.maxUses || (invite.expiresAt && invite.expiresAt < new Date())) {
+        if (!invite || invite.revokedAt || invite.usedCount >= invite.maxUses || (invite.expiresAt && invite.expiresAt < new Date())) {
           return null
         }
 
@@ -161,12 +191,7 @@ function registerInternalAssistantRoutes(app: express.Express) {
 
       res.json({
         token: issued.token,
-        member: {
-          id: member.id,
-          name: member.name,
-          role: member.role,
-          dailyQuota: member.dailyQuota,
-        },
+        member: serializeMember(member),
       })
     } catch (error) {
       next(error)
@@ -189,6 +214,7 @@ function registerInternalAssistantRoutes(app: express.Express) {
       }
 
       const prisma = requireDatabase()
+      const now = new Date()
       const session =
         sessionId
           ? await prisma.chatSession.findFirst({ where: { id: sessionId, memberId: member.id } })
@@ -196,6 +222,7 @@ function registerInternalAssistantRoutes(app: express.Express) {
               data: {
                 memberId: member.id,
                 title: question.slice(0, 36),
+                lastMessageAt: now,
               },
             })
 
@@ -205,6 +232,7 @@ function registerInternalAssistantRoutes(app: express.Express) {
           data: {
             memberId: member.id,
             title: question.slice(0, 36),
+            lastMessageAt: now,
           },
         }))
 
@@ -224,6 +252,7 @@ function registerInternalAssistantRoutes(app: express.Express) {
         chunks: context?.chunks ?? [],
         intent: answerPlan.intent,
         grounding: answerPlan.grounding,
+        modelChannelId: member.modelChannelId,
       })
       const reply = await prisma.chatMessage.create({
         data: {
@@ -241,6 +270,14 @@ function registerInternalAssistantRoutes(app: express.Express) {
           model: generated.model,
         },
       })
+      await prisma.member.update({
+        where: { id: member.id },
+        data: { lastSeenAt: now },
+      })
+      await prisma.chatSession.update({
+        where: { id: activeSession.id },
+        data: { lastMessageAt: now },
+      })
 
       res.json({
         answer: generated.answer,
@@ -251,6 +288,7 @@ function registerInternalAssistantRoutes(app: express.Express) {
           provider: generated.provider,
           reason: generated.reason,
           diagnostic: generated.diagnostic,
+          modelChannel: generated.modelChannel,
           citationCount: citations.length,
           retrieval: context?.retrieval,
           intent: answerPlan.intent,
@@ -272,13 +310,84 @@ function registerInternalAssistantRoutes(app: express.Express) {
       }
 
       const prisma = requireDatabase()
-      const [members, invites, messages, usage] = await Promise.all([
+      const [members, invites, messages, usage, disabledMembers] = await Promise.all([
         prisma.member.count(),
         prisma.invite.count(),
         prisma.chatMessage.count(),
         prisma.usageLog.count(),
+        prisma.member.count({ where: { status: 'DISABLED' } }),
       ])
-      res.json({ members, invites, messages, usage })
+      res.json({ members, invites, messages, usage, disabledMembers, modelChannels: listSafeModelChannels() })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/admin/model-channels', async (req, res) => {
+    if (!isAdminRequest(req.headers.authorization)) {
+      res.status(401).json({ error: 'missing-admin-token' })
+      return
+    }
+
+    res.json({ modelChannels: listSafeModelChannels() })
+  })
+
+  app.get('/admin/members', async (req, res, next) => {
+    try {
+      if (!isAdminRequest(req.headers.authorization)) {
+        res.status(401).json({ error: 'missing-admin-token' })
+        return
+      }
+
+      const prisma = requireDatabase()
+      const members = await prisma.member.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      })
+      res.json({ members: members.map(serializeMember), modelChannels: listSafeModelChannels() })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.patch('/admin/members/:id', async (req, res, next) => {
+    try {
+      if (!isAdminRequest(req.headers.authorization)) {
+        res.status(401).json({ error: 'missing-admin-token' })
+        return
+      }
+
+      const prisma = requireDatabase()
+      const member = await prisma.member.findUnique({ where: { id: req.params.id } })
+      if (!member) {
+        res.status(404).json({ error: 'member-not-found' })
+        return
+      }
+
+      const assignment = readModelChannelAssignment(req.body?.modelChannelId)
+      if (!assignment.ok) {
+        res.status(400).json({ error: 'unsupported-model-channel' })
+        return
+      }
+
+      const status = readMemberStatus(req.body?.status)
+      if (req.body?.status !== undefined && !status) {
+        res.status(400).json({ error: 'unsupported-member-status' })
+        return
+      }
+
+      const data: Prisma.MemberUpdateInput = {}
+      if (assignment.changed) data.modelChannelId = assignment.value
+      if (status) {
+        data.status = status
+        data.disabledAt = status === 'DISABLED' ? new Date() : null
+      }
+
+      const updated = await prisma.member.update({
+        where: { id: member.id },
+        data,
+      })
+      res.json({ member: serializeMember(updated), modelChannels: listSafeModelChannels() })
     } catch (error) {
       next(error)
     }
@@ -318,6 +427,53 @@ function registerInternalAssistantRoutes(app: express.Express) {
 function isAdminRequest(header: string | undefined) {
   if (!env.adminToken || !header?.startsWith('Bearer ')) return false
   return header.slice('Bearer '.length).trim() === env.adminToken
+}
+
+function isActiveMember(member: Pick<Member, 'status'>) {
+  return member.status !== 'DISABLED'
+}
+
+function serializeMember(
+  member: Pick<Member, 'id' | 'name' | 'role' | 'status' | 'dailyQuota' | 'modelChannelId' | 'disabledAt' | 'lastSeenAt' | 'createdAt'>,
+) {
+  return {
+    id: member.id,
+    name: member.name,
+    role: member.role,
+    status: member.status,
+    dailyQuota: member.dailyQuota,
+    modelChannelId: member.modelChannelId ?? null,
+    modelChannel: getMemberModelChannel(member.modelChannelId),
+    disabledAt: member.disabledAt?.toISOString() ?? null,
+    lastSeenAt: member.lastSeenAt?.toISOString() ?? null,
+    createdAt: member.createdAt.toISOString(),
+  }
+}
+
+function getMemberModelChannel(modelChannelId: string | null | undefined) {
+  const resolved = resolveModelChannel(modelChannelId)
+  const safeChannels = listSafeModelChannels()
+  return safeChannels.find((channel) => channel.id === resolved.id) ?? safeChannels[0]
+}
+
+function readModelChannelAssignment(value: unknown):
+  | { ok: true; changed: false; value?: never }
+  | { ok: true; changed: true; value: string | null }
+  | { ok: false; changed: false; value?: never } {
+  if (value === undefined) return { ok: true, changed: false }
+  if (value === null) return { ok: true, changed: true, value: null }
+  if (typeof value !== 'string') return { ok: false, changed: false }
+
+  const normalized = value.trim().toLowerCase()
+  if (!normalized) return { ok: true, changed: true, value: null }
+  const channel = listSafeModelChannels().find((item) => item.id === normalized)
+  if (!channel) return { ok: false, changed: false }
+  return { ok: true, changed: true, value: channel.isDefault ? null : channel.id }
+}
+
+function readMemberStatus(value: unknown) {
+  if (value === 'ACTIVE' || value === 'DISABLED') return value
+  return null
 }
 
 function readPositiveInteger(value: unknown, fallback: number) {

@@ -12,6 +12,7 @@ import { getProjectAssistantSummary, getProjectAssistantTags, projects } from '.
 
 export type AssistantVisibility = 'public' | 'internal'
 export type AssistantMemberRole = 'MEMBER' | 'ADMIN'
+export type AssistantMemberStatus = 'ACTIVE' | 'DISABLED'
 
 export const ASSISTANT_STORAGE_KEYS = {
   memberToken: 'biau-assistant-member-token',
@@ -54,7 +55,22 @@ export interface AssistantMemberProfile {
   id: string
   name: string
   role: AssistantMemberRole
+  status?: AssistantMemberStatus
   dailyQuota: number
+  modelChannelId?: string | null
+  modelChannel?: AssistantModelChannelSummary
+  disabledAt?: string | null
+  lastSeenAt?: string | null
+  createdAt?: string
+}
+
+export interface AssistantModelChannelSummary {
+  id: string
+  label: string
+  provider: string
+  model: string
+  configured: boolean
+  isDefault: boolean
 }
 
 export const publicAssistantSuggestions: AssistantSuggestion[] = [
@@ -188,6 +204,10 @@ function isAssistantMemberRole(value: unknown): value is AssistantMemberRole {
   return value === 'MEMBER' || value === 'ADMIN'
 }
 
+function isAssistantMemberStatus(value: unknown): value is AssistantMemberStatus {
+  return value === 'ACTIVE' || value === 'DISABLED'
+}
+
 export function normalizeAssistantKnowledgeItem(value: unknown): AssistantKnowledgeItem | null {
   if (!isRecord(value)) return null
   const { id, title, summary, href, tags, visibility } = value
@@ -218,9 +238,33 @@ export function normalizeAssistantCitations(value: unknown): AssistantKnowledgeI
     .filter((item): item is AssistantKnowledgeItem => item !== null)
 }
 
+export function normalizeAssistantModelChannel(value: unknown): AssistantModelChannelSummary | null {
+  if (!isRecord(value)) return null
+  const { id, label, provider, model, configured, isDefault } = value
+  if (
+    typeof id !== 'string' ||
+    typeof label !== 'string' ||
+    typeof provider !== 'string' ||
+    typeof model !== 'string' ||
+    typeof configured !== 'boolean' ||
+    typeof isDefault !== 'boolean'
+  ) {
+    return null
+  }
+
+  return { id, label, provider, model, configured, isDefault }
+}
+
+export function normalizeAssistantModelChannels(value: unknown): AssistantModelChannelSummary[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .map((item) => normalizeAssistantModelChannel(item))
+    .filter((item): item is AssistantModelChannelSummary => item !== null)
+}
+
 export function normalizeAssistantMember(value: unknown): AssistantMemberProfile | null {
   if (!isRecord(value)) return null
-  const { id, name, role, dailyQuota } = value
+  const { id, name, role, status, dailyQuota, modelChannelId, modelChannel, disabledAt, lastSeenAt, createdAt } = value
   if (
     typeof id !== 'string' ||
     typeof name !== 'string' ||
@@ -231,5 +275,16 @@ export function normalizeAssistantMember(value: unknown): AssistantMemberProfile
     return null
   }
 
-  return { id, name, role, dailyQuota }
+  return {
+    id,
+    name,
+    role,
+    status: isAssistantMemberStatus(status) ? status : undefined,
+    dailyQuota,
+    modelChannelId: typeof modelChannelId === 'string' || modelChannelId === null ? modelChannelId : undefined,
+    modelChannel: normalizeAssistantModelChannel(modelChannel) ?? undefined,
+    disabledAt: typeof disabledAt === 'string' || disabledAt === null ? disabledAt : undefined,
+    lastSeenAt: typeof lastSeenAt === 'string' || lastSeenAt === null ? lastSeenAt : undefined,
+    createdAt: typeof createdAt === 'string' ? createdAt : undefined,
+  }
 }
