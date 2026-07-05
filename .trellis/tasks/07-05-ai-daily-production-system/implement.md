@@ -2,14 +2,14 @@
 
 ## Phase 0. Current-State Audit
 
-- [ ] 记录当前公开博客数据生成链路：
+- [x] 记录当前公开博客数据生成链路：
   - `src/data/blog.ts`
   - `src/data/blogContent.ts`
   - `src/data/blogCuration.ts`
   - `src/data/blog-posts/*.ts`
-- [ ] 记录当前后端部署和 Prisma 迁移方式。
-- [ ] 检查 `/assistant/admin` 的认证方式是否可复用到 `/studio`。
-- [ ] 确认 `blog:check` 对导出产物的要求。
+- [x] 记录当前后端部署和 Prisma 迁移方式。
+- [x] 检查 `/assistant/admin` 的认证方式是否可复用到 `/studio`。
+- [x] 确认 `blog:check` 对导出产物的要求。
 
 验证：
 
@@ -18,6 +18,8 @@ npm.cmd run prisma:validate
 npm.cmd run server:build
 npm.cmd run blog:check
 ```
+
+审计落档：见 `audit.md`。
 
 ## Phase 1. Studio Shell And Auth Boundary
 
