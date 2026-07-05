@@ -413,3 +413,36 @@ Added a cross-project reliability suite runner, public suite report, GitHub Acti
 ### Next Steps
 
 - None - task complete
+
+
+## Session 60: AI Daily draft pipeline
+
+**Date**: 2026-07-05
+**Task**: AI Daily draft pipeline
+**Branch**: `main`
+
+### Summary
+
+Added an offline AI Daily source-pack draft generator, sample source pack and draft, usage documentation, and AI Daily workflow spec with manual-review gates.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `ec7af09` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
