@@ -24,6 +24,69 @@ Use `useMemo` for derived collections when the grouping logic is non-trivial and
 
 Public catalog and article data are static TypeScript exports in `src/data/`. Keep display data typed and sanitized. Runtime assistant conversations and admin state belong to the assistant API/frontend flow, not to global stores.
 
+## Scenario: Content Studio Draft Preview State
+
+### 1. Scope / Trigger
+
+- Trigger: changing `/studio` draft editing, `StudioContentBody`, body block parsing, preview rendering, or future static blog export.
+- Goal: keep the editor textarea, browser preview, saved Studio payload, and future export path aligned.
+
+### 2. Signatures
+
+- `bodyJsonFromText(value: string): StudioContentBody`
+- `textFromBodyJson(draft: Pick<StudioDraft, "bodyJson">): string`
+- `StudioDraftPreview` consumes `{ title, slug, column, tag, detail, readTime, date, body, knowledgePoints, projectIds }`.
+- `StudioContentBlock.type` supports `paragraph`, `heading`, `list`, `image`, `flow`, and `source-card`.
+
+### 3. Contracts
+
+- The editor stores textarea state in the page, but all structured body conversion must go through `src/utils/studioDraftBody.ts`.
+- The preview must render from the same `StudioContentBody` that save requests send to `/studio/api/content-drafts`.
+- Public-preview styling should reuse public blog detail classes such as `detail-header`, `detail-block`, `blog-post-body`, and `blog-post-body-text`, with Studio-scoped CSS only for sizing and editor metadata.
+- Related project preview derives from `src/data/portfolio.ts` and the draft `projectIds` field.
+- The preview is editorial UI only; it must not expose admin tokens, database URLs, model provider URLs, or private source data.
+
+### 4. Validation & Error Matrix
+
+- Empty textarea -> preview renders a placeholder body section and save sends `{ blocks: [] }`.
+- `## Heading` -> stored as a `heading` block and starts a preview section.
+- `- item` lists -> stored as a `list` block and previewed with `detail-highlights`.
+- `![alt](url "caption")` -> stored as an `image` block; the URL must still be public-safe before publishing.
+- Mermaid fenced blocks starting with ` ```mermaid ` -> stored as a `flow` block and previewed as readable source until a diagram renderer is added.
+- Unknown or malformed text -> stored as a `paragraph`, not discarded.
+
+### 5. Good/Base/Bad Cases
+
+- Good: changing the textarea immediately updates preview and saving persists the same block structure.
+- Good: loading a saved draft uses `textFromBodyJson()` so headings/lists/images do not collapse into plain unlabeled paragraphs.
+- Base: a simple article with only paragraphs still previews and saves correctly.
+- Bad: adding a second body parser inside the export script that interprets headings or images differently from Studio preview.
+- Bad: importing `StudioPage.tsx` from a Node validation script just to reuse body parsing.
+
+### 6. Tests Required
+
+- Run `npm.cmd run lint` and `npm.cmd run build` after changing Studio preview or parser code.
+- Run `npm.cmd run check:ui` after changing Studio layout; `/studio` must be part of the route set.
+- Future export scripts should import `bodyJsonFromText` / `textFromBodyJson` or consume saved `StudioContentBody` directly rather than reparsing page state.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```tsx
+const blocks = bodyText.split('\n\n').map((text) => ({ type: 'paragraph', text }))
+```
+
+This silently makes preview, save, and export disagree once headings, lists, images, or flows are supported.
+
+#### Correct
+
+```tsx
+const previewBody = bodyJsonFromText(draftForm.bodyText)
+```
+
+One parser owns the lightweight authoring format, and both preview and save use its `StudioContentBody`.
+
 ## Scenario: Project Detail Content And Assistant Projection
 
 ### 1. Scope / Trigger

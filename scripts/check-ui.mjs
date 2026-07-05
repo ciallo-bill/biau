@@ -14,6 +14,7 @@ const routes = [
   { path: '/blog', title: '知识库', nav: '回主页', canonical: '/blog' },
   { path: '/status', title: '项目可靠性观察', nav: '回主页', canonical: '/status' },
   { path: '/status/legal-rag', title: 'Legal RAG', nav: '回主页', canonical: '/status/legal-rag' },
+  { path: '/studio', title: '内容工作台', nav: '回主页', canonical: '/studio' },
   { path: '/assistant', title: '内部助手', nav: '回主页', canonical: '/assistant' },
   { path: '/assistant/admin', title: '内部助手管理页', nav: '回主页', canonical: '/assistant/admin' },
   { path: '/projects/legal-rag', title: 'Legal RAG', nav: '回主页', canonical: '/projects/legal-rag' },

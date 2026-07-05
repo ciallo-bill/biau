@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
+import { StudioDraftPreview } from '../components/StudioDraftPreview'
 import { blogColumnMeta, blogColumnOrder, type BlogColumn } from '../data/blog'
 import {
   STUDIO_STORAGE_KEYS,
@@ -20,6 +21,7 @@ import {
   type StudioSourceTier,
   type StudioVisibility,
 } from '../data/studio'
+import { bodyJsonFromText, textFromBodyJson } from '../utils/studioDraftBody'
 import { STUDIO_API_BASE, STUDIO_API_ENV_NAMES, explainStudioApiError, requestStudioApi } from '../utils/studioApi'
 
 interface DraftFormState {
@@ -119,22 +121,6 @@ function splitList(value: string) {
     .filter(Boolean)
 }
 
-function bodyJsonFromText(value: string) {
-  const blocks = value
-    .split(/\n{2,}/u)
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .map((text) => ({ type: 'paragraph', text }))
-  return { blocks }
-}
-
-function textFromBodyJson(draft: StudioDraft) {
-  return draft.bodyJson.blocks
-    .map((block) => block.text || block.items?.join('\n') || block.caption || block.mermaid || '')
-    .filter(Boolean)
-    .join('\n\n')
-}
-
 function getDraftFromPayload(payload: unknown) {
   return isRecord(payload) ? normalizeStudioDraft(payload.draft) : null
 }
@@ -195,6 +181,10 @@ export function StudioPage() {
     () => [...sources].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
     [sources],
   )
+  const previewBody = useMemo(() => bodyJsonFromText(draftForm.bodyText), [draftForm.bodyText])
+  const previewKnowledgePoints = useMemo(() => splitList(draftForm.knowledgePointsText), [draftForm.knowledgePointsText])
+  const previewProjectIds = useMemo(() => splitList(draftForm.projectIdsText), [draftForm.projectIdsText])
+  const previewDate = selectedDraft?.publishedAt?.slice(0, 10) || selectedDraft?.updatedAt?.slice(0, 10) || today()
 
   const saveToken = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -547,152 +537,170 @@ export function StudioPage() {
           </div>
         </aside>
 
-        <section className="studio-card studio-editor">
-          <div className="studio-card__header">
-            <div>
-              <p className="assistant-panel__eyebrow">BLOG EDITOR</p>
-              <h2>{selectedDraft ? '编辑草稿' : '新建草稿'}</h2>
-            </div>
-            {selectedDraft && <span className="studio-status-pill">{studioDraftStatuses[selectedDraft.status]}</span>}
-          </div>
-
-          <form className="studio-form" onSubmit={saveDraft}>
-            <div className="studio-form-grid">
-              <label className="assistant-field">
-                <span>标题</span>
-                <input
-                  value={draftForm.title}
-                  onChange={(event) => {
-                    const title = event.target.value
-                    updateDraftField('title', title)
-                    if (!selectedDraft && !draftForm.slug) updateDraftField('slug', slugify(title))
-                  }}
-                  placeholder="写一个访客可读的技术标题"
-                />
-              </label>
-              <label className="assistant-field">
-                <span>Slug</span>
-                <input
-                  value={draftForm.slug}
-                  onChange={(event) => updateDraftField('slug', event.target.value)}
-                  placeholder="agentic-rag-notes"
-                />
-              </label>
-              <label className="assistant-field">
-                <span>栏目</span>
-                <select
-                  value={draftForm.column}
-                  onChange={(event) => updateDraftField('column', event.target.value as BlogColumn)}
-                >
-                  {blogColumnOrder.map((column) => (
-                    <option key={column} value={column}>
-                      {blogColumnMeta[column].titleZh} / {blogColumnMeta[column].titleEn}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="assistant-field">
-                <span>可见性</span>
-                <select
-                  value={draftForm.visibility}
-                  onChange={(event) => updateDraftField('visibility', event.target.value as StudioVisibility)}
-                >
-                  {Object.entries(studioVisibilityLabels).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="assistant-field">
-                <span>标签</span>
-                <input value={draftForm.tag} onChange={(event) => updateDraftField('tag', event.target.value)} />
-              </label>
-              <label className="assistant-field">
-                <span>阅读时间</span>
-                <input value={draftForm.readTime} onChange={(event) => updateDraftField('readTime', event.target.value)} />
-              </label>
+        <section className="studio-editor-stack">
+          <section className="studio-card studio-editor">
+            <div className="studio-card__header">
+              <div>
+                <p className="assistant-panel__eyebrow">BLOG EDITOR</p>
+                <h2>{selectedDraft ? '编辑草稿' : '新建草稿'}</h2>
+              </div>
+              {selectedDraft && <span className="studio-status-pill">{studioDraftStatuses[selectedDraft.status]}</span>}
             </div>
 
-            <label className="assistant-field">
-              <span>摘要</span>
-              <textarea
-                value={draftForm.detail}
-                onChange={(event) => updateDraftField('detail', event.target.value)}
-                rows={3}
-                placeholder="公开列表里的文章摘要，必须能解释读者为什么要点开"
-              />
-            </label>
+            <form className="studio-form" onSubmit={saveDraft}>
+              <div className="studio-form-grid">
+                <label className="assistant-field">
+                  <span>标题</span>
+                  <input
+                    value={draftForm.title}
+                    onChange={(event) => {
+                      const title = event.target.value
+                      updateDraftField('title', title)
+                      if (!selectedDraft && !draftForm.slug) updateDraftField('slug', slugify(title))
+                    }}
+                    placeholder="写一个访客可读的技术标题"
+                  />
+                </label>
+                <label className="assistant-field">
+                  <span>Slug</span>
+                  <input
+                    value={draftForm.slug}
+                    onChange={(event) => updateDraftField('slug', event.target.value)}
+                    placeholder="agentic-rag-notes"
+                  />
+                </label>
+                <label className="assistant-field">
+                  <span>栏目</span>
+                  <select
+                    value={draftForm.column}
+                    onChange={(event) => updateDraftField('column', event.target.value as BlogColumn)}
+                  >
+                    {blogColumnOrder.map((column) => (
+                      <option key={column} value={column}>
+                        {blogColumnMeta[column].titleZh} / {blogColumnMeta[column].titleEn}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="assistant-field">
+                  <span>可见性</span>
+                  <select
+                    value={draftForm.visibility}
+                    onChange={(event) => updateDraftField('visibility', event.target.value as StudioVisibility)}
+                  >
+                    {Object.entries(studioVisibilityLabels).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="assistant-field">
+                  <span>标签</span>
+                  <input value={draftForm.tag} onChange={(event) => updateDraftField('tag', event.target.value)} />
+                </label>
+                <label className="assistant-field">
+                  <span>阅读时间</span>
+                  <input value={draftForm.readTime} onChange={(event) => updateDraftField('readTime', event.target.value)} />
+                </label>
+              </div>
 
-            <label className="assistant-field">
-              <span>正文草稿</span>
-              <textarea
-                value={draftForm.bodyText}
-                onChange={(event) => updateDraftField('bodyText', event.target.value)}
-                rows={12}
-                placeholder="用空行分段。后续切片会加入更完整的块编辑器、图片和流程图。"
-              />
-            </label>
-
-            <div className="studio-form-grid">
               <label className="assistant-field">
-                <span>知识点</span>
+                <span>摘要</span>
                 <textarea
-                  value={draftForm.knowledgePointsText}
-                  onChange={(event) => updateDraftField('knowledgePointsText', event.target.value)}
-                  rows={4}
-                  placeholder="每行一个知识点"
+                  value={draftForm.detail}
+                  onChange={(event) => updateDraftField('detail', event.target.value)}
+                  rows={3}
+                  placeholder="公开列表里的文章摘要，必须能解释读者为什么要点开"
                 />
               </label>
+
               <label className="assistant-field">
-                <span>关联项目 ID</span>
+                <span>正文草稿</span>
                 <textarea
-                  value={draftForm.projectIdsText}
-                  onChange={(event) => updateDraftField('projectIdsText', event.target.value)}
-                  rows={4}
-                  placeholder="blog-semi&#10;legal-rag"
+                  value={draftForm.bodyText}
+                  onChange={(event) => updateDraftField('bodyText', event.target.value)}
+                  rows={12}
+                  placeholder="用空行分段；支持 ## 标题、- 列表、![alt](url)、```mermaid 代码块。"
                 />
               </label>
-            </div>
 
-            <div className="studio-form-grid">
-              <label className="assistant-field">
-                <span>AI 辅助方式</span>
-                <select
-                  value={draftForm.aiAssistance}
-                  onChange={(event) => updateDraftField('aiAssistance', event.target.value)}
-                >
-                  <option value="none">none</option>
-                  <option value="summary-assisted">summary-assisted</option>
-                  <option value="draft-assisted">draft-assisted</option>
-                  <option value="polish-assisted">polish-assisted</option>
-                </select>
-              </label>
-              <label className="assistant-field">
-                <span>编辑者</span>
-                <input
-                  value={draftForm.editorName}
-                  onChange={(event) => updateDraftField('editorName', event.target.value)}
-                  placeholder="站长"
-                />
-              </label>
-            </div>
+              <div className="studio-form-grid">
+                <label className="assistant-field">
+                  <span>知识点</span>
+                  <textarea
+                    value={draftForm.knowledgePointsText}
+                    onChange={(event) => updateDraftField('knowledgePointsText', event.target.value)}
+                    rows={4}
+                    placeholder="每行一个知识点"
+                  />
+                </label>
+                <label className="assistant-field">
+                  <span>关联项目 ID</span>
+                  <textarea
+                    value={draftForm.projectIdsText}
+                    onChange={(event) => updateDraftField('projectIdsText', event.target.value)}
+                    rows={4}
+                    placeholder="blog-semi&#10;legal-rag"
+                  />
+                </label>
+              </div>
 
-            <div className="assistant-admin-actions studio-actions">
-              <button type="submit" disabled={isSavingDraft || !adminToken}>
-                {isSavingDraft ? '保存中…' : selectedDraft ? '保存草稿' : '创建草稿'}
-              </button>
-              <button type="button" disabled={!selectedDraft} onClick={() => void reviewDraft('needs-changes')}>
-                标记待修
-              </button>
-              <button type="button" disabled={!selectedDraft} onClick={() => void reviewDraft('approved')}>
-                审核通过
-              </button>
-              <button type="button" disabled={!canExport} onClick={() => void createPublishExport()}>
-                创建导出记录
-              </button>
-            </div>
-          </form>
+              <div className="studio-form-grid">
+                <label className="assistant-field">
+                  <span>AI 辅助方式</span>
+                  <select
+                    value={draftForm.aiAssistance}
+                    onChange={(event) => updateDraftField('aiAssistance', event.target.value)}
+                  >
+                    <option value="none">none</option>
+                    <option value="summary-assisted">summary-assisted</option>
+                    <option value="draft-assisted">draft-assisted</option>
+                    <option value="polish-assisted">polish-assisted</option>
+                  </select>
+                </label>
+                <label className="assistant-field">
+                  <span>编辑者</span>
+                  <input
+                    value={draftForm.editorName}
+                    onChange={(event) => updateDraftField('editorName', event.target.value)}
+                    placeholder="站长"
+                  />
+                </label>
+              </div>
+
+              <div className="assistant-admin-actions studio-actions">
+                <button type="submit" disabled={isSavingDraft || !adminToken}>
+                  {isSavingDraft ? '保存中…' : selectedDraft ? '保存草稿' : '创建草稿'}
+                </button>
+                <button type="button" disabled={!selectedDraft} onClick={() => void reviewDraft('needs-changes')}>
+                  标记待修
+                </button>
+                <button type="button" disabled={!selectedDraft} onClick={() => void reviewDraft('approved')}>
+                  审核通过
+                </button>
+                <button type="button" disabled={!canExport} onClick={() => void createPublishExport()}>
+                  创建导出记录
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <StudioDraftPreview
+            title={draftForm.title}
+            slug={draftForm.slug}
+            column={draftForm.column}
+            tag={draftForm.tag}
+            detail={draftForm.detail}
+            readTime={draftForm.readTime}
+            date={previewDate}
+            body={previewBody}
+            knowledgePoints={previewKnowledgePoints}
+            projectIds={previewProjectIds}
+            statusLabel={selectedDraft ? studioDraftStatuses[selectedDraft.status] : '未保存'}
+            visibilityLabel={studioVisibilityLabels[draftForm.visibility]}
+            aiAssistance={draftForm.aiAssistance}
+          />
         </section>
 
         <aside className="studio-side-stack">

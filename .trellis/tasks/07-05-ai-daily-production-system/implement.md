@@ -78,7 +78,7 @@ npm.cmd run server:build
   - 关联项目
   - 正文块
   - 可见性
-- [ ] 预览区复用公开文章样式，尽量接近 `/blog/:slug`。
+- [x] 预览区复用公开文章样式，尽量接近 `/blog/:slug`。
 - [x] 审核 checklist 明确来源、敏感信息、栏目适配和公开风险。
 
 验证：
@@ -87,6 +87,8 @@ npm.cmd run server:build
 npm.cmd run lint
 npm.cmd run build
 ```
+
+2026-07-05：已新增 Studio 草稿公开预览组件，正文 textarea 支持段落、标题、列表、图片、Mermaid 和 source-card 的轻量文本格式；`check:ui` 已覆盖 `/studio`。
 
 ## Phase 4. Publish Export
 

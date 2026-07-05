@@ -3191,6 +3191,7 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 }
 
 .studio-form,
+.studio-editor-stack,
 .studio-side-stack,
 .studio-draft-list,
 .studio-source-list,
@@ -3263,6 +3264,131 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 
 .studio-actions {
   padding-top: var(--space-8);
+}
+
+.studio-preview {
+  overflow: hidden;
+}
+
+.studio-preview-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-bottom: var(--space-16);
+}
+
+.studio-preview-toolbar span {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0 var(--space-10, 10px);
+  overflow-wrap: anywhere;
+  color: color-mix(in oklch, var(--blue) 82%, var(--ink));
+  background: color-mix(in oklch, var(--blue) 10%, transparent);
+  border: 1px solid color-mix(in oklch, var(--blue) 24%, transparent);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.studio-preview-article .detail-header {
+  padding: var(--space-24);
+  border-radius: var(--radius-lg);
+}
+
+.studio-preview-article .detail-title {
+  max-width: 18ch;
+  font-size: clamp(2rem, 6vw, 3.45rem);
+  line-height: 1.04;
+}
+
+.studio-preview-article .detail-summary {
+  max-width: 64ch;
+}
+
+.studio-preview-article .detail-body {
+  padding: var(--space-16) 0 0;
+  grid-template-columns: 1fr;
+}
+
+.studio-preview-article .detail-block,
+.studio-preview-article .blog-post-section {
+  grid-column: auto;
+  padding: var(--space-18, 18px);
+  border-radius: var(--radius-lg);
+}
+
+.studio-preview-blocks {
+  display: grid;
+  gap: var(--space-14, 14px);
+}
+
+.studio-preview-figure,
+.studio-preview-flow {
+  display: grid;
+  gap: var(--space-8);
+  margin: 0;
+}
+
+.studio-preview-figure img {
+  width: 100%;
+  max-height: 360px;
+  display: block;
+  object-fit: cover;
+  border: 1px solid var(--flow-ui-card-border);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 1px 0 var(--flow-ui-inset);
+}
+
+.studio-preview-figure figcaption,
+.studio-preview-flow figcaption {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.studio-preview-flow pre {
+  margin: 0;
+  padding: var(--space-16);
+  overflow: auto;
+  color: color-mix(in oklch, var(--ink) 84%, var(--blue));
+  background: color-mix(in oklch, var(--panel-strong) 64%, transparent);
+  border: 1px solid var(--flow-ui-card-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.studio-preview-source-card {
+  display: grid;
+  gap: 4px;
+  padding: var(--space-12, 12px);
+  background: color-mix(in oklch, var(--green) 8%, var(--panel-strong));
+  border: 1px solid color-mix(in oklch, var(--green) 24%, var(--flow-ui-card-border));
+  border-radius: var(--radius-md);
+}
+
+.studio-preview-source-card span {
+  color: color-mix(in oklch, var(--green) 72%, var(--ink));
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.studio-preview-source-card strong {
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.studio-preview-related {
+  margin-top: var(--space-16);
+  padding: var(--space-18, 18px);
+  border-radius: var(--radius-lg);
 }
 
 .public-assistant {
