@@ -1,17 +1,19 @@
-import { useMemo, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ASSISTANT_STORAGE_KEYS,
-  demoInternalMessages,
-  demoInternalSessions,
   internalAssistantSuggestions,
   normalizeAssistantCitations,
   normalizeAssistantMember,
+  normalizeAssistantMessages,
+  normalizeAssistantSessionPreview,
+  normalizeAssistantSessionPreviews,
   publicKnowledgeBase,
   searchPublicKnowledge,
   type AssistantKnowledgeItem,
   type AssistantMemberProfile,
   type AssistantMessage,
+  type AssistantSessionPreview,
 } from '../data/assistant'
 import { ASSISTANT_API_ENV_NAMES, INTERNAL_ASSISTANT_API_BASE } from '../utils/assistantApi'
 
@@ -23,6 +25,13 @@ interface AssistantResponse {
   citations: AssistantKnowledgeItem[]
   sessionId?: string
   errorCode?: string
+}
+
+interface AssistantApiResult<T> {
+  ok: boolean
+  status: number
+  errorCode: string
+  data: T
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -50,11 +59,22 @@ function getErrorCode(payload: unknown) {
   return isRecord(payload) && typeof payload.error === 'string' ? payload.error : ''
 }
 
+function createOpeningMessage(): AssistantMessage {
+  return {
+    id: 'assistant-opening',
+    role: 'assistant',
+    content:
+      '这里是内部助手工作台。兑换邀请码后，我会把对话保存到你的内部会话列表；未连接 API 时仍可用公开站点知识做临时整理。',
+    timestamp: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+    citations: publicKnowledgeBase.filter((item) => ['site:intro', 'site:status'].includes(item.id)),
+  }
+}
+
 function buildLocalInternalAnswer(question: string, prefix = ''): AssistantResponse {
   const citations = searchPublicKnowledge(question)
   if (citations.length === 0) {
     return {
-      content: `${prefix}当前内部助手还处于首版工作台阶段，现在只连接已脱敏的公开站点知识。这个问题暂时没有足够资料，可以换成项目名、博客主题或交付相关问题继续试。`,
+      content: `${prefix}当前没有命中足够的站点资料。我不会补造内部事实；可以换成项目名、博客主题或交付相关问题继续试。`,
       citations: publicKnowledgeBase.slice(0, 2),
     }
   }
@@ -74,6 +94,22 @@ function explainInternalApiError(question: string, status: number, errorCode: st
       ...fallback,
       content: `成员 token 缺失或无效，内部 API 没有接受这次请求。本地回退继续：${fallback.content}`,
       errorCode: errorCode || 'missing-or-invalid-token',
+    }
+  }
+
+  if (status === 403 || errorCode === 'member-disabled') {
+    return {
+      ...fallback,
+      content: `当前成员已被禁用，无法继续写入内部会话。本地回退继续：${fallback.content}`,
+      errorCode: errorCode || 'member-disabled',
+    }
+  }
+
+  if (status === 404 || errorCode === 'session-not-found') {
+    return {
+      ...fallback,
+      content: `当前会话不存在或不属于这个成员。本地回退继续：${fallback.content}`,
+      errorCode: errorCode || 'session-not-found',
     }
   }
 
@@ -129,17 +165,138 @@ async function requestInternalAnswer(
   }
 }
 
+async function requestMemberProfile(memberToken: string) {
+  const emptyResult: AssistantApiResult<AssistantMemberProfile | null> = {
+    ok: false,
+    status: 0,
+    errorCode: '',
+    data: null,
+  }
+  if (!API_BASE || !memberToken) return emptyResult
+  const response = await fetch(`${API_BASE}/me`, {
+    headers: { Authorization: `Bearer ${memberToken}` },
+  })
+  const payload = (await response.json().catch(() => ({}))) as unknown
+  if (!response.ok || !isRecord(payload)) {
+    return {
+      ...emptyResult,
+      status: response.status,
+      errorCode: getErrorCode(payload),
+    }
+  }
+  return {
+    ok: true,
+    status: response.status,
+    errorCode: '',
+    data: normalizeAssistantMember(payload.member),
+  }
+}
+
+async function requestSessions(memberToken: string) {
+  const emptyResult: AssistantApiResult<AssistantSessionPreview[]> = {
+    ok: false,
+    status: 0,
+    errorCode: '',
+    data: [],
+  }
+  if (!API_BASE || !memberToken) return emptyResult
+  const response = await fetch(`${API_BASE}/chat/internal/sessions`, {
+    headers: { Authorization: `Bearer ${memberToken}` },
+  })
+  const payload = (await response.json().catch(() => ({}))) as unknown
+  if (!response.ok || !isRecord(payload)) {
+    return {
+      ...emptyResult,
+      status: response.status,
+      errorCode: getErrorCode(payload),
+    }
+  }
+  return {
+    ok: true,
+    status: response.status,
+    errorCode: '',
+    data: normalizeAssistantSessionPreviews(payload.sessions),
+  }
+}
+
+async function requestSessionMessages(memberToken: string, sessionId: string) {
+  if (!API_BASE || !memberToken || !sessionId) return null
+  const response = await fetch(`${API_BASE}/chat/internal/sessions/${sessionId}/messages`, {
+    headers: { Authorization: `Bearer ${memberToken}` },
+  })
+  const payload = (await response.json().catch(() => ({}))) as unknown
+  if (!response.ok || !isRecord(payload)) return null
+  const session = normalizeAssistantSessionPreview(payload.session)
+  const messages = normalizeAssistantMessages(payload.messages)
+  if (!session) return null
+  return { session, messages }
+}
+
+async function requestNewSession(memberToken: string) {
+  if (!API_BASE || !memberToken) return null
+  const response = await fetch(`${API_BASE}/chat/internal/sessions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${memberToken}`,
+    },
+    body: JSON.stringify({ title: '新的内部会话' }),
+  })
+  const payload = (await response.json().catch(() => ({}))) as unknown
+  if (!response.ok || !isRecord(payload)) return null
+  return normalizeAssistantSessionPreview(payload.session)
+}
+
+async function requestArchiveSession(memberToken: string, sessionId: string) {
+  if (!API_BASE || !memberToken || !sessionId) return null
+  const response = await fetch(`${API_BASE}/chat/internal/sessions/${sessionId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${memberToken}`,
+    },
+    body: JSON.stringify({ archived: true }),
+  })
+  const payload = (await response.json().catch(() => ({}))) as unknown
+  if (!response.ok || !isRecord(payload)) return null
+  return normalizeAssistantSessionPreview(payload.session)
+}
+
+function formatAssistantTimestamp(value: string) {
+  const parsed = Date.parse(value)
+  if (Number.isNaN(parsed)) return value
+  return new Date(parsed).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+}
+
+function formatSessionUpdatedAt(value: string) {
+  const parsed = Date.parse(value)
+  if (Number.isNaN(parsed)) return value
+  return new Date(parsed).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
+function formatLoadedMessages(messages: AssistantMessage[]) {
+  return messages.map((message) => ({
+    ...message,
+    timestamp: formatAssistantTimestamp(message.timestamp),
+  }))
+}
+
 export function AssistantPage() {
-  const [messages, setMessages] = useState<AssistantMessage[]>(demoInternalMessages)
+  const [messages, setMessages] = useState<AssistantMessage[]>(() => [createOpeningMessage()])
+  const [sessions, setSessions] = useState<AssistantSessionPreview[]>([])
   const [draft, setDraft] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedSessionId, setSelectedSessionId] = useState(demoInternalSessions[0]?.id ?? 'demo-session')
+  const [isLoadingSessions, setIsLoadingSessions] = useState(false)
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false)
+  const [isCreatingSession, setIsCreatingSession] = useState(false)
+  const [isArchivingSession, setIsArchivingSession] = useState(false)
+  const [selectedSessionId, setSelectedSessionId] = useState(() => readStoredValue(ASSISTANT_STORAGE_KEYS.sessionId))
   const [memberToken, setMemberToken] = useState(() => readStoredValue(ASSISTANT_STORAGE_KEYS.memberToken))
   const [member, setMember] = useState<AssistantMemberProfile | null>(() => readStoredMember())
-  const [apiSessionId, setApiSessionId] = useState(() => readStoredValue(ASSISTANT_STORAGE_KEYS.sessionId))
   const [inviteCode, setInviteCode] = useState('')
   const [memberName, setMemberName] = useState('')
   const [inviteStatus, setInviteStatus] = useState('')
+  const [workspaceStatus, setWorkspaceStatus] = useState('')
   const [isRedeeming, setIsRedeeming] = useState(false)
   const messageSeq = useRef(0)
 
@@ -159,9 +316,104 @@ export function AssistantPage() {
   }
 
   const selectedSession = useMemo(
-    () => demoInternalSessions.find((session) => session.id === selectedSessionId) ?? demoInternalSessions[0],
-    [selectedSessionId],
+    () => sessions.find((session) => session.id === selectedSessionId) ?? null,
+    [selectedSessionId, sessions],
   )
+
+  useEffect(() => {
+    let cancelled = false
+    if (!API_BASE || !memberToken) return
+
+    async function loadWorkspace() {
+      setIsLoadingSessions(true)
+      setWorkspaceStatus('')
+      const [profileResult, sessionsResult] = await Promise.all([
+        requestMemberProfile(memberToken),
+        requestSessions(memberToken),
+      ])
+      if (cancelled) return
+
+      if (profileResult.ok && profileResult.data) {
+        setMember(profileResult.data)
+        window.localStorage.setItem(ASSISTANT_STORAGE_KEYS.member, JSON.stringify(profileResult.data))
+      }
+      const nextSessions = sessionsResult.data
+      setSessions(nextSessions)
+      setSelectedSessionId((currentSelectedSessionId) => {
+        if (currentSelectedSessionId && nextSessions.some((session) => session.id === currentSelectedSessionId)) {
+          return currentSelectedSessionId
+        }
+        const nextSessionId = nextSessions[0]?.id ?? ''
+        if (nextSessionId) {
+          window.localStorage.setItem(ASSISTANT_STORAGE_KEYS.sessionId, nextSessionId)
+        } else {
+          window.localStorage.removeItem(ASSISTANT_STORAGE_KEYS.sessionId)
+        }
+        return nextSessionId
+      })
+      if (!profileResult.ok && (profileResult.status === 401 || profileResult.errorCode === 'missing-or-invalid-token')) {
+        setWorkspaceStatus('成员 token 无效，请清除后重新兑换邀请码。')
+      } else if (!sessionsResult.ok && (sessionsResult.status === 503 || sessionsResult.errorCode === 'database-not-configured')) {
+        setWorkspaceStatus('内部 API 还没有可用数据库，历史会话暂时无法同步。')
+      } else if (!sessionsResult.ok) {
+        setWorkspaceStatus('无法同步内部会话列表，本页仍可继续当前对话。')
+      } else {
+        setWorkspaceStatus(nextSessions.length > 0 ? '历史会话已同步。' : '还没有历史会话，可以直接发送第一条消息。')
+      }
+      setIsLoadingSessions(false)
+    }
+
+    void loadWorkspace().catch(() => {
+      if (!cancelled) {
+        setWorkspaceStatus('无法同步内部会话列表，本页仍可继续当前对话。')
+        setIsLoadingSessions(false)
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [memberToken])
+
+  useEffect(() => {
+    let cancelled = false
+    if (!API_BASE || !memberToken || !selectedSessionId) return
+
+    async function loadMessages() {
+      setIsLoadingMessages(true)
+      const result = await requestSessionMessages(memberToken, selectedSessionId)
+      if (cancelled) return
+
+      if (!result) {
+        setWorkspaceStatus('当前会话不存在或无法读取，已经回到临时会话。')
+        setSelectedSessionId('')
+        window.localStorage.removeItem(ASSISTANT_STORAGE_KEYS.sessionId)
+        setMessages([createOpeningMessage()])
+        setIsLoadingMessages(false)
+        return
+      }
+
+      setSessions((current) => {
+        const exists = current.some((session) => session.id === result.session.id)
+        return exists
+          ? current.map((session) => (session.id === result.session.id ? result.session : session))
+          : [result.session, ...current]
+      })
+      setMessages(result.messages.length > 0 ? formatLoadedMessages(result.messages) : [])
+      setIsLoadingMessages(false)
+    }
+
+    void loadMessages().catch(() => {
+      if (!cancelled) {
+        setWorkspaceStatus('无法读取当前会话消息。')
+        setIsLoadingMessages(false)
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [memberToken, selectedSessionId])
 
   const persistMember = (token: string, nextMember: AssistantMemberProfile) => {
     setMemberToken(token)
@@ -173,7 +425,9 @@ export function AssistantPage() {
   const clearMember = () => {
     setMemberToken('')
     setMember(null)
-    setApiSessionId('')
+    setSessions([])
+    setSelectedSessionId('')
+    setMessages([createOpeningMessage()])
     window.localStorage.removeItem(ASSISTANT_STORAGE_KEYS.memberToken)
     window.localStorage.removeItem(ASSISTANT_STORAGE_KEYS.member)
     window.localStorage.removeItem(ASSISTANT_STORAGE_KEYS.sessionId)
@@ -228,12 +482,80 @@ export function AssistantPage() {
       persistMember(token, nextMember)
       setInviteCode('')
       setMemberName('')
+      setSelectedSessionId('')
+      setMessages([createOpeningMessage()])
+      window.localStorage.removeItem(ASSISTANT_STORAGE_KEYS.sessionId)
       setInviteStatus('邀请码已兑换，后续消息会优先调用内部助手 API。')
     } catch {
       setInviteStatus('无法连接内部助手 API，当前仍可使用本地公开知识回退。')
     } finally {
       setIsRedeeming(false)
     }
+  }
+
+  const refreshSessions = async () => {
+    if (!memberToken || !API_BASE) {
+      setWorkspaceStatus('需要先兑换邀请码并配置内部助手 API。')
+      return
+    }
+
+    setIsLoadingSessions(true)
+    const sessionsResult = await requestSessions(memberToken)
+    const nextSessions = sessionsResult.data
+    setSessions(nextSessions)
+    setWorkspaceStatus(
+      sessionsResult.ok
+        ? nextSessions.length > 0
+          ? '历史会话已刷新。'
+          : '还没有历史会话。'
+        : sessionsResult.status === 503 || sessionsResult.errorCode === 'database-not-configured'
+          ? '内部 API 还没有可用数据库，历史会话暂时无法同步。'
+          : '刷新历史会话失败，请稍后再试。',
+    )
+    setIsLoadingSessions(false)
+  }
+
+  const createSession = async () => {
+    if (!memberToken || !API_BASE) {
+      setWorkspaceStatus('需要先兑换邀请码并配置内部助手 API。')
+      return
+    }
+
+    setIsCreatingSession(true)
+    const session = await requestNewSession(memberToken)
+    setIsCreatingSession(false)
+    if (!session) {
+      setWorkspaceStatus('创建会话失败，请检查内部助手 API。')
+      return
+    }
+
+    setSessions((current) => [session, ...current.filter((item) => item.id !== session.id)])
+    setSelectedSessionId(session.id)
+    setMessages([])
+    window.localStorage.setItem(ASSISTANT_STORAGE_KEYS.sessionId, session.id)
+    setWorkspaceStatus('新的内部会话已创建。')
+  }
+
+  const archiveCurrentSession = async () => {
+    if (!memberToken || !selectedSessionId) return
+    setIsArchivingSession(true)
+    const archived = await requestArchiveSession(memberToken, selectedSessionId)
+    setIsArchivingSession(false)
+    if (!archived) {
+      setWorkspaceStatus('归档会话失败，请稍后再试。')
+      return
+    }
+
+    setSessions((current) => current.filter((session) => session.id !== selectedSessionId))
+    setSelectedSessionId('')
+    setMessages([createOpeningMessage()])
+    window.localStorage.removeItem(ASSISTANT_STORAGE_KEYS.sessionId)
+    setWorkspaceStatus('会话已归档。')
+  }
+
+  const selectSession = (sessionId: string) => {
+    setSelectedSessionId(sessionId)
+    window.localStorage.setItem(ASSISTANT_STORAGE_KEYS.sessionId, sessionId)
   }
 
   const sendMessage = async (content: string) => {
@@ -247,15 +569,23 @@ export function AssistantPage() {
     setIsLoading(true)
 
     try {
-      const result = await requestInternalAnswer(trimmed, memberToken, apiSessionId)
+      const result = await requestInternalAnswer(trimmed, memberToken, selectedSessionId)
       if (result.sessionId) {
-        setApiSessionId(result.sessionId)
+        setSelectedSessionId(result.sessionId)
         window.localStorage.setItem(ASSISTANT_STORAGE_KEYS.sessionId, result.sessionId)
+      }
+      if (result.errorCode === 'session-not-found') {
+        setSelectedSessionId('')
+        window.localStorage.removeItem(ASSISTANT_STORAGE_KEYS.sessionId)
       }
       setMessages((current) => [
         ...current,
         createMessage('assistant', result.content, result.citations),
       ])
+      if (memberToken && API_BASE) {
+        const sessionsResult = await requestSessions(memberToken)
+        if (sessionsResult.ok) setSessions(sessionsResult.data)
+      }
     } catch {
       const fallback = buildLocalInternalAnswer(trimmed, '内部助手 API 暂时不可用，本地回退继续：')
       setMessages((current) => [
@@ -267,7 +597,8 @@ export function AssistantPage() {
     }
   }
 
-  const chatMode = API_BASE && memberToken ? 'API 当前会话' : '本地公开知识回退'
+  const chatMode = API_BASE && memberToken ? 'API 持久化会话' : '本地公开知识回退'
+  const composerDisabled = isLoading || draft.trim().length === 0
 
   return (
     <main className="assistant-page page-stack">
@@ -277,14 +608,14 @@ export function AssistantPage() {
             <p className="section-subtitle">INTERNAL ASSISTANT</p>
             <h1 className="assistant-sidebar__title">内部助手</h1>
             <p className="assistant-sidebar__description">
-              给内部小伙伴使用的协作入口。第一版先围绕公开站点知识、提纲整理和交付辅助，不冒充完整私有知识库。
+              面向内部协作的会话工作台。登录后自动保存历史会话，并按成员分配的模型渠道回答。
             </p>
           </div>
 
           <div className="assistant-sidebar__status">
             <span className="assistant-chip">{API_BASE ? 'API 已配置' : '本地回退'}</span>
             <span className="assistant-chip">{member ? '已兑换 token' : '未兑换邀请码'}</span>
-            <span className="assistant-chip">公开知识边界</span>
+            <span className="assistant-chip">{sessions.length > 0 ? `${sessions.length} 个会话` : '暂无历史'}</span>
           </div>
 
           <section className="assistant-auth" aria-label="成员访问">
@@ -329,26 +660,43 @@ export function AssistantPage() {
             {inviteStatus && <p className="assistant-status-text">{inviteStatus}</p>}
           </section>
 
-          <section className="assistant-session-list" aria-label="示例工作流">
-            <p className="assistant-panel__eyebrow">EXAMPLES, NOT HISTORY</p>
-            {demoInternalSessions.map((session) => (
+          <section className="assistant-session-list" aria-label="会话历史">
+            <div className="assistant-session-list__header">
+              <p className="assistant-panel__eyebrow">HISTORY</p>
+              <div className="assistant-session-actions">
+                <button type="button" onClick={() => void createSession()} disabled={!memberToken || isCreatingSession}>
+                  {isCreatingSession ? '创建中' : '新建'}
+                </button>
+                <button type="button" onClick={() => void refreshSessions()} disabled={!memberToken || isLoadingSessions}>
+                  {isLoadingSessions ? '同步中' : '刷新'}
+                </button>
+              </div>
+            </div>
+
+            {sessions.map((session) => (
               <button
                 key={session.id}
                 type="button"
                 className={`assistant-session ${session.id === selectedSessionId ? 'is-active' : ''}`}
-                onClick={() => setSelectedSessionId(session.id)}
+                onClick={() => selectSession(session.id)}
               >
                 <strong>{session.title}</strong>
                 <span>{session.preview}</span>
-                <em>{session.updatedAt}</em>
+                <em>{formatSessionUpdatedAt(session.updatedAt)}</em>
               </button>
             ))}
+
+            {sessions.length === 0 && (
+              <p className="assistant-status-text">
+                {member ? '还没有历史会话，发送消息后会自动创建。' : '兑换邀请码后会显示你的历史会话。'}
+              </p>
+            )}
           </section>
 
           <div className="assistant-sidebar__footer">
             <Link to="/assistant/admin" className="assistant-link-card">
               <strong>管理员入口</strong>
-              <span>隐藏页用于手动保存 admin token、查看摘要和创建邀请码。</span>
+              <span>管理邀请码、成员和模型渠道。</span>
             </Link>
           </div>
         </aside>
@@ -357,16 +705,23 @@ export function AssistantPage() {
           <header className="assistant-main__header">
             <div>
               <p className="assistant-main__eyebrow">CURRENT SESSION</p>
-              <h2>{selectedSession?.title ?? '当前会话'}</h2>
+              <h2>{selectedSession?.title ?? '临时会话'}</h2>
             </div>
             <div className="assistant-main__meta">
               <span>{member ? `成员：${member.name}` : '未兑换：本地回退'}</span>
               <span>{chatMode}</span>
-              <span>{apiSessionId ? '已保存当前 sessionId' : '浏览器临时会话'}</span>
+              <span>{selectedSessionId ? '已选择历史会话' : '未选择历史会话'}</span>
+              <button type="button" onClick={() => void archiveCurrentSession()} disabled={!selectedSessionId || isArchivingSession}>
+                {isArchivingSession ? '归档中' : '归档'}
+              </button>
             </div>
           </header>
 
           <div className="assistant-thread" aria-live="polite">
+            {messages.length === 0 && !isLoadingMessages && (
+              <div className="assistant-empty-state">这个会话还没有消息，输入问题即可开始。</div>
+            )}
+
             {messages.map((message) => (
               <article key={message.id} className={`assistant-bubble is-${message.role}`}>
                 <div className="assistant-bubble__meta">
@@ -387,6 +742,7 @@ export function AssistantPage() {
               </article>
             ))}
 
+            {isLoadingMessages && <div className="assistant-loading">正在读取历史消息…</div>}
             {isLoading && <div className="assistant-loading">正在整理内部助手回复…</div>}
           </div>
 
@@ -417,8 +773,8 @@ export function AssistantPage() {
               rows={4}
             />
             <div className="assistant-composer__actions">
-              <p>当前只保留本页对话。兑换邀请码后可写入当前 session，但历史列表和私有知识库还不在本版范围内。</p>
-              <button type="submit" disabled={isLoading || draft.trim().length === 0}>
+              <p>{workspaceStatus || '兑换邀请码后会写入你的内部历史会话；未连接 API 时仅使用本地公开知识回退。'}</p>
+              <button type="submit" disabled={composerDisabled}>
                 发送到内部助手
               </button>
             </div>
@@ -428,11 +784,11 @@ export function AssistantPage() {
         <aside className="assistant-inspector">
           <section className="assistant-panel">
             <p className="assistant-panel__eyebrow">BOUNDARY</p>
-            <h3>第一版边界</h3>
+            <h3>工作台边界</h3>
             <ul>
-              <li>公开助手只回答本站公开内容。</li>
-              <li>内部助手先做协作入口和当前会话。</li>
-              <li>不声明已接入私有文档或完整历史记录。</li>
+              <li>历史会话按成员 token 隔离。</li>
+              <li>模型渠道由管理员按成员分配。</li>
+              <li>内部知识源仍等待下一步接入。</li>
             </ul>
           </section>
 
@@ -440,9 +796,9 @@ export function AssistantPage() {
             <p className="assistant-panel__eyebrow">DEPLOY</p>
             <h3>部署结构</h3>
             <ul>
-              <li>Cloudflare Pages：当前主站</li>
-              <li>Render：聊天 API</li>
-              <li>PostgreSQL：邀请码和会话写入</li>
+              <li>Internal API：成员、会话、管理面。</li>
+              <li>RAG Orchestrator：scoped retrieval。</li>
+              <li>PostgreSQL：邀请码和会话持久化。</li>
             </ul>
           </section>
 
@@ -450,9 +806,9 @@ export function AssistantPage() {
             <p className="assistant-panel__eyebrow">NEXT</p>
             <h3>后续再做</h3>
             <ul>
-              <li>历史会话列表与检索</li>
-              <li>私有知识源接入</li>
-              <li>更完整的成员管理与导出</li>
+              <li>内部知识源管理和同步。</li>
+              <li>成员禁用/审计更完整的管理面。</li>
+              <li>更细的使用量和质量观察。</li>
             </ul>
           </section>
         </aside>

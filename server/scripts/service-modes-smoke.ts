@@ -143,6 +143,11 @@ try {
     const internalChat = await postJson(`${base}/chat/internal`, { message: '内部助手' })
     if (internalChat.response.status !== 404) throw new Error(`public mode should not expose internal chat, got ${internalChat.response.status}`)
 
+    const internalSessions = await fetch(`${base}/chat/internal/sessions`)
+    if (internalSessions.status !== 404) {
+      throw new Error(`public mode should not expose internal sessions, got ${internalSessions.status}`)
+    }
+
     const ragHealth = await fetch(`${base}/rag/health`)
     if (ragHealth.status !== 404) throw new Error(`public mode should not expose /rag, got ${ragHealth.status}`)
   })
@@ -156,6 +161,11 @@ try {
 
     const internalChat = await postJson(`${base}/chat/internal`, { message: '内部助手' })
     if (internalChat.response.status !== 401) throw new Error(`internal mode should require auth, got ${internalChat.response.status}`)
+
+    const internalSessions = await fetch(`${base}/chat/internal/sessions`)
+    if (internalSessions.status !== 401) {
+      throw new Error(`internal mode should expose protected internal sessions, got ${internalSessions.status}`)
+    }
 
     const adminSummary = await fetch(`${base}/admin/summary`)
     if (adminSummary.status !== 401) throw new Error(`internal mode should expose protected admin routes, got ${adminSummary.status}`)
@@ -172,6 +182,11 @@ try {
 
     const publicChat = await postJson(`${base}/chat/public`, { message: 'RAG 项目' })
     if (publicChat.response.status !== 404) throw new Error(`rag mode should not expose chat, got ${publicChat.response.status}`)
+
+    const internalSessions = await fetch(`${base}/chat/internal/sessions`)
+    if (internalSessions.status !== 404) {
+      throw new Error(`rag mode should not expose internal sessions, got ${internalSessions.status}`)
+    }
 
     const unauthorizedRetrieve = await postJson(`${base}/v1/retrieve`, { query: 'RAG 项目', scope: 'public' })
     if (unauthorizedRetrieve.response.status !== 401) throw new Error(`rag mode should require retrieve key, got ${unauthorizedRetrieve.response.status}`)
@@ -217,6 +232,11 @@ try {
 
     const internalChat = await postJson(`${base}/chat/internal`, { message: '内部助手' })
     if (internalChat.response.status !== 404) throw new Error(`studio mode should not expose internal chat, got ${internalChat.response.status}`)
+
+    const internalSessions = await fetch(`${base}/chat/internal/sessions`)
+    if (internalSessions.status !== 404) {
+      throw new Error(`studio mode should not expose internal sessions, got ${internalSessions.status}`)
+    }
 
     const ragHealth = await fetch(`${base}/rag/health`)
     if (ragHealth.status !== 404) throw new Error(`studio mode should not expose /rag, got ${ragHealth.status}`)

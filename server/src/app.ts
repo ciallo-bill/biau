@@ -131,10 +131,6 @@ function registerInternalAssistantRoutes(app: express.Express) {
         res.status(403).json({ error: 'member-disabled' })
         return
       }
-      if (!isActiveMember(member)) {
-        res.status(403).json({ error: 'member-disabled' })
-        return
-      }
 
       const prisma = requireDatabase()
       const updated = await prisma.member.update({
@@ -198,11 +194,156 @@ function registerInternalAssistantRoutes(app: express.Express) {
     }
   })
 
+  app.get('/chat/internal/sessions', async (req, res, next) => {
+    try {
+      const member = await readBearerMember(req)
+      if (!member) {
+        res.status(401).json({ error: 'missing-or-invalid-token' })
+        return
+      }
+      if (!isActiveMember(member)) {
+        res.status(403).json({ error: 'member-disabled' })
+        return
+      }
+
+      const prisma = requireDatabase()
+      const includeArchived = req.query.includeArchived === 'true'
+      const sessions = await prisma.chatSession.findMany({
+        where: {
+          memberId: member.id,
+          ...(includeArchived ? {} : { archivedAt: null }),
+        },
+        orderBy: [{ lastMessageAt: 'desc' }, { updatedAt: 'desc' }],
+        take: 100,
+        include: {
+          messages: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+          },
+        },
+      })
+      res.json({ sessions: sessions.map(serializeChatSession) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/chat/internal/sessions', async (req, res, next) => {
+    try {
+      const member = await readBearerMember(req)
+      if (!member) {
+        res.status(401).json({ error: 'missing-or-invalid-token' })
+        return
+      }
+      if (!isActiveMember(member)) {
+        res.status(403).json({ error: 'member-disabled' })
+        return
+      }
+
+      const prisma = requireDatabase()
+      const title = readBoundedString(req.body?.title, 60) || '新的内部会话'
+      const session = await prisma.chatSession.create({
+        data: {
+          memberId: member.id,
+          title,
+        },
+        include: { messages: true },
+      })
+      res.json({ session: serializeChatSession(session) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/chat/internal/sessions/:id/messages', async (req, res, next) => {
+    try {
+      const member = await readBearerMember(req)
+      if (!member) {
+        res.status(401).json({ error: 'missing-or-invalid-token' })
+        return
+      }
+      if (!isActiveMember(member)) {
+        res.status(403).json({ error: 'member-disabled' })
+        return
+      }
+
+      const prisma = requireDatabase()
+      const session = await prisma.chatSession.findFirst({
+        where: { id: req.params.id, memberId: member.id },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'asc' },
+          },
+        },
+      })
+      if (!session) {
+        res.status(404).json({ error: 'session-not-found' })
+        return
+      }
+
+      res.json({
+        session: serializeChatSession(session),
+        messages: session.messages.map(serializeChatMessage),
+      })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.patch('/chat/internal/sessions/:id', async (req, res, next) => {
+    try {
+      const member = await readBearerMember(req)
+      if (!member) {
+        res.status(401).json({ error: 'missing-or-invalid-token' })
+        return
+      }
+      if (!isActiveMember(member)) {
+        res.status(403).json({ error: 'member-disabled' })
+        return
+      }
+
+      const prisma = requireDatabase()
+      const session = await prisma.chatSession.findFirst({ where: { id: req.params.id, memberId: member.id } })
+      if (!session) {
+        res.status(404).json({ error: 'session-not-found' })
+        return
+      }
+
+      const title = req.body?.title === undefined ? undefined : readBoundedString(req.body?.title, 60)
+      if (req.body?.title !== undefined && !title) {
+        res.status(400).json({ error: 'missing-title' })
+        return
+      }
+
+      const data: Prisma.ChatSessionUpdateInput = {}
+      if (title) data.title = title
+      if (typeof req.body?.archived === 'boolean') data.archivedAt = req.body.archived ? new Date() : null
+
+      const updated = await prisma.chatSession.update({
+        where: { id: session.id },
+        data,
+        include: {
+          messages: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+          },
+        },
+      })
+      res.json({ session: serializeChatSession(updated) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.post('/chat/internal', async (req, res, next) => {
     try {
       const member = await readBearerMember(req)
       if (!member) {
         res.status(401).json({ error: 'missing-or-invalid-token' })
+        return
+      }
+      if (!isActiveMember(member)) {
+        res.status(403).json({ error: 'member-disabled' })
         return
       }
 
@@ -215,16 +356,11 @@ function registerInternalAssistantRoutes(app: express.Express) {
 
       const prisma = requireDatabase()
       const now = new Date()
-      const session =
-        sessionId
-          ? await prisma.chatSession.findFirst({ where: { id: sessionId, memberId: member.id } })
-          : await prisma.chatSession.create({
-              data: {
-                memberId: member.id,
-                title: question.slice(0, 36),
-                lastMessageAt: now,
-              },
-            })
+      const session = sessionId ? await prisma.chatSession.findFirst({ where: { id: sessionId, memberId: member.id } }) : null
+      if (sessionId && !session) {
+        res.status(404).json({ error: 'session-not-found' })
+        return
+      }
 
       const activeSession =
         session ??
@@ -450,6 +586,47 @@ function serializeMember(
   }
 }
 
+function serializeChatSession(
+  session: {
+    id: string
+    title: string
+    archivedAt: Date | null
+    lastMessageAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    messages?: Array<{ content: string; createdAt: Date }>
+  },
+) {
+  const lastMessage = session.messages?.[0]
+  const updatedAt = session.lastMessageAt ?? session.updatedAt
+  return {
+    id: session.id,
+    title: session.title,
+    archived: Boolean(session.archivedAt),
+    archivedAt: session.archivedAt?.toISOString() ?? null,
+    updatedAt: updatedAt.toISOString(),
+    createdAt: session.createdAt.toISOString(),
+    preview: lastMessage ? compactPreview(lastMessage.content) : '还没有消息，打开后可以开始新的内部协作。',
+  }
+}
+
+function serializeChatMessage(message: {
+  id: string
+  role: string
+  content: string
+  citations: unknown
+  createdAt: Date
+}) {
+  const role = message.role === 'USER' ? 'user' : message.role === 'ASSISTANT' ? 'assistant' : 'assistant'
+  return {
+    id: message.id,
+    role,
+    content: message.content,
+    citations: Array.isArray(message.citations) ? message.citations : [],
+    timestamp: message.createdAt.toISOString(),
+  }
+}
+
 function getMemberModelChannel(modelChannelId: string | null | undefined) {
   const resolved = resolveModelChannel(modelChannelId)
   const safeChannels = listSafeModelChannels()
@@ -474,6 +651,15 @@ function readModelChannelAssignment(value: unknown):
 function readMemberStatus(value: unknown) {
   if (value === 'ACTIVE' || value === 'DISABLED') return value
   return null
+}
+
+function readBoundedString(value: unknown, maxLength: number) {
+  return typeof value === 'string' ? value.trim().slice(0, maxLength) : ''
+}
+
+function compactPreview(value: string) {
+  const normalized = value.replace(/\s+/g, ' ').trim()
+  return normalized.length > 72 ? `${normalized.slice(0, 71)}…` : normalized
 }
 
 function readPositiveInteger(value: unknown, fallback: number) {

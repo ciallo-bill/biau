@@ -43,6 +43,9 @@ export interface AssistantSessionPreview {
   title: string
   updatedAt: string
   preview: string
+  archived?: boolean
+  archivedAt?: string | null
+  createdAt?: string
 }
 
 export interface AssistantSuggestion {
@@ -236,6 +239,59 @@ export function normalizeAssistantCitations(value: unknown): AssistantKnowledgeI
   return value
     .map((item) => normalizeAssistantKnowledgeItem(item))
     .filter((item): item is AssistantKnowledgeItem => item !== null)
+}
+
+export function normalizeAssistantMessage(value: unknown): AssistantMessage | null {
+  if (!isRecord(value)) return null
+  const { id, role, content, timestamp, citations } = value
+  if (
+    typeof id !== 'string' ||
+    (role !== 'user' && role !== 'assistant') ||
+    typeof content !== 'string' ||
+    typeof timestamp !== 'string'
+  ) {
+    return null
+  }
+
+  return {
+    id,
+    role,
+    content,
+    timestamp,
+    citations: normalizeAssistantCitations(citations),
+  }
+}
+
+export function normalizeAssistantMessages(value: unknown): AssistantMessage[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .map((item) => normalizeAssistantMessage(item))
+    .filter((item): item is AssistantMessage => item !== null)
+}
+
+export function normalizeAssistantSessionPreview(value: unknown): AssistantSessionPreview | null {
+  if (!isRecord(value)) return null
+  const { id, title, updatedAt, preview, archived, archivedAt, createdAt } = value
+  if (typeof id !== 'string' || typeof title !== 'string' || typeof updatedAt !== 'string' || typeof preview !== 'string') {
+    return null
+  }
+
+  return {
+    id,
+    title,
+    updatedAt,
+    preview,
+    archived: archived === true,
+    archivedAt: typeof archivedAt === 'string' || archivedAt === null ? archivedAt : undefined,
+    createdAt: typeof createdAt === 'string' ? createdAt : undefined,
+  }
+}
+
+export function normalizeAssistantSessionPreviews(value: unknown): AssistantSessionPreview[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .map((item) => normalizeAssistantSessionPreview(item))
+    .filter((item): item is AssistantSessionPreview => item !== null)
 }
 
 export function normalizeAssistantModelChannel(value: unknown): AssistantModelChannelSummary | null {

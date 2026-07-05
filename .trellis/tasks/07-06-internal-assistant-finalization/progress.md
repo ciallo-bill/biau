@@ -40,3 +40,50 @@ Sensitive scan:
 Manual gate:
 
 - User must configure real `ASSISTANT_MODEL_CHANNELS_JSON` values in Render or another private environment before production use.
+
+## 2026-07-06 internal session history
+
+Completed the next focused internal-assistant slice for member-scoped persistent session history.
+
+Implemented:
+
+- Member-protected session APIs:
+  - `GET /chat/internal/sessions`
+  - `POST /chat/internal/sessions`
+  - `GET /chat/internal/sessions/:id/messages`
+  - `PATCH /chat/internal/sessions/:id`
+- Internal chat now rejects cross-member or missing `sessionId` with `session-not-found` instead of creating or attaching to the wrong session.
+- Internal chat rejects disabled members before persistence.
+- Session previews include safe title, preview, updated time, created time, and archive state.
+- `/assistant` now uses real API-backed history instead of demo sessions:
+  - member profile sync
+  - session list sync
+  - message loading
+  - new session creation
+  - current session archive
+  - clearer token/database degraded states
+- `src/data/assistant.ts` owns session/message payload normalizers.
+- Smoke tests now assert protected session route behavior and service-mode route isolation.
+- Backend quality spec now records the internal session-history contract.
+
+Validation:
+
+- `npm.cmd run prisma:validate`
+- `npm.cmd run prisma:generate`
+- `npm.cmd run server:build`
+- `npm.cmd run server:smoke`
+- `npm.cmd run assistant:service-modes-smoke`
+- `npm.cmd run assistant:rag-smoke`
+- `npm.cmd run lint`
+- `npm.cmd run build`
+- `npm.cmd run check:ui`
+- `git diff --check`
+
+Sensitive scan:
+
+- No real key, database URL, Qdrant endpoint, model relay URL, admin token, member token, or invite code was found.
+- Hits were limited to placeholders, smoke-test values, local `127.0.0.1` mock endpoints, and code variable names.
+
+Manual gate:
+
+- Production validation still requires the user-managed Render database, migrations, member token, and real internal assistant API deployment. Local checks intentionally did not call live model/provider channels.

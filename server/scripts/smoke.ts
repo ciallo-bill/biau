@@ -621,6 +621,11 @@ try {
     throw new Error(`internal chat should require auth, got ${internalChat.status}`)
   }
 
+  const internalSessions = await fetch(`${base}/chat/internal/sessions`)
+  if (internalSessions.status !== 401) {
+    throw new Error(`internal session list should require auth, got ${internalSessions.status}`)
+  }
+
   if (!process.env.DATABASE_URL?.trim()) {
     const internalWithToken = await fetch(`${base}/chat/internal`, {
       method: 'POST',
@@ -632,6 +637,13 @@ try {
     })
     if (internalWithToken.status !== 503) {
       throw new Error(`internal chat should report missing database when token is present, got ${internalWithToken.status}`)
+    }
+
+    const sessionsWithToken = await fetch(`${base}/chat/internal/sessions`, {
+      headers: { Authorization: 'Bearer smoke-test-token' },
+    })
+    if (sessionsWithToken.status !== 503) {
+      throw new Error(`internal session list should report missing database when token is present, got ${sessionsWithToken.status}`)
     }
   }
 

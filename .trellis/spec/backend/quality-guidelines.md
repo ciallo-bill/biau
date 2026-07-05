@@ -283,6 +283,87 @@ await generateAnswer(question, citations, 'internal', {
 
 The database stores only a safe channel id; the server resolves keys and endpoints from private environment variables.
 
+## Scenario: Internal Assistant Session History
+
+### 1. Scope / Trigger
+
+- Trigger: changing internal assistant member session APIs, `/assistant` history UI, chat persistence, `ChatSession`/`ChatMessage` serialization, or service-mode route isolation.
+- Goal: let each internal member browse, create, continue, and archive only their own persisted sessions while keeping unauthenticated and no-database states low-sensitive and actionable.
+
+### 2. Signatures
+
+- Backend APIs:
+  - `GET /chat/internal/sessions`
+  - `POST /chat/internal/sessions`
+  - `GET /chat/internal/sessions/:id/messages`
+  - `PATCH /chat/internal/sessions/:id`
+  - `POST /chat/internal` with optional `{ sessionId }`.
+- Auth: all session routes require `Authorization: Bearer <member-token>`.
+- DB:
+  - `ChatSession.memberId` is the owner boundary.
+  - `ChatSession.archivedAt` hides archived sessions from the default list.
+  - `ChatSession.lastMessageAt` drives newest-first ordering.
+- Frontend:
+  - `src/data/assistant.ts` owns `normalizeAssistantSessionPreview()` and `normalizeAssistantMessages()`.
+  - `/assistant` stores only the selected `sessionId` and member token in browser convenience storage.
+
+### 3. Contracts
+
+- Session list returns `{ sessions: AssistantSessionPreview[] }`, newest first, non-archived by default.
+- Session previews expose only `{ id, title, preview, updatedAt, createdAt, archived, archivedAt }`.
+- Message load returns `{ session, messages }`, where messages normalize to `{ id, role: "user" | "assistant", content, timestamp, citations }`.
+- `POST /chat/internal` must resolve `sessionId` with `findFirst({ where: { id: sessionId, memberId: member.id } })`; never attach a message to a session owned by another member.
+- If `sessionId` is absent, internal chat creates a session for the authenticated member and returns its `sessionId`.
+- Public, RAG, and Studio service modes must not mount internal session routes; internal mode mounts them but keeps them protected.
+- Browser code must consume frontend normalizers instead of casting raw payloads inside route components.
+
+### 4. Validation & Error Matrix
+
+- Missing bearer token -> `401 { error: "missing-or-invalid-token" }`.
+- Disabled member -> `403 { error: "member-disabled" }`.
+- Present bearer token but no database -> `503 { error: "database-not-configured" }`.
+- Unknown or cross-member session id -> `404 { error: "session-not-found" }`.
+- Blank session title on rename -> `400 { error: "missing-title" }`.
+- Malformed message/session payload in the browser -> drop invalid entries and show a low-sensitive degraded status.
+
+### 5. Good/Base/Bad Cases
+
+- Good: member A sends with no `sessionId`; the API creates session A1, stores user/assistant messages, updates `lastMessageAt`, and the UI refreshes A's session list.
+- Good: member B requests A1 through `GET /chat/internal/sessions/:id/messages`; the API returns `session-not-found`, not A's messages.
+- Base: no API base URL or no member token; `/assistant` keeps a clearly labeled local public-knowledge fallback.
+- Bad: selecting a session by id with `findUnique({ where: { id } })` and then comparing owner in frontend.
+- Bad: public mode exposes `/chat/internal/sessions` even though `/chat/internal` itself is hidden.
+
+### 6. Tests Required
+
+- Run `npm.cmd run server:build` after route or serializer changes.
+- Run `npm.cmd run server:smoke`; it must assert session routes reject missing auth and report `database-not-configured` when a bearer token exists but persistence is absent.
+- Run `npm.cmd run assistant:service-modes-smoke`; it must assert public/rag/studio do not expose session routes and internal exposes them only behind auth.
+- Run `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run check:ui` after `/assistant` or payload-normalizer changes.
+- Sensitive scan changed files for member tokens, admin tokens, invite codes, database URLs, model channels, raw session content from private users, and provider endpoints.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+const session = await prisma.chatSession.findUnique({ where: { id: sessionId } })
+await prisma.chatMessage.create({ data: { sessionId: session.id, memberId: member.id, content } })
+```
+
+This lets any valid session id become a cross-member attachment point.
+
+#### Correct
+
+```ts
+const session = await prisma.chatSession.findFirst({
+  where: { id: sessionId, memberId: member.id },
+})
+if (!session) return res.status(404).json({ error: 'session-not-found' })
+```
+
+The authenticated member id is part of the database query, so another member's session is indistinguishable from a missing session.
+
 ## Avoid
 
 - Do not instantiate Prisma per request.

@@ -2789,6 +2789,18 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   gap: var(--space-8);
 }
 
+.assistant-session-list__header {
+  display: flex;
+  gap: var(--space-8);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.assistant-session-actions {
+  display: flex;
+  gap: 6px;
+}
+
 .assistant-auth,
 .assistant-auth-form,
 .assistant-member-card,
@@ -2943,6 +2955,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 .public-assistant__suggestion,
 .assistant-auth button,
 .assistant-composer button,
+.assistant-session-actions button,
+.assistant-main__meta button,
 .assistant-admin-form button,
 .assistant-admin-actions button,
 .studio-form button,
@@ -2961,6 +2975,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 .assistant-suggestions button:disabled,
 .assistant-auth button:disabled,
 .assistant-composer button:disabled,
+.assistant-session-actions button:disabled,
+.assistant-main__meta button:disabled,
 .assistant-admin-form button:disabled,
 .assistant-admin-actions button:disabled,
 .studio-form button:disabled,
@@ -3032,6 +3048,14 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 
 .assistant-status-text {
   margin: 0;
+}
+
+.assistant-empty-state {
+  padding: var(--space-20, 20px);
+  color: var(--muted);
+  background: color-mix(in oklch, var(--panel) 38%, transparent);
+  border: 1px dashed var(--flow-ui-border);
+  border-radius: var(--radius-lg);
 }
 
 .assistant-inspector {
