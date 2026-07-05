@@ -76,6 +76,21 @@ export interface AssistantModelChannelSummary {
   isDefault: boolean
 }
 
+export type AssistantInviteStatus = 'OPEN' | 'EXHAUSTED' | 'EXPIRED' | 'REVOKED'
+
+export interface AssistantInviteSummary {
+  id: string
+  label: string
+  role: AssistantMemberRole
+  dailyQuota: number
+  maxUses: number
+  usedCount: number
+  status: AssistantInviteStatus
+  expiresAt?: string | null
+  revokedAt?: string | null
+  createdAt?: string
+}
+
 export const publicAssistantSuggestions: AssistantSuggestion[] = [
   {
     id: 'demo-ready-projects',
@@ -292,6 +307,42 @@ export function normalizeAssistantSessionPreviews(value: unknown): AssistantSess
   return value
     .map((item) => normalizeAssistantSessionPreview(item))
     .filter((item): item is AssistantSessionPreview => item !== null)
+}
+
+export function normalizeAssistantInvite(value: unknown): AssistantInviteSummary | null {
+  if (!isRecord(value)) return null
+  const { id, label, role, dailyQuota, maxUses, usedCount, status, expiresAt, revokedAt, createdAt } = value
+  if (
+    typeof id !== 'string' ||
+    typeof label !== 'string' ||
+    (role !== 'MEMBER' && role !== 'ADMIN') ||
+    typeof dailyQuota !== 'number' ||
+    typeof maxUses !== 'number' ||
+    typeof usedCount !== 'number' ||
+    (status !== 'OPEN' && status !== 'EXHAUSTED' && status !== 'EXPIRED' && status !== 'REVOKED')
+  ) {
+    return null
+  }
+
+  return {
+    id,
+    label,
+    role,
+    dailyQuota,
+    maxUses,
+    usedCount,
+    status,
+    expiresAt: typeof expiresAt === 'string' || expiresAt === null ? expiresAt : undefined,
+    revokedAt: typeof revokedAt === 'string' || revokedAt === null ? revokedAt : undefined,
+    createdAt: typeof createdAt === 'string' ? createdAt : undefined,
+  }
+}
+
+export function normalizeAssistantInvites(value: unknown): AssistantInviteSummary[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .map((item) => normalizeAssistantInvite(item))
+    .filter((item): item is AssistantInviteSummary => item !== null)
 }
 
 export function normalizeAssistantModelChannel(value: unknown): AssistantModelChannelSummary | null {

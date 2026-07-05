@@ -364,6 +364,84 @@ if (!session) return res.status(404).json({ error: 'session-not-found' })
 
 The authenticated member id is part of the database query, so another member's session is indistinguishable from a missing session.
 
+## Scenario: Internal Assistant Admin Controls
+
+### 1. Scope / Trigger
+
+- Trigger: changing `/admin/summary`, `/admin/members`, `/admin/invites`, `/assistant/admin`, invite revocation, member disable/enable, or assistant admin payload normalizers.
+- Goal: give the owner an operational admin surface without exposing invite codes, invite hashes, member token hashes, admin tokens, model endpoints, or provider secrets.
+
+### 2. Signatures
+
+- Admin auth: every admin route requires `Authorization: Bearer <ADMIN_TOKEN>`.
+- APIs:
+  - `GET /admin/summary`
+  - `GET /admin/members`
+  - `PATCH /admin/members/:id`
+  - `GET /admin/invites`
+  - `POST /admin/invites`
+  - `PATCH /admin/invites/:id`
+- Frontend normalizers:
+  - `normalizeAssistantMember()`
+  - `normalizeAssistantInvite()`
+  - `normalizeAssistantInvites()`
+  - `normalizeAssistantModelChannels()`
+
+### 3. Contracts
+
+- Invite list responses expose metadata only: `{ id, label, role, dailyQuota, maxUses, usedCount, status, expiresAt, revokedAt, createdAt }`.
+- Invite list responses must never expose plaintext invite codes, `codeHash`, member tokens, token hashes, or raw authorization headers.
+- Invite statuses are derived server-side as `OPEN`, `EXHAUSTED`, `EXPIRED`, or `REVOKED`.
+- `PATCH /admin/invites/:id` accepts `{ revoked: boolean }` and stores only `revokedAt`.
+- `PATCH /admin/members/:id` accepts `{ status?: "ACTIVE" | "DISABLED", modelChannelId?: string | null }`.
+- Disabling a member sets `disabledAt`; enabling clears `disabledAt`.
+- `/assistant/admin` may store the admin token in local browser storage for convenience, but it must use `type="password"` and never render the token in status text.
+
+### 4. Validation & Error Matrix
+
+- Missing or mismatched admin token -> `401 { error: "missing-admin-token" }`.
+- Valid admin token but no database -> `503 { error: "database-not-configured" }`.
+- Unknown member -> `404 { error: "member-not-found" }`.
+- Unsupported member status -> `400 { error: "unsupported-member-status" }`.
+- Unknown invite -> `404 { error: "invite-not-found" }`.
+- Non-boolean invite revocation payload -> `400 { error: "unsupported-invite-revocation" }`.
+- Unknown model channel assignment -> `400 { error: "unsupported-model-channel" }`.
+
+### 5. Good/Base/Bad Cases
+
+- Good: owner refreshes invites, sees only labels/status/counts, and revokes an invite; future redemption fails because `revokedAt` is set.
+- Good: owner disables a member; `/chat/internal`, `/me`, and session APIs reject that member with `member-disabled`.
+- Base: no database configured; admin UI explains the deployment gap without showing stack traces or env values.
+- Bad: invite list includes `codeHash`, original plaintext code, bearer token, or a direct provider/base URL.
+- Bad: frontend constructs admin payloads from arbitrary objects without using assistant normalizers at the API boundary.
+
+### 6. Tests Required
+
+- Run `npm.cmd run server:build` after admin route changes.
+- Run `npm.cmd run server:smoke`; it must assert admin routes reject missing admin token and report `database-not-configured` when a valid admin token is present but persistence is absent.
+- Run `npm.cmd run assistant:service-modes-smoke`; it must assert admin invite routes are mounted only in internal/all mode.
+- Run `npm.cmd run lint`, `npm.cmd run build`, and `npm.cmd run check:ui` after `/assistant/admin` or normalizer changes.
+- Sensitive scan changed files for invite codes, `codeHash`, member tokens, admin tokens, database URLs, model channel endpoints, and provider keys.
+
+### 7. Wrong vs Correct
+
+#### Wrong
+
+```ts
+res.json(await prisma.invite.findMany())
+```
+
+This leaks `codeHash` and makes future schema additions accidentally public.
+
+#### Correct
+
+```ts
+const invites = await prisma.invite.findMany({ orderBy: { createdAt: 'desc' }, take: 100 })
+res.json({ invites: invites.map(serializeInvite) })
+```
+
+`serializeInvite()` owns the public admin metadata contract and excludes all secret or hash fields.
+
 ## Avoid
 
 - Do not instantiate Prisma per request.

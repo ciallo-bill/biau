@@ -148,6 +148,11 @@ try {
       throw new Error(`public mode should not expose internal sessions, got ${internalSessions.status}`)
     }
 
+    const adminInvites = await fetch(`${base}/admin/invites`)
+    if (adminInvites.status !== 404) {
+      throw new Error(`public mode should not expose admin invite routes, got ${adminInvites.status}`)
+    }
+
     const ragHealth = await fetch(`${base}/rag/health`)
     if (ragHealth.status !== 404) throw new Error(`public mode should not expose /rag, got ${ragHealth.status}`)
   })
@@ -170,6 +175,9 @@ try {
     const adminSummary = await fetch(`${base}/admin/summary`)
     if (adminSummary.status !== 401) throw new Error(`internal mode should expose protected admin routes, got ${adminSummary.status}`)
 
+    const adminInvites = await fetch(`${base}/admin/invites`)
+    if (adminInvites.status !== 401) throw new Error(`internal mode should expose protected admin invite routes, got ${adminInvites.status}`)
+
     const ragHealth = await fetch(`${base}/rag/health`)
     if (ragHealth.status !== 404) throw new Error(`internal mode should not expose /rag, got ${ragHealth.status}`)
   })
@@ -186,6 +194,11 @@ try {
     const internalSessions = await fetch(`${base}/chat/internal/sessions`)
     if (internalSessions.status !== 404) {
       throw new Error(`rag mode should not expose internal sessions, got ${internalSessions.status}`)
+    }
+
+    const adminInvites = await fetch(`${base}/admin/invites`)
+    if (adminInvites.status !== 404) {
+      throw new Error(`rag mode should not expose admin invite routes, got ${adminInvites.status}`)
     }
 
     const unauthorizedRetrieve = await postJson(`${base}/v1/retrieve`, { query: 'RAG 项目', scope: 'public' })
@@ -236,6 +249,11 @@ try {
     const internalSessions = await fetch(`${base}/chat/internal/sessions`)
     if (internalSessions.status !== 404) {
       throw new Error(`studio mode should not expose internal sessions, got ${internalSessions.status}`)
+    }
+
+    const adminInvites = await fetch(`${base}/admin/invites`)
+    if (adminInvites.status !== 404) {
+      throw new Error(`studio mode should not expose admin invite routes, got ${adminInvites.status}`)
     }
 
     const ragHealth = await fetch(`${base}/rag/health`)

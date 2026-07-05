@@ -162,6 +162,7 @@ const app = createApp()
 const server = app.listen(port, '127.0.0.1')
 const base = `http://127.0.0.1:${port}`
 const originalModelEnv = snapshotModelEnv()
+const originalAdminToken = env.adminToken
 const originalStudioAdminToken = env.studioAdminToken
 const originalStudioDatabaseUrl = env.studioDatabaseUrl
 
@@ -626,6 +627,11 @@ try {
     throw new Error(`internal session list should require auth, got ${internalSessions.status}`)
   }
 
+  const adminInvites = await fetch(`${base}/admin/invites`)
+  if (adminInvites.status !== 401) {
+    throw new Error(`admin invite list should require admin token, got ${adminInvites.status}`)
+  }
+
   if (!process.env.DATABASE_URL?.trim()) {
     const internalWithToken = await fetch(`${base}/chat/internal`, {
       method: 'POST',
@@ -645,11 +651,32 @@ try {
     if (sessionsWithToken.status !== 503) {
       throw new Error(`internal session list should report missing database when token is present, got ${sessionsWithToken.status}`)
     }
+
+    env.adminToken = 'admin-smoke-token'
+    const invitesWithAdminToken = await fetch(`${base}/admin/invites`, {
+      headers: { Authorization: 'Bearer admin-smoke-token' },
+    })
+    if (invitesWithAdminToken.status !== 503) {
+      throw new Error(`admin invite list should report missing database when admin token is present, got ${invitesWithAdminToken.status}`)
+    }
+
+    const revokeInviteWithoutDb = await fetch(`${base}/admin/invites/smoke-invite-id`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: 'Bearer admin-smoke-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ revoked: true }),
+    })
+    if (revokeInviteWithoutDb.status !== 503) {
+      throw new Error(`admin invite revoke should report missing database when admin token is present, got ${revokeInviteWithoutDb.status}`)
+    }
   }
 
   console.log('Assistant API smoke passed')
 } finally {
   restoreModelEnv(originalModelEnv)
+  env.adminToken = originalAdminToken
   env.studioAdminToken = originalStudioAdminToken
   env.studioDatabaseUrl = originalStudioDatabaseUrl
   server.close()

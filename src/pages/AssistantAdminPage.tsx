@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import {
   ASSISTANT_STORAGE_KEYS,
+  normalizeAssistantInvites,
   normalizeAssistantMember,
   normalizeAssistantModelChannels,
+  type AssistantInviteSummary,
   type AssistantMemberProfile,
   type AssistantModelChannelSummary,
 } from '../data/assistant'
@@ -14,6 +16,10 @@ interface AdminSummary {
   members: number
   disabledMembers: number
   invites: number
+  openInvites: number
+  revokedInvites: number
+  expiredInvites: number
+  exhaustedInvites: number
   messages: number
   usage: number
   modelChannels: AssistantModelChannelSummary[]
@@ -31,6 +37,10 @@ const emptySummary: AdminSummary = {
   members: 0,
   disabledMembers: 0,
   invites: 0,
+  openInvites: 0,
+  revokedInvites: 0,
+  expiredInvites: 0,
+  exhaustedInvites: 0,
   messages: 0,
   usage: 0,
   modelChannels: [],
@@ -55,7 +65,7 @@ function readStoredAdminToken() {
 
 function normalizeSummary(value: unknown): AdminSummary | null {
   if (!isRecord(value)) return null
-  const { members, disabledMembers, invites, messages, usage, modelChannels } = value
+  const { members, disabledMembers, invites, openInvites, revokedInvites, expiredInvites, exhaustedInvites, messages, usage, modelChannels } = value
   if (
     typeof members !== 'number' ||
     typeof invites !== 'number' ||
@@ -68,6 +78,10 @@ function normalizeSummary(value: unknown): AdminSummary | null {
     members,
     disabledMembers: typeof disabledMembers === 'number' ? disabledMembers : 0,
     invites,
+    openInvites: typeof openInvites === 'number' ? openInvites : 0,
+    revokedInvites: typeof revokedInvites === 'number' ? revokedInvites : 0,
+    expiredInvites: typeof expiredInvites === 'number' ? expiredInvites : 0,
+    exhaustedInvites: typeof exhaustedInvites === 'number' ? exhaustedInvites : 0,
     messages,
     usage,
     modelChannels: normalizeAssistantModelChannels(modelChannels),
@@ -91,7 +105,24 @@ function explainAdminError(status: number, errorCode: string) {
   if (errorCode === 'missing-code') return '请输入邀请码。'
   if (errorCode === 'unsupported-model-channel') return '模型渠道不存在或未在服务端配置。'
   if (errorCode === 'member-not-found') return '成员不存在或已被删除。'
+  if (errorCode === 'invite-not-found') return '邀请码不存在或已被删除。'
+  if (errorCode === 'unsupported-invite-revocation') return '邀请码撤销参数不正确。'
+  if (errorCode === 'unsupported-member-status') return '成员状态参数不正确。'
   return `管理接口返回 ${status}，请检查 API 服务。`
+}
+
+function formatAdminDate(value?: string | null) {
+  if (!value) return '未设置'
+  const parsed = Date.parse(value)
+  if (Number.isNaN(parsed)) return value
+  return new Date(parsed).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
+const inviteStatusLabels: Record<AssistantInviteSummary['status'], string> = {
+  OPEN: '可用',
+  EXHAUSTED: '已用尽',
+  EXPIRED: '已过期',
+  REVOKED: '已撤销',
 }
 
 export function AssistantAdminPage() {
@@ -100,12 +131,16 @@ export function AssistantAdminPage() {
   const [summary, setSummary] = useState<AdminSummary>(emptySummary)
   const [summaryStatus, setSummaryStatus] = useState('')
   const [inviteStatus, setInviteStatus] = useState('')
+  const [invitesStatus, setInvitesStatus] = useState('')
   const [membersStatus, setMembersStatus] = useState('')
   const [isLoadingSummary, setIsLoadingSummary] = useState(false)
   const [isCreatingInvite, setIsCreatingInvite] = useState(false)
+  const [isLoadingInvites, setIsLoadingInvites] = useState(false)
   const [isLoadingMembers, setIsLoadingMembers] = useState(false)
   const [updatingMemberId, setUpdatingMemberId] = useState('')
+  const [updatingInviteId, setUpdatingInviteId] = useState('')
   const [inviteForm, setInviteForm] = useState<InviteFormState>(defaultInviteForm)
+  const [invites, setInvites] = useState<AssistantInviteSummary[]>([])
   const [members, setMembers] = useState<AssistantMemberProfile[]>([])
   const [modelChannels, setModelChannels] = useState<AssistantModelChannelSummary[]>([])
 
@@ -204,6 +239,41 @@ export function AssistantAdminPage() {
     }
   }
 
+  const loadInvites = async () => {
+    if (!API_BASE) {
+      setInvitesStatus(`当前没有配置 ${ASSISTANT_API_ENV_NAMES.internal}，无法调用邀请码 API。`)
+      return
+    }
+    if (!adminToken) {
+      setInvitesStatus('请先保存 admin token。')
+      return
+    }
+
+    setIsLoadingInvites(true)
+    setInvitesStatus('')
+    try {
+      const response = await fetch(`${API_BASE}/admin/invites`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const payload = (await response.json().catch(() => ({}))) as unknown
+      if (!response.ok) {
+        setInvitesStatus(explainAdminError(response.status, getErrorCode(payload)))
+        return
+      }
+      if (!isRecord(payload)) {
+        setInvitesStatus('邀请码 API 返回格式不完整。')
+        return
+      }
+
+      setInvites(normalizeAssistantInvites(payload.invites))
+      setInvitesStatus('邀请码列表已更新。')
+    } catch {
+      setInvitesStatus('无法连接邀请码 API。')
+    } finally {
+      setIsLoadingInvites(false)
+    }
+  }
+
   const updateMemberModelChannel = async (memberId: string, modelChannelId: string) => {
     if (!API_BASE || !adminToken) {
       setMembersStatus('请先保存 admin token 并确认 API base 已配置。')
@@ -244,6 +314,92 @@ export function AssistantAdminPage() {
       setMembersStatus('无法连接成员更新 API。')
     } finally {
       setUpdatingMemberId('')
+    }
+  }
+
+  const updateMemberStatus = async (memberId: string, status: 'ACTIVE' | 'DISABLED') => {
+    if (!API_BASE || !adminToken) {
+      setMembersStatus('请先保存 admin token 并确认 API base 已配置。')
+      return
+    }
+
+    setUpdatingMemberId(memberId)
+    setMembersStatus('')
+    try {
+      const response = await fetch(`${API_BASE}/admin/members/${memberId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      })
+      const payload = (await response.json().catch(() => ({}))) as unknown
+      if (!response.ok) {
+        setMembersStatus(explainAdminError(response.status, getErrorCode(payload)))
+        return
+      }
+      if (!isRecord(payload)) {
+        setMembersStatus('成员更新 API 返回格式不完整。')
+        return
+      }
+
+      const updated = normalizeAssistantMember(payload.member)
+      if (!updated) {
+        setMembersStatus('成员更新 API 返回的成员格式不完整。')
+        return
+      }
+
+      setMembers((current) => current.map((member) => (member.id === updated.id ? updated : member)))
+      setMembersStatus(`${updated.name} 已${status === 'DISABLED' ? '禁用' : '启用'}。`)
+      void loadSummary()
+    } catch {
+      setMembersStatus('无法连接成员更新 API。')
+    } finally {
+      setUpdatingMemberId('')
+    }
+  }
+
+  const updateInviteRevocation = async (inviteId: string, revoked: boolean) => {
+    if (!API_BASE || !adminToken) {
+      setInvitesStatus('请先保存 admin token 并确认 API base 已配置。')
+      return
+    }
+
+    setUpdatingInviteId(inviteId)
+    setInvitesStatus('')
+    try {
+      const response = await fetch(`${API_BASE}/admin/invites/${inviteId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ revoked }),
+      })
+      const payload = (await response.json().catch(() => ({}))) as unknown
+      if (!response.ok) {
+        setInvitesStatus(explainAdminError(response.status, getErrorCode(payload)))
+        return
+      }
+      if (!isRecord(payload)) {
+        setInvitesStatus('邀请码更新 API 返回格式不完整。')
+        return
+      }
+
+      const updated = normalizeAssistantInvites([payload.invite])[0]
+      if (!updated) {
+        setInvitesStatus('邀请码更新 API 返回格式不完整。')
+        return
+      }
+
+      setInvites((current) => current.map((invite) => (invite.id === updated.id ? updated : invite)))
+      setInvitesStatus(`邀请码已${revoked ? '撤销' : '恢复'}：${updated.label}`)
+      void loadSummary()
+    } catch {
+      setInvitesStatus('无法连接邀请码更新 API。')
+    } finally {
+      setUpdatingInviteId('')
     }
   }
 
@@ -291,7 +447,11 @@ export function AssistantAdminPage() {
         return
       }
 
-      const label = isRecord(payload) && typeof payload.label === 'string' ? payload.label : inviteForm.label
+      const invite = isRecord(payload) ? normalizeAssistantInvites([payload.invite])[0] : null
+      const label = invite?.label ?? inviteForm.label
+      if (invite) {
+        setInvites((current) => [invite, ...current.filter((item) => item.id !== invite.id)])
+      }
       setInviteStatus(`邀请码已创建：${label}`)
       setInviteForm({ ...defaultInviteForm, label: inviteForm.label || defaultInviteForm.label })
       void loadSummary()
@@ -357,6 +517,14 @@ export function AssistantAdminPage() {
               <span>
                 <strong>{summary.invites}</strong>
                 邀请码
+              </span>
+              <span>
+                <strong>{summary.openInvites}</strong>
+                可用邀请
+              </span>
+              <span>
+                <strong>{summary.revokedInvites}</strong>
+                已撤销邀请
               </span>
               <span>
                 <strong>{summary.messages}</strong>
@@ -430,6 +598,38 @@ export function AssistantAdminPage() {
             </form>
 
             {inviteStatus && <p className="assistant-status-text">{inviteStatus}</p>}
+
+            <div className="assistant-admin-actions">
+              <button type="button" onClick={() => void loadInvites()} disabled={isLoadingInvites || !adminToken}>
+                {isLoadingInvites ? '读取中…' : '刷新邀请码'}
+              </button>
+            </div>
+            {invitesStatus && <p className="assistant-status-text">{invitesStatus}</p>}
+            <div className="assistant-admin-table" aria-label="邀请码列表">
+              {invites.map((invite) => (
+                <div key={invite.id} className="assistant-admin-row assistant-admin-row--member">
+                  <div>
+                    <strong>{invite.label}</strong>
+                    <span>
+                      {invite.role} · {inviteStatusLabels[invite.status]} · {invite.usedCount}/{invite.maxUses} 次
+                    </span>
+                    <span>
+                      创建：{formatAdminDate(invite.createdAt)} · 过期：{formatAdminDate(invite.expiresAt)}
+                    </span>
+                  </div>
+                  <div className="assistant-admin-actions">
+                    <button
+                      type="button"
+                      disabled={updatingInviteId === invite.id}
+                      onClick={() => void updateInviteRevocation(invite.id, invite.status !== 'REVOKED')}
+                    >
+                      {invite.status === 'REVOKED' ? '恢复' : '撤销'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {invites.length === 0 && <p className="assistant-status-text">刷新后会显示最近的邀请码；不会展示明文邀请码或 hash。</p>}
+            </div>
           </article>
 
           <article className="assistant-admin-card">
@@ -467,6 +667,15 @@ export function AssistantAdminPage() {
                       ))}
                     </select>
                   </label>
+                  <div className="assistant-admin-actions">
+                    <button
+                      type="button"
+                      disabled={updatingMemberId === member.id}
+                      onClick={() => void updateMemberStatus(member.id, member.status === 'DISABLED' ? 'ACTIVE' : 'DISABLED')}
+                    >
+                      {member.status === 'DISABLED' ? '启用' : '禁用'}
+                    </button>
+                  </div>
                 </div>
               ))}
               {members.length === 0 && <p className="assistant-status-text">刷新后会显示已兑换邀请码的内部成员。</p>}

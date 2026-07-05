@@ -87,3 +87,38 @@ Sensitive scan:
 Manual gate:
 
 - Production validation still requires the user-managed Render database, migrations, member token, and real internal assistant API deployment. Local checks intentionally did not call live model/provider channels.
+
+## 2026-07-06 admin invite and member controls
+
+Completed the next focused admin-management slice for internal assistant operations.
+
+Implemented:
+
+- `/admin/summary` now includes invite state counts: open, revoked, expired, exhausted.
+- Added admin invite APIs:
+  - `GET /admin/invites`
+  - `PATCH /admin/invites/:id` with `{ revoked: boolean }`
+- Invite list responses expose safe metadata only and never include plaintext invite codes or `codeHash`.
+- Existing invite redemption already rejects revoked invites through `revokedAt`.
+- `/assistant/admin` now supports:
+  - refreshing invite metadata
+  - revoking/restoring invites
+  - enabling/disabling members
+  - displaying safe invite/member statuses
+- `src/data/assistant.ts` owns invite payload normalizers.
+- Smoke tests now cover admin invite auth/no-database behavior and service-mode isolation.
+- Backend quality spec now records the admin-control contract.
+
+Validation:
+
+- `npm.cmd run prisma:validate`
+- `npm.cmd run server:build`
+- `npm.cmd run server:smoke`
+- `npm.cmd run assistant:service-modes-smoke`
+- `npm.cmd run lint`
+- `npm.cmd run build`
+- `npm.cmd run check:ui`
+
+Manual gate:
+
+- Production admin control validation still requires the deployed internal API, migrated database, and user-managed `ADMIN_TOKEN`. Local validation did not create, revoke, or inspect production invites.

@@ -1,6 +1,6 @@
 import cors from 'cors'
 import express from 'express'
-import { Prisma, type Member } from '@prisma/client'
+import { Prisma, type Invite, type Member } from '@prisma/client'
 import { env, hasDatabase } from './env.js'
 import { sha256 } from './crypto.js'
 import { issueMemberToken, readBearerMember, requireDatabase } from './auth.js'
@@ -446,14 +446,33 @@ function registerInternalAssistantRoutes(app: express.Express) {
       }
 
       const prisma = requireDatabase()
-      const [members, invites, messages, usage, disabledMembers] = await Promise.all([
+      const [members, inviteRows, messages, usage, disabledMembers] = await Promise.all([
         prisma.member.count(),
-        prisma.invite.count(),
+        prisma.invite.findMany({
+          select: {
+            revokedAt: true,
+            expiresAt: true,
+            usedCount: true,
+            maxUses: true,
+          },
+        }),
         prisma.chatMessage.count(),
         prisma.usageLog.count(),
         prisma.member.count({ where: { status: 'DISABLED' } }),
       ])
-      res.json({ members, invites, messages, usage, disabledMembers, modelChannels: listSafeModelChannels() })
+      const inviteSummary = summarizeInvites(inviteRows)
+      res.json({
+        members,
+        invites: inviteSummary.total,
+        openInvites: inviteSummary.open,
+        revokedInvites: inviteSummary.revoked,
+        expiredInvites: inviteSummary.expired,
+        exhaustedInvites: inviteSummary.exhausted,
+        messages,
+        usage,
+        disabledMembers,
+        modelChannels: listSafeModelChannels(),
+      })
     } catch (error) {
       next(error)
     }
@@ -529,6 +548,55 @@ function registerInternalAssistantRoutes(app: express.Express) {
     }
   })
 
+  app.get('/admin/invites', async (req, res, next) => {
+    try {
+      if (!isAdminRequest(req.headers.authorization)) {
+        res.status(401).json({ error: 'missing-admin-token' })
+        return
+      }
+
+      const prisma = requireDatabase()
+      const invites = await prisma.invite.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      })
+      res.json({ invites: invites.map(serializeInvite) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.patch('/admin/invites/:id', async (req, res, next) => {
+    try {
+      if (!isAdminRequest(req.headers.authorization)) {
+        res.status(401).json({ error: 'missing-admin-token' })
+        return
+      }
+
+      if (typeof req.body?.revoked !== 'boolean') {
+        res.status(400).json({ error: 'unsupported-invite-revocation' })
+        return
+      }
+
+      const prisma = requireDatabase()
+      const invite = await prisma.invite.findUnique({ where: { id: req.params.id } })
+      if (!invite) {
+        res.status(404).json({ error: 'invite-not-found' })
+        return
+      }
+
+      const updated = await prisma.invite.update({
+        where: { id: invite.id },
+        data: {
+          revokedAt: req.body.revoked ? new Date() : null,
+        },
+      })
+      res.json({ invite: serializeInvite(updated) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.post('/admin/invites', async (req, res, next) => {
     try {
       if (!isAdminRequest(req.headers.authorization)) {
@@ -553,7 +621,7 @@ function registerInternalAssistantRoutes(app: express.Express) {
           maxUses: readPositiveInteger(req.body?.maxUses, 1),
         },
       })
-      res.json({ id: invite.id, label: invite.label, role: invite.role, dailyQuota: invite.dailyQuota, maxUses: invite.maxUses })
+      res.json({ invite: serializeInvite(invite) })
     } catch (error) {
       next(error)
     }
@@ -584,6 +652,56 @@ function serializeMember(
     lastSeenAt: member.lastSeenAt?.toISOString() ?? null,
     createdAt: member.createdAt.toISOString(),
   }
+}
+
+function serializeInvite(invite: {
+  id: string
+  label: string
+  role: string
+  dailyQuota: number
+  maxUses: number
+  usedCount: number
+  expiresAt: Date | null
+  revokedAt: Date | null
+  createdAt: Date
+}) {
+  return {
+    id: invite.id,
+    label: invite.label,
+    role: invite.role,
+    dailyQuota: invite.dailyQuota,
+    maxUses: invite.maxUses,
+    usedCount: invite.usedCount,
+    status: getInviteStatus(invite),
+    expiresAt: invite.expiresAt?.toISOString() ?? null,
+    revokedAt: invite.revokedAt?.toISOString() ?? null,
+    createdAt: invite.createdAt.toISOString(),
+  }
+}
+
+function getInviteStatus(invite: Pick<Invite, 'revokedAt' | 'expiresAt' | 'usedCount' | 'maxUses'>) {
+  if (invite.revokedAt) return 'REVOKED'
+  if (invite.expiresAt && invite.expiresAt < new Date()) return 'EXPIRED'
+  if (invite.usedCount >= invite.maxUses) return 'EXHAUSTED'
+  return 'OPEN'
+}
+
+function summarizeInvites(invites: Array<Pick<Invite, 'revokedAt' | 'expiresAt' | 'usedCount' | 'maxUses'>>) {
+  const summary = {
+    total: invites.length,
+    open: 0,
+    revoked: 0,
+    expired: 0,
+    exhausted: 0,
+  }
+  for (const invite of invites) {
+    const status = getInviteStatus(invite)
+    if (status === 'OPEN') summary.open += 1
+    if (status === 'REVOKED') summary.revoked += 1
+    if (status === 'EXPIRED') summary.expired += 1
+    if (status === 'EXHAUSTED') summary.exhausted += 1
+  }
+  return summary
 }
 
 function serializeChatSession(
