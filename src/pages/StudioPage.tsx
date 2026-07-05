@@ -9,6 +9,8 @@ import {
   normalizeStudioHealth,
   normalizeStudioIssue,
   normalizeStudioIssues,
+  normalizeStudioPublishExport,
+  normalizeStudioPublishExports,
   normalizeStudioSource,
   normalizeStudioSources,
   readStoredStudioToken,
@@ -20,6 +22,7 @@ import {
   type StudioAiDailyIssue,
   type StudioDraft,
   type StudioHealth,
+  type StudioPublishExport,
   type StudioSourceItem,
   type StudioSourceTier,
   type StudioVisibility,
@@ -131,9 +134,23 @@ function getIssueFromPayload(payload: unknown) {
   return isRecord(payload) ? normalizeStudioIssue(payload.issue) : null
 }
 
+function getPublishExportFromPayload(payload: unknown) {
+  return isRecord(payload) ? normalizeStudioPublishExport(payload.publishExport) : null
+}
+
 function formatDateTime(value: string) {
   if (!value) return '未知'
   return new Date(value).toLocaleString('zh-CN', { hour12: false })
+}
+
+function readPublishExportStatus(checks: unknown) {
+  if (!isRecord(checks)) return '未回写检查'
+  const status = checks.status
+  if (status === 'pending-local-export') return '等待本地导出'
+  if (status === 'local-export-written') return '已写入，待检查'
+  if (status === 'passed') return '检查通过'
+  if (status === 'failed') return '检查失败'
+  return typeof status === 'string' && status ? status : '已记录检查'
 }
 
 function draftToForm(draft: StudioDraft): DraftFormState {
@@ -160,6 +177,7 @@ export function StudioPage() {
   const [drafts, setDrafts] = useState<StudioDraft[]>([])
   const [sources, setSources] = useState<StudioSourceItem[]>([])
   const [issues, setIssues] = useState<StudioAiDailyIssue[]>([])
+  const [publishExports, setPublishExports] = useState<StudioPublishExport[]>([])
   const [selectedDraftId, setSelectedDraftId] = useState('')
   const [draftForm, setDraftForm] = useState<DraftFormState>(defaultDraftForm)
   const [sourceForm, setSourceForm] = useState<SourceFormState>(defaultSourceForm)
@@ -205,6 +223,7 @@ export function StudioPage() {
     setDrafts([])
     setSources([])
     setIssues([])
+    setPublishExports([])
     window.localStorage.removeItem(STUDIO_STORAGE_KEYS.adminToken)
     setStatusText('Studio token 已清除。')
   }
@@ -238,14 +257,16 @@ export function StudioPage() {
         return
       }
 
-      const [draftResult, sourceResult, issueResult] = await Promise.all([
+      const [draftResult, sourceResult, issueResult, publishExportResult] = await Promise.all([
         requestStudioApi('/content-drafts', token),
         requestStudioApi('/source-items', token),
         requestStudioApi('/ai-daily/issues', token),
+        requestStudioApi('/publish-exports', token),
       ])
       if (draftResult.ok) setDrafts(normalizeStudioDrafts(draftResult.payload))
       if (sourceResult.ok) setSources(normalizeStudioSources(sourceResult.payload))
       if (issueResult.ok) setIssues(normalizeStudioIssues(issueResult.payload))
+      if (publishExportResult.ok) setPublishExports(normalizeStudioPublishExports(publishExportResult.payload))
       setStatusText('Studio 数据已刷新。')
     } catch {
       setStatusText('无法连接 Studio API。')
@@ -372,11 +393,13 @@ export function StudioPage() {
         exportedBy: draftForm.editorName.trim(),
       }),
     })
-    setStatusText(
-      result.ok
-        ? '已创建发布导出记录；实际写入公开数据会在导出器切片完成。'
-        : explainStudioApiError(result.status, readStudioError(result.payload)),
-    )
+    if (!result.ok) {
+      setStatusText(explainStudioApiError(result.status, readStudioError(result.payload)))
+      return
+    }
+    const publishExport = getPublishExportFromPayload(result.payload)
+    if (publishExport) setPublishExports((current) => [publishExport, ...current.filter((item) => item.id !== publishExport.id)])
+    setStatusText('已创建发布导出记录；本地导出器写入公开数据后可回写文件列表和检查结果。')
   }
 
   const saveSource = async (event: FormEvent<HTMLFormElement>) => {
@@ -819,7 +842,7 @@ export function StudioPage() {
             <h2>发布边界</h2>
             <ul className="assistant-admin-list">
               <li>数据库草稿不会直接出现在公开站。</li>
-              <li>审核通过后只创建导出记录，实际写文件由后续导出器完成。</li>
+              <li>审核通过后创建导出记录，由本地/CI 导出器写入公开数据并回写检查结果。</li>
               <li>模型辅助默认关闭，真实调用必须按具体内容任务批准。</li>
               <li>来源和正文会拦截明显 token、key 和数据库连接串。</li>
             </ul>
@@ -828,6 +851,21 @@ export function StudioPage() {
                 当前草稿更新于 {formatDateTime(selectedDraft.updatedAt)}，状态为 {studioDraftStatuses[selectedDraft.status]}。
               </p>
             )}
+            <div className="studio-publish-list">
+              {publishExports.slice(0, 5).map((publishExport) => (
+                <article key={publishExport.id} className="studio-publish-item">
+                  <div>
+                    <strong>{publishExport.draft?.title || publishExport.draftId}</strong>
+                    <span>
+                      {publishExport.draft?.slug || publishExport.target} · {readPublishExportStatus(publishExport.checks)}
+                    </span>
+                  </div>
+                  <span>{formatDateTime(publishExport.createdAt)}</span>
+                  {publishExport.exportedFiles.length > 0 && <em>{publishExport.exportedFiles.join('、')}</em>}
+                </article>
+              ))}
+              {publishExports.length === 0 && <p className="assistant-status-text">还没有发布导出记录。</p>}
+            </div>
           </article>
         </aside>
       </section>

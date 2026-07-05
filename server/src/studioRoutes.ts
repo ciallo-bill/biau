@@ -213,17 +213,25 @@ export function createStudioRouter() {
           exportedFilesJson: [],
           checksJson: { status: 'pending-local-export' },
         },
+        include: { draft: true },
       })
       res.status(201).json({
-        publishExport: {
-          id: publishExport.id,
-          draftId: publishExport.draftId,
-          target: publishExport.target,
-          exportedFiles: [],
-          checks: { status: 'pending-local-export' },
-          createdAt: publishExport.createdAt.toISOString(),
-        },
+        publishExport: toPublishExportResponse(publishExport),
       })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  router.get('/publish-exports', async (_req, res, next) => {
+    try {
+      const prisma = requireStudioDatabase()
+      const publishExports = await prisma.publishExport.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 40,
+        include: { draft: true },
+      })
+      res.json({ publishExports: publishExports.map(toPublishExportResponse) })
     } catch (error) {
       next(error)
     }
@@ -247,6 +255,7 @@ export function createStudioRouter() {
       const publishExport = await prisma.publishExport.update({
         where: { id: existing.id },
         data: input.data,
+        include: { draft: true },
       })
       res.json({ publishExport: toPublishExportResponse(publishExport) })
     } catch (error) {
@@ -894,14 +903,28 @@ function toReviewResponse(review: Prisma.ContentReviewGetPayload<Record<string, 
   }
 }
 
-function toPublishExportResponse(publishExport: Prisma.PublishExportGetPayload<Record<string, never>>) {
+function toPublishExportResponse(
+  publishExport:
+    | Prisma.PublishExportGetPayload<Record<string, never>>
+    | Prisma.PublishExportGetPayload<{ include: { draft: true } }>,
+) {
+  const draft = 'draft' in publishExport ? publishExport.draft : null
   return {
     id: publishExport.id,
     draftId: publishExport.draftId,
     target: publishExport.target,
     exportedFiles: jsonStringArray(publishExport.exportedFilesJson),
     checks: publishExport.checksJson,
+    exportedBy: publishExport.exportedBy,
     createdAt: publishExport.createdAt.toISOString(),
+    draft: draft
+      ? {
+          id: draft.id,
+          slug: draft.slug,
+          title: draft.title,
+          status: draftStatusToApi[draft.status as StudioDraftStatus],
+        }
+      : null,
   }
 }
 

@@ -117,6 +117,24 @@ export interface StudioAiDailyIssueDetail {
   draft: StudioDraft | null
 }
 
+export interface StudioPublishExportDraftSummary {
+  id: string
+  slug: string
+  title: string
+  status: StudioDraftStatus
+}
+
+export interface StudioPublishExport {
+  id: string
+  draftId: string
+  target: string
+  exportedFiles: string[]
+  checks: unknown
+  exportedBy: string | null
+  createdAt: string
+  draft: StudioPublishExportDraftSummary | null
+}
+
 export const studioDraftStatuses: Record<StudioDraftStatus, string> = {
   draft: '草稿',
   'review-needed': '待审核',
@@ -350,6 +368,39 @@ export function normalizeStudioIssueDetail(value: unknown): StudioAiDailyIssueDe
     issue,
     sources,
     draft: normalizeStudioDraft(value.draft),
+  }
+}
+
+export function normalizeStudioPublishExport(value: unknown): StudioPublishExport | null {
+  if (!isRecord(value) || typeof value.id !== 'string' || typeof value.draftId !== 'string') return null
+  return {
+    id: value.id,
+    draftId: value.draftId,
+    target: readString(value.target),
+    exportedFiles: readStringArray(value.exportedFiles),
+    checks: value.checks,
+    exportedBy: readNullableString(value.exportedBy),
+    createdAt: readString(value.createdAt),
+    draft: normalizePublishExportDraftSummary(value.draft),
+  }
+}
+
+export function normalizeStudioPublishExports(value: unknown): StudioPublishExport[] {
+  if (!isRecord(value) || !Array.isArray(value.publishExports)) return []
+  return value.publishExports
+    .map((item) => normalizeStudioPublishExport(item))
+    .filter((item): item is StudioPublishExport => item !== null)
+}
+
+function normalizePublishExportDraftSummary(value: unknown): StudioPublishExportDraftSummary | null {
+  if (!isRecord(value) || typeof value.id !== 'string' || typeof value.slug !== 'string') return null
+  const status = isDraftStatus(value.status) ? value.status : null
+  if (!status) return null
+  return {
+    id: value.id,
+    slug: value.slug,
+    title: readString(value.title),
+    status,
   }
 }
 

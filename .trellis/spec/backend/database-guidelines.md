@@ -153,12 +153,14 @@ The Studio route uses the Studio database boundary and returns the same standard
 ### 2. Signatures
 
 - Create export intent: `POST /studio/api/content-drafts/:id/publish-exports`.
+- List export records: `GET /studio/api/publish-exports`.
 - Report local export: `PATCH /studio/api/publish-exports/:id`.
 - Local command: `npm.cmd run studio:export -- --draft <id-or-slug>`.
 
 ### 3. Contracts
 
 - `POST /content-drafts/:id/publish-exports` requires an approved draft and creates `PublishExport` with `checksJson.status = "pending-local-export"`.
+- `GET /publish-exports` returns the latest export records in descending `createdAt` order and includes a safe draft summary `{ id, slug, title, status }`.
 - `PATCH /publish-exports/:id` accepts `{ exportedFiles: string[], checks: object, exportedBy?: string }`.
 - `exportedFiles` must be public repo-relative paths such as `src/data/blog.ts`; absolute paths and `..` traversal are rejected.
 - `checks` must be sanitized JSON and must not include tokens, database URLs, provider URLs, request bodies, or stack traces.
