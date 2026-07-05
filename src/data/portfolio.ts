@@ -204,7 +204,7 @@ export const projects: Project[] = [
         {
           title: '全栈与部署形态',
           body:
-            '项目采用 workspace monorepo：Web 端是 Vue 3、Vite、TypeScript，API 端是 Node.js、Express、TypeScript，并通过 shared package 复用请求/响应类型。API Dockerfile 会构建 shared 与 API 输出、复制数据集并暴露服务端口，线上演示使用可替换的模型与向量存储适配器。',
+            '项目采用 workspace monorepo：Web 端是 Vue 3、Vite、TypeScript，API 端是 Node.js、Express、TypeScript，并通过 shared package 复用请求/响应类型。API Dockerfile 会构建 shared 与 API 输出、复制数据集并暴露服务端口，线上演示使用可替换的模型与向量存储适配器；配置用户、项目成员和项目空间授权则把公开 demo 从单用户样例推进到更接近团队试用的边界。',
         },
         {
           title: '适配器取舍',
@@ -248,7 +248,7 @@ export const projects: Project[] = [
           items: [
             '问答要求基于召回片段生成，引用不足时可以拒答或返回边界说明。',
             '合同审查的高风险项来自规则命中，模型增强只改变表达，不绕过风险识别和 schema 校验。',
-            '审计与诊断信息帮助复盘一次回答从导入、检索到生成的关键步骤。',
+            '审计与诊断信息帮助复盘一次回答从导入、检索到生成的关键步骤；项目空间变更、数据集导入、RAG 问答和合同审查等敏感动作都会留下可查询的 audit log。',
           ],
         },
       ],
@@ -278,6 +278,7 @@ export const projects: Project[] = [
       '系统支持公开安全数据集和文档导入，RAG pipeline 包含清洗、项目级 SHA-256 去重、章节感知 chunk、embedding、memory/pgvector 存储、query rewrite、向量+关键词混合召回、merge/filter/rerank、grounded answer 或 refusal、citations 与 diagnostics。',
       '合同审查采用规则优先策略，规则召回付款、交付、违约责任、知识产权、争议解决和终止等风险；模型只辅助改写已召回风险的解释和建议，并在 schema 校验失败时回退到规则结果。',
       '项目包含 RAG 与合同审查 eval fixtures、quality/evaluation 报告路由和质量面板，适合说明 AI 应用如何做引用溯源、可解释风险审查和质量评测。',
+      'Legal RAG 后端还把配置用户、项目成员、项目空间授权、ingestion job 和 audit log 纳入数据模型，让公开演示能够解释“谁在什么项目空间里做了什么 AI 操作”。',
       'Legal RAG Web 工作台的标题、favicon、登录面板和侧边栏已对齐 BIAU Port / 泊岸品牌；公开试用凭据仍只能通过低权限、可轮换、可公开的 demo 配置展示。',
       '线上工作台入口是 https://legal-rag-web.onrender.com，有登录门禁，公开页面不会放真实后台/admin 密码；如果 Legal RAG 登录页显示公开演示凭据，访客可以使用页面给出的低权限 demo 凭据试用；如果没有显示凭据，则仍是受控演示入口。',
       'Legal RAG 公开自助试用需要维护者同时配置 API 侧登录校验密码和 Web 侧 VITE_PUBLIC_DEMO_EMAIL / VITE_PUBLIC_DEMO_PASSWORD；VITE_PUBLIC_DEMO_PASSWORD 会进入前端包，所以只能填写可公开、低权限、可轮换的 demo 密码。',
@@ -392,6 +393,7 @@ export const projects: Project[] = [
           items: [
             'gamer workspace 有 Node 测试脚本覆盖 apps、packages、services 和 tools；Android 侧有生成 UI、API mapper、Repository、桌宠 shell、导入请求构造等单元测试。',
             'Community API 测试覆盖 health、鉴权、Feed、已通过桌宠、资源包、导入草稿、审核、签到、钱包、SLA、限流、结构化日志、指标和 PostgreSQL 迁移。',
+            'private-ops preflight、smoke 和 target hooks audit 脚本把私有部署面、Community API、Admin Review 与 Worker gate 拆成可检查清单；公开案例只复述检查形态，不暴露私有 token 或部署地址。',
             '追踪矩阵把孵化室、桌宠呈现、社区展示、创作审核、奖励账本、安全边界、限流 SLA、生成质量和数据模型映射到测试用例。',
           ],
         },
@@ -410,6 +412,7 @@ export const projects: Project[] = [
           items: [
             '这是进行中的产品工程，不应描述为已经完全生产化的公共 AI 桌宠平台。',
             '公开 APK 还没有开放下载；展示页只说明当前 App 画面、debug 构建内部验证信号和发布门禁，不提供伪造或占位下载。',
+            '当前本地只确认到 debug APK 产物；debug APK 不能作为公开下载包、应用商店发布物或长期版本承诺。',
             '真实生成 Worker、模型适配、私有运维、部署验证、租户权限和完整鉴权仍属于受控后台能力，不对公开访客开放。',
             '机器 QA 只能帮助发现透明背景、动作稳定性、循环锚点和布局问题，最终发布仍需要人类视觉审核。',
             'Android 真实设备/模拟器端到端、长期 SLA、队列守护、运维 Runbook 和监控告警仍需要继续补强。',
@@ -436,6 +439,7 @@ export const projects: Project[] = [
       'Community API 是 App 唯一后端入口，包含 health、SLA、metrics、feed、community-home、approved pets、package download descriptor、wallet、check-in、submissions、import drafts、bundle validation、admin review 和 fantasy-pet proxy 等能力。',
       '生成规则服务负责 app-safe job 创建、轮询、artifact 索引、不透明 downloadId、人工 review decision、package plan、pet.zip 构建、worker readiness 和内部 GA/Codex/QA 证据；机器证据不能替代人工视觉 accept。',
       '质量证据包括 Node workspace tests、Android 单元测试、Community API routes/server/store/rate-limit/metrics/SLA/logging/postgres 测试、pet package contract 测试、追踪矩阵、结构化日志、Prometheus metrics 和 SLA 文档。',
+      '私有运维侧有 preflight、smoke 和 target hooks audit 脚本，用来检查 Community API、Admin Review、Worker gate 和受控部署面；公开助手只能说明这种验证形态，不能透露私有 token、部署地址或 Worker 命令。',
       '项目已在主站提供 /pet-app-showcase/ 静态 App 展示与下载状态页，使用 BIAU Port / 泊岸标题与 favicon，并用真实 Android 模拟器截图展示桌宠模式、孵化桌宠、社区和个人页；APK 区域明确标注待正式签名包，debug 构建只作为内部验证信号，不提供占位下载。',
       '最近一次 APK 发布门禁审计只找到 debug APK，没有 release APK/AAB 候选；公开下载继续关闭，后续需要正式构建、签名策略、校验摘要、版本说明、回归证据和人工确认。',
       '当前项目应被描述为 WIP：Android 模拟器 E2E、live 私有部署验证、生产鉴权、租户隔离、Worker daemon、队列运营、Runbook、长期 SLA 和可观测告警仍是后续优化方向。',
@@ -557,6 +561,7 @@ export const projects: Project[] = [
           title: '测试与验收证据',
           items: [
             'API 和共享包使用 Vitest；测试覆盖受保护写入、队列/inline 行为、本地恢复、商品导入历史、Seller 回读、非重试错误、Ozon 同步容错、类目本地化、佣金可信度和插件接口映射。',
+            '构建前会检查浏览器插件的 WXT manifest、popup、content script、共享发布元数据和下载包版本是否一致，减少“后台提示一个版本、插件实际又是另一个版本”的交付错位。',
             'smoke 脚本验证种子账号、店铺数量和导入日志数量等基础运行状态，交付清单要求跑依赖安装、测试、构建和 Docker 配置检查。',
             '上线检查报告验证 API health、真实 adapter 状态、插件版本一致性和 Seller 样本覆盖，同时把佣金覆盖不足标记为需要保守展示的风险。',
           ],
@@ -593,6 +598,7 @@ export const projects: Project[] = [
             '完善权限、审计查询、操作回滚、失败重试和导入历史诊断，让真实运营动作更容易追责和复盘。',
             '优化插件配置与发布链路，减少默认配置、扩展密钥和下载包版本管理对人工流程的依赖。',
             '逐步增强监控、备份演练、日志脱敏、依赖升级和部署自动化，把自用系统推进到更稳的生产运营形态。',
+            '把私有部署脚本中的主机、账号和上传细节迁移到更标准的 CI/CD secret 管理里，公开案例页只保留部署形态和验证方法。',
           ],
         },
       ],
@@ -607,7 +613,7 @@ export const projects: Project[] = [
       'Prisma 模型覆盖用户、店铺、Ozon 凭证、Seller 会话、商品、采集商品、草稿、导入日志、PendingAction、JobQueue、AuditLog、市场指标和佣金映射等对象。',
       '外部平台写入通过 PendingAction 和 JobQueue 收口；当前代码和测试显示商品写入与一键铺货默认偏向队列或本地后台执行，只有显式配置 inline 才同步执行。',
       '浏览器插件负责 Ozon/Seller 页面采集、Seller 上下文读取、跨标签页请求、ERP 路由打开和图片下载，并通过认证或扩展密钥边界接入 ERP API。',
-      '项目验证证据包括 API/shared Vitest、受保护写入测试、Ozon 同步容错测试、插件接口映射测试、smoke 脚本、交接清单、上线检查、佣金覆盖报告和依赖审计记录。',
+      '项目验证证据包括 API/shared Vitest、受保护写入测试、Ozon 同步容错测试、插件接口映射测试、插件版本发布检查、smoke 脚本、交接清单、上线检查、佣金覆盖报告和依赖审计记录。',
       '后续优化方向包括运行模式可视化、Worker/队列运维、佣金可信映射补齐、权限和审计增强、插件发布自动化、日志脱敏、备份演练和部署自动化。',
     ],
   },
@@ -704,7 +710,7 @@ export const projects: Project[] = [
         {
           title: '自动化检查',
           body:
-            '站点脚本覆盖内容审计、构建、构建产物链接审计、Cloudflare Pages 部署、试玩包导出检查、试玩资源上传和公开端点检查。公开端点检查会访问游戏站首页、六个游戏详情、文章/日志入口、RSS、sitemap、robots、六个 Web 试玩入口和主站项目页。',
+            '站点脚本覆盖内容审计、构建、构建产物链接审计、Cloudflare Pages 部署、试玩包导出检查、试玩资源上传和公开端点检查。构建产物审计还会检查站内链接、资源路径和关键 JSON-LD 结构化数据；公开端点检查会访问游戏站首页、六个游戏详情、文章/日志入口、RSS、sitemap、robots、六个 Web 试玩入口和主站项目页。',
         },
       ],
       quality: [
@@ -714,6 +720,7 @@ export const projects: Project[] = [
             'content:audit 当前统计到 4 篇已发布文章、39 篇文章工作区草稿、6 个游戏项目和 5 篇开发日志，并检查静态资源引用和内容关系。',
             'verify 会串起内容审计、Astro build 和构建产物审计，减少断链、缺图和结构化数据问题。',
             'deploy:check 使用公开 URL 做端点可用性检查，覆盖内容站和试玩站的关键入口。',
+            'RSS、sitemap、robots 和结构化数据不是装饰项，而是让游戏案例、开发日志和文章归档能被搜索引擎与外部阅读器稳定识别的内容基础设施。',
           ],
         },
         {
@@ -751,7 +758,7 @@ export const projects: Project[] = [
       '六个游戏包括 Tetris、Next Spacewar、intespace、Raiden、space-war 和 Spacewar II；Spacewar II 已作为第六个公开 Web 试玩项目接入，并补齐菜单、战斗和结果页真实截图。',
       'Godot Web 试玩入口由独立试玩域名承载，首次加载可能较慢；移动端输入、横竖屏缩放、HUD 可读性和浏览器性能仍需要持续回归。',
       '最近内容审计统计到 4 篇已发布文章、39 篇文章工作区草稿、6 个游戏项目和 5 篇开发日志，静态资源引用和内容关系检查通过。',
-      'Playlab 的质量链路包括 content:audit、Astro build、dist:audit、deploy:pages、deploy:play、play export/check/upload 和 deploy:check；公开端点检查覆盖游戏站、六个游戏详情页、六个试玩入口、RSS、sitemap、robots 和主站项目页。',
+      'Playlab 的质量链路包括 content:audit、Astro build、dist:audit、deploy:pages、deploy:play、play export/check/upload 和 deploy:check；dist:audit 会检查站内链接、资源路径和 JSON-LD，公开端点检查覆盖游戏站、六个游戏详情页、六个试玩入口、RSS、sitemap、robots 和主站项目页。',
       '当前 Playlab 应作为游戏作品集平台展示；博客和部分文章归档质量仍是后续优化方向，不应把它描述成已经完全成熟的内容产品。',
     ],
   },
@@ -830,12 +837,12 @@ export const projects: Project[] = [
         {
           title: '助手后端与公开知识生成',
           body:
-            '仓库同时保留一个 Express/TypeScript 助手后端，配合 Prisma 与 PostgreSQL 支持 invite、member、chat session、message 和 usage log 等 MVP 数据结构。`scripts/generate-assistant-knowledge.ts` 会把公开项目和精选博客生成到 `server/data/public-knowledge.json`，让前端 fallback 和后端知识源保持同一份公开事实。',
+            '仓库同时保留一个 Express/TypeScript 助手后端，配合 Prisma 与 PostgreSQL 支持 invite、member、chat session、message 和 usage log 等 MVP 数据结构。公开助手还在推进 Agentic Hybrid RAG groundwork：服务端已有 RAG Orchestrator、embedding client、PostgreSQL/pgvector store 和 Qdrant store 适配层，但公开页面仍只声明已接入的公开安全事实。`scripts/generate-assistant-knowledge.ts` 会把公开项目和精选博客生成到 `server/data/public-knowledge.json`，让前端 fallback 和后端知识源保持同一份公开事实。',
         },
         {
           title: '内容与 SEO 管线',
           body:
-            '公开博客由 `blogCuration` 控制 visibility、role、priority 和 project relation；隐藏草稿不会进入公开列表、详情加载、助手知识或 sitemap。`scripts/generate-sitemap.mjs` 会从项目 id 和公开博客生成 sitemap，`SeoManager` 根据路由应用 canonical、description 和 Open Graph 信息。',
+            '公开博客由 `blogCuration` 控制 visibility、role、priority 和 project relation；隐藏草稿不会进入公开列表、详情加载、助手知识或 sitemap。Studio 页面和规划脚本可以生成 project detail、status、resource 和 blog draft 的 review plan，但不会绕过 `portfolio.ts`、`statusTargets.ts` 或博客 curation 的 Git diff 审查。`scripts/generate-sitemap.mjs` 会从项目 id 和公开博客生成 sitemap，`SeoManager` 根据路由应用 canonical、description 和 Open Graph 信息。',
           visual: {
             id: 'blog-semi-blog-ui',
             type: 'status',
@@ -886,6 +893,8 @@ export const projects: Project[] = [
       'BIAU Port 当前主站使用 React 19、Vite、TypeScript 和 Semi Design 构建，负责组织首页、项目集、项目详情、博客、公开助手、内部助手和隐藏管理页。',
       '项目数据、博客 curation、助手建议和公开知识都存放在 `src/data/`，项目详情页通过 `detailContent` 展示案例分析，公开助手通过 `assistantContext` 和精选博客生成可检索知识。',
       '仓库包含一个 Express/TypeScript 助手后端，配合 Prisma/PostgreSQL 支持 invite、member、chat session、message 和 usage log 等 MVP 数据结构；前端未配置 API 时会使用公开知识 fallback。',
+      '公开助手方向已经从本地知识 fallback 推进到 Agentic Hybrid RAG groundwork：server 侧包含 RAG Orchestrator、embedding client、PostgreSQL/pgvector store、Qdrant store 和 sync/smoke 脚本，但公开站点只展示已经可公开验证的能力。',
+      'Studio 和规划脚本可生成项目详情、状态页、资源和博客草稿的 review plan；真正公开仍要手动更新 typed data、运行检查并通过 Git diff 审查。',
       '内容治理规则要求隐藏草稿不进入公开列表、详情加载、助手知识或 sitemap；公开博客由 visibility、role、priority 和 project relation 控制。',
       '验证链路包括 assistant:index、sitemap:generate、blog:check、lint、build、check:ui 和 verify，其中 verify 会串起助手知识、Prisma、server build/smoke、前端构建、博客检查、preview 和 UI 检查。',
       '当前边界是静态数据驱动、人工审核发布、内部助手 MVP 和公开安全事实展示；后续会继续完善项目案例、博客流水线、助手引用质量、移动端布局和部署验证。',
@@ -1566,7 +1575,7 @@ export const projects: Project[] = [
         {
           title: '部署和展示边界',
           body:
-            '公开产品展示站由 Cloudflare Pages 承载静态页面、技术文档、素材和阶段 APK 下载；展示站中的 latest-xunqiu64.apk 是当前用于展示的最新阶段包副本。动态 API 由独立 Render 服务承载，数据库由 PostgreSQL/Flyway 初始化，文件上传走 R2。静态站和 BIAU Port 都只展示项目材料，不保存旧后端 IP、测试密码、签名路径、数据库连接、R2 密钥或 Render 私有配置。',
+            '公开产品展示站由 Cloudflare Pages 承载静态页面、技术文档、素材和阶段 APK 下载；展示站中的 latest-xunqiu64.apk 是当前用于展示的阶段包副本，用来说明迁移进展，不等同于应用商店发布承诺。动态 API 由独立 Render 服务承载，数据库由 PostgreSQL/Flyway 初始化，文件上传走 R2。静态站和 BIAU Port 都只展示项目材料，不保存旧后端 IP、测试密码、签名路径、数据库连接、R2 密钥或 Render 私有配置。',
         },
       ],
       limitations: [
@@ -1576,6 +1585,7 @@ export const projects: Project[] = [
             '64 位客户端仍有一部分页面处于需回归或安全等价状态，不能把所有旧版深层能力都表述为完整生产可用。',
             '支付、IM、推送、地图、分享、真实兑换、赛事创建和比分提交等高副作用能力保留边界，不在展示环境触发真实外部服务。',
             'Render 免费服务、演示数据、静态阶段 APK 下载和 R2 配置都更适合展示和轻量验证，不应被描述为长期生产运营方案。',
+            '阶段 APK 可以帮助访客理解 Android 64 位迁移结果，但公开下载前仍需要补齐签名、版本说明、扫描、回滚和发布渠道策略。',
           ],
         },
       ],
@@ -1599,6 +1609,7 @@ export const projects: Project[] = [
       '项目有 Android 测试矩阵、旧版入口对照、后端 MockMvc 测试、PostgreSQL/Testcontainers 测试和部署烟测脚本；支付、IM、推送、地图、分享等高副作用能力当前以安全等价或 stub 方式收口。',
       '现代后端健康检查路径是 /free_kicker/actuator/health，smoke 脚本覆盖 health、登录、动态、短视频、球队和球场；如果公开 health 冷启动或超时，应作为运维排查信号，而不是生产 SLA 结论。',
       '公开展示站提供产品页、技术文档和 latest-xunqiu64.apk 阶段包副本；这些入口用于展示与轻量验证，不代表完整生产发布或长期生产运营方案，也不包含旧后端 IP、测试密码、签名路径或私有云配置。',
+      'latest-xunqiu64.apk 是展示站阶段包，不等同于应用商店发布承诺；后续公开下载策略仍需要签名、版本说明、扫描、回滚和发布渠道策略。',
       '寻球静态展示站首页、技术文档页和 404 页已统一 BIAU Port / 泊岸标题与 favicon，并在页脚说明归属泊岸项目展示体系。',
       '后续优化方向包括真实设备回归、旧 WebView 原生化、权限与审计、文件治理、监控部署、短视频播放器升级和更完整的生产化运维。',
     ],
