@@ -41,4 +41,4 @@
 
 - [x] 更新 PRD 验收状态和证据。
 - [x] 更新相关 spec，如新增 public status report contract。
-- [ ] 提交并推送 `blog-semi/main`。
+- [x] 提交并推送 `blog-semi/main`。
