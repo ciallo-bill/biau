@@ -181,6 +181,7 @@ npm.cmd run build
 ## Human Gates
 
 - 生产数据库连接：用户需要在 Render/部署平台填写真实 `DATABASE_URL`，代码里只保留环境变量读取。
+- Content Studio 独立数据库：用户决定内部助手库与内容工作台库分开维护；Studio 服务应设置 `STUDIO_DATABASE_URL`，迁移用 `npm run prisma:migrate:studio`。
 - Studio 管理密钥：用户需要设置 `ADMIN_TOKEN` 或后续专用 `STUDIO_ADMIN_TOKEN`；仓库不能保存真实 token。
 - CORS 域名：用户需要确认公开站域名和后端 API 域名，并在部署平台设置 `CORS_ORIGIN`。
 - 生产迁移：第一次上线新增 Prisma 模型时，需要确认部署流程会执行 migration，或由用户手动在平台 shell 中执行。

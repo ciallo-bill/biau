@@ -13,6 +13,8 @@ interface EnvSnapshot {
   ragInternalApiKey: string
   ragSyncToken: string
   ragStoreProvider: string
+  studioAdminToken: string
+  studioDatabaseUrl: string
   qdrantUrl: string
   qdrantApiKey: string
   qdrantPublicCollection: string
@@ -52,6 +54,8 @@ function snapshotEnv(): EnvSnapshot {
     ragInternalApiKey: env.ragInternalApiKey,
     ragSyncToken: env.ragSyncToken,
     ragStoreProvider: env.ragStoreProvider,
+    studioAdminToken: env.studioAdminToken,
+    studioDatabaseUrl: env.studioDatabaseUrl,
     qdrantUrl: env.qdrantUrl,
     qdrantApiKey: env.qdrantApiKey,
     qdrantPublicCollection: env.qdrantPublicCollection,
@@ -69,6 +73,8 @@ function restoreEnv(snapshot: EnvSnapshot) {
   env.ragInternalApiKey = snapshot.ragInternalApiKey
   env.ragSyncToken = snapshot.ragSyncToken
   env.ragStoreProvider = snapshot.ragStoreProvider
+  env.studioAdminToken = snapshot.studioAdminToken
+  env.studioDatabaseUrl = snapshot.studioDatabaseUrl
   env.qdrantUrl = snapshot.qdrantUrl
   env.qdrantApiKey = snapshot.qdrantApiKey
   env.qdrantPublicCollection = snapshot.qdrantPublicCollection
@@ -85,6 +91,8 @@ async function withService(mode: AssistantServiceMode, run: (base: string) => Pr
   env.ragInternalApiKey = 'internal-rag-smoke-key'
   env.ragSyncToken = 'sync-rag-smoke-token'
   env.ragStoreProvider = 'local'
+  env.studioAdminToken = 'studio-smoke-token'
+  env.studioDatabaseUrl = ''
   env.qdrantUrl = ''
   env.qdrantApiKey = ''
   env.qdrantPublicCollection = 'biau_public_chunks'
@@ -191,6 +199,34 @@ try {
     )
     if (!qdrantFallbackRetrieve.response.ok || qdrantFallbackRetrieve.payload?.meta.store !== 'local') {
       throw new Error('rag mode qdrant without config should fall back to local retrieval')
+    }
+  })
+
+  await withService('studio', async (base) => {
+    const health = await getJson<{ serviceMode?: string; service?: string }>(`${base}/health`)
+    if (!health.response.ok || health.payload?.serviceMode !== 'studio' || health.payload.service !== 'biau-content-studio-api') {
+      throw new Error('studio mode health is invalid')
+    }
+
+    const publicChat = await postJson(`${base}/chat/public`, { message: 'RAG 项目' })
+    if (publicChat.response.status !== 404) throw new Error(`studio mode should not expose public chat, got ${publicChat.response.status}`)
+
+    const internalChat = await postJson(`${base}/chat/internal`, { message: '内部助手' })
+    if (internalChat.response.status !== 404) throw new Error(`studio mode should not expose internal chat, got ${internalChat.response.status}`)
+
+    const ragHealth = await fetch(`${base}/rag/health`)
+    if (ragHealth.status !== 404) throw new Error(`studio mode should not expose /rag, got ${ragHealth.status}`)
+
+    const studioMissingToken = await fetch(`${base}/studio/api/health`)
+    if (studioMissingToken.status !== 401) throw new Error(`studio mode should protect studio api, got ${studioMissingToken.status}`)
+
+    const studioHealth = await fetch(`${base}/studio/api/health`, {
+      headers: { Authorization: 'Bearer studio-smoke-token' },
+    })
+    if (!studioHealth.ok) throw new Error(`studio mode health with token failed: ${studioHealth.status}`)
+    const studioHealthPayload = (await studioHealth.json()) as { service?: string; database?: boolean }
+    if (studioHealthPayload.service !== 'biau-content-studio-api' || studioHealthPayload.database !== false) {
+      throw new Error('studio mode studio api health payload is invalid')
     }
   })
 

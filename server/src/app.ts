@@ -29,6 +29,11 @@ export function createApp() {
 
   if (serviceMode === 'rag') {
     app.use(createRagOrchestratorRouter({ requireAuth: true }))
+  } else if (serviceMode === 'studio') {
+    app.get('/health', (_req, res) => {
+      res.json(buildStudioHealth())
+    })
+    app.use('/studio/api', createStudioRouter())
   } else {
     app.get('/health', (_req, res) => {
       res.json(buildAssistantHealth(serviceMode))
@@ -53,6 +58,16 @@ export function createApp() {
   })
 
   return app
+}
+
+function buildStudioHealth() {
+  return {
+    ok: true,
+    service: 'biau-content-studio-api',
+    serviceMode: 'studio',
+    database: Boolean(env.studioDatabaseUrl),
+    authConfigured: Boolean(env.studioAdminToken),
+  }
 }
 
 function buildAssistantHealth(serviceMode: AssistantServiceMode) {

@@ -27,6 +27,7 @@ export const env = {
   port: Number(process.env.PORT ?? 8787),
   assistantServiceMode,
   databaseUrl: process.env.DATABASE_URL?.trim() ?? '',
+  studioDatabaseUrl: process.env.STUDIO_DATABASE_URL?.trim() || process.env.DATABASE_URL?.trim() || '',
   corsOrigin: process.env.CORS_ORIGIN?.trim() ?? '*',
   assistantModelApiKey,
   assistantModelBaseUrl,
@@ -66,6 +67,10 @@ export function hasDatabase() {
   return env.databaseUrl.length > 0
 }
 
+export function hasStudioDatabase() {
+  return env.studioDatabaseUrl.length > 0
+}
+
 export function hasModelProvider() {
   return (env.assistantModelApiKey || env.openaiApiKey).length > 0
 }
@@ -77,7 +82,7 @@ function readBoolean(value: string | undefined) {
 
 function readServiceMode(value: string | undefined): AssistantServiceMode {
   const normalized = value?.trim().toLowerCase()
-  if (normalized === 'public' || normalized === 'internal' || normalized === 'rag') return normalized
+  if (normalized === 'public' || normalized === 'internal' || normalized === 'rag' || normalized === 'studio') return normalized
   return 'all'
 }
 

@@ -1,7 +1,7 @@
 import express from 'express'
 import { Prisma } from '@prisma/client'
-import { requireDatabase } from './auth.js'
-import { env, hasDatabase } from './env.js'
+import { requireStudioDatabase } from './db.js'
+import { env, hasStudioDatabase } from './env.js'
 
 const blogColumns = new Set(['knowledge', 'project-notes', 'resources', 'ai-daily', 'build-log'])
 const sourceTiers = new Set([
@@ -72,15 +72,16 @@ export function createStudioRouter() {
     res.json({
       ok: true,
       service: 'biau-content-studio-api',
-      database: hasDatabase(),
+      database: hasStudioDatabase(),
       auth: 'admin-token',
       publishMode: 'static-export',
+      databaseRole: env.studioDatabaseUrl && env.studioDatabaseUrl !== env.databaseUrl ? 'studio-dedicated' : 'shared-or-fallback',
     })
   })
 
   router.get('/content-drafts', async (_req, res, next) => {
     try {
-      const prisma = requireDatabase()
+      const prisma = requireStudioDatabase()
       const drafts = await prisma.contentDraft.findMany({
         orderBy: { updatedAt: 'desc' },
         take: 60,
@@ -100,7 +101,7 @@ export function createStudioRouter() {
         return
       }
 
-      const prisma = requireDatabase()
+      const prisma = requireStudioDatabase()
       const draft = await prisma.contentDraft.create({
         data: input.data,
         include: { reviews: { orderBy: { reviewedAt: 'desc' }, take: 1 } },
@@ -117,7 +118,7 @@ export function createStudioRouter() {
 
   router.patch('/content-drafts/:id', async (req, res, next) => {
     try {
-      const prisma = requireDatabase()
+      const prisma = requireStudioDatabase()
       const existing = await prisma.contentDraft.findUnique({ where: { id: req.params.id } })
       if (!existing) {
         res.status(404).json({ error: 'draft-not-found' })
@@ -153,7 +154,7 @@ export function createStudioRouter() {
         return
       }
 
-      const prisma = requireDatabase()
+      const prisma = requireStudioDatabase()
       const existing = await prisma.contentDraft.findUnique({ where: { id: req.params.id } })
       if (!existing) {
         res.status(404).json({ error: 'draft-not-found' })
@@ -190,7 +191,7 @@ export function createStudioRouter() {
 
   router.post('/content-drafts/:id/publish-exports', async (req, res, next) => {
     try {
-      const prisma = requireDatabase()
+      const prisma = requireStudioDatabase()
       const existing = await prisma.contentDraft.findUnique({ where: { id: req.params.id } })
       if (!existing) {
         res.status(404).json({ error: 'draft-not-found' })
@@ -229,7 +230,7 @@ export function createStudioRouter() {
 
   router.get('/source-items', async (_req, res, next) => {
     try {
-      const prisma = requireDatabase()
+      const prisma = requireStudioDatabase()
       const sources = await prisma.sourceItem.findMany({ orderBy: { updatedAt: 'desc' }, take: 80 })
       res.json({ sources: sources.map(toSourceResponse) })
     } catch (error) {
@@ -244,7 +245,7 @@ export function createStudioRouter() {
         res.status(400).json({ error: input.error })
         return
       }
-      const prisma = requireDatabase()
+      const prisma = requireStudioDatabase()
       const source = await prisma.sourceItem.create({ data: input.data })
       res.status(201).json({ source: toSourceResponse(source) })
     } catch (error) {
@@ -254,7 +255,7 @@ export function createStudioRouter() {
 
   router.get('/ai-daily/issues', async (_req, res, next) => {
     try {
-      const prisma = requireDatabase()
+      const prisma = requireStudioDatabase()
       const issues = await prisma.aiDailyIssue.findMany({ orderBy: { date: 'desc' }, take: 60 })
       res.json({ issues: issues.map(toAiDailyIssueResponse) })
     } catch (error) {
@@ -269,7 +270,7 @@ export function createStudioRouter() {
         res.status(400).json({ error: input.error })
         return
       }
-      const prisma = requireDatabase()
+      const prisma = requireStudioDatabase()
       const issue = await prisma.aiDailyIssue.create({ data: input.data })
       res.status(201).json({ issue: toAiDailyIssueResponse(issue) })
     } catch (error) {

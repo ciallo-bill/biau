@@ -161,6 +161,7 @@ const server = app.listen(port, '127.0.0.1')
 const base = `http://127.0.0.1:${port}`
 const originalModelEnv = snapshotModelEnv()
 const originalStudioAdminToken = env.studioAdminToken
+const originalStudioDatabaseUrl = env.studioDatabaseUrl
 
 try {
   const creativePlan = planAssistantAnswer('您能不能生成一首七言古诗', 'internal')
@@ -210,12 +211,27 @@ try {
     headers: { Authorization: 'Bearer studio-smoke-token' },
   })
   if (!studioHealth.ok) throw new Error(`studio health failed with token: ${studioHealth.status}`)
-  const studioHealthPayload = (await studioHealth.json()) as { service?: string; publishMode?: string }
-  if (studioHealthPayload.service !== 'biau-content-studio-api' || studioHealthPayload.publishMode !== 'static-export') {
+  const studioHealthPayload = (await studioHealth.json()) as { service?: string; publishMode?: string; databaseRole?: string }
+  if (
+    studioHealthPayload.service !== 'biau-content-studio-api' ||
+    studioHealthPayload.publishMode !== 'static-export' ||
+    !studioHealthPayload.databaseRole
+  ) {
     throw new Error('studio health returned invalid payload')
   }
 
-  if (!process.env.DATABASE_URL?.trim()) {
+  env.studioDatabaseUrl = 'studio-smoke-dedicated-db'
+  const studioDedicatedHealth = await fetch(`${base}/studio/api/health`, {
+    headers: { Authorization: 'Bearer studio-smoke-token' },
+  })
+  if (!studioDedicatedHealth.ok) throw new Error(`studio dedicated health failed: ${studioDedicatedHealth.status}`)
+  const studioDedicatedPayload = (await studioDedicatedHealth.json()) as { database?: boolean; databaseRole?: string }
+  if (studioDedicatedPayload.database !== true || studioDedicatedPayload.databaseRole !== 'studio-dedicated') {
+    throw new Error('studio health should report dedicated database role when STUDIO_DATABASE_URL differs')
+  }
+  env.studioDatabaseUrl = originalStudioDatabaseUrl
+
+  if (!env.studioDatabaseUrl) {
     const studioDraftsWithoutDb = await fetch(`${base}/studio/api/content-drafts`, {
       headers: { Authorization: 'Bearer studio-smoke-token' },
     })
@@ -583,6 +599,7 @@ try {
 } finally {
   restoreModelEnv(originalModelEnv)
   env.studioAdminToken = originalStudioAdminToken
+  env.studioDatabaseUrl = originalStudioDatabaseUrl
   server.close()
 }
 

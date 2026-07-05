@@ -8,6 +8,7 @@
 - `/studio` 是内部工作台页面，不直接公开未审核数据库草稿。
 - `/studio/api/*` 只挂载在 `ASSISTANT_SERVICE_MODE=all` 或 `internal` 的后端服务上。
 - 第一版认证使用 `STUDIO_ADMIN_TOKEN`，未设置时回退到 `ADMIN_TOKEN`。
+- Studio 默认使用 `STUDIO_DATABASE_URL`；未设置时才回退到 `DATABASE_URL`。
 - 模型辅助默认不启用；AI 日报来源和草稿编辑都可以先人工录入。
 
 ## 本地使用
@@ -16,6 +17,7 @@
 
 ```text
 DATABASE_URL=<postgres connection string>
+STUDIO_DATABASE_URL=<optional dedicated studio postgres connection string>
 ADMIN_TOKEN=<owner token>
 STUDIO_ADMIN_TOKEN=<optional owner token>
 ```
@@ -65,9 +67,39 @@ VITE_STUDIO_API_BASE_URL=http://localhost:8787
 ```powershell
 npm.cmd run prisma:validate
 npm.cmd run prisma:generate
+npm.cmd run prisma:migrate:studio
 npm.cmd run server:build
 npm.cmd run server:smoke
 npm.cmd run lint
 npm.cmd run build
 ```
 
+## 独立部署推荐
+
+如果要把内部助手库和内容工作台库分开，推荐新建一个 Render Web Service：
+
+```text
+ASSISTANT_SERVICE_MODE=studio
+STUDIO_DATABASE_URL=<Aiven PostgreSQL Service URI>
+STUDIO_ADMIN_TOKEN=<owner token>
+CORS_ORIGIN=<main site origin>
+NODE_VERSION=22
+```
+
+Build Command：
+
+```bash
+npm install && npm run prisma:generate && npm run server:build
+```
+
+Start Command：
+
+```bash
+npm run prisma:migrate:studio && npm run server:start
+```
+
+然后让主站前端指向这个服务：
+
+```text
+VITE_STUDIO_API_BASE_URL=https://<studio-service>.onrender.com
+```
