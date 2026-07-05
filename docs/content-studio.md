@@ -1,0 +1,73 @@
+# BIAU Port 内容工作台
+
+内容工作台是站长侧内部编辑面，用来把博客、AI 日报来源、审核状态和发布导出记录先保存到后端数据库，再导出到公开静态内容。
+
+## 架构边界
+
+- 公开站仍然读取已审核的静态内容产物。
+- `/studio` 是内部工作台页面，不直接公开未审核数据库草稿。
+- `/studio/api/*` 只挂载在 `ASSISTANT_SERVICE_MODE=all` 或 `internal` 的后端服务上。
+- 第一版认证使用 `STUDIO_ADMIN_TOKEN`，未设置时回退到 `ADMIN_TOKEN`。
+- 模型辅助默认不启用；AI 日报来源和草稿编辑都可以先人工录入。
+
+## 本地使用
+
+1. 在 `.env.local` 或部署平台设置后端变量：
+
+```text
+DATABASE_URL=<postgres connection string>
+ADMIN_TOKEN=<owner token>
+STUDIO_ADMIN_TOKEN=<optional owner token>
+```
+
+2. 启动后端与前端：
+
+```powershell
+npm.cmd run server:dev
+npm.cmd run dev
+```
+
+3. 前端 API base：
+
+```text
+VITE_STUDIO_API_BASE_URL=http://localhost:8787
+```
+
+如果不设置 `VITE_STUDIO_API_BASE_URL`，前端会回退到 `VITE_INTERNAL_ASSISTANT_API_BASE_URL`，再回退到 `VITE_CHAT_API_BASE_URL`。
+
+4. 打开：
+
+```text
+/studio
+```
+
+在页面里粘贴 `STUDIO_ADMIN_TOKEN` 或 `ADMIN_TOKEN`。token 只保存在当前浏览器 localStorage，用于调用受保护的 Studio API。
+
+## 当前能力
+
+- 读取 Studio API health。
+- 创建、编辑和审核内容草稿。
+- 创建发布导出记录。
+- 保存 AI 日报来源池条目。
+- 创建 AI 日报 issue 并关联来源 ID。
+- 后端会拦截明显的 key、token、数据库连接串等敏感内容。
+
+## 仍是人工 Gate 的事项
+
+- 生产环境真实 `DATABASE_URL`。
+- Render/Supabase 等平台上的 migration 执行。
+- 生产 `STUDIO_ADMIN_TOKEN`。
+- 第一次真实模型辅助摘要/润色任务。
+- 实际把 approved 草稿导出到 `src/data/blog*.ts` 的本地/CI 导出器。
+
+## 验证
+
+```powershell
+npm.cmd run prisma:validate
+npm.cmd run prisma:generate
+npm.cmd run server:build
+npm.cmd run server:smoke
+npm.cmd run lint
+npm.cmd run build
+```
+

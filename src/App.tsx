@@ -30,6 +30,7 @@ const ProjectDetailPage = lazy(() =>
   import('./pages/ProjectDetailPage').then((module) => ({ default: module.ProjectDetailPage })),
 )
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage').then((module) => ({ default: module.BlogPostPage })))
+const StudioPage = lazy(() => import('./pages/StudioPage').then((module) => ({ default: module.StudioPage })))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then((module) => ({ default: module.NotFoundPage })))
 
 function getPageClass(pathname: string) {
@@ -37,6 +38,7 @@ function getPageClass(pathname: string) {
   if (pathname === '/projects') return 'page-tools page-subpage'
   if (pathname.startsWith('/projects/')) return 'page-detail page-project-detail page-subpage'
   if (pathname === '/assistant' || pathname.startsWith('/assistant/')) return 'page-assistant page-subpage'
+  if (pathname === '/studio' || pathname.startsWith('/studio/')) return 'page-studio page-subpage'
   if (pathname === '/status' || pathname.startsWith('/status/')) return 'page-status page-subpage'
   if (pathname === '/blog') return 'page-letters page-blog page-subpage'
   if (pathname.startsWith('/blog/')) return 'page-detail page-blog-post page-subpage'
@@ -56,7 +58,7 @@ function App() {
   }, [harborScene])
 
   const pageClass = getPageClass(pathname)
-  const showPublicAssistant = !pathname.startsWith('/assistant')
+  const showPublicAssistant = !pathname.startsWith('/assistant') && !pathname.startsWith('/studio')
 
   return (
     <div className={`app ${pageClass}`}>
@@ -95,6 +97,7 @@ function App() {
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
           <Route path="/assistant" element={<AssistantPage />} />
           <Route path="/assistant/admin" element={<AssistantAdminPage />} />
+          <Route path="/studio/*" element={<StudioPage />} />
           <Route path="/status" element={<SiteStatusPage />} />
           <Route path="/status/:projectId" element={<SiteStatusDetailPage />} />
           <Route path="/blog" element={<BlogPage />} />

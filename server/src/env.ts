@@ -20,6 +20,7 @@ const assistantRagApiBaseUrl = readFirstEnv('ASSISTANT_RAG_API_BASE_URL')
 const assistantRagApiKey = readFirstEnv('ASSISTANT_RAG_API_KEY')
 const assistantRagTimeoutMs = readPositiveInteger(process.env.ASSISTANT_RAG_TIMEOUT_MS, 3000)
 const assistantServiceMode = readServiceMode(process.env.ASSISTANT_SERVICE_MODE)
+const adminToken = process.env.ADMIN_TOKEN?.trim() ?? ''
 
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
@@ -37,7 +38,8 @@ export const env = {
   openaiApiKey: process.env.OPENAI_API_KEY?.trim() || assistantModelApiKey,
   openaiBaseUrl: normalizeBaseUrl(process.env.OPENAI_BASE_URL?.trim() || assistantModelBaseUrl),
   openaiModel: process.env.OPENAI_MODEL?.trim() || assistantModelName,
-  adminToken: process.env.ADMIN_TOKEN?.trim() ?? '',
+  adminToken,
+  studioAdminToken: process.env.STUDIO_ADMIN_TOKEN?.trim() || adminToken,
   metricsEnabled: readBoolean(process.env.METRICS_ENABLED),
   ragStoreProvider: readFirstEnv('RAG_STORE_PROVIDER') || 'local',
   ragDatabaseUrl: readFirstEnv('RAG_DATABASE_URL', 'SUPABASE_DATABASE_URL', 'SUPABASE_DB_URL'),

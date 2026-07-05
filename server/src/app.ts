@@ -8,6 +8,7 @@ import { generateAnswer, planAssistantAnswer } from './model.js'
 import { createMetricsMiddleware, renderPrometheusMetrics } from './metrics.js'
 import { retrieveAssistantContext, retrievePublicAssistantContext } from './ragClient.js'
 import { createRagOrchestratorRouter } from './ragRoutes.js'
+import { createStudioRouter } from './studioRoutes.js'
 import type { AssistantServiceMode, ChatPayload, ChatResponse } from './types.js'
 
 export function createApp() {
@@ -35,6 +36,7 @@ export function createApp() {
 
     if (serviceMode === 'all' || serviceMode === 'public') registerPublicAssistantRoutes(app)
     if (serviceMode === 'all' || serviceMode === 'internal') registerInternalAssistantRoutes(app)
+    if (serviceMode === 'all' || serviceMode === 'internal') app.use('/studio/api', createStudioRouter())
     if (serviceMode === 'all') app.use('/rag', createRagOrchestratorRouter({ requireAuth: false }))
   }
 

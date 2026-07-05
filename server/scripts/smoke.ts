@@ -160,6 +160,7 @@ const app = createApp()
 const server = app.listen(port, '127.0.0.1')
 const base = `http://127.0.0.1:${port}`
 const originalModelEnv = snapshotModelEnv()
+const originalStudioAdminToken = env.studioAdminToken
 
 try {
   const creativePlan = planAssistantAnswer('您能不能生成一首七言古诗', 'internal')
@@ -189,6 +190,38 @@ try {
     }
   } else if (metrics.status !== 404) {
     throw new Error(`metrics should be disabled by default, got ${metrics.status}`)
+  }
+
+  env.studioAdminToken = ''
+  const studioNoAuthConfig = await fetch(`${base}/studio/api/health`, {
+    headers: { Authorization: 'Bearer studio-smoke-token' },
+  })
+  if (studioNoAuthConfig.status !== 503) {
+    throw new Error(`studio health should report auth not configured, got ${studioNoAuthConfig.status}`)
+  }
+
+  env.studioAdminToken = 'studio-smoke-token'
+  const studioMissingToken = await fetch(`${base}/studio/api/health`)
+  if (studioMissingToken.status !== 401) {
+    throw new Error(`studio health should require admin token, got ${studioMissingToken.status}`)
+  }
+
+  const studioHealth = await fetch(`${base}/studio/api/health`, {
+    headers: { Authorization: 'Bearer studio-smoke-token' },
+  })
+  if (!studioHealth.ok) throw new Error(`studio health failed with token: ${studioHealth.status}`)
+  const studioHealthPayload = (await studioHealth.json()) as { service?: string; publishMode?: string }
+  if (studioHealthPayload.service !== 'biau-content-studio-api' || studioHealthPayload.publishMode !== 'static-export') {
+    throw new Error('studio health returned invalid payload')
+  }
+
+  if (!process.env.DATABASE_URL?.trim()) {
+    const studioDraftsWithoutDb = await fetch(`${base}/studio/api/content-drafts`, {
+      headers: { Authorization: 'Bearer studio-smoke-token' },
+    })
+    if (studioDraftsWithoutDb.status !== 503) {
+      throw new Error(`studio drafts should report missing database, got ${studioDraftsWithoutDb.status}`)
+    }
   }
 
   forceNoModelProvider()
@@ -549,6 +582,7 @@ try {
   console.log('Assistant API smoke passed')
 } finally {
   restoreModelEnv(originalModelEnv)
+  env.studioAdminToken = originalStudioAdminToken
   server.close()
 }
 

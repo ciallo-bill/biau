@@ -2945,6 +2945,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 .assistant-composer button,
 .assistant-admin-form button,
 .assistant-admin-actions button,
+.studio-form button,
+.studio-card__header button,
 .public-assistant__composer button,
 .public-assistant__close {
   min-height: 38px;
@@ -2961,6 +2963,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 .assistant-composer button:disabled,
 .assistant-admin-form button:disabled,
 .assistant-admin-actions button:disabled,
+.studio-form button:disabled,
+.studio-card__header button:disabled,
 .public-assistant__composer button:disabled {
   cursor: not-allowed;
   opacity: 0.56;
@@ -2989,6 +2993,7 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 .assistant-composer textarea,
 .assistant-field input,
 .assistant-field select,
+.assistant-field textarea,
 .public-assistant__composer input {
   width: 100%;
   color: var(--ink);
@@ -3004,7 +3009,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   padding: 0 var(--space-12, 12px);
 }
 
-.assistant-composer textarea {
+.assistant-composer textarea,
+.assistant-field textarea {
   resize: vertical;
   min-height: 112px;
   padding: var(--space-16);
@@ -3122,6 +3128,141 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   min-width: 0;
   overflow-wrap: anywhere;
   color: var(--ink);
+}
+
+.studio-page {
+  gap: var(--space-24);
+}
+
+.studio-control-bar,
+.studio-card {
+  background: var(--panel);
+  border: 1px solid var(--flow-ui-border-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  -webkit-backdrop-filter: blur(var(--flow-backdrop-blur)) saturate(1.08);
+  backdrop-filter: blur(var(--flow-backdrop-blur)) saturate(1.08);
+}
+
+.studio-control-bar {
+  padding: var(--space-20);
+  display: grid;
+  gap: var(--space-12, 12px);
+}
+
+.studio-token-form {
+  grid-template-columns: minmax(260px, 1fr) auto;
+  align-items: end;
+}
+
+.studio-health {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.studio-grid {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.72fr) minmax(420px, 1.42fr) minmax(280px, 0.86fr);
+  gap: var(--space-16);
+  align-items: start;
+}
+
+.studio-card {
+  min-width: 0;
+  padding: var(--space-20);
+}
+
+.studio-card__header {
+  margin-bottom: var(--space-16);
+  display: flex;
+  gap: var(--space-12, 12px);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.studio-card__header h2,
+.studio-card h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-serif-display);
+  font-weight: var(--weight-title);
+  letter-spacing: 0;
+}
+
+.studio-form,
+.studio-side-stack,
+.studio-draft-list,
+.studio-source-list,
+.studio-issue-list {
+  display: grid;
+  gap: var(--space-12, 12px);
+}
+
+.studio-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-12, 12px);
+}
+
+.studio-draft-item,
+.studio-source-list button,
+.studio-issue-list article {
+  width: 100%;
+  padding: var(--space-12, 12px);
+  display: grid;
+  gap: 4px;
+  color: inherit;
+  text-align: left;
+  background: color-mix(in oklch, var(--panel-strong) 54%, transparent);
+  border: 1px solid var(--flow-ui-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 1px 0 var(--flow-ui-inset);
+}
+
+.studio-draft-item,
+.studio-source-list button {
+  cursor: pointer;
+}
+
+.studio-draft-item.is-active {
+  border-color: color-mix(in oklch, var(--green) 34%, var(--flow-ui-card-border));
+  background: color-mix(in oklch, var(--green) 10%, var(--panel-strong));
+}
+
+.studio-draft-item strong,
+.studio-source-list strong,
+.studio-issue-list strong {
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.studio-draft-item span,
+.studio-draft-item em,
+.studio-source-list span,
+.studio-issue-list span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.studio-status-pill {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-10, 10px);
+  color: color-mix(in oklch, var(--green) 78%, var(--ink));
+  background: color-mix(in oklch, var(--green) 10%, transparent);
+  border: 1px solid color-mix(in oklch, var(--green) 28%, transparent);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.studio-actions {
+  padding-top: var(--space-8);
 }
 
 .public-assistant {
@@ -3543,6 +3684,8 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   .detail-related-grid,
   .assistant-shell,
   .assistant-admin-grid,
+  .studio-grid,
+  .studio-token-form,
   .status-overview,
   .status-targets,
   .status-project-index,
@@ -3580,6 +3723,10 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
 
   .assistant-inspector {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .studio-side-stack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .status-summary-grid {
@@ -3849,7 +3996,9 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   .assistant-sidebar,
   .assistant-main,
   .assistant-inspector,
-  .assistant-admin-shell {
+  .assistant-admin-shell,
+  .studio-control-bar,
+  .studio-card {
     border-radius: var(--radius-lg);
   }
 
@@ -3882,8 +4031,20 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   }
 
   .assistant-form-grid,
-  .assistant-admin-summary {
+  .assistant-admin-summary,
+  .studio-form-grid,
+  .studio-side-stack {
     grid-template-columns: 1fr;
+  }
+
+  .studio-card,
+  .studio-control-bar {
+    padding: var(--space-16);
+  }
+
+  .studio-card__header,
+  .studio-token-form {
+    display: grid;
   }
 
   .public-assistant {

@@ -68,6 +68,82 @@ model UsageLog {
   member    Member?  @relation(fields: [memberId], references: [id], onDelete: SetNull)
 }
 
+model ContentDraft {
+  id              String             @id @default(cuid())
+  slug            String             @unique
+  title           String
+  column          String
+  tag             String
+  detail          String
+  readTime        String             @default("8 min")
+  bodyJson        Json
+  knowledgePoints Json?
+  projectIds      Json?
+  status          ContentDraftStatus @default(DRAFT)
+  visibility      ContentVisibility  @default(HIDDEN)
+  aiAssistance    String             @default("none")
+  createdBy       String?
+  updatedBy       String?
+  publishedAt     DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  reviews         ContentReview[]
+  publishExports  PublishExport[]
+  aiDailyIssues   AiDailyIssue[]
+}
+
+model ContentReview {
+  id            String              @id @default(cuid())
+  draftId       String
+  status        ContentReviewStatus @default(PENDING)
+  checklistJson Json
+  notes         String              @default("")
+  reviewedBy    String?
+  reviewedAt    DateTime            @default(now())
+  draft         ContentDraft        @relation(fields: [draftId], references: [id], onDelete: Cascade)
+}
+
+model PublishExport {
+  id                String       @id @default(cuid())
+  draftId           String
+  target            String
+  exportedFilesJson Json
+  checksJson        Json?
+  exportedBy        String?
+  createdAt         DateTime     @default(now())
+  draft             ContentDraft @relation(fields: [draftId], references: [id], onDelete: Cascade)
+}
+
+model SourceItem {
+  id            String   @id @default(cuid())
+  title         String
+  url           String
+  sourceName    String
+  sourceTier    String
+  language      String   @default("zh")
+  publishedAt   DateTime?
+  capturedAt    DateTime @default(now())
+  rawExcerpt    String?
+  summary       String   @default("")
+  tagsJson      Json?
+  riskFlagsJson Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AiDailyIssue {
+  id            String             @id @default(cuid())
+  date          String             @unique
+  title         String
+  status        AiDailyIssueStatus @default(SOURCE_COLLECTED)
+  sourceIdsJson Json
+  briefJson     Json?
+  draftId       String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  draft         ContentDraft?      @relation(fields: [draftId], references: [id], onDelete: SetNull)
+}
+
 enum MemberRole {
   MEMBER
   ADMIN
@@ -77,4 +153,38 @@ enum MessageRole {
   USER
   ASSISTANT
   SYSTEM
+}
+
+enum ContentDraftStatus {
+  DRAFT
+  REVIEW_NEEDED
+  APPROVED
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+enum ContentVisibility {
+  HIDDEN
+  FEATURED
+  ARCHIVE
+}
+
+enum ContentReviewStatus {
+  PENDING
+  APPROVED
+  NEEDS_CHANGES
+  REJECTED
+}
+
+enum AiDailyIssueStatus {
+  SOURCE_COLLECTED
+  EXTRACTED
+  SUMMARIZED
+  SYNTHESIZED
+  REVIEW_NEEDED
+  APPROVED
+  PUBLISHED
+  REJECTED
+  NEEDS_MORE_EVIDENCE
 }
