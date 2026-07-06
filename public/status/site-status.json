@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-07-06T05:05:00.074Z",
+  "checkedAt": "2026-07-06T05:50:00.320Z",
   "base": "https://biau.playlab.eu.cc",
   "ok": true,
   "summary": {
@@ -22,8 +22,8 @@
       "note": "工作台已对齐 BIAU Port / 泊岸入口品牌；入口可达不代表已开放公开 demo 凭据，未显示凭据时仍是受控演示。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 924,
-      "checkedAt": "2026-07-06T05:05:00.079Z",
+      "durationMs": 665,
+      "checkedAt": "2026-07-06T05:50:00.325Z",
       "finalUrl": "https://legal-rag-web.onrender.com/",
       "issues": []
     },
@@ -39,8 +39,8 @@
       "note": "展示页已接入 BIAU Port / 泊岸标题与 favicon；入口可达代表展示页和截图可访问，正式 APK 下载仍需签名包、校验摘要和人工确认。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 668,
-      "checkedAt": "2026-07-06T05:05:01.003Z",
+      "durationMs": 2102,
+      "checkedAt": "2026-07-06T05:50:00.990Z",
       "finalUrl": "https://biau.playlab.eu.cc/pet-app-showcase/",
       "issues": []
     },
@@ -56,8 +56,8 @@
       "note": "代码侧支持生产普通注册默认开放，但当前线上状态以 bootstrap synthetic 为准；登录页主品牌和后台侧栏已接入 BIAU Port / 泊岸外壳。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 3824,
-      "checkedAt": "2026-07-06T05:05:01.671Z",
+      "durationMs": 1665,
+      "checkedAt": "2026-07-06T05:50:03.092Z",
       "finalUrl": "https://erp.ciallobill.qzz.io/",
       "issues": []
     },
@@ -73,8 +73,8 @@
       "note": "游戏站已统一 BIAU Playlab 命名、泊岸 favicon、导航副标题和页脚归属；静态站可用不代表每个 Web 试玩资源都已完成运行检查。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 820,
-      "checkedAt": "2026-07-06T05:05:05.495Z",
+      "durationMs": 666,
+      "checkedAt": "2026-07-06T05:50:04.757Z",
       "finalUrl": "https://games.playlab.eu.cc/",
       "issues": []
     },
@@ -90,8 +90,8 @@
       "note": "展示站标题和 favicon 已纳入 BIAU Port / 泊岸体系；阶段 APK 是否公开发布仍需人工确认。",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 1017,
-      "checkedAt": "2026-07-06T05:05:06.315Z",
+      "durationMs": 726,
+      "checkedAt": "2026-07-06T05:50:05.423Z",
       "finalUrl": "https://xunqiu.playlab.eu.cc/",
       "issues": []
     }
@@ -165,7 +165,7 @@
           "label": "在线工作台入口",
           "status": "online",
           "description": "检查公开 Legal RAG 工作台入口是否响应。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 924 ms。由 L0 入口检测自动合并。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 665 ms。由 L0 入口检测自动合并。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "legal-rag-entry"
@@ -234,7 +234,7 @@
           "label": "演示入口",
           "status": "online",
           "description": "检查 ERP 登录/演示入口是否响应，并确认入口以 BIAU Port / 泊岸品牌外壳承载 Ozon ERP 产品名。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 3824 ms。由 L0 入口检测自动合并；登录页主视觉和登录后侧栏已改为泊岸统一图标与归属说明。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 1665 ms。由 L0 入口检测自动合并；登录页主视觉和登录后侧栏已改为泊岸统一图标与归属说明。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "ozon-erp-entry"
@@ -301,7 +301,7 @@
           "label": "产品展示页",
           "status": "online",
           "description": "检查寻球展示页、文档和阶段包入口是否响应，并确认标题/favicon 归属泊岸展示体系。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 1017 ms。由 L0 入口检测自动合并；展示站首页、文档页和 404 页已补 BIAU Port / 泊岸标题与 favicon。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 726 ms。由 L0 入口检测自动合并；展示站首页、文档页和 404 页已补 BIAU Port / 泊岸标题与 favicon。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "xunqiu-entry"
@@ -404,7 +404,7 @@
           "label": "游戏站入口",
           "status": "online",
           "description": "检查 Playlab 静态站入口是否响应，并确认 BIAU Playlab 命名、泊岸 favicon、导航副标题和页脚归属已同步。",
-          "evidence": "最近一次入口检测通过：HTTP 200，耗时 820 ms。由 L0 入口检测自动合并；游戏站已统一 BIAU Playlab 命名并换用 BIAU Port / 泊岸 favicon，导航和页脚也显示泊岸归属。",
+          "evidence": "最近一次入口检测通过：HTTP 200，耗时 666 ms。由 L0 入口检测自动合并；游戏站已统一 BIAU Playlab 命名并换用 BIAU Port / 泊岸 favicon，导航和页脚也显示泊岸归属。",
           "cadence": "每次生成状态页",
           "ownerHint": "公开入口",
           "relatedTargetId": "biau-playlab-entry"
@@ -413,9 +413,9 @@
           "id": "biau-playlab-web-builds",
           "layer": "synthetic",
           "label": "Web 试玩资源",
-          "status": "planned",
+          "status": "online",
           "description": "检查每个公开试玩项目的 HTML、WASM/PCK 或导出资源是否可加载。",
-          "evidence": "游戏仓库包含 Godot 项目、截图捕获脚本和 Playlab 资源同步痕迹。",
+          "evidence": "最近一次 synthetic 检查：3/3 public pages, 6/6 playable pages, 36/36 discovered resources responded。`npm.cmd run playlab:synthetic` 会检查公开入口、游戏列表、First Tetris 详情页、公开试玩 index 和从 HTML 发现的 Godot Web 资源响应；缺少新发布批准时不会把未验证构建包装成已上线。",
           "cadence": "游戏导出后",
           "ownerHint": "Playlab static check"
         },
@@ -423,9 +423,9 @@
           "id": "biau-playlab-mobile-hints",
           "layer": "synthetic",
           "label": "移动端提示",
-          "status": "planned",
+          "status": "online",
           "description": "检查移动端访问时是否清楚提示试玩限制、控制方式或推荐设备。",
-          "evidence": "主站详情页已持续优化移动端提示和项目入口。",
+          "evidence": "最近一次 synthetic 检查：Found 5/5 mobile/control hint terms in public Playlab pages。`playlab:synthetic` 会从公开 Playlab 页面中检查移动、触屏、触控、多端和键盘等低风险提示文案。",
           "cadence": "UI 改动后",
           "ownerHint": "UI regression"
         }
@@ -434,7 +434,7 @@
         "是否上线新的试玩构建或公开测试版本需要人工确认。"
       ],
       "nextActions": [
-        "为 Playlab 增加静态资源 manifest 检查。",
+        "把 Playlab synthetic 从 HTML 发现资源升级为版本化 manifest 检查。",
         "把关键游戏详情纳入 UI 回归截图。"
       ]
     }

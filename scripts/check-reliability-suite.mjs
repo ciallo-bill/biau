@@ -53,6 +53,14 @@ const steps = [
     reportKind: 'synthetic',
   },
   {
+    id: 'playlab',
+    label: 'BIAU Playlab synthetic',
+    script: 'playlab:synthetic',
+    supportsStrict: true,
+    outputPath: 'public/status/biau-playlab-synthetic.json',
+    reportKind: 'synthetic',
+  },
+  {
     id: 'site-status',
     label: 'Public status aggregation',
     script: 'site:status',
