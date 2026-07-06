@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url'
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const outputPath = resolve(repoRoot, 'public/status/xunqiu-synthetic.json')
 const DEFAULT_TIMEOUT_MS = 12_000
-const CHECK_IDS = ['xunqiu-backend-health', 'xunqiu-compat-api', 'xunqiu-apk-gate']
 const COMPAT_ENDPOINTS = [
   {
     name: 'tweets',
@@ -169,7 +168,11 @@ async function main() {
   const checks = []
 
   if (!baseUrl) {
-    checks.push(...CHECK_IDS.map((id) => emptyCheck(id, 'XUNQIU_SYNTHETIC_API_BASE_URL is not configured')))
+    checks.push(
+      emptyCheck('xunqiu-backend-health', 'XUNQIU_SYNTHETIC_API_BASE_URL is not configured'),
+      emptyCheck('xunqiu-compat-api', 'XUNQIU_SYNTHETIC_API_BASE_URL is not configured'),
+      emptyCheck('xunqiu-apk-gate', 'APK release gate requires a separate release artifact check'),
+    )
     await writeReport({ checkedAt, apiBaseConfigured: false, checks })
     console.log('Xunqiu synthetic report generated without API base URL; all live checks are unchecked.')
     return

@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-07-06T05:48:37.257Z",
+  "checkedAt": "2026-07-06T06:55:44.457Z",
   "apiBaseConfigured": false,
   "hasCredentials": false,
   "ok": true,
@@ -9,7 +9,7 @@
       "status": "unchecked",
       "httpStatus": 0,
       "durationMs": 0,
-      "checkedAt": "2026-07-06T05:48:37.258Z",
+      "checkedAt": "2026-07-06T06:55:44.459Z",
       "summary": "XUNQIU_SYNTHETIC_API_BASE_URL is not configured",
       "issues": []
     },
@@ -18,7 +18,7 @@
       "status": "unchecked",
       "httpStatus": 0,
       "durationMs": 0,
-      "checkedAt": "2026-07-06T05:48:37.258Z",
+      "checkedAt": "2026-07-06T06:55:44.459Z",
       "summary": "XUNQIU_SYNTHETIC_API_BASE_URL is not configured",
       "issues": []
     },
@@ -27,8 +27,8 @@
       "status": "unchecked",
       "httpStatus": 0,
       "durationMs": 0,
-      "checkedAt": "2026-07-06T05:48:37.258Z",
-      "summary": "XUNQIU_SYNTHETIC_API_BASE_URL is not configured",
+      "checkedAt": "2026-07-06T06:55:44.459Z",
+      "summary": "APK release gate requires a separate release artifact check",
       "issues": []
     }
   ]

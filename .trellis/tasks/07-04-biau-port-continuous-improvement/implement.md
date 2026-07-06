@@ -96,6 +96,10 @@ When the selected slice touches a related repository:
   smoke gate. The command wraps Studio sample export, project detail planning,
   status detail planning, and AI Daily sample draft generation while writing
   the AI Daily smoke draft only to the system temp directory.
+- 2026-07-06: Polished Xunqiu reliability status semantics so the APK release
+  gate no longer reports "API base URL not configured" when the backend API base
+  is missing; the gate now correctly points at a separate release artifact
+  check and regenerated public status JSON.
 
 ## Discovery Sweep Checklist
 
