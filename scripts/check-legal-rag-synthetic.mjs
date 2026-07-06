@@ -82,6 +82,7 @@ function emptyCheck(id, summary, issues = []) {
 
 function statusFromResponse(response, ok) {
   if (ok) return 'online'
+  if (response.error && response.status === 0) return 'offline'
   if ([401, 403, 404, 405, 408, 409, 425, 429].includes(response.status)) return 'degraded'
   if (response.status > 0) return 'offline'
   return 'unchecked'
@@ -90,10 +91,35 @@ function statusFromResponse(response, ok) {
 function issueFromResponse(response, fallback = '') {
   if (response.ok) return ''
   if (fallback) return fallback
+  if (response.errorKind) return `request failed: ${response.errorKind}`
+  if (response.error) return 'request failed: network_error'
   if (response.status === 401 || response.status === 403) return 'requires authentication'
   if (response.status === 429) return 'rate limited'
   if (response.status >= 500) return `server returned HTTP ${response.status}`
   return response.status > 0 ? `HTTP ${response.status}` : 'request failed'
+}
+
+function classifyFetchError(error) {
+  if (!error || typeof error !== 'object') return 'network_error'
+  const code =
+    typeof error.code === 'string'
+      ? error.code
+      : error.cause && typeof error.cause === 'object'
+        ? (error.cause.code ?? '')
+        : ''
+
+  if (error.name === 'AbortError' || code === 'ETIMEDOUT') return 'timeout'
+  if (code === 'ENOTFOUND' || code === 'EAI_AGAIN') return 'dns_error'
+  if (
+    code === 'CERT_HAS_EXPIRED' ||
+    code === 'SELF_SIGNED_CERT_IN_CHAIN' ||
+    code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' ||
+    code === 'DEPTH_ZERO_SELF_SIGNED_CERT'
+  ) {
+    return 'tls_error'
+  }
+  if (code === 'ECONNREFUSED' || code === 'ECONNRESET' || code === 'UND_ERR_SOCKET') return 'connection_error'
+  return 'network_error'
 }
 
 async function requestJson(baseUrl, path, options, timeoutMs, cookieJar) {
@@ -122,6 +148,7 @@ async function requestJson(baseUrl, path, options, timeoutMs, cookieJar) {
       durationMs: Date.now() - startedAt,
       json,
       error: '',
+      errorKind: '',
     }
   } catch (error) {
     return {
@@ -130,6 +157,7 @@ async function requestJson(baseUrl, path, options, timeoutMs, cookieJar) {
       durationMs: Date.now() - startedAt,
       json: null,
       error: error instanceof Error ? error.message : String(error),
+      errorKind: classifyFetchError(error),
     }
   } finally {
     clearTimeout(timeout)
@@ -150,7 +178,7 @@ function storeCookies(response, cookieJar) {
 }
 
 function checkFromResponse(id, response, ok, summary, fallbackIssue = '') {
-  const issue = response.error || issueFromResponse(response, fallbackIssue)
+  const issue = issueFromResponse(response, fallbackIssue)
   return {
     id,
     status: statusFromResponse(response, ok),
