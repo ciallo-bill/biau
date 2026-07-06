@@ -23,14 +23,21 @@ Continue sustained improvements across blog-semi and related projects after Roun
 
 ## Acceptance Criteria
 
-- [ ] 父任务包含 `prd.md`、`design.md`、`implement.md` 和 `manual-gates.md`。
-- [ ] 至少完成 1 个 P1 子任务并推送可验证成果。
-- [ ] 至少一个关联项目的公开展示、状态页或演示入口可信度得到改进。
-- [ ] 已完成子任务都有最小相关验证记录。
-- [ ] 人工 gate 集中记录，且没有阻塞其他可推进任务。
-- [ ] 没有提交任何密钥、生产凭据、数据库连接串、私有模型渠道、未批准 APK 链接或敏感业务数据。
-- [ ] 完成整轮后汇总结果、剩余人工待办、验证记录、提交和后续建议。
+- [x] 父任务包含 `prd.md`、`design.md`、`implement.md` 和 `manual-gates.md`。
+- [x] 至少完成 1 个 P1 子任务并推送可验证成果。
+- [x] 至少一个关联项目的公开展示、状态页或演示入口可信度得到改进。
+- [x] 已完成子任务都有最小相关验证记录。
+- [x] 人工 gate 集中记录，且没有阻塞其他可推进任务。
+- [x] 没有提交任何密钥、生产凭据、数据库连接串、私有模型渠道、未批准 APK 链接或敏感业务数据。
+- [x] 完成整轮后汇总结果、剩余人工待办、验证记录、提交和后续建议。
 
 ## Notes
 
 - 本父任务只管理路线和验收；实现由子任务完成。
+
+## Round 6 Summary
+
+- 完成并归档 `07-07-round-6-xunqiu-status-apk-backend-gate`：新增 Xunqiu 状态契约，约束 API base、兼容 API、APK gate 与公开下载状态。
+- 完成并归档 `07-07-round-6-playlab-game-showcase-contract`：新增 Playlab synthetic 契约，要求 playable/resource/build/mobile hints 状态自洽，并给 `site:status` 增加一次 bounded retry。
+- 完成并归档 `07-07-round-6-project-detail-visual-evidence-followup`：项目详情正文 visual 增加 public-safe caption 和截图 source evidence，`project-details:check` 已覆盖。
+- Round 6 提交均已推送 `origin main`。
