@@ -15,7 +15,7 @@ Continue sustained autonomous improvements after Round 7, focusing on reliabilit
 ## Acceptance Criteria
 
 - [ ] At least one child task is completed, verified, committed, and pushed.
-- [ ] Manual gates are recorded in task notes when encountered.
+- [x] Manual gates are recorded in task notes when encountered.
 - [ ] No secrets, production credentials, private URLs, model relay endpoints, or unapproved APK links are committed.
 - [ ] Finished child tasks are archived before the parent is archived.
 
@@ -23,3 +23,4 @@ Continue sustained autonomous improvements after Round 7, focusing on reliabilit
 
 - Default child order: reliability/status observation first, then public demo readiness, then project detail/content improvements, then assistant or AI Daily follow-ups.
 - Current first child: `07-07-round-8-reliability-status-local-evidence-hardening`.
+- Push gate: local commit `aa7d284` is ready, but SSH host key verification blocked `git push origin main`; see `manual-gates.md`.
