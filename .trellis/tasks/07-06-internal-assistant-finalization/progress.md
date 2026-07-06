@@ -274,3 +274,27 @@ Validation:
 Manual gate:
 
 - Production verification of real answer quality and live provider behavior still requires user-approved real tasks. This slice only displays sanitized metadata returned by the internal API and does not call live model channels.
+
+## 2026-07-06 public facts refresh for internal assistant
+
+Completed a small public-content consistency slice after the internal assistant workspace moved beyond the original MVP copy.
+
+Implemented:
+
+- Removed unused legacy `demoInternalSessions` and `demoInternalMessages` exports from `src/data/assistant.ts`.
+- Updated the BIAU Port project case page copy to describe the current internal assistant shape:
+  - member workspace with invite redemption and identity checks
+  - real session history and archive flow
+  - member-level model channels
+  - admin workspace for invites, members, knowledge, sync status, and low-sensitive usage
+  - internal knowledge management and Qdrant internal collection sync path
+- Kept production gates explicit: Render env vars, migrations, approved internal corpus, and user-approved real model tasks are still required for production validation.
+- Regenerated `server/data/public-knowledge.json` and `server/data/public-knowledge-v2.json` so the public assistant no longer repeats stale "internal assistant MVP" facts for the main site project.
+
+Validation:
+
+- `npm.cmd run assistant:index`
+
+Manual gate:
+
+- None for this content refresh beyond the existing production configuration gates.

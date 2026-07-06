@@ -241,40 +241,6 @@ export const publicKnowledgeBase: AssistantKnowledgeItem[] = [
 
 export const publicKnowledgeV2: PublicKnowledgeV2 = buildPublicKnowledgeV2(publicKnowledgeBase, { projects })
 
-export const demoInternalSessions: AssistantSessionPreview[] = [
-  {
-    id: 'session-site-planning',
-    title: '示例：站点能力整理',
-    updatedAt: '示例',
-    preview: '总结当前主站已经公开的 AI、ERP、游戏与移动端内容。',
-  },
-  {
-    id: 'session-rag-outline',
-    title: '示例：RAG 工具页草案',
-    updatedAt: '示例',
-    preview: '把公开文章整理成一个更像工作台的知识入口。',
-  },
-  {
-    id: 'session-release-check',
-    title: '示例：发布前检查',
-    updatedAt: '示例',
-    preview: '梳理部署、SEO、资源和交互验证项。',
-  },
-]
-
-export const demoInternalMessages: AssistantMessage[] = [
-  {
-    id: 'assistant-1',
-    role: 'assistant',
-    content:
-      '这里是内部助手的示例开场。第一版适合整理项目资料、生成提纲、串联公开知识点和复盘交付路线；它还不是完整历史记录或私有知识库。',
-    timestamp: '09:30',
-    citations: publicKnowledgeBase.filter((item) =>
-      ['site:intro', 'blog:ai-app-deployment-layers', 'blog:ai-tool-permission-audit'].includes(item.id),
-    ),
-  },
-]
-
 export function searchPublicKnowledge(query: string) {
   return searchAssistantKnowledge(publicKnowledgeBase, query, { knowledge: publicKnowledgeV2 }).citations
 }
