@@ -26,6 +26,16 @@ const issueKinds = new Set([
 const erpRegistrationStatuses = new Set(['open', 'closed-by-env', 'deploy-stale', 'blocked', 'unchecked'])
 const legalDemoAccessStatuses = new Set(['open-demo', 'credential-required', 'blocked-by-login', 'degraded', 'offline'])
 const legalProtectedCheckIds = new Set(['legal-rag-qa', 'legal-rag-contract-review', 'legal-rag-observability'])
+const xunqiuApkGateStatuses = new Set([
+  'not-configured',
+  'stage-apk-found',
+  'release-like-artifact-found',
+  'debug-only',
+  'unknown-artifact-found',
+  'no-artifact',
+  'approved-release',
+])
+const xunqiuRequiredCheckIds = new Set(['xunqiu-backend-health', 'xunqiu-compat-api', 'xunqiu-apk-gate'])
 const disallowedKeys = new Set([
   'token',
   'password',
@@ -264,6 +274,54 @@ function checkLegalRagDemoGate(fileName: string, payload: Record<string, unknown
   }
 }
 
+function checkXunqiuGate(fileName: string, payload: Record<string, unknown>) {
+  if (fileName !== 'xunqiu-synthetic.json') return
+
+  const apiBaseConfigured = payload.apiBaseConfigured
+  const checks = Array.isArray(payload.checks) ? payload.checks.filter(isRecord) : []
+  const checksById = new Map(checks.map((check) => [String(check.id), check]))
+  const apkGate = isRecord(payload.apkGate) ? payload.apkGate : null
+
+  if (typeof apiBaseConfigured !== 'boolean') fail(`${fileName}: apiBaseConfigured must be boolean`)
+  if (payload.hasCredentials !== false) fail(`${fileName}: hasCredentials must be false for public-safe Xunqiu checks`)
+  for (const id of xunqiuRequiredCheckIds) {
+    if (!checksById.has(id)) fail(`${fileName}: required check "${id}" is missing`)
+  }
+
+  const backendChecks = ['xunqiu-backend-health', 'xunqiu-compat-api']
+  if (apiBaseConfigured === false) {
+    for (const id of backendChecks) {
+      if (checksById.get(id)?.status === 'online') fail(`${fileName}:${id} cannot be online when apiBaseConfigured=false`)
+    }
+  }
+
+  if (!apkGate) {
+    fail(`${fileName}: apkGate is missing`)
+    return
+  }
+
+  const apkStatus = apkGate.status
+  const publicDownloadApproved = apkGate.publicDownloadApproved
+  if (!isNonEmptyString(apkStatus) || !xunqiuApkGateStatuses.has(apkStatus)) {
+    fail(`${fileName}: apkGate.status "${String(apkStatus)}" is not allowed`)
+  }
+  if (typeof publicDownloadApproved !== 'boolean') fail(`${fileName}: apkGate.publicDownloadApproved must be boolean`)
+
+  const countFields = ['stageArtifactCount', 'releaseLikeArtifactCount', 'debugArtifactCount', 'unknownArtifactCount']
+  for (const field of countFields) {
+    if (typeof apkGate[field] !== 'number') fail(`${fileName}: apkGate.${field} must be numeric`)
+  }
+
+  const apkCheck = checksById.get('xunqiu-apk-gate')
+  if (publicDownloadApproved !== true && apkCheck?.status === 'online') {
+    fail(`${fileName}: xunqiu-apk-gate cannot be online while publicDownloadApproved=false`)
+  }
+  if (publicDownloadApproved === true) {
+    if (apkStatus !== 'approved-release') fail(`${fileName}: publicDownloadApproved=true requires apkGate.status=approved-release`)
+    if (apkCheck?.status !== 'online') fail(`${fileName}: publicDownloadApproved=true requires xunqiu-apk-gate to be online`)
+  }
+}
+
 async function checkSyntheticSnapshots(knownCheckIds: Set<string>) {
   let entries: string[]
   try {
@@ -293,6 +351,7 @@ async function checkSyntheticSnapshots(knownCheckIds: Set<string>) {
     checkApkGate(fileName, payload)
     checkErpRegistrationGate(fileName, payload)
     checkLegalRagDemoGate(fileName, payload)
+    checkXunqiuGate(fileName, payload)
   }
 }
 

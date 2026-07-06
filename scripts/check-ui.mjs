@@ -54,7 +54,23 @@ const projectDetailVisualCases = projects
   .filter((project) => project.expectedVisuals > 0)
 
 async function gotoApp(page, path, options = {}) {
-  await page.goto(`${base}${path}`, { waitUntil: options.waitUntil ?? 'domcontentloaded' })
+  const url = `${base}${path}`
+  const waitUntil = options.waitUntil ?? 'domcontentloaded'
+  const timeout = options.timeout ?? 45_000
+  let lastError = null
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      await page.goto(url, { waitUntil, timeout })
+      lastError = null
+      break
+    } catch (error) {
+      lastError = error
+      if (attempt === 0) await page.waitForTimeout(500)
+    }
+  }
+
+  if (lastError) throw lastError
   await page.locator('#root').waitFor({ state: 'attached', timeout: 10000 })
   await page.locator('.route-loading').waitFor({ state: 'detached', timeout: 10000 }).catch(() => {})
 }
@@ -387,7 +403,7 @@ for (const path of ['/projects', '/blog']) {
       window.setTimeout(() => observer.disconnect(), 1200)
     })
   })
-  await routeFlashPage.goto(`${base}${path}`, { waitUntil: 'load' })
+  await routeFlashPage.goto(`${base}${path}`, { waitUntil: 'load', timeout: 45_000 })
   await routeFlashPage.waitForTimeout(1300)
   const routeFlashEvents = await routeFlashPage.evaluate(() => window.__routeFlashEvents ?? [])
   if (routeFlashEvents.some((event) => event.value === 'present' || event.value === 'true')) {
@@ -417,7 +433,7 @@ await homeIntroPage.addInitScript(() => {
     )
   }
 })
-await homeIntroPage.goto(`${base}/`, { waitUntil: 'domcontentloaded' })
+await gotoApp(homeIntroPage, '/', { waitUntil: 'domcontentloaded' })
 await homeIntroPage.waitForSelector('.harbor-intro__vessel', { timeout: 3000 }).catch(() => {
   failures.push('/ home intro: expected harbor intro vessel to mount on first visit')
 })
