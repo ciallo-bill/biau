@@ -618,3 +618,36 @@ Finalized internal assistant local implementation: answer diagnostics, refreshed
 ### Next Steps
 
 - None - task complete
+
+
+## Session 66: Internal assistant member model routing finalization
+
+**Date**: 2026-07-06
+**Task**: Internal assistant member model routing finalization
+**Branch**: `main`
+
+### Summary
+
+Finalized member-level model channel routing for the internal assistant: active/inactive channel semantics, safe channel summaries, usage log channel id, admin/member UI labels, deployment/spec docs, and mock-only validation.
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `72276df` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
