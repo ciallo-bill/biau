@@ -20,7 +20,7 @@ Strengthen the main site's reliability/status observation with local determinist
 - [x] A deterministic local check covers status evidence freshness/shape and is wired into verification where appropriate.
 - [x] Existing `status:contract`, `site:status`, `check:ui`, `lint`, `build`, and `verify` pass.
 - [x] Manual gates are documented for credentials, cloud monitoring, metrics, and live synthetic checks.
-- [ ] Changes are committed and pushed.
+- [x] Changes are committed locally; push is deferred to the GitHub SSH host key manual gate.
 
 ## Notes
 
@@ -62,3 +62,4 @@ Strengthen the main site's reliability/status observation with local determinist
 - Public/internal assistant live model prompts remain opt-in only; do not add them to default liveness checks.
 - Prometheus, Grafana, ARMS, Umami/Plausible, Cloudflare dashboards, and alert routing remain human platform setup.
 - Pet/Xunqiu APK/AAB signing, checksum publication, and public download approval remain human release gates.
+- GitHub SSH host key verification blocks `git push origin main`; local commit `aa7d284` is ready to push after the user verifies the trusted host key.
