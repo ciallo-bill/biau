@@ -11,9 +11,16 @@
 - 只有 release 构建、签名、回归、校验和人工批准齐全时才允许公开下载。
 - 当前若只有 debug 产物，必须保持 gate 关闭并说明原因。
 
+## Confirmed Facts
+
+- Pet 根目录没有顶层 git 仓库，实际由多个子项目/原型仓库组成。
+- 当前公开展示页源位于 `D:\workspace4Cursor\pet\gamer\pet-app-showcase-site`。
+- `npm.cmd run pet:synthetic` 确认公开展示页和 4/4 截图可访问。
+- 最新 `apkGate.status` 是 `debug-only`，只发现 debug APK，公开下载仍需关闭。
+
 ## Acceptance Criteria
 
-- [ ] Pet 展示页和主站状态准确表达 APK gate。
-- [ ] 运行 `pet:synthetic` 或项目内展示页检查。
-- [ ] 记录发布所需人工 gate。
-- [ ] 不公开未批准 APK、签名文件路径或内部构建链接。
+- [x] Pet 展示页和主站状态准确表达 APK gate。
+- [x] 运行 `pet:synthetic` 或项目内展示页检查。
+- [x] 记录发布所需人工 gate。
+- [x] 不公开未批准 APK、签名文件路径或内部构建链接。

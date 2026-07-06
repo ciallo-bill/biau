@@ -388,7 +388,10 @@ export const reliabilityProjects: ReliabilityProject[] = [
         ownerHint: 'Pet API',
       },
     ],
-    gates: ['真实 Pet APK 发布、后端部署和账号体系公开演示都需要人工确认。'],
+    gates: [
+      '最近一次 Pet synthetic 的 `apkGate.status` 为 `debug-only`，只发现 debug APK；这不是公开发布候选，不能放下载链接。',
+      '真实 Pet APK 发布、后端部署和账号体系公开演示都需要人工确认。',
+    ],
     nextActions: ['准备正式 release 构建和签名策略后再形成 release candidate 清单。', '有正式签名包、校验摘要、版本说明和回归证据后补下载状态检查。'],
   },
   {

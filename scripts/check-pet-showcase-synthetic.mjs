@@ -110,6 +110,7 @@ async function fetchWithTimeout(url, timeoutMs, accept) {
       contentType,
       body,
       error: '',
+      errorKind: '',
     }
   } catch (error) {
     return {
@@ -119,17 +120,46 @@ async function fetchWithTimeout(url, timeoutMs, accept) {
       contentType: '',
       body: '',
       error: error instanceof Error ? error.message : String(error),
+      errorKind: classifyFetchError(error),
     }
   } finally {
     clearTimeout(timeout)
   }
 }
 
+function classifyFetchError(error) {
+  if (!error || typeof error !== 'object') return 'network_error'
+  const code =
+    typeof error.code === 'string'
+      ? error.code
+      : error.cause && typeof error.cause === 'object'
+        ? (error.cause.code ?? '')
+        : ''
+
+  if (error.name === 'AbortError' || code === 'ETIMEDOUT') return 'timeout'
+  if (code === 'ENOTFOUND' || code === 'EAI_AGAIN') return 'dns_error'
+  if (
+    code === 'CERT_HAS_EXPIRED' ||
+    code === 'SELF_SIGNED_CERT_IN_CHAIN' ||
+    code === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' ||
+    code === 'DEPTH_ZERO_SELF_SIGNED_CERT'
+  ) {
+    return 'tls_error'
+  }
+  if (code === 'ECONNREFUSED' || code === 'ECONNRESET' || code === 'UND_ERR_SOCKET') return 'connection_error'
+  return 'network_error'
+}
+
+function issueFromResponse(label, response) {
+  if (response.status > 0) return `${label}: HTTP ${response.status}`
+  return `${label}: request failed: ${response.errorKind || 'network_error'}`
+}
+
 function validateShowcasePage(response) {
   const issues = []
 
   if (!response.ok) {
-    issues.push(`showcase page: HTTP ${response.status || 'request failed'}${response.error ? ` (${response.error})` : ''}`)
+    issues.push(issueFromResponse('showcase page', response))
     return issues
   }
 
@@ -156,7 +186,7 @@ function validateShowcasePage(response) {
 
 function validateScreenshot(path, response) {
   if (!response.ok) {
-    return [`${path}: HTTP ${response.status || 'request failed'}${response.error ? ` (${response.error})` : ''}`]
+    return [issueFromResponse(path, response)]
   }
   if (response.contentType && !response.contentType.startsWith('image/')) {
     return [`${path}: expected image response`]
