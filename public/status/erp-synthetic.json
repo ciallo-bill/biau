@@ -1,30 +1,30 @@
 {
-  "checkedAt": "2026-07-06T18:13:33.681Z",
-  "apiBaseConfigured": false,
+  "checkedAt": "2026-07-06T18:42:22.581Z",
+  "apiBaseConfigured": true,
   "hasCredentials": false,
-  "registrationEnabled": null,
-  "registrationStatus": "unchecked",
-  "registrationSummary": "ERP registration state was not checked.",
+  "registrationEnabled": true,
+  "registrationStatus": "open",
+  "registrationSummary": "Auth bootstrap reports registrationEnabled=true.",
   "expectedCommitConfigured": false,
-  "liveCommit": null,
+  "liveCommit": "8f384374872d",
   "ok": true,
   "checks": [
     {
       "id": "ozon-erp-health",
-      "status": "unchecked",
-      "httpStatus": 0,
-      "durationMs": 0,
-      "checkedAt": "2026-07-06T18:13:33.682Z",
-      "summary": "ERP_SYNTHETIC_API_BASE_URL is not configured",
+      "status": "online",
+      "httpStatus": 200,
+      "durationMs": 975,
+      "checkedAt": "2026-07-06T18:42:23.557Z",
+      "summary": "API health returned status=ok",
       "issues": []
     },
     {
       "id": "ozon-erp-auth",
-      "status": "unchecked",
-      "httpStatus": 0,
-      "durationMs": 0,
-      "checkedAt": "2026-07-06T18:13:33.682Z",
-      "summary": "ERP_SYNTHETIC_API_BASE_URL is not configured",
+      "status": "online",
+      "httpStatus": 200,
+      "durationMs": 549,
+      "checkedAt": "2026-07-06T18:42:24.106Z",
+      "summary": "Auth bootstrap returned registrationEnabled=true; registrationStatus=open",
       "issues": []
     },
     {
@@ -32,8 +32,8 @@
       "status": "unchecked",
       "httpStatus": 0,
       "durationMs": 0,
-      "checkedAt": "2026-07-06T18:13:33.682Z",
-      "summary": "ERP_SYNTHETIC_API_BASE_URL is not configured",
+      "checkedAt": "2026-07-06T18:42:24.106Z",
+      "summary": "Credentials are required before plugin or sync smoke checks",
       "issues": []
     }
   ]

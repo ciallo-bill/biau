@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -18,6 +18,7 @@ function parseArgs(argv) {
   const args = {
     strict: process.env.ERP_SYNTHETIC_STRICT === '1',
     timeoutMs: Number(process.env.ERP_SYNTHETIC_TIMEOUT_MS || DEFAULT_TIMEOUT_MS),
+    forceUnconfigured: process.env.ERP_SYNTHETIC_FORCE_UNCONFIGURED === '1',
   }
 
   const readValue = (index) => argv[index + 1] ?? ''
@@ -25,6 +26,10 @@ function parseArgs(argv) {
     const item = argv[index]
     if (item === '--strict') {
       args.strict = true
+      continue
+    }
+    if (item === '--force-unconfigured') {
+      args.forceUnconfigured = true
       continue
     }
     if (item === '--timeout') {
@@ -203,6 +208,11 @@ async function main() {
   const checks = []
 
   if (!baseUrl) {
+    if (!args.forceUnconfigured && (await hasReadableExistingReport())) {
+      console.log('ERP_SYNTHETIC_API_BASE_URL is not configured; preserved existing ERP synthetic report.')
+      return
+    }
+
     checks.push(...CHECK_IDS.map((id) => emptyCheck(id, 'ERP_SYNTHETIC_API_BASE_URL is not configured')))
     await writeReport({
       checkedAt,
@@ -329,6 +339,15 @@ async function main() {
   )
 
   if (args.strict && checks.some((check) => check.status === 'offline')) process.exitCode = 1
+}
+
+async function hasReadableExistingReport() {
+  try {
+    const payload = JSON.parse(await readFile(outputPath, 'utf8'))
+    return Boolean(payload && typeof payload === 'object' && Array.isArray(payload.checks))
+  } catch {
+    return false
+  }
 }
 
 async function writeReport(report) {

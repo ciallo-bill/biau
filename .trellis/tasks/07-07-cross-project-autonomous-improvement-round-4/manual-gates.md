@@ -11,6 +11,7 @@ Use this file for user/platform actions that cannot be safely performed from the
 - Metrics/observability: enabling `/metrics`, Grafana, ARMS, Plausible/Umami, Cloudflare analytics, or tracing requires platform configuration and public-safe label review.
 - Legal RAG public workbench entry: `site:status` currently reports a low-sensitive `network_error` / `timeout` class for `legal-rag-entry`; user/platform side should verify Render service health, region connectivity, and whether the public web service is sleeping, paused, or redeploying. Existing credentialed `legal-rag-synthetic.json` still records the protected functional flow as online, so do not rotate demo credentials solely from this entry reachability failure.
 - Studio / AI Daily production: user/platform side still needs to verify Render `biau-content-studio-api` variables, run `prisma:migrate:studio`, confirm `/studio/api/health` with a Studio token, and perform the first real AI Daily issue -> hidden review draft conversion. The safe local gate `studio:smoke` passes without live model calls.
+- ERP demo: latest public bootstrap synthetic confirms `registrationEnabled=true` and API health is online. To verify the login path, create or confirm a low-privilege, rotatable demo account and provide it only through environment variables for `ERP_SYNTHETIC_USERNAME` / `ERP_SYNTHETIC_PASSWORD`; plugin/sync smoke still needs a desensitized fixture or dedicated demo shop, never real store credentials.
 
 ## Resolved Gates
 
