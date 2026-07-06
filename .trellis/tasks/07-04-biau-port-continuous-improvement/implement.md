@@ -69,6 +69,12 @@ When the selected slice touches a related repository:
   UI/data semantics slice. The child separates `/status` entry reachability
   counts from reliability ability coverage counts, updates UI regression
   assertions, and requires no manual gate.
+- 2026-07-06: Created child
+  `07-06-07-06-ai-daily-doc-current-flow-sync` after discovering
+  `docs/ai-daily-pipeline.md` still described the old CLI-first draft flow.
+  The child updates documentation to the current Studio-first AI Daily workflow,
+  while keeping offline CLI, model calls, production secrets, migrations, and
+  automatic publishing as explicit gates.
 
 ## Discovery Sweep Checklist
 
