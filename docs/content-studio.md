@@ -6,7 +6,9 @@
 
 - 公开站仍然读取已审核的静态内容产物。
 - `/studio` 是内部工作台页面，不直接公开未审核数据库草稿。
-- `/studio/api/*` 只挂载在 `ASSISTANT_SERVICE_MODE=all` 或 `internal` 的后端服务上。
+- `/studio/api/*` 在本地 `ASSISTANT_SERVICE_MODE=all`、内部助手服务
+  `internal`、以及独立内容工作台服务 `studio` 中可用；公开助手和 RAG
+  Orchestrator 服务不挂载 Studio 路由。
 - 第一版认证使用 `STUDIO_ADMIN_TOKEN`，未设置时回退到 `ADMIN_TOKEN`。
 - Studio 默认使用 `STUDIO_DATABASE_URL`；未设置时才回退到 `DATABASE_URL`。
 - 模型辅助默认不启用；AI 日报来源和草稿编辑都可以先人工录入。
