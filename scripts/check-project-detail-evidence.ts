@@ -10,6 +10,15 @@ interface ProjectEvidenceSummary {
 
 const MIN_DETAIL_SECTIONS = 5
 const MIN_BODY_VISUALS = 2
+const SENSITIVE_SOURCE_PATTERNS = [
+  /^[A-Za-z]:[\\/]/u,
+  /^file:/iu,
+  /localhost/iu,
+  /127\.0\.0\.1/u,
+  /192\.168\./u,
+  /10\.\d{1,3}\./u,
+  /(?:token|key|secret|password|passwd|pwd)=/iu,
+]
 
 const issues: string[] = []
 const summaries: ProjectEvidenceSummary[] = []
@@ -22,9 +31,30 @@ function flattenSections(sections: Record<string, ProjectDetailSection[] | undef
   return Object.values(sections ?? {}).flatMap((items) => items ?? [])
 }
 
+function isPublicSourceUrl(value: string) {
+  if (SENSITIVE_SOURCE_PATTERNS.some((pattern) => pattern.test(value))) return false
+  if (value.startsWith('/')) return true
+
+  try {
+    const parsed = new URL(value)
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:'
+  } catch {
+    return false
+  }
+}
+
 function checkVisual(projectId: string, visual: ProjectVisualBlock) {
   if (!visual.title.trim()) fail(projectId, `visual ${visual.id} is missing a title`)
   if (!visual.description.trim()) fail(projectId, `visual ${visual.id} is missing a description`)
+
+  if (visual.sourceUrl || visual.sourceLabel) {
+    if (!visual.sourceUrl?.trim()) fail(projectId, `visual ${visual.id} has sourceLabel but no sourceUrl`)
+    if (!visual.sourceLabel?.trim()) fail(projectId, `visual ${visual.id} has sourceUrl but no sourceLabel`)
+  }
+
+  if (visual.sourceUrl && !isPublicSourceUrl(visual.sourceUrl)) {
+    fail(projectId, `visual ${visual.id} sourceUrl must be a public route or http(s) URL`)
+  }
 
   if (!visual.image) return
   if (!visual.image.startsWith('/images/projects/')) {
@@ -32,6 +62,10 @@ function checkVisual(projectId: string, visual: ProjectVisualBlock) {
     return
   }
   if (!visual.alt?.trim()) fail(projectId, `visual ${visual.id} image is missing alt text`)
+  if (!visual.caption?.trim()) fail(projectId, `visual ${visual.id} image is missing a public-safe caption`)
+  if (visual.type === 'screenshot' && !visual.sourceUrl?.trim()) {
+    fail(projectId, `visual ${visual.id} screenshot is missing sourceUrl evidence`)
+  }
 
   const publicPath = join(process.cwd(), 'public', visual.image.replace(/^\//u, ''))
   if (!existsSync(publicPath)) fail(projectId, `visual ${visual.id} references a missing asset: ${visual.image}`)
@@ -73,4 +107,3 @@ if (issues.length > 0) {
   console.log(`Project detail evidence check passed for ${projects.length} projects.`)
   console.log(`sections/visuals: ${compact}`)
 }
-
