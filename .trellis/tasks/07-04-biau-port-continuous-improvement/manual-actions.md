@@ -13,18 +13,10 @@ queue when the user is available.
 - Why manual: user explicitly forbids model liveness tests; validation must not use ping/test prompts.
 - Codex can continue meanwhile: yes, with deterministic mocks and local fallback checks.
 
-### M2. Choose external RAG runtime after local contract is stable
-
-- Related task: `07-04-public-assistant-kg-lite`
-- Needed from user: choose whether to provision Supabase, Render Postgres, Neo4j/Aura, Cloudflare Vectorize/AI Search, or another runtime.
-- Recommendation on file: start with Agentic Hybrid RAG and delay Neo4j until deep graph traversal is proven necessary.
-- Why manual: cloud resources, costs, credentials, and long-term platform preference require user approval.
-- Codex can continue meanwhile: yes, by building provider-agnostic exports, mocks, and local retrieval.
-
 ### M3. Provide or approve RAG / model / embedding secrets
 
 - Related task: `07-04-public-assistant-kg-lite`
-- Needed from user: add secrets to the chosen deployment platform, not to the repo.
+- Needed from user: add server-only secrets to Render / Cloudflare / provider dashboards, not to the repo. Current RAG path needs `ASSISTANT_RAG_API_BASE_URL`, scoped `ASSISTANT_RAG_API_KEY`, `RAG_PUBLIC_API_KEY`, `RAG_INTERNAL_API_KEY`, `RAG_SYNC_TOKEN`, Qdrant URL/API key, embedding base/key/model/dimension, and optional reranker settings.
 - Why manual: Codex must not write or expose keys, database URLs, or private endpoints.
 - Codex can continue meanwhile: yes, using mocks and disabled-by-default adapters.
 - Detail queue: see `07-04-public-assistant-kg-lite/manual-actions.md`.
@@ -86,14 +78,18 @@ queue when the user is available.
 - Why manual: `blog-semi` has an explicit default push rule, but related repositories may have different branch/deployment safety expectations.
 - Codex can continue meanwhile: yes, by keeping commits per repository and reporting exactly which repo/branch changed.
 
-### M12. Approve public assistant RAG Orchestrator production resources
+### M12. Approve public assistant RAG Orchestrator production rollout
 
 - Related task: `07-04-public-assistant-rag-orchestrator-phase-2`
-- Needed from user: choose Orchestrator hosting, first vector store, embedding/reranker providers, production secrets, and whether production Orchestrator health/retrieval endpoints may be checked.
-- Recommendation: Render or existing Node assistant API host for the Orchestrator, Supabase Postgres + pgvector for first external vector store, Neo4j only after real deep graph traversal need appears.
-- Why manual: this requires cloud resources, billing choices, private credentials, and live production validation policy.
+- Needed from user: confirm the three Render services are using the agreed boundaries (`public`, `internal`, `rag`), fill the private Render variables, approve public/internal knowledge sync, and approve any live health/retrieval/model validation tasks.
+- Recommendation: keep `biau-rag-orchestrator` as the scoped RAG service, use Qdrant collections as the first production vector path, keep Supabase/Postgres for internal assistant application data, and defer Neo4j until real deep graph traversal is proven necessary.
+- Why manual: this requires cloud resources, private credentials, production sync choices, and live validation policy.
 - Codex can continue meanwhile: yes, by building local/mock Orchestrator contract, eval harness, provider-neutral adapters, and documentation.
 
 ## Done
 
-- None yet.
+### M2. Record external RAG runtime decision
+
+- Related task: `07-04-public-assistant-kg-lite`
+- Resolution: final architecture is three service boundaries plus a scoped RAG Orchestrator on Render, with Qdrant collections as the production vector path.
+- Notes: Supabase/Postgres remains appropriate for internal assistant application data, and Neo4j is deferred until real deep graph traversal is proven necessary.
