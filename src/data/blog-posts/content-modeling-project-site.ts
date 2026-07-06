@@ -46,6 +46,10 @@ const post: BlogPost = {
       "body": "早期站点可以把结构化数据放在 src/data 中，迭代快、部署简单、适合静态站。内容规模变大后，再考虑 Headless CMS、Markdown 文件或后端接口。关键是先把数据结构设计稳定，否则换成任何 CMS 都只是把混乱搬到另一个系统里。"
     },
     {
+      "title": "证据边界：本篇依据哪些公开材料",
+      "body": "这篇文章的依据来自当前公开仓库中的内容模型，而不是未公开后台资料：src/data/blogShared.ts 定义 BlogPost、BlogColumn、knowledgePoints、scenarios、practiceChecklist、sections 和 takeaways；src/data/blog.ts 维护摘要索引；src/data/blogCuration.ts 维护 featured、archive、hidden 与项目关联；src/data/blogContent.ts 维护正文 loader；src/data/portfolio.ts 则提供项目展示模型。scripts/audit-blog-catalog.ts、scripts/check-public-blog.mjs 和 scripts/check-project-detail-evidence.ts 共同说明内容索引、公开安全和项目证据如何被检查。"
+    },
+    {
       "title": "项目例子：blog-semi 如何组织内容",
       "body": "blog-semi 可以把项目展示、资源入口和技术博客分成独立数据集合。Legal RAG、Pet、ERP、移动端和游戏项目进入项目模型；构建文档、学习资料和演示入口进入资源模型；RAG、Agent、队列、权限、部署和内容治理进入博客模型。这样站点更像产品内容系统，而不是临时拼接的展示页。"
     }

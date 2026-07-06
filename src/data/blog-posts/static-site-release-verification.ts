@@ -46,6 +46,10 @@ const post: BlogPost = {
       "body": "小型静态站不一定需要复杂 CI，但每次内容更新都应该有固定验证顺序：build、lint、扫描、diff check、commit、push、等待部署、检查 HTML、抽查 bundle。步骤清楚后，内容更新就不会变成凭感觉发布。"
     },
     {
+      "title": "证据边界：发布检查来自哪些脚本",
+      "body": "本文依据的是当前仓库里的静态站发布脚本和检查顺序：package.json 定义 build、lint、blog:check、sitemap:generate、main-site:synthetic、site:status 和 verify 等命令；scripts/verify.mjs 把 assistant:index、Prisma 校验、lint、server:build、server:smoke、Cloudflare 函数 smoke、frontend build、blog 检查、项目详情证据和 UI 检查串成完整门禁；scripts/check-main-site-synthetic.mjs、scripts/check-site-monitor.mjs 与 scripts/generate-sitemap.mjs 则分别覆盖公开入口、站点巡检和 sitemap 输出。这里讨论的是可复用发布方法，不是某一次线上部署状态承诺。"
+    },
+    {
       "title": "项目例子：blog-semi 的发布闭环",
       "body": "blog-semi 每次公开文章更新后，会先在本地构建并记录新资源，再提交推送到远程，等待 Cloudflare Pages 部署完成后检查线上 HTML 是否引用新资源，最后读取线上 bundle 确认新 slug 存在且不包含不适合公开的信息。这样公开内容更新有完整证据链。"
     }

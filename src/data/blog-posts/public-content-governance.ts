@@ -46,6 +46,10 @@ const post: BlogPost = {
       "body": "公开内容发布前应该检查标题、摘要、正文和构建产物，避免出现私有路径、敏感配置、账号信息、非公开准备语境或不适合公开的说明。检查可以从人工审阅开始，再逐步加入关键词扫描、链接检查、截图检查和线上 bundle 抽查。"
     },
     {
+      "title": "证据边界：公开治理依据哪些规则",
+      "body": "这篇文章依据的是仓库已经公开的安全边界：AGENTS.md 和 .trellis/spec/frontend/quality-guidelines.md 要求提交内容视为公开资料，并禁止写入密钥、连接串、真实账号和私有路径；scripts/check-public-blog.mjs 扫描公开博客禁用语境；scripts/check-project-detail-evidence.ts 要求项目正文图片有公开来源、拒绝本地路径和 secret-like query；src/data/blogCuration.ts 控制哪些文章进入公开选择器；scripts/generate-assistant-knowledge.ts 只从公开内容生成助手索引。这些材料支撑了“公开版讲方法，私有版留细节”的分层原则。"
+    },
+    {
       "title": "项目例子：公开站和内部知识库的协作",
       "body": "blog-semi 公开站负责展示正式技术文章和脱敏项目案例；内部知识库负责保存更完整的项目上下文、排障步骤和复盘材料。同一个主题可以有两种版本：公开版强调技术方法和实践价值，内部版保留更细的项目背景和验证细节。"
     }

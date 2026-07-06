@@ -47,6 +47,41 @@ checks should assert the link count and `/status/:projectId` route target from
 the same data instead of duplicating project ids or fixed counts in Playwright
 code.
 
+For route-level UI checks, wait for route-specific async readiness in addition
+to the shared `.route-loading` Suspense fallback. Blog detail routes, for
+example, load the route module first and then load article content via
+`getBlogPost()`, so `check:ui` must wait until the title is no longer
+`文章载入中` before asserting the final heading. When checking lazy images, scroll
+the image into view and wait for `complete && naturalWidth > 0` before reading
+layout metrics. Prefer `requestfailed` logs with URLs for actionable resource
+failures; anonymous Chromium `Failed to load resource: net::ERR_TIMED_OUT`
+console noise from local preview should not be the only failure signal when
+explicit route, image, and link assertions still pass.
+
+### Blog Knowledge Quality Gate
+
+Public `知识积累 / Knowledge Notes` posts must pass
+`npm.cmd run blog:knowledge-check` before they are treated as publishable. The
+gate reads `getPublicBlogPosts()` plus the loadable runtime article from
+`getBlogPost()`, so it checks the same public selector and route content that
+visitors and the public assistant use.
+
+The gate enforces:
+
+- at least three concrete `knowledgePoints`;
+- reusable `scenarios` and `practiceChecklist` entries;
+- multiple substantive sections and takeaways;
+- a source/evidence section whose body cites public references, official docs,
+  or safe repo paths such as `src/data/...`, `scripts/...`, or `package.json`;
+- reusable knowledge-first framing before local project application notes;
+- no local absolute paths, private IPs, file URLs, or secret-like query strings.
+
+Do not satisfy this gate by inventing citations. If a knowledge article is based
+on this repository's public engineering work, cite the relevant public source
+files and scripts. If public blog body content changes, regenerate assistant
+knowledge with `npm.cmd run assistant:index` and let `npm.cmd run verify` rerun
+`blog:knowledge-check`.
+
 ## Review Priorities
 
 - Preserve the product website / solution showcase voice.

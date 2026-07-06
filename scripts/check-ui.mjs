@@ -73,6 +73,46 @@ async function gotoApp(page, path, options = {}) {
   if (lastError) throw lastError
   await page.locator('#root').waitFor({ state: 'attached', timeout: 10000 })
   await page.locator('.route-loading').waitFor({ state: 'detached', timeout: 10000 }).catch(() => {})
+  if (path.startsWith('/blog/')) {
+    await page
+      .waitForFunction(
+        () => {
+          const title = document.querySelector('h1, .hero-title-main')?.textContent?.trim() ?? ''
+          return title.length > 0 && title !== '文章载入中'
+        },
+        null,
+        { timeout: 15_000 },
+      )
+      .catch(() => {})
+  }
+}
+
+async function waitForImageReady(imageLocator, timeout = 15_000) {
+  await imageLocator.scrollIntoViewIfNeeded()
+  await imageLocator.waitFor({ state: 'visible', timeout }).catch(() => {})
+  return imageLocator.evaluate(
+    (image, waitMs) =>
+      new Promise((resolve) => {
+        const img = image instanceof HTMLImageElement ? image : null
+        if (!img) {
+          resolve(false)
+          return
+        }
+        if (img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+          resolve(true)
+          return
+        }
+
+        const timer = window.setTimeout(() => resolve(false), waitMs)
+        const done = () => {
+          window.clearTimeout(timer)
+          resolve(img.complete && img.naturalWidth > 0 && img.naturalHeight > 0)
+        }
+        img.addEventListener('load', done, { once: true })
+        img.addEventListener('error', done, { once: true })
+      }),
+    timeout,
+  )
 }
 
 const failures = []
@@ -85,9 +125,11 @@ for (const viewport of viewports) {
 
     page.on('console', (message) => {
       if (['error', 'warning'].includes(message.type())) {
+        if (message.text() === 'Failed to load resource: net::ERR_TIMED_OUT') return
         logs.push(`${message.type()}: ${message.text()}`)
       }
     })
+    page.on('requestfailed', (request) => logs.push(`requestfailed: ${request.url()} ${request.failure()?.errorText ?? 'failed'}`))
     page.on('pageerror', (error) => logs.push(`pageerror: ${error.message}`))
 
     await gotoApp(page, route.path)
@@ -709,12 +751,14 @@ await projectDetailButtonKeyboardPage.close()
 
 const imagePage = await browser.newPage({ viewport: viewports[1] })
 await gotoApp(imagePage, '/projects/legal-rag')
-const imageOk = await imagePage.locator('.detail-hero-image img').evaluate((image) => {
+const heroImage = imagePage.locator('.detail-hero-image img')
+const heroImageReady = await waitForImageReady(heroImage)
+const imageOk = heroImageReady && (await heroImage.evaluate((image) => {
   const img = image instanceof HTMLImageElement ? image : null
   if (!img || img.naturalWidth === 0 || img.naturalHeight === 0) return false
   const rect = img.getBoundingClientRect()
   return rect.left >= -1 && rect.right <= document.documentElement.clientWidth + 1
-})
+}))
 const webpSource = await imagePage.locator('.detail-hero-image source[type="image/webp"]').getAttribute('srcset')
 if (!imageOk) {
   failures.push('/projects/legal-rag image: detail image did not load or overflowed horizontally')
@@ -810,8 +854,9 @@ for (const project of projectDetailVisualCases) {
 
   for (let index = 0; index < renderedImageCount; index += 1) {
     const visualImage = visualImages.nth(index)
-    await visualImage.scrollIntoViewIfNeeded()
-    const metrics = await visualImage.evaluate((image) => {
+    const isReady = await waitForImageReady(visualImage)
+    const metrics = isReady
+      ? await visualImage.evaluate((image) => {
       const img = image instanceof HTMLImageElement ? image : null
       if (!img) return null
       const rect = img.getBoundingClientRect()
@@ -824,6 +869,7 @@ for (const project of projectDetailVisualCases) {
         viewportWidth: document.documentElement.clientWidth,
       }
     })
+      : null
 
     if (!metrics || !metrics.complete || metrics.naturalWidth === 0 || metrics.naturalHeight === 0) {
       failures.push(`/projects/${project.id} case visuals: visual image ${index + 1} did not load`)
