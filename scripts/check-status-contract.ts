@@ -23,6 +23,7 @@ const issueKinds = new Set([
   'http_status',
   'not_checked',
 ])
+const erpRegistrationStatuses = new Set(['open', 'closed-by-env', 'deploy-stale', 'blocked', 'unchecked'])
 const disallowedKeys = new Set([
   'token',
   'password',
@@ -196,6 +197,38 @@ function checkApkGate(fileName: string, payload: Record<string, unknown>) {
   }
 }
 
+function checkErpRegistrationGate(fileName: string, payload: Record<string, unknown>) {
+  if (fileName !== 'erp-synthetic.json') return
+
+  const registrationEnabled = payload.registrationEnabled
+  const registrationStatus = payload.registrationStatus
+  const registrationSummary = payload.registrationSummary
+  const checks = Array.isArray(payload.checks) ? payload.checks.filter(isRecord) : []
+  const authCheck = checks.find((check) => check.id === 'ozon-erp-auth')
+
+  if (registrationEnabled !== null && typeof registrationEnabled !== 'boolean') {
+    fail(`${fileName}: registrationEnabled must be boolean or null`)
+  }
+  if (!isNonEmptyString(registrationStatus) || !erpRegistrationStatuses.has(registrationStatus)) {
+    fail(`${fileName}: registrationStatus "${String(registrationStatus)}" is not allowed`)
+  }
+  if (!isNonEmptyString(registrationSummary)) fail(`${fileName}: registrationSummary is missing`)
+  if (!authCheck) {
+    fail(`${fileName}: ozon-erp-auth check is missing`)
+    return
+  }
+
+  if (registrationEnabled === false && authCheck.status === 'online') {
+    fail(`${fileName}: ozon-erp-auth cannot be online while registrationEnabled=false`)
+  }
+  if (registrationStatus !== 'open' && authCheck.status === 'online') {
+    fail(`${fileName}: ozon-erp-auth cannot be online while registrationStatus=${String(registrationStatus)}`)
+  }
+  if (registrationStatus === 'open' && registrationEnabled !== true) {
+    fail(`${fileName}: registrationStatus=open requires registrationEnabled=true`)
+  }
+}
+
 async function checkSyntheticSnapshots(knownCheckIds: Set<string>) {
   let entries: string[]
   try {
@@ -223,6 +256,7 @@ async function checkSyntheticSnapshots(knownCheckIds: Set<string>) {
     }
     for (const check of payload.checks) checkSyntheticCheck(fileName, check, knownCheckIds)
     checkApkGate(fileName, payload)
+    checkErpRegistrationGate(fileName, payload)
   }
 }
 
