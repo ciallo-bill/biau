@@ -331,3 +331,61 @@ Validation:
 Manual gate:
 
 - Production deployment must run the new migration before historical answer diagnostics can persist for new messages. Existing messages safely show no historical diagnostics until new answers are generated.
+
+## 2026-07-06 verification and AC audit
+
+Ran a broad current-HEAD verification pass after the internal assistant finalization slices.
+
+Validation:
+
+- `npm.cmd run verify`
+  - `assistant:index`
+  - `prisma:validate`
+  - `lint`
+  - `server:build`
+  - `server:smoke`
+  - `cf-assistant:smoke`
+  - `build`
+  - `blog:check`
+  - `preview`
+  - `check:ui`
+- `npm.cmd run assistant:service-modes-smoke`
+- `npm.cmd run assistant:rag-smoke`
+- `npm.cmd run assistant:rag-sync-local`
+- `npm.cmd run site:status`
+
+Current AC audit:
+
+- AC1 `/assistant` workspace UI:
+  - Locally supported by current `/assistant` route implementation, removal of legacy demo session exports, `check:ui`, and route rendering checks.
+  - Verified states include unauthenticated/local fallback, no default public widget on assistant route, suggestion send, assistant answer bubble, citations, route layout, and no horizontal overflow.
+  - Real deployed API states for a migrated member with existing history still require production internal API + database validation.
+- AC2 member-scoped session APIs:
+  - Implemented routes: `GET/POST /chat/internal/sessions`, `GET/PATCH /chat/internal/sessions/:id`, and `POST /chat/internal`.
+  - Code scopes session lookup by `{ id, memberId }`; missing/cross-member session ids return `session-not-found`.
+  - Smoke verifies missing auth and no-database low-sensitive behavior; live member-isolation e2e needs a migrated production or test Postgres.
+- AC3 scoped internal RAG:
+  - Internal chat calls `retrieveAssistantContext(question, "internal")`.
+  - RAG service-mode smoke and RAG smoke verify scoped route boundaries and public/internal Qdrant isolation with local/mock stores.
+  - Real internal key + Qdrant collection behavior requires Render/Qdrant env validation.
+- AC4 admin management:
+  - Admin UI now has Overview, Invites, Members, Knowledge, Usage, and Safety tabs.
+  - APIs cover members, invites, model channels, internal knowledge docs/sync, and usage.
+  - Smoke verifies auth/no-database behavior and service-mode isolation; production validation requires deployed `ADMIN_TOKEN` and migrated database.
+- AC5 internal knowledge and sync:
+  - Prisma models, admin APIs, sync run recording, local-readonly fallback, Qdrant internal sync path, and mock RAG coverage are implemented.
+  - `assistant:rag-sync-local` validates local sync plan; true embedding/Qdrant sync is user-approved manual gate.
+- AC6 member model channels:
+  - Implemented `ASSISTANT_MODEL_CHANNELS_JSON`, `Member.modelChannelId`, admin assignment UI, safe summaries, and internal chat routing.
+  - Smoke uses local mock provider only; no live provider测活 was run.
+- AC7 checks:
+  - Required local gates passed, including `verify`, `assistant:service-modes-smoke`, `assistant:rag-smoke`, `assistant:rag-sync-local`, and `site:status`.
+- AC8 docs/status/manual gates:
+  - Deployment docs and specs describe service boundaries, internal RAG/Qdrant config, model channels, sync token, and database SSL compatibility.
+  - Manual gates list Render env vars, migrations, internal corpus approval, Qdrant sync approval, real model validation approval, and internal entry visibility.
+  - `public/status/site-status.json` refreshed with 5/5 online public targets.
+
+Conclusion:
+
+- Local code, docs, generated public knowledge, service-mode isolation, mock RAG sync, and UI checks are in good shape for the task's implementation scope.
+- The remaining proof points are platform/manual gates, not local code blockers: production migrations, Render envs, real internal corpus approval, real Qdrant/embedding sync, and user-approved real model tasks.
