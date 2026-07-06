@@ -7,7 +7,7 @@
 3. [x] Add the smallest contract guard for credential-gated protected checks.
 4. [x] Run `status:contract` and `verify`.
 5. [x] Update this task with results and manual gates.
-6. [ ] Commit and push `blog-semi`.
+6. [x] Commit and push `blog-semi`.
 
 ## Result
 

@@ -18,7 +18,7 @@
 - [x] 确认当前主站 Legal RAG synthetic/status 快照语义。
 - [x] 完成一个本地可验证的 Legal demo gate 契约改进。
 - [x] 运行主站相关验证。
-- [ ] 提交并推送 `blog-semi`；Legal RAG 仓库只在安全且符合规则时提交/推送。
+- [x] 提交并推送 `blog-semi`；Legal RAG 仓库只在安全且符合规则时提交/推送。
 
 ## Notes
 
