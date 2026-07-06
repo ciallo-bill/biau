@@ -1,0 +1,28 @@
+{
+  "id": "07-07-cross-project-autonomous-improvement-round-7",
+  "name": "07-07-cross-project-autonomous-improvement-round-7",
+  "title": "Cross-project autonomous improvement round 7",
+  "description": "Continue sustained improvements after Round 6, focusing on internal assistant Agentic Workspace readiness, knowledge-admin operations, evidence-first blog quality, reliability observation, and cross-project public demonstration gates.",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P1",
+  "creator": "zhang",
+  "assignee": "zhang",
+  "createdAt": "2026-07-07",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "07-07-07-07-round-7-internal-assistant-agentic-workspace-polish"
+  ],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}

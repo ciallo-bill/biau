@@ -103,6 +103,7 @@ async function stopPreview(child) {
 
 await run(['run', 'assistant:index'])
 await run(['run', 'assistant:meta-check'])
+await run(['run', 'assistant:admin-check'])
 await run(['run', 'prisma:validate'])
 await run(['run', 'lint'])
 await run(['run', 'server:build'])

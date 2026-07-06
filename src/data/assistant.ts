@@ -209,6 +209,23 @@ export interface AssistantInternalKnowledgeSyncRun {
   diagnostic?: Record<string, string | number | boolean> | null
 }
 
+export interface AssistantKnowledgeOpsSummary {
+  total: number
+  draft: number
+  reviewed: number
+  active: number
+  archived: number
+  eligible: number
+  syncedEligible: number
+  unsyncedEligible: number
+  staleEligible: number
+  lastSyncStatus?: AssistantInternalKnowledgeSyncStatus
+  lastSyncReason?: string
+  lastSyncMode?: string
+  lastSyncAccepted?: boolean
+  lastSyncIssueCount?: number
+}
+
 export interface AssistantUsageSummary {
   id: string
   scope: string
@@ -744,6 +761,65 @@ export function normalizeAssistantInternalKnowledgeDocuments(value: unknown): As
     .filter((item): item is AssistantInternalKnowledgeDocument => item !== null)
 }
 
+const ASSISTANT_SYNC_DIAGNOSTIC_KEYS = new Set([
+  'mode',
+  'scope',
+  'reason',
+  'accepted',
+  'documentCount',
+  'chunkCount',
+  'issueCount',
+  'httpStatus',
+  'sourceName',
+  'sourceChecksum',
+])
+
+export function summarizeAssistantKnowledgeOps(
+  documents: AssistantInternalKnowledgeDocument[],
+  lastSyncRun?: AssistantInternalKnowledgeSyncRun | null,
+): AssistantKnowledgeOpsSummary {
+  const counts: Record<AssistantInternalKnowledgeStatus, number> = {
+    DRAFT: 0,
+    REVIEWED: 0,
+    ACTIVE: 0,
+    ARCHIVED: 0,
+  }
+  let syncedEligible = 0
+  let unsyncedEligible = 0
+  let staleEligible = 0
+
+  for (const document of documents) {
+    counts[document.status] += 1
+    if (!isSyncEligibleKnowledgeStatus(document.status)) continue
+
+    if (!document.lastSyncedAt) {
+      unsyncedEligible += 1
+    } else if (isAfter(document.updatedAt, document.lastSyncedAt)) {
+      staleEligible += 1
+    } else {
+      syncedEligible += 1
+    }
+  }
+
+  const diagnostic = lastSyncRun?.diagnostic ?? null
+  return {
+    total: documents.length,
+    draft: counts.DRAFT,
+    reviewed: counts.REVIEWED,
+    active: counts.ACTIVE,
+    archived: counts.ARCHIVED,
+    eligible: counts.REVIEWED + counts.ACTIVE,
+    syncedEligible,
+    unsyncedEligible,
+    staleEligible,
+    lastSyncStatus: lastSyncRun?.status,
+    lastSyncReason: typeof diagnostic?.reason === 'string' ? diagnostic.reason : undefined,
+    lastSyncMode: typeof diagnostic?.mode === 'string' ? diagnostic.mode : undefined,
+    lastSyncAccepted: typeof diagnostic?.accepted === 'boolean' ? diagnostic.accepted : undefined,
+    lastSyncIssueCount: typeof diagnostic?.issueCount === 'number' ? diagnostic.issueCount : lastSyncRun?.issueCount,
+  }
+}
+
 export function normalizeAssistantInternalKnowledgeSyncRun(value: unknown): AssistantInternalKnowledgeSyncRun | null {
   if (!isRecord(value)) return null
   const { id, status, documentCount, chunkCount, issueCount, startedAt, finishedAt, diagnostic } = value
@@ -823,11 +899,23 @@ function normalizeAssistantSyncDiagnostic(value: unknown): Record<string, string
   if (!isRecord(value)) return null
   const diagnostic: Record<string, string | number | boolean> = {}
   for (const [key, item] of Object.entries(value)) {
-    if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
+    if (ASSISTANT_SYNC_DIAGNOSTIC_KEYS.has(key) && (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean')) {
       diagnostic[key] = item
     }
   }
   return diagnostic
+}
+
+function isSyncEligibleKnowledgeStatus(status: AssistantInternalKnowledgeStatus) {
+  return status === 'REVIEWED' || status === 'ACTIVE'
+}
+
+function isAfter(left?: string | null, right?: string | null) {
+  if (!left || !right) return false
+  const leftTime = Date.parse(left)
+  const rightTime = Date.parse(right)
+  if (Number.isNaN(leftTime) || Number.isNaN(rightTime)) return false
+  return leftTime > rightTime
 }
 
 export function normalizeAssistantModelChannel(value: unknown): AssistantModelChannelSummary | null {

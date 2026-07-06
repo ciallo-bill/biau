@@ -8,6 +8,7 @@ import {
   normalizeAssistantMember,
   normalizeAssistantModelChannels,
   normalizeAssistantUsageSummaries,
+  summarizeAssistantKnowledgeOps,
   type AssistantInternalKnowledgeDocument,
   type AssistantInternalKnowledgeStatus,
   type AssistantInternalKnowledgeSyncRun,
@@ -204,12 +205,39 @@ const knowledgeStatusLabels: Record<AssistantInternalKnowledgeStatus, string> = 
   ARCHIVED: '已归档',
 }
 
+const syncDiagnosticLabels: Record<string, string> = {
+  mode: '模式',
+  scope: '范围',
+  reason: '原因',
+  accepted: '已接收',
+  documentCount: '文档数',
+  chunkCount: 'Chunk 数',
+  issueCount: '问题数',
+  httpStatus: 'HTTP 状态',
+  sourceName: '来源',
+  sourceChecksum: '来源摘要',
+}
+
 function splitTags(value: string) {
   return value
     .split(/[,\n，]/)
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 16)
+}
+
+function formatDiagnosticValue(value: string | number | boolean) {
+  if (typeof value === 'boolean') return value ? '是' : '否'
+  return String(value)
+}
+
+function formatKnowledgeDocumentSyncState(document: AssistantInternalKnowledgeDocument) {
+  if (document.status !== 'REVIEWED' && document.status !== 'ACTIVE') return '不参与同步'
+  if (!document.lastSyncedAt) return '待同步'
+  const updatedAt = document.updatedAt ? Date.parse(document.updatedAt) : Number.NaN
+  const syncedAt = Date.parse(document.lastSyncedAt)
+  if (!Number.isNaN(updatedAt) && !Number.isNaN(syncedAt) && updatedAt > syncedAt) return '内容已变更'
+  return '已同步'
 }
 
 export function AssistantAdminPage() {
@@ -241,6 +269,8 @@ export function AssistantAdminPage() {
   const [lastKnowledgeSyncRun, setLastKnowledgeSyncRun] = useState<AssistantInternalKnowledgeSyncRun | null>(null)
   const [modelChannels, setModelChannels] = useState<AssistantModelChannelSummary[]>([])
   const [usageLogs, setUsageLogs] = useState<AssistantUsageSummary[]>([])
+  const knowledgeOps = summarizeAssistantKnowledgeOps(knowledgeDocuments, lastKnowledgeSyncRun)
+  const syncDiagnosticEntries = Object.entries(lastKnowledgeSyncRun?.diagnostic ?? {})
 
   const saveAdminToken = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -1120,10 +1150,54 @@ export function AssistantAdminPage() {
               </button>
             </div>
             {knowledgeStatus && <p className="assistant-status-text">{knowledgeStatus}</p>}
+            <div className="assistant-admin-summary" aria-label="内部知识同步准备度">
+              <span>
+                <strong>{knowledgeOps.total}</strong>
+                全部文档
+              </span>
+              <span>
+                <strong>{knowledgeOps.eligible}</strong>
+                可同步
+              </span>
+              <span>
+                <strong>{knowledgeOps.unsyncedEligible}</strong>
+                待首次同步
+              </span>
+              <span>
+                <strong>{knowledgeOps.staleEligible}</strong>
+                内容已变更
+              </span>
+              <span>
+                <strong>{knowledgeOps.syncedEligible}</strong>
+                已同步
+              </span>
+            </div>
             {lastKnowledgeSyncRun && (
-              <p className="assistant-status-text">
-                最近同步：{lastKnowledgeSyncRun.status} · 文档 {lastKnowledgeSyncRun.documentCount} · chunk {lastKnowledgeSyncRun.chunkCount}
-              </p>
+              <div className="assistant-admin-row assistant-admin-row--member" aria-label="最近内部知识同步诊断">
+                <div>
+                  <strong>最近同步：{lastKnowledgeSyncRun.status}</strong>
+                  <span>
+                    文档 {lastKnowledgeSyncRun.documentCount} · chunk {lastKnowledgeSyncRun.chunkCount} · 问题 {lastKnowledgeSyncRun.issueCount}
+                  </span>
+                  <span>
+                    开始：{formatAdminDate(lastKnowledgeSyncRun.startedAt)} · 完成：{formatAdminDate(lastKnowledgeSyncRun.finishedAt)}
+                  </span>
+                </div>
+                <div>
+                  <strong>{knowledgeOps.lastSyncReason ?? knowledgeOps.lastSyncMode ?? '低敏诊断'}</strong>
+                  <span>accepted：{knowledgeOps.lastSyncAccepted === undefined ? '未返回' : knowledgeOps.lastSyncAccepted ? '是' : '否'}</span>
+                  <span>issue：{knowledgeOps.lastSyncIssueCount ?? 0}</span>
+                </div>
+              </div>
+            )}
+            {syncDiagnosticEntries.length > 0 && (
+              <ul className="assistant-admin-list" aria-label="内部知识同步低敏诊断字段">
+                {syncDiagnosticEntries.map(([key, value]) => (
+                  <li key={key}>
+                    {syncDiagnosticLabels[key] ?? key}：{formatDiagnosticValue(value)}
+                  </li>
+                ))}
+              </ul>
             )}
             <div className="assistant-admin-table" aria-label="内部知识文档列表">
               {knowledgeDocuments.map((document) => (
@@ -1134,7 +1208,7 @@ export function AssistantAdminPage() {
                       {knowledgeStatusLabels[document.status]} · {document.sourceType} · {document.tags.join(' / ') || '无标签'}
                     </span>
                     <span>
-                      更新：{formatAdminDate(document.updatedAt)} · 上次同步：{formatAdminDate(document.lastSyncedAt)}
+                      更新：{formatAdminDate(document.updatedAt)} · 上次同步：{formatAdminDate(document.lastSyncedAt)} · {formatKnowledgeDocumentSyncState(document)}
                     </span>
                   </div>
                   <div className="assistant-admin-actions">
