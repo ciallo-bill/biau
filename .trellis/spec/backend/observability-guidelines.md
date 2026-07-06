@@ -100,6 +100,10 @@ Also run a sensitive scan on changed files and manually inspect hits that mentio
 - Reliability suite step statuses are `passed`, `failed`, and `skipped`.
 - A synthetic script must update only the check ids it can actually verify. Do not promote adjacent human gates such as APK release, production registration, or credential publication from `planned` to `online`.
 - Adjacent human gates can be mirrored as explanatory metadata, but their public status remains `planned`, `unchecked`, or `degraded` until the exact release credential, account, APK, or production configuration has been approved and verified.
+- Synthetic checks that can trigger a live model call must be opt-in. Default
+  scheduled checks may verify low-sensitive health endpoints, but must not post
+  prompt-like payloads to chat/model endpoints unless an explicit task approval,
+  CLI flag, or environment gate is present.
 - If a live payload contains a business gate such as `registrationEnabled`,
   `demoEnabled`, `modelConfigured`, or `downloadApproved`, distinguish payload
   shape from gate state. HTTP 200 plus a well-formed boolean proves the endpoint

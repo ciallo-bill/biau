@@ -90,6 +90,18 @@ npm.cmd run reliability:check -- --skip site-monitor
 - `--skip`：跳过某个步骤，支持多次传入或逗号分隔，例如 `--skip site-monitor,pet`。
 - `public/status/reliability-suite.json` 只保存低敏摘要，不保存环境变量、API base URL、token、原始 stdout/stderr 或外部平台后台链接。
 
+主站 synthetic 默认只检查公开页面、sitemap、robots 和同域
+`/api/health`。它不会默认向 `/api/chat/public` 发送问题，避免在公开助手
+已接入真实模型时变成无意的模型测活。只有已经批准一次真实内容任务后，才使用：
+
+```powershell
+npm.cmd run main-site:synthetic -- --assistant-chat
+$env:MAIN_SITE_SYNTHETIC_ASSISTANT_CHAT='1'; npm.cmd run main-site:synthetic; Remove-Item Env:\MAIN_SITE_SYNTHETIC_ASSISTANT_CHAT
+```
+
+没有这个显式 opt-in 时，公开助手检查会记录为 `unchecked`，表示 health
+可读但 live chat/citation/model 状态未检查。
+
 默认检查：
 
 - `https://biau.playlab.eu.cc/`

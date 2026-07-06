@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-07-05T02:41:51.483Z",
+  "checkedAt": "2026-07-06T05:04:43.237Z",
   "baseConfigured": true,
   "ok": true,
   "checks": [
@@ -7,18 +7,18 @@
       "id": "blog-semi-public-routes",
       "status": "online",
       "httpStatus": 200,
-      "durationMs": 2328,
-      "checkedAt": "2026-07-05T02:41:51.483Z",
+      "durationMs": 3013,
+      "checkedAt": "2026-07-06T05:04:43.237Z",
       "summary": "7/7 public routes returned expected responses",
       "issues": []
     },
     {
       "id": "blog-semi-public-assistant",
-      "status": "online",
+      "status": "unchecked",
       "httpStatus": 200,
-      "durationMs": 7647,
-      "checkedAt": "2026-07-05T02:41:51.483Z",
-      "summary": "Public assistant API returned a model answer with public citations",
+      "durationMs": 262,
+      "checkedAt": "2026-07-06T05:04:43.237Z",
+      "summary": "Assistant health returned valid JSON; live chat validation skipped by policy",
       "issues": []
     }
   ]

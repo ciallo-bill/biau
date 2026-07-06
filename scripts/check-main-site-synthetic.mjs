@@ -25,6 +25,7 @@ function parseArgs(argv) {
     baseUrl: normalizeBaseUrl(process.env.MAIN_SITE_SYNTHETIC_BASE_URL || process.env.SITE_STATUS_BASE_URL || DEFAULT_BASE_URL),
     timeoutMs: Number(process.env.MAIN_SITE_SYNTHETIC_TIMEOUT_MS || DEFAULT_TIMEOUT_MS),
     strict: process.env.MAIN_SITE_SYNTHETIC_STRICT === '1',
+    assistantChat: isTruthy(process.env.MAIN_SITE_SYNTHETIC_ASSISTANT_CHAT),
   }
 
   const readValue = (index) => argv[index + 1] ?? ''
@@ -32,6 +33,14 @@ function parseArgs(argv) {
     const item = argv[index]
     if (item === '--strict') {
       args.strict = true
+      continue
+    }
+    if (item === '--assistant-chat') {
+      args.assistantChat = true
+      continue
+    }
+    if (item === '--skip-assistant-chat' || item === '--no-assistant-chat') {
+      args.assistantChat = false
       continue
     }
     if (item === '--base') {
@@ -55,6 +64,10 @@ function parseArgs(argv) {
 
   if (!Number.isFinite(args.timeoutMs) || args.timeoutMs <= 0) args.timeoutMs = DEFAULT_TIMEOUT_MS
   return args
+}
+
+function isTruthy(value) {
+  return ['1', 'true', 'yes', 'on'].includes(String(value || '').trim().toLowerCase())
 }
 
 function normalizeBaseUrl(value) {
@@ -313,15 +326,31 @@ function summarizeAssistantFailure(issues) {
   return 'Public assistant API did not return valid health/chat JSON'
 }
 
-async function validateAssistantApi(baseUrl, timeoutMs, checkedAt) {
+async function validateAssistantApi(baseUrl, timeoutMs, checkedAt, allowChat) {
   const health = await requestJsonWithTimeout(absoluteUrl(baseUrl, '/api/health'), timeoutMs)
+  const healthIssues = validateHealthResponse(health)
+
+  if (!allowChat) {
+    return {
+      id: ASSISTANT_CHECK_ID,
+      status: healthIssues.length === 0 ? 'unchecked' : 'offline',
+      httpStatus: health.status,
+      durationMs: health.durationMs,
+      checkedAt,
+      summary:
+        healthIssues.length === 0
+          ? 'Assistant health returned valid JSON; live chat validation skipped by policy'
+          : summarizeAssistantFailure(healthIssues),
+      issues: healthIssues,
+    }
+  }
+
   const chat = await requestJsonWithTimeout(absoluteUrl(baseUrl, '/api/chat/public'), timeoutMs, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message: 'RAG 项目' }),
   })
 
-  const healthIssues = validateHealthResponse(health)
   const chatValidation = validateChatResponse(chat)
   const issues = [...healthIssues, ...chatValidation.issues]
   let status = 'offline'
@@ -376,7 +405,7 @@ async function main() {
     summary: `${passed}/${results.length} public routes returned expected responses`,
     issues,
   }
-  const assistantCheck = await validateAssistantApi(args.baseUrl, args.timeoutMs, checkedAt)
+  const assistantCheck = await validateAssistantApi(args.baseUrl, args.timeoutMs, checkedAt, args.assistantChat)
   const payload = {
     checkedAt,
     baseConfigured: true,

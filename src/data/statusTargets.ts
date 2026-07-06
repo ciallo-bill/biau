@@ -124,11 +124,11 @@ export const reliabilityProjects: ReliabilityProject[] = [
       {
         id: 'blog-semi-public-assistant',
         layer: 'synthetic',
-        label: '公开助手问答',
+        label: '公开助手 health / live chat gate',
         status: 'planned',
-        description: '用一个公开项目问题验证同域 `/api/health` 与 `/api/chat/public` 是否返回模型或 fallback 状态。',
-        evidence: '`main-site:synthetic` 会检查公开助手 API 是否真实接入、是否返回 citation，以及当前是模型增强还是公开知识 fallback。',
-        cadence: '发布前 + 模型配置变更后',
+        description: '默认只验证同域 `/api/health` 是否返回低敏 JSON；只有显式 opt-in 后才向 `/api/chat/public` 发送公开项目问题。',
+        evidence: '`main-site:synthetic` 默认不会触发 live chat，避免无意模型测活；使用 `--assistant-chat` 或 `MAIN_SITE_SYNTHETIC_ASSISTANT_CHAT=1` 后才检查 answer、citation 与 model/fallback 状态。',
+        cadence: 'health 发布前或每日；live chat 仅在模型配置变更且获得批准后',
         ownerHint: 'assistant API',
       },
       {
@@ -155,7 +155,7 @@ export const reliabilityProjects: ReliabilityProject[] = [
     gates: ['开启生产模型、生产 metrics scrape 或第三方告警前需要人工确认。'],
     nextActions: [
       '把 `main-site:synthetic` 接入定时任务或内部监控。',
-      'Cloudflare Pages Functions 部署后配置 `ASSISTANT_MODEL_*` 并复查公开助手状态。',
+      'Cloudflare Pages Functions 部署后先复查 `/api/health`；需要验证模型回答时，再显式运行 `main-site:synthetic -- --assistant-chat`。',
       '生产 RAG Orchestrator 部署并确认可检查后，再把 `/health` 纳入 synthetic 或内部监控。',
     ],
   },

@@ -30,7 +30,8 @@
     "07-06-07-06-status-summary-semantics-polish",
     "07-06-07-06-ai-daily-doc-current-flow-sync",
     "07-06-07-06-rag-manual-gate-env-copy-refresh",
-    "07-06-07-06-project-detail-visual-regression-guard"
+    "07-06-07-06-project-detail-visual-regression-guard",
+    "07-06-07-06-main-site-synthetic-assistant-chat-gate"
   ],
   "parent": null,
   "relatedFiles": [],
