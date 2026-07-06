@@ -75,6 +75,22 @@ When the selected slice touches a related repository:
   The child updates documentation to the current Studio-first AI Daily workflow,
   while keeping offline CLI, model calls, production secrets, migrations, and
   automatic publishing as explicit gates.
+- 2026-07-06: Completed and archived child
+  `07-06-07-06-biau-playlab-public-synthetic`. Added
+  `npm.cmd run playlab:synthetic`, wired it into `reliability:check`, generated
+  `public/status/biau-playlab-synthetic.json`, and confirmed 6/6 public
+  playable pages plus 36/36 discovered Godot Web resources responded. Also
+  refreshed missing WebP derivatives so project detail visual checks pass.
+- 2026-07-06: Verified the internal assistant member model-channel work was
+  already locally complete from `07-06-internal-assistant-finalization`: schema,
+  API, admin UI, safe summaries, and mock provider routing exist. Re-ran
+  `prisma:validate`, `server:build`, `assistant:service-modes-smoke`, and
+  `server:smoke`; all passed without live model calls. Remaining work is
+  production env/migration/model validation manual gates.
+- 2026-07-06: Fixed `site:monitor -- --check-external` false positives by
+  ignoring `rel=preconnect` and `rel=dns-prefetch` connection hints. External
+  link checking now stays green on the deployed site instead of treating font
+  origin preconnect URLs as clickable links.
 
 ## Discovery Sweep Checklist
 
