@@ -1,8 +1,10 @@
 import { createServer as createHttpServer } from 'node:http'
 import { createServer as createTcpServer } from 'node:net'
+import type { PrismaClient } from '@prisma/client'
 import { createApp } from '../src/app.js'
 import { env } from '../src/env.js'
 import { generateAnswer, planAssistantAnswer } from '../src/model.js'
+import { runInternalAgent } from '../src/agentOrchestrator.js'
 
 function findAvailablePort(startPort: number) {
   return new Promise<number>((resolve, reject) => {
@@ -165,6 +167,14 @@ const originalModelEnv = snapshotModelEnv()
 const originalAdminToken = env.adminToken
 const originalStudioAdminToken = env.studioAdminToken
 const originalStudioDatabaseUrl = env.studioDatabaseUrl
+const mockAgentPrisma = {
+  internalKnowledgeDocument: {
+    findMany: async () => [],
+  },
+  chatMessage: {
+    findMany: async () => [],
+  },
+} as unknown as PrismaClient
 
 try {
   const creativePlan = planAssistantAnswer('您能不能生成一首七言古诗', 'internal')
@@ -180,6 +190,39 @@ try {
   const publicPlan = planAssistantAnswer('您能不能生成一首七言古诗', 'public')
   if (publicPlan.intent !== 'site_qa' || publicPlan.grounding !== 'strict' || publicPlan.useRetrieval !== true) {
     throw new Error('public assistant should keep strict public-knowledge grounding')
+  }
+
+  forceNoModelProvider()
+  forceNoRagOrchestrator()
+  const statusAgentRun = await runInternalAgent({
+    question: 'Legal RAG 当前状态是否正常？',
+    member: { id: 'smoke-member', name: 'Smoke Member', role: 'MEMBER', modelChannelId: null },
+    sessionId: 'smoke-session',
+    prisma: mockAgentPrisma,
+    plannerMode: 'mock',
+  })
+  if (
+    statusAgentRun.meta.agent.mode !== 'agentic-workspace' ||
+    statusAgentRun.meta.agent.planner !== 'mock' ||
+    !statusAgentRun.meta.tools.some((tool) => tool.id === 'status.query') ||
+    !statusAgentRun.meta.tools.some((tool) => tool.id === 'project.lookup') ||
+    statusAgentRun.meta.guardrails.sensitiveOutputBlocked
+  ) {
+    throw new Error('internal agent mock planner should select safe status/project tools')
+  }
+
+  const draftAgentRun = await runInternalAgent({
+    question: '帮我生成 Ozon ERP 项目详情草稿',
+    member: { id: 'smoke-member', name: 'Smoke Member', role: 'MEMBER', modelChannelId: null },
+    sessionId: 'smoke-session',
+    prisma: mockAgentPrisma,
+    plannerMode: 'mock',
+  })
+  if (
+    !draftAgentRun.meta.tools.some((tool) => tool.id === 'studio.draft' && tool.permission === 'draft-write') ||
+    draftAgentRun.meta.guardrails.blockedPermissions.length > 0
+  ) {
+    throw new Error('internal agent should allow draft-write planning without publish/admin mutation')
   }
 
   const health = await fetch(`${base}/health`)

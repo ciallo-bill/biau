@@ -4,11 +4,12 @@ import { Prisma, type InternalKnowledgeDocument, type InternalKnowledgeSyncRun, 
 import { env, hasDatabase } from './env.js'
 import { sha256 } from './crypto.js'
 import { issueMemberToken, readBearerMember, requireDatabase } from './auth.js'
-import { generateAnswer, hasConfiguredModelChannel, listSafeModelChannels, normalizeModelChannelId, planAssistantAnswer } from './model.js'
+import { generateAnswer, hasConfiguredModelChannel, listSafeModelChannels, normalizeModelChannelId } from './model.js'
 import { createMetricsMiddleware, renderPrometheusMetrics } from './metrics.js'
-import { retrieveAssistantContext, retrievePublicAssistantContext } from './ragClient.js'
+import { retrievePublicAssistantContext } from './ragClient.js'
 import { createRagOrchestratorRouter } from './ragRoutes.js'
 import { createStudioRouter } from './studioRoutes.js'
+import { runInternalAgent } from './agentOrchestrator.js'
 import type { AssistantServiceMode, ChatPayload, ChatResponse } from './types.js'
 
 type InternalKnowledgeStatusValue = 'DRAFT' | 'REVIEWED' | 'ACTIVE' | 'ARCHIVED'
@@ -383,32 +384,20 @@ function registerInternalAssistantRoutes(app: express.Express) {
         },
       })
 
-      const answerPlan = planAssistantAnswer(question, 'internal')
-      const context = answerPlan.useRetrieval ? await retrieveAssistantContext(question, 'internal') : null
-      const citations = context?.citations ?? []
-      const generated = await generateAnswer(question, citations, 'internal', {
-        chunks: context?.chunks ?? [],
-        intent: answerPlan.intent,
-        grounding: answerPlan.grounding,
-        modelChannelId: member.modelChannelId,
+      const agentResult = await runInternalAgent({
+        question,
+        member,
+        sessionId: activeSession.id,
+        prisma,
       })
-      const answerMeta = buildAssistantAnswerMeta({
-        mode: generated.mode,
-        model: generated.model,
-        provider: generated.provider,
-        reason: generated.reason,
-        modelChannel: generated.modelChannel,
-        citationCount: citations.length,
-        retrieval: context?.retrieval,
-        intent: answerPlan.intent,
-        grounding: answerPlan.grounding,
-      })
+      const citations = agentResult.citations
+      const answerMeta = buildAssistantAnswerMeta(agentResult.meta)
       const reply = await prisma.chatMessage.create({
         data: {
           memberId: member.id,
           sessionId: activeSession.id,
           role: 'ASSISTANT',
-          content: generated.answer,
+          content: agentResult.answer,
           citations: citations as unknown as Prisma.InputJsonValue,
           meta: answerMeta as unknown as Prisma.InputJsonValue,
         },
@@ -417,8 +406,8 @@ function registerInternalAssistantRoutes(app: express.Express) {
         data: {
           memberId: member.id,
           scope: 'internal-chat',
-          model: generated.model,
-          modelChannelId: generated.modelChannel?.id ?? null,
+          model: agentResult.meta.model,
+          modelChannelId: agentResult.meta.modelChannel?.id ?? null,
         },
       })
       await prisma.member.update({
@@ -431,11 +420,11 @@ function registerInternalAssistantRoutes(app: express.Express) {
       })
 
       res.json({
-        answer: generated.answer,
+        answer: agentResult.answer,
         citations,
         meta: {
           ...answerMeta,
-          diagnostic: generated.diagnostic,
+          diagnostic: agentResult.meta.diagnostic,
         },
         sessionId: activeSession.id,
         messageId: reply.id,
@@ -1231,6 +1220,10 @@ function buildAssistantAnswerMeta(meta: NonNullable<ChatResponse['meta']>) {
     retrieval: meta.retrieval,
     intent: meta.intent,
     grounding: meta.grounding,
+    agent: meta.agent,
+    tools: meta.tools,
+    guardrails: meta.guardrails,
+    fallbackReason: meta.fallbackReason,
   } satisfies NonNullable<ChatResponse['meta']>)
 }
 
@@ -1243,7 +1236,9 @@ function sanitizeAssistantAnswerMeta(value: unknown) {
     value.reason === 'provider_error' ||
     value.reason === 'empty_response' ||
     value.reason === 'no_public_context' ||
-    value.reason === 'self_check_failed'
+    value.reason === 'self_check_failed' ||
+    value.reason === 'tool_error' ||
+    value.reason === 'policy_blocked'
       ? value.reason
       : undefined
 
@@ -1257,7 +1252,26 @@ function sanitizeAssistantAnswerMeta(value: unknown) {
     retrieval: sanitizeAssistantRetrievalMeta(value.retrieval),
     intent: sanitizeAssistantAnswerIntent(value.intent),
     grounding: sanitizeAssistantGroundingMode(value.grounding),
+    agent: sanitizeAgentRunMeta(value.agent),
+    tools: sanitizeAgentToolTraces(value.tools),
+    guardrails: sanitizeAgentGuardrails(value.guardrails),
+    fallbackReason: sanitizeAssistantFallbackReason(value.fallbackReason),
   })
+}
+
+function sanitizeAssistantFallbackReason(value: unknown) {
+  if (
+    value === 'not_configured' ||
+    value === 'provider_error' ||
+    value === 'empty_response' ||
+    value === 'no_public_context' ||
+    value === 'self_check_failed' ||
+    value === 'tool_error' ||
+    value === 'policy_blocked'
+  ) {
+    return value
+  }
+  return undefined
 }
 
 function sanitizeAssistantAnswerIntent(value: unknown) {
@@ -1303,6 +1317,118 @@ function sanitizeAssistantRetrievalMeta(value: unknown) {
     expandedEntityCount: typeof value.expandedEntityCount === 'number' ? value.expandedEntityCount : undefined,
     modelCalls: typeof value.modelCalls === 'number' ? value.modelCalls : undefined,
   } as NonNullable<ChatResponse['meta']>['retrieval']
+}
+
+function sanitizeAgentRunMeta(value: unknown): NonNullable<ChatResponse['meta']>['agent'] {
+  if (!isPlainRecord(value)) return undefined
+  const planner: NonNullable<NonNullable<ChatResponse['meta']>['agent']>['planner'] =
+    value.planner === 'model' || value.planner === 'mock' || value.planner === 'fallback' ? value.planner : 'fallback'
+  const status: NonNullable<NonNullable<ChatResponse['meta']>['agent']>['status'] =
+    value.status === 'completed' || value.status === 'guarded' || value.status === 'degraded' || value.status === 'failed'
+      ? value.status
+      : 'degraded'
+  const steps = Array.isArray(value.steps)
+    ? value.steps.filter((step): step is NonNullable<NonNullable<ChatResponse['meta']>['agent']>['steps'][number] =>
+        step === 'plan' ||
+        step === 'validate' ||
+        step === 'execute' ||
+        step === 'critique' ||
+        step === 'compose' ||
+        step === 'sanitize' ||
+        step === 'persist',
+      )
+    : []
+  return {
+    mode: 'agentic-workspace' as const,
+    planner,
+    status,
+    steps,
+    toolCount: typeof value.toolCount === 'number' ? value.toolCount : 0,
+    durationMs: typeof value.durationMs === 'number' ? value.durationMs : 0,
+  }
+}
+
+function sanitizeAgentToolTraces(value: unknown): NonNullable<ChatResponse['meta']>['tools'] {
+  if (!Array.isArray(value)) return undefined
+  const traces: NonNullable<NonNullable<ChatResponse['meta']>['tools']> = []
+  for (const item of value) {
+    const trace = sanitizeAgentToolTrace(item)
+    if (trace) traces.push(trace)
+  }
+  return traces.length > 0 ? traces : undefined
+}
+
+function sanitizeAgentToolTrace(value: unknown): NonNullable<NonNullable<ChatResponse['meta']>['tools']>[number] | null {
+  if (!isPlainRecord(value)) return null
+  const id = sanitizeAgentToolId(value.id)
+  const permission = sanitizeAgentToolPermission(value.permission)
+  const status = sanitizeAgentToolStatus(value.status)
+  const label = typeof value.label === 'string' ? value.label : id ?? ''
+  const summary = typeof value.summary === 'string' ? value.summary : ''
+  if (!id || !permission || !status || !summary) return null
+  return {
+    id,
+    label,
+    permission,
+    status,
+    durationMs: typeof value.durationMs === 'number' ? value.durationMs : 0,
+    summary,
+    citationCount: typeof value.citationCount === 'number' ? value.citationCount : undefined,
+    itemCount: typeof value.itemCount === 'number' ? value.itemCount : undefined,
+    errorClass: value.errorClass === 'tool_error' || value.errorClass === 'policy_blocked' || value.errorClass === 'not_configured' ? value.errorClass : undefined,
+  }
+}
+
+function sanitizeAgentGuardrails(value: unknown): NonNullable<ChatResponse['meta']>['guardrails'] {
+  if (!isPlainRecord(value)) return undefined
+  const status: NonNullable<NonNullable<ChatResponse['meta']>['guardrails']>['status'] =
+    value.status === 'passed' || value.status === 'warned' || value.status === 'blocked' ? value.status : 'warned'
+  const citationSufficiency: NonNullable<NonNullable<ChatResponse['meta']>['guardrails']>['citationSufficiency'] =
+    value.citationSufficiency === 'enough' || value.citationSufficiency === 'weak' || value.citationSufficiency === 'none'
+      ? value.citationSufficiency
+      : 'none'
+  return {
+    status,
+    allowedPermissions: readAgentPermissions(value.allowedPermissions),
+    blockedPermissions: readAgentPermissions(value.blockedPermissions),
+    citationSufficiency,
+    sensitiveOutputBlocked: value.sensitiveOutputBlocked === true,
+    issues: readStringArray(value.issues).slice(0, 8),
+  }
+}
+
+function sanitizeAgentToolId(value: unknown) {
+  if (
+    value === 'rag.retrieve' ||
+    value === 'status.query' ||
+    value === 'project.lookup' ||
+    value === 'knowledge.search' ||
+    value === 'studio.draft' ||
+    value === 'memory.search' ||
+    value === 'memory.write' ||
+    value === 'answer.direct'
+  ) {
+    return value
+  }
+  return null
+}
+
+function sanitizeAgentToolPermission(value: unknown) {
+  if (value === 'read' || value === 'draft-write' || value === 'admin-write' || value === 'external-live') return value
+  return null
+}
+
+function sanitizeAgentToolStatus(value: unknown) {
+  if (value === 'selected' || value === 'skipped' || value === 'completed' || value === 'failed' || value === 'blocked') return value
+  return null
+}
+
+function readAgentPermissions(value: unknown) {
+  if (!Array.isArray(value)) return []
+  return value.filter(
+    (item): item is NonNullable<NonNullable<ChatResponse['meta']>['guardrails']>['allowedPermissions'][number] =>
+      item === 'read' || item === 'draft-write' || item === 'admin-write' || item === 'external-live',
+  )
 }
 
 function sanitizeRagFallbackReason(value: unknown) {

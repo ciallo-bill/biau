@@ -4,6 +4,9 @@ import type {
   AssistantGroundingMode,
   AssistantModelChannelSummary,
   AssistantScope,
+  ChatFallbackReason,
+  AgentToolId,
+  AgentToolPermission,
   Citation,
   ProviderDiagnostic,
   ProviderDiagnosticKind,
@@ -14,7 +17,7 @@ interface OpenAIResponse {
   choices?: Array<{ message?: { content?: string } }>
 }
 
-export type AssistantFallbackReason = 'not_configured' | 'provider_error' | 'empty_response' | 'no_public_context' | 'self_check_failed'
+export type AssistantFallbackReason = ChatFallbackReason
 
 export interface GeneratedAnswer {
   answer: string
@@ -31,9 +34,31 @@ const DEFAULT_MODEL_CHANNEL_ID = 'default'
 
 interface GenerateAnswerOptions {
   chunks?: RagChunkCitation[]
+  contextBlocks?: string[]
   intent?: AssistantAnswerIntent
   grounding?: AssistantGroundingMode
   modelChannelId?: string | null
+}
+
+export interface AgentPlannerToolMenuItem {
+  id: AgentToolId
+  label: string
+  permission: AgentToolPermission
+  description: string
+}
+
+export interface AgentPlannerPlan {
+  toolIds: AgentToolId[]
+  intent: AssistantAnswerIntent
+  grounding: AssistantGroundingMode
+}
+
+export interface AgentPlannerModelResult {
+  plan: AgentPlannerPlan | null
+  planner: 'model' | 'fallback'
+  reason?: AssistantFallbackReason | 'invalid_response'
+  diagnostic?: ProviderDiagnostic
+  modelChannel?: AssistantModelChannelSummary
 }
 
 export interface AssistantAnswerPlan {
@@ -292,6 +317,136 @@ export function planAssistantAnswer(question: string, scope: AssistantScope): As
   return { intent: 'general', grounding: 'none', useRetrieval: false }
 }
 
+export async function planInternalAgentTools(
+  question: string,
+  toolMenu: AgentPlannerToolMenuItem[],
+  options: { modelChannelId?: string | null } = {},
+): Promise<AgentPlannerModelResult> {
+  const modelConfig = resolveModelChannel(options.modelChannelId)
+  const safeModelChannel = toSafeModelChannel(modelConfig)
+  if (!isModelChannelConfigured(modelConfig)) {
+    return { plan: null, planner: 'fallback', reason: 'not_configured', modelChannel: safeModelChannel }
+  }
+
+  const endpoints = getChatCompletionEndpoints(modelConfig.baseUrl)
+  if (endpoints.length === 0) {
+    return { plan: null, planner: 'fallback', reason: 'not_configured', modelChannel: safeModelChannel }
+  }
+
+  const menuText = toolMenu
+    .map((tool) => `- ${tool.id} (${tool.permission}): ${tool.description}`)
+    .join('\n')
+  const body = {
+    model: modelConfig.model,
+    messages: [
+      {
+        role: 'system',
+        content: [
+          '你是 BIAU Port 内部助手的工具规划器。',
+          '只返回一个 JSON 对象，不要输出 Markdown。',
+          'JSON 结构必须是 {"toolIds":[],"intent":"site_qa|creative|planning|general","grounding":"strict|background|none"}。',
+          '只能选择工具菜单里的 id，不能选择 admin-write 或 external-live 类动作。',
+          '普通聊天只允许 read 和 draft-write；draft-write 只能生成待人工审核的草稿计划。',
+        ].join('\n'),
+      },
+      {
+        role: 'user',
+        content: [`用户问题：${question}`, '可用工具：', menuText, '请选择 1-4 个最合适的工具。'].join('\n\n'),
+      },
+    ],
+  }
+
+  let response: Response | null = null
+  let diagnostic: ProviderDiagnostic | undefined
+  let attemptedEndpoints = 0
+  for (const endpoint of endpoints) {
+    attemptedEndpoints += 1
+    const attempt = await requestChatCompletion(endpoint, modelConfig.apiKey, body)
+    response = attempt.response
+    if (response?.ok) break
+    diagnostic = {
+      ...attempt.diagnostic,
+      attemptedEndpoints,
+    }
+    if (!response || ![404, 405].includes(response.status)) break
+  }
+
+  if (!response?.ok) {
+    return {
+      plan: null,
+      planner: 'fallback',
+      reason: 'provider_error',
+      diagnostic,
+      modelChannel: safeModelChannel,
+    }
+  }
+
+  const payload = (await response.json().catch(() => null)) as OpenAIResponse | null
+  const content = payload?.choices?.[0]?.message?.content?.trim()
+  if (!content) {
+    return {
+      plan: null,
+      planner: 'fallback',
+      reason: 'empty_response',
+      diagnostic: {
+        kind: 'empty_response',
+        attemptedEndpoints,
+        timeoutMs: MODEL_REQUEST_TIMEOUT_MS,
+      },
+      modelChannel: safeModelChannel,
+    }
+  }
+
+  const parsed = parsePlannerJson(content)
+  const plan = normalizePlannerPlan(parsed, toolMenu)
+  if (!plan) {
+    return { plan: null, planner: 'fallback', reason: 'invalid_response', modelChannel: safeModelChannel }
+  }
+
+  return { plan, planner: 'model', modelChannel: safeModelChannel }
+}
+
+function parsePlannerJson(content: string) {
+  const firstBrace = content.indexOf('{')
+  const lastBrace = content.lastIndexOf('}')
+  if (firstBrace < 0 || lastBrace <= firstBrace) return null
+  try {
+    return JSON.parse(content.slice(firstBrace, lastBrace + 1)) as unknown
+  } catch {
+    return null
+  }
+}
+
+function normalizePlannerPlan(value: unknown, toolMenu: AgentPlannerToolMenuItem[]): AgentPlannerPlan | null {
+  if (!isRecord(value) || !Array.isArray(value.toolIds)) return null
+  const allowed = new Map(toolMenu.map((tool) => [tool.id, tool]))
+  const toolIds = value.toolIds
+    .filter((item): item is AgentToolId => typeof item === 'string' && allowed.has(item as AgentToolId))
+    .filter((toolId, index, items) => items.indexOf(toolId) === index)
+    .filter((toolId) => {
+      const tool = allowed.get(toolId)
+      return tool?.permission === 'read' || tool?.permission === 'draft-write'
+    })
+    .slice(0, 4)
+  if (toolIds.length === 0) return null
+
+  return {
+    toolIds,
+    intent: readAssistantAnswerIntent(value.intent),
+    grounding: readAssistantGroundingMode(value.grounding),
+  }
+}
+
+function readAssistantAnswerIntent(value: unknown): AssistantAnswerIntent {
+  if (value === 'site_qa' || value === 'creative' || value === 'planning' || value === 'general') return value
+  return 'general'
+}
+
+function readAssistantGroundingMode(value: unknown): AssistantGroundingMode {
+  if (value === 'strict' || value === 'background' || value === 'none') return value
+  return 'none'
+}
+
 function includesAny(value: string, terms: string[]) {
   return terms.some((term) => value.includes(term))
 }
@@ -459,13 +614,15 @@ export async function generateAnswer(
         .join('\n\n')
     : ''
   const chunkContext = shouldUseGrounding ? buildChunkContext(options.chunks ?? []) : ''
+  const agentContext = buildAgentContext(options.contextBlocks ?? [])
   const system = buildSystemPrompt(scope, answerPlan)
   const userContent =
     answerPlan.grounding === 'none'
       ? [
           `问题：${question}`,
+          agentContext ? `Agent 工具上下文（只用于回答，不要逐字照抄）：\n${agentContext}` : '',
           '请直接完成用户任务。不要添加来源、citation、站内路径或资料编号，除非用户明确要求。',
-        ].join('\n\n')
+        ].filter(Boolean).join('\n\n')
       : [
           `问题：${question}`,
           answerPlan.grounding === 'background'
@@ -473,6 +630,7 @@ export async function generateAnswer(
             : '只可使用以下公开资料。每条资料包含标题、摘要和站内路径；路径只用于生成 citation，不要写进正文：',
           context,
           chunkContext ? `可用证据片段（只用于理解，不要逐字照抄编号）：\n${chunkContext}` : '',
+          agentContext ? `Agent 工具上下文（只用于回答，不要逐字照抄）：\n${agentContext}` : '',
           answerPlan.grounding === 'background'
             ? '请按用户要求输出；只有资料确实相关时才使用它们作为背景。'
             : '请按系统规则回答；不要编造未出现在资料里的链接或能力。',
@@ -575,6 +733,15 @@ function buildChunkContext(chunks: RagChunkCitation[]) {
     .slice(0, 5)
     .map((chunk, index) => `${index + 1}. ${chunk.section}｜${chunk.text}`)
     .join('\n\n')
+}
+
+function buildAgentContext(blocks: string[]) {
+  return blocks
+    .map((block) => block.replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .slice(0, 8)
+    .map((block, index) => `${index + 1}. ${block.slice(0, 800)}`)
+    .join('\n')
 }
 
 function passesDeterministicSelfCheck(answer: string, citations: Citation[], scope: 'public' | 'internal') {

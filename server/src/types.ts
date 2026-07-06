@@ -28,9 +28,30 @@ export interface ChatPayload {
 }
 
 export type ChatAnswerMode = 'model' | 'fallback'
-export type ChatFallbackReason = 'not_configured' | 'provider_error' | 'empty_response' | 'no_public_context' | 'self_check_failed'
+export type ChatFallbackReason =
+  | 'not_configured'
+  | 'provider_error'
+  | 'empty_response'
+  | 'no_public_context'
+  | 'self_check_failed'
+  | 'tool_error'
+  | 'policy_blocked'
 export type ProviderDiagnosticKind = 'timeout' | 'network_error' | 'http_status' | 'empty_response'
 export type RagAdapterDiagnosticKind = 'not_configured' | 'timeout' | 'network_error' | 'http_status' | 'invalid_response'
+export type AgentWorkflowStepId = 'plan' | 'validate' | 'execute' | 'critique' | 'compose' | 'sanitize' | 'persist'
+export type AgentPlannerMode = 'model' | 'mock' | 'fallback'
+export type AgentRunStatus = 'completed' | 'guarded' | 'degraded' | 'failed'
+export type AgentToolPermission = 'read' | 'draft-write' | 'admin-write' | 'external-live'
+export type AgentToolStatus = 'selected' | 'skipped' | 'completed' | 'failed' | 'blocked'
+export type AgentToolId =
+  | 'rag.retrieve'
+  | 'status.query'
+  | 'project.lookup'
+  | 'knowledge.search'
+  | 'studio.draft'
+  | 'memory.search'
+  | 'memory.write'
+  | 'answer.direct'
 
 export interface ProviderDiagnostic {
   kind: ProviderDiagnosticKind
@@ -70,6 +91,36 @@ export interface AssistantRetrievalMeta {
   diagnostic?: RagAdapterDiagnostic
 }
 
+export interface AgentToolTrace {
+  id: AgentToolId
+  label: string
+  permission: AgentToolPermission
+  status: AgentToolStatus
+  durationMs: number
+  summary: string
+  citationCount?: number
+  itemCount?: number
+  errorClass?: 'tool_error' | 'policy_blocked' | 'not_configured'
+}
+
+export interface AgentGuardrailSummary {
+  status: 'passed' | 'warned' | 'blocked'
+  allowedPermissions: AgentToolPermission[]
+  blockedPermissions: AgentToolPermission[]
+  citationSufficiency: 'enough' | 'weak' | 'none'
+  sensitiveOutputBlocked: boolean
+  issues: string[]
+}
+
+export interface AgentRunMeta {
+  mode: 'agentic-workspace'
+  planner: AgentPlannerMode
+  status: AgentRunStatus
+  steps: AgentWorkflowStepId[]
+  toolCount: number
+  durationMs: number
+}
+
 export interface ChatResponse {
   answer: string
   citations: Citation[]
@@ -84,6 +135,10 @@ export interface ChatResponse {
     retrieval?: AssistantRetrievalMeta
     intent?: AssistantAnswerIntent
     grounding?: AssistantGroundingMode
+    agent?: AgentRunMeta
+    tools?: AgentToolTrace[]
+    guardrails?: AgentGuardrailSummary
+    fallbackReason?: ChatFallbackReason | 'tool_error' | 'policy_blocked'
   }
   sessionId?: string
   messageId?: string

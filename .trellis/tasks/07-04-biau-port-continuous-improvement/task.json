@@ -37,7 +37,8 @@
     "07-06-studio-ai-daily-local-smoke",
     "07-06-erp-auth-bridge-query-preservation",
     "07-06-legal-rag-synthetic-preserve-evidence",
-    "07-06-07-06-internal-assistant-member-model-routing"
+    "07-06-07-06-internal-assistant-member-model-routing",
+    "07-06-internal-assistant-agentic-workspace"
   ],
   "parent": null,
   "relatedFiles": [],

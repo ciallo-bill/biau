@@ -52,6 +52,39 @@ export interface AssistantRetrievalSummary {
   modelCalls?: number
 }
 
+export type AssistantAgentPermission = 'read' | 'draft-write' | 'admin-write' | 'external-live'
+export type AssistantAgentToolStatus = 'selected' | 'skipped' | 'completed' | 'failed' | 'blocked'
+
+export interface AssistantAgentRunSummary {
+  mode: 'agentic-workspace'
+  planner: 'model' | 'mock' | 'fallback'
+  status: 'completed' | 'guarded' | 'degraded' | 'failed'
+  steps: string[]
+  toolCount: number
+  durationMs: number
+}
+
+export interface AssistantAgentToolTrace {
+  id: string
+  label: string
+  permission: AssistantAgentPermission
+  status: AssistantAgentToolStatus
+  durationMs: number
+  summary: string
+  citationCount?: number
+  itemCount?: number
+  errorClass?: string
+}
+
+export interface AssistantAgentGuardrails {
+  status: 'passed' | 'warned' | 'blocked'
+  allowedPermissions: AssistantAgentPermission[]
+  blockedPermissions: AssistantAgentPermission[]
+  citationSufficiency: 'enough' | 'weak' | 'none'
+  sensitiveOutputBlocked: boolean
+  issues: string[]
+}
+
 export interface AssistantAnswerMetaSummary {
   mode: string
   model: string
@@ -62,6 +95,10 @@ export interface AssistantAnswerMetaSummary {
   grounding?: string
   modelChannel?: AssistantModelChannelSummary
   retrieval?: AssistantRetrievalSummary
+  agent?: AssistantAgentRunSummary
+  tools?: AssistantAgentToolTrace[]
+  guardrails?: AssistantAgentGuardrails
+  fallbackReason?: string
 }
 
 export interface AssistantSessionPreview {
@@ -328,7 +365,7 @@ export function normalizeAssistantMessages(value: unknown): AssistantMessage[] {
 
 export function normalizeAssistantAnswerMeta(value: unknown): AssistantAnswerMetaSummary | null {
   if (!isRecord(value)) return null
-  const { mode, model, provider, reason, citationCount, intent, grounding, modelChannel, retrieval } = value
+  const { mode, model, provider, reason, citationCount, intent, grounding, modelChannel, retrieval, agent, tools, guardrails, fallbackReason } = value
   if (typeof mode !== 'string' || typeof model !== 'string' || typeof citationCount !== 'number') return null
   return {
     mode,
@@ -340,6 +377,10 @@ export function normalizeAssistantAnswerMeta(value: unknown): AssistantAnswerMet
     grounding: typeof grounding === 'string' ? grounding : undefined,
     modelChannel: normalizeAssistantModelChannel(modelChannel) ?? undefined,
     retrieval: normalizeAssistantRetrievalSummary(retrieval),
+    agent: normalizeAssistantAgentRun(agent),
+    tools: normalizeAssistantAgentToolTraces(tools),
+    guardrails: normalizeAssistantAgentGuardrails(guardrails),
+    fallbackReason: typeof fallbackReason === 'string' ? fallbackReason : undefined,
   }
 }
 
@@ -380,6 +421,91 @@ function normalizeAssistantRetrievalSummary(value: unknown): AssistantRetrievalS
     expandedEntityCount: typeof expandedEntityCount === 'number' ? expandedEntityCount : undefined,
     modelCalls: typeof modelCalls === 'number' ? modelCalls : undefined,
   }
+}
+
+function normalizeAssistantAgentRun(value: unknown): AssistantAgentRunSummary | undefined {
+  if (!isRecord(value)) return undefined
+  const { mode, planner, status, steps, toolCount, durationMs } = value
+  if (
+    mode !== 'agentic-workspace' ||
+    (planner !== 'model' && planner !== 'mock' && planner !== 'fallback') ||
+    (status !== 'completed' && status !== 'guarded' && status !== 'degraded' && status !== 'failed') ||
+    typeof toolCount !== 'number' ||
+    typeof durationMs !== 'number'
+  ) {
+    return undefined
+  }
+
+  return {
+    mode,
+    planner,
+    status,
+    steps: Array.isArray(steps) ? steps.filter((step): step is string => typeof step === 'string') : [],
+    toolCount,
+    durationMs,
+  }
+}
+
+function normalizeAssistantAgentToolTraces(value: unknown): AssistantAgentToolTrace[] | undefined {
+  if (!Array.isArray(value)) return undefined
+  const traces = value.map(normalizeAssistantAgentToolTrace).filter((trace): trace is AssistantAgentToolTrace => trace !== null)
+  return traces.length > 0 ? traces : undefined
+}
+
+function normalizeAssistantAgentToolTrace(value: unknown): AssistantAgentToolTrace | null {
+  if (!isRecord(value)) return null
+  const { id, label, permission, status, durationMs, summary, citationCount, itemCount, errorClass } = value
+  if (
+    typeof id !== 'string' ||
+    typeof label !== 'string' ||
+    !isAgentPermission(permission) ||
+    !isAgentToolStatus(status) ||
+    typeof durationMs !== 'number' ||
+    typeof summary !== 'string'
+  ) {
+    return null
+  }
+
+  return {
+    id,
+    label,
+    permission,
+    status,
+    durationMs,
+    summary,
+    citationCount: typeof citationCount === 'number' ? citationCount : undefined,
+    itemCount: typeof itemCount === 'number' ? itemCount : undefined,
+    errorClass: typeof errorClass === 'string' ? errorClass : undefined,
+  }
+}
+
+function normalizeAssistantAgentGuardrails(value: unknown): AssistantAgentGuardrails | undefined {
+  if (!isRecord(value)) return undefined
+  const { status, allowedPermissions, blockedPermissions, citationSufficiency, sensitiveOutputBlocked, issues } = value
+  if (
+    (status !== 'passed' && status !== 'warned' && status !== 'blocked') ||
+    (citationSufficiency !== 'enough' && citationSufficiency !== 'weak' && citationSufficiency !== 'none') ||
+    typeof sensitiveOutputBlocked !== 'boolean'
+  ) {
+    return undefined
+  }
+
+  return {
+    status,
+    allowedPermissions: Array.isArray(allowedPermissions) ? allowedPermissions.filter(isAgentPermission) : [],
+    blockedPermissions: Array.isArray(blockedPermissions) ? blockedPermissions.filter(isAgentPermission) : [],
+    citationSufficiency,
+    sensitiveOutputBlocked,
+    issues: Array.isArray(issues) ? issues.filter((issue): issue is string => typeof issue === 'string') : [],
+  }
+}
+
+function isAgentPermission(value: unknown): value is AssistantAgentPermission {
+  return value === 'read' || value === 'draft-write' || value === 'admin-write' || value === 'external-live'
+}
+
+function isAgentToolStatus(value: unknown): value is AssistantAgentToolStatus {
+  return value === 'selected' || value === 'skipped' || value === 'completed' || value === 'failed' || value === 'blocked'
 }
 
 export function normalizeAssistantSessionPreview(value: unknown): AssistantSessionPreview | null {

@@ -65,6 +65,36 @@ function formatModelChannelState(channel?: AssistantMemberProfile['modelChannel'
   return channel.isDefault ? '默认可用' : '可用'
 }
 
+function formatAgentStatus(status?: string) {
+  if (status === 'completed') return '已完成'
+  if (status === 'guarded') return '已拦截'
+  if (status === 'degraded') return '降级完成'
+  if (status === 'failed') return '失败'
+  return '等待运行'
+}
+
+function formatPlanner(planner?: string) {
+  if (planner === 'model') return '模型规划'
+  if (planner === 'mock') return '确定性规划'
+  if (planner === 'fallback') return '回退规划'
+  return '等待规划'
+}
+
+function formatPermission(permission: string) {
+  if (permission === 'draft-write') return '草稿写入'
+  if (permission === 'read') return '只读'
+  if (permission === 'admin-write') return '管理写入'
+  if (permission === 'external-live') return '外部 live'
+  return permission
+}
+
+function formatGuardrailStatus(status?: string) {
+  if (status === 'passed') return '通过'
+  if (status === 'warned') return '提醒'
+  if (status === 'blocked') return '拦截'
+  return '等待'
+}
+
 function getErrorCode(payload: unknown) {
   return isRecord(payload) && typeof payload.error === 'string' ? payload.error : ''
 }
@@ -631,6 +661,9 @@ export function AssistantPage() {
   const chatMode = API_BASE && memberToken ? 'API 持久化会话' : '本地公开知识回退'
   const composerDisabled = isLoading || draft.trim().length === 0
   const retrieval = lastAnswerMeta?.retrieval
+  const agent = lastAnswerMeta?.agent
+  const tools = lastAnswerMeta?.tools ?? []
+  const guardrails = lastAnswerMeta?.guardrails
   const answerMode = lastAnswerMeta
     ? lastAnswerMeta.mode === 'model'
       ? '模型回答'
@@ -823,13 +856,15 @@ export function AssistantPage() {
 
         <aside className="assistant-inspector">
           <section className="assistant-panel">
-            <p className="assistant-panel__eyebrow">ANSWER</p>
-            <h3>回答状态</h3>
+            <p className="assistant-panel__eyebrow">AGENT</p>
+            <h3>运行状态</h3>
             <ul>
+              <li>Agent：{formatAgentStatus(agent?.status)} · {formatPlanner(agent?.planner)}</li>
               <li>模式：{answerMode}</li>
               <li>模型：{lastAnswerMeta?.model ?? '等待回答'}</li>
               <li>渠道：{answerChannel?.label ?? '默认模型通道'} · {formatModelChannelState(answerChannel)}</li>
               <li>引用：{lastAnswerMeta?.citationCount ?? latestCitations.length}</li>
+              <li>耗时：{agent ? `${agent.durationMs} ms` : '等待回答'}</li>
             </ul>
             {retrieval && (
               <div className="assistant-panel__facts" aria-label="检索诊断">
@@ -839,6 +874,31 @@ export function AssistantPage() {
                 <span>{retrieval.candidateCount} candidates</span>
               </div>
             )}
+          </section>
+
+          <section className="assistant-panel">
+            <p className="assistant-panel__eyebrow">TOOLS</p>
+            <h3>工具轨迹</h3>
+            <ul>
+              {tools.map((tool) => (
+                <li key={tool.id}>
+                  {tool.label} · {formatPermission(tool.permission)} · {tool.status}
+                  {tool.itemCount !== undefined ? ` · ${tool.itemCount}` : ''}
+                </li>
+              ))}
+              {tools.length === 0 && <li>下一次 Agent 回答后显示工具调用。</li>}
+            </ul>
+          </section>
+
+          <section className="assistant-panel">
+            <p className="assistant-panel__eyebrow">GUARDRAILS</p>
+            <h3>安全检查</h3>
+            <ul>
+              <li>状态：{formatGuardrailStatus(guardrails?.status)}</li>
+              <li>证据：{guardrails?.citationSufficiency ?? '等待回答'}</li>
+              <li>权限：{guardrails?.allowedPermissions.map(formatPermission).join(' / ') || '只读 / 草稿写入'}</li>
+              {guardrails?.issues.slice(0, 3).map((issue) => <li key={issue}>提示：{issue}</li>)}
+            </ul>
           </section>
 
           <section className="assistant-panel">
