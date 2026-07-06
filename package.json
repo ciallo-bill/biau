@@ -34,6 +34,7 @@
     "studio:smoke": "node scripts/check-studio-smoke.mjs",
     "blog:audit": "tsx scripts/audit-blog-catalog.ts",
     "blog:check": "node scripts/check-public-blog.mjs",
+    "project-details:check": "tsx scripts/check-project-detail-evidence.ts",
     "docs:observability-check": "node scripts/check-observability-docs.mjs",
     "erp:synthetic": "node scripts/check-erp-synthetic.mjs",
     "legal-rag:synthetic": "node scripts/check-legal-rag-synthetic.mjs",

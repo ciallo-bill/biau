@@ -11,6 +11,16 @@
 - 1 张架构或流程图：用于说明系统边界、数据流或任务流。
 - 1 组脱敏说明：明确哪些信息已被替换、裁剪或不公开。
 
+## 自动检查
+
+项目详情页的正文证据由脚本守门：
+
+```powershell
+npm.cmd run project-details:check
+```
+
+该检查会读取 `src/data/portfolio.ts`，确认每个项目都有详情内容、正文中至少有 2 个 visual、图片路径指向 `public/images/projects/` 下的真实文件，并检查 visual 标题、说明和图片 alt 文本。新增或修改项目详情页时先跑它，再跑 `assistant:index`、`lint`、`build` 和 UI 检查。
+
 ## 当前覆盖
 
 | 项目 | 已上线素材 | 缺口 | 下一步 |
