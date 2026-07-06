@@ -2,7 +2,17 @@ import { createHash } from 'node:crypto'
 import { env } from './env.js'
 import { publicKnowledgeV2, retrieveKnowledge } from './knowledge.js'
 import { embedText, isExternalEmbeddingConfigured } from './ragEmbeddings.js'
-import type { AssistantScope, Citation, RagChunkCitation, RagHealthResponse, RagRetrievePayload, RagRetrieveResponse, RagSyncResponse } from './types.js'
+import type {
+  AssistantScope,
+  Citation,
+  RagChunkCitation,
+  RagHealthResponse,
+  RagRetrievePayload,
+  RagRetrieveResponse,
+  RagSyncDocument,
+  RagSyncPayload,
+  RagSyncResponse,
+} from './types.js'
 
 interface QdrantScoredPoint {
   id: string | number
@@ -12,7 +22,7 @@ interface QdrantScoredPoint {
 
 interface QdrantPayload {
   scope: AssistantScope
-  source: 'public-knowledge-v2'
+  source: 'public-knowledge-v2' | 'internal-knowledge-documents'
   documentId: string
   chunkId: string
   title: string
@@ -36,6 +46,7 @@ const SERVICE_NAME = 'biau-rag-orchestrator'
 const QDRANT_STORE_NAME = 'qdrant'
 const DEFAULT_QDRANT_DIMENSION = 4096
 const QDRANT_BATCH_SIZE = 32
+const INTERNAL_CHUNK_TARGET_LENGTH = 1200
 
 export function isQdrantRagStoreSelected() {
   return env.ragStoreProvider.toLowerCase() === 'qdrant'
@@ -120,13 +131,21 @@ export async function retrieveQdrantRagContext(
 
 export async function syncQdrantRagStore(): Promise<RagSyncResponse | null> {
   if (!isQdrantRagStoreConfigured()) return null
-  if (!publicKnowledgeV2) return qdrantSyncDiagnostics(false, 0, 0, 1)
+  if (!publicKnowledgeV2) return qdrantSyncDiagnostics(false, 'public', 'server/data/public-knowledge-v2.json', '', 0, 0, 1)
 
   try {
     if (!isExternalEmbeddingConfigured()) {
       const localEmbedding = await embedText('dimension check').catch(() => null)
       if (!localEmbedding || localEmbedding.dimensions !== expectedEmbeddingDimensions()) {
-        return qdrantSyncDiagnostics(false, publicKnowledgeV2.public_documents.length, publicKnowledgeV2.knowledge_chunks.length, 1)
+        return qdrantSyncDiagnostics(
+          false,
+          'public',
+          'server/data/public-knowledge-v2.json',
+          hashJson(publicKnowledgeV2),
+          publicKnowledgeV2.public_documents.length,
+          publicKnowledgeV2.knowledge_chunks.length,
+          1,
+        )
       }
     }
 
@@ -167,9 +186,103 @@ export async function syncQdrantRagStore(): Promise<RagSyncResponse | null> {
     }
 
     const issueCount = await deleteStalePublicPoints(new Set(publicKnowledgeV2.knowledge_chunks.map((chunk) => chunk.id))).catch(() => 1)
-    return qdrantSyncDiagnostics(true, publicKnowledgeV2.public_documents.length, points.length, issueCount)
+    return qdrantSyncDiagnostics(
+      true,
+      'public',
+      'server/data/public-knowledge-v2.json',
+      hashJson(publicKnowledgeV2),
+      publicKnowledgeV2.public_documents.length,
+      points.length,
+      issueCount,
+    )
   } catch {
-    return qdrantSyncDiagnostics(false, publicKnowledgeV2.public_documents.length, publicKnowledgeV2.knowledge_chunks.length, 1)
+    return qdrantSyncDiagnostics(
+      false,
+      'public',
+      'server/data/public-knowledge-v2.json',
+      hashJson(publicKnowledgeV2),
+      publicKnowledgeV2.public_documents.length,
+      publicKnowledgeV2.knowledge_chunks.length,
+      1,
+    )
+  }
+}
+
+export async function syncQdrantInternalRagStore(payload: RagSyncPayload): Promise<RagSyncResponse | null> {
+  if (!isQdrantRagStoreConfigured() || !env.qdrantInternalCollection) return null
+
+  const documents = normalizeInternalSyncDocuments(payload.documents)
+  const chunks = documents.flatMap(chunkInternalDocument)
+  const sourceChecksum = hashJson({
+    scope: 'internal',
+    documents: documents.map((document) => ({
+      id: document.id,
+      slug: document.slug,
+      title: document.title,
+      status: document.status,
+      sourceType: document.sourceType,
+      updatedAt: document.updatedAt,
+      bodyHash: hashJson(document.body),
+    })),
+  })
+
+  if (documents.length === 0 || chunks.length === 0) {
+    return qdrantSyncDiagnostics(false, 'internal', 'internal-knowledge-documents', sourceChecksum, documents.length, chunks.length, 0)
+  }
+
+  try {
+    if (!isExternalEmbeddingConfigured()) {
+      const localEmbedding = await embedText('dimension check').catch(() => null)
+      if (!localEmbedding || localEmbedding.dimensions !== expectedEmbeddingDimensions()) {
+        return qdrantSyncDiagnostics(false, 'internal', 'internal-knowledge-documents', sourceChecksum, documents.length, chunks.length, 1)
+      }
+    }
+
+    const documentById = new Map(documents.map((document) => [document.id, document]))
+    const points = []
+    for (const chunk of chunks) {
+      const document = documentById.get(chunk.documentId)
+      if (!document) continue
+      const embedding = await embedText([document.title, chunk.section, chunk.text, ...(document.tags ?? [])].join('\n'), {
+        expectedDimensions: expectedEmbeddingDimensions(),
+      })
+      points.push({
+        id: toQdrantPointId(chunk.id),
+        vector: embedding.vector,
+        payload: {
+          scope: 'internal',
+          source: 'internal-knowledge-documents',
+          documentId: document.id,
+          chunkId: chunk.id,
+          title: document.title,
+          summary: document.summary || compactText(document.body, 180),
+          href: '/assistant/admin',
+          tags: document.tags ?? [],
+          visibility: 'internal',
+          sourceType: document.sourceType || 'manual',
+          section: chunk.section,
+          text: chunk.text,
+          contentHash: hashJson({
+            documentId: document.id,
+            updatedAt: document.updatedAt,
+            bodyHash: hashJson(document.body),
+            chunkIndex: chunk.index,
+            textHash: hashJson(chunk.text),
+          }),
+        } satisfies QdrantPayload,
+      })
+    }
+
+    for (let index = 0; index < points.length; index += QDRANT_BATCH_SIZE) {
+      await requestQdrantJson(`/collections/${encodeURIComponent(env.qdrantInternalCollection)}/points?wait=true`, 'PUT', {
+        points: points.slice(index, index + QDRANT_BATCH_SIZE),
+      })
+    }
+
+    const issueCount = await deleteStaleInternalPoints(new Set(chunks.map((chunk) => chunk.id))).catch(() => 1)
+    return qdrantSyncDiagnostics(true, 'internal', 'internal-knowledge-documents', sourceChecksum, documents.length, points.length, issueCount)
+  } catch {
+    return qdrantSyncDiagnostics(false, 'internal', 'internal-knowledge-documents', sourceChecksum, documents.length, chunks.length, 1)
   }
 }
 
@@ -202,6 +315,19 @@ async function getCollectionPointCount(collection: string) {
 }
 
 async function deleteStalePublicPoints(currentChunkIds: Set<string>) {
+  return deleteStaleScopedPoints(env.qdrantPublicCollection, 'public', 'public-knowledge-v2', currentChunkIds)
+}
+
+async function deleteStaleInternalPoints(currentChunkIds: Set<string>) {
+  return deleteStaleScopedPoints(env.qdrantInternalCollection, 'internal', 'internal-knowledge-documents', currentChunkIds)
+}
+
+async function deleteStaleScopedPoints(
+  collection: string,
+  scope: AssistantScope,
+  source: QdrantPayload['source'],
+  currentChunkIds: Set<string>,
+) {
   let offset: unknown
   let issueCount = 0
   const stalePointIds: Array<string | number> = []
@@ -212,13 +338,13 @@ async function deleteStalePublicPoints(currentChunkIds: Set<string>) {
       with_vector: false,
       filter: {
         must: [
-          { key: 'scope', match: { value: 'public' } },
-          { key: 'source', match: { value: 'public-knowledge-v2' } },
+          { key: 'scope', match: { value: scope } },
+          { key: 'source', match: { value: source } },
         ],
       },
     }
     if (offset !== undefined && offset !== null) payload.offset = offset
-    const response = await requestQdrantJson(`/collections/${encodeURIComponent(env.qdrantPublicCollection)}/points/scroll`, 'POST', payload)
+    const response = await requestQdrantJson(`/collections/${encodeURIComponent(collection)}/points/scroll`, 'POST', payload)
     const result = isRecord(response) && isRecord(response.result) ? response.result : null
     const points = Array.isArray(result?.points) ? result.points : []
     for (const point of points) {
@@ -234,7 +360,7 @@ async function deleteStalePublicPoints(currentChunkIds: Set<string>) {
 
   for (let index = 0; index < stalePointIds.length; index += QDRANT_BATCH_SIZE) {
     const ids = stalePointIds.slice(index, index + QDRANT_BATCH_SIZE)
-    const response = await requestQdrantRaw(`/collections/${encodeURIComponent(env.qdrantPublicCollection)}/points/delete?wait=true`, 'POST', {
+    const response = await requestQdrantRaw(`/collections/${encodeURIComponent(collection)}/points/delete?wait=true`, 'POST', {
       points: ids,
     })
     if (!response.ok) issueCount += ids.length
@@ -328,6 +454,7 @@ function readQdrantPayload(value: unknown): QdrantPayload | null {
   if (!isRecord(value)) return null
   const scope = value.scope === 'internal' ? 'internal' : value.scope === 'public' ? 'public' : null
   const visibility = value.visibility === 'internal' ? 'internal' : value.visibility === 'public' ? 'public' : null
+  const source = value.source === 'internal-knowledge-documents' ? 'internal-knowledge-documents' : 'public-knowledge-v2'
   if (!scope || !visibility) return null
   const documentId = readString(value.documentId)
   const chunkId = readString(value.chunkId)
@@ -341,7 +468,7 @@ function readQdrantPayload(value: unknown): QdrantPayload | null {
   if (!documentId || !chunkId || !title || !summary || !href || !section || !text || !sourceType || !contentHash) return null
   return {
     scope,
-    source: 'public-knowledge-v2',
+    source,
     documentId,
     chunkId,
     title,
@@ -357,19 +484,28 @@ function readQdrantPayload(value: unknown): QdrantPayload | null {
   }
 }
 
-function qdrantSyncDiagnostics(accepted: boolean, documentCount: number, chunkCount: number, issueCount: number): RagSyncResponse {
+function qdrantSyncDiagnostics(
+  accepted: boolean,
+  scope: AssistantScope,
+  sourceName: string,
+  sourceChecksum: string,
+  documentCount: number,
+  chunkCount: number,
+  issueCount: number,
+): RagSyncResponse {
   return {
     ok: true,
     mode: 'qdrant',
+    scope,
     accepted,
     health: accepted ? emptyQdrantHealthWithCounts(documentCount, chunkCount) : emptyQdrantHealth(),
     diagnostics: {
-      sourceName: 'server/data/public-knowledge-v2.json',
-      sourceChecksum: publicKnowledgeV2 ? hashJson(publicKnowledgeV2) : '',
+      sourceName,
+      sourceChecksum,
       documentCount,
       chunkCount,
-      entityCount: publicKnowledgeV2?.entities.length ?? 0,
-      relationCount: publicKnowledgeV2?.relations.length ?? 0,
+      entityCount: scope === 'public' ? publicKnowledgeV2?.entities.length ?? 0 : 0,
+      relationCount: scope === 'public' ? publicKnowledgeV2?.relations.length ?? 0 : 0,
       issueCount,
     },
   }
@@ -438,6 +574,102 @@ function toQdrantPointId(id: string) {
 
 function hashJson(value: unknown) {
   return createHash('sha256').update(JSON.stringify(value)).digest('hex')
+}
+
+interface InternalSyncChunk {
+  id: string
+  documentId: string
+  section: string
+  text: string
+  index: number
+}
+
+function normalizeInternalSyncDocuments(value: RagSyncPayload['documents']): RagSyncDocument[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .map((document) => ({
+      id: compactIdentifier(document.id),
+      slug: compactIdentifier(document.slug ?? ''),
+      title: compactText(document.title, 140),
+      summary: compactText(document.summary ?? '', 280),
+      body: compactBody(document.body, 24000),
+      tags: normalizeTags(document.tags),
+      status: compactText(document.status ?? '', 40),
+      sourceType: compactText(document.sourceType ?? 'manual', 60),
+      updatedAt: compactText(document.updatedAt ?? '', 80),
+    }))
+    .filter((document) => document.id && document.title && document.body)
+}
+
+function chunkInternalDocument(document: RagSyncDocument): InternalSyncChunk[] {
+  const paragraphs = document.body
+    .split(/\n{2,}/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+  const chunks: InternalSyncChunk[] = []
+  const sourceParts = paragraphs.length > 0 ? paragraphs : [document.body.trim()].filter(Boolean)
+
+  for (const part of sourceParts) {
+    for (const text of splitLongText(part, INTERNAL_CHUNK_TARGET_LENGTH)) {
+      const index = chunks.length
+      chunks.push({
+        id: `internal:${document.id}:chunk:${index + 1}`,
+        documentId: document.id,
+        section: document.title,
+        text,
+        index,
+      })
+    }
+  }
+
+  return chunks
+}
+
+function splitLongText(value: string, maxLength: number) {
+  const text = value.trim()
+  if (!text) return []
+  const chunks: string[] = []
+  for (let index = 0; index < text.length; index += maxLength) {
+    chunks.push(text.slice(index, index + maxLength).trim())
+  }
+  return chunks.filter(Boolean)
+}
+
+function normalizeTags(value: unknown) {
+  if (!Array.isArray(value)) return []
+  return Array.from(
+    new Set(
+      value
+        .filter((item): item is string => typeof item === 'string')
+        .map((item) => compactText(item, 40))
+        .filter(Boolean),
+    ),
+  ).slice(0, 12)
+}
+
+function compactIdentifier(value: unknown) {
+  if (typeof value !== 'string') return ''
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9:_-]+/g, '-')
+    .replace(/-+/g, '-')
+    .slice(0, 160)
+}
+
+function compactText(value: unknown, maxLength: number) {
+  if (typeof value !== 'string') return ''
+  return value.replace(/\s+/g, ' ').trim().slice(0, maxLength)
+}
+
+function compactBody(value: unknown, maxLength: number) {
+  if (typeof value !== 'string') return ''
+  return value
+    .replace(/\r\n/g, '\n')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+    .slice(0, maxLength)
 }
 
 function readString(value: unknown) {

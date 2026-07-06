@@ -180,6 +180,8 @@ PORT=10000
 
 `/assistant/admin` 的内部知识源管理会把 `REVIEWED` / `ACTIVE` 文档作为 internal corpus 同步计划提交给 RAG Orchestrator。真实同步需要 Internal Assistant API 和 RAG Orchestrator 配置相同的 `RAG_SYNC_TOKEN`；未配置时只会记录低敏 `SKIPPED` 同步运行，不会把文档或 token 暴露给浏览器。
 
+当 RAG Orchestrator 使用 `RAG_STORE_PROVIDER=qdrant` 且 Qdrant 与 embedding 变量完整时，`scope=internal` 的同步会把内部知识文档切分为 chunks、生成 embedding，并写入 `QDRANT_INTERNAL_COLLECTION`。本地或未配置 Qdrant/embedding 时，`/v1/sync` 只返回 `local-readonly` 或低敏未接受诊断，不会触碰真实向量库，也不会把文档正文写入诊断。
+
 ### RAG Orchestrator
 
 ```text

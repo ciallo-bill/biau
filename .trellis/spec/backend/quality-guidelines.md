@@ -474,6 +474,9 @@ res.json({ invites: invites.map(serializeInvite) })
 - Missing `ASSISTANT_RAG_API_BASE_URL` or `RAG_SYNC_TOKEN` does not fail the admin UI; it records `SKIPPED` with low-sensitive reason `rag-sync-not-configured`.
 - External sync diagnostics may include mode, scope, reason, accepted, counts, and numeric HTTP status only. They must not include RAG base URLs, sync tokens, embedding keys, Qdrant URLs, raw request bodies, raw responses, stack traces, or full document payloads.
 - RAG `/v1/sync` must keep no-payload public sync behavior intact. `scope: "internal"` uses the internal documents payload and may return `local-readonly` diagnostics in local mode.
+- When `RAG_STORE_PROVIDER=qdrant` is selected and Qdrant plus embedding config is complete, `scope: "internal"` sync writes chunk points only to `QDRANT_INTERNAL_COLLECTION`, using payload `visibility: "internal"` and `source: "internal-knowledge-documents"`.
+- Qdrant internal sync must delete stale internal points for that source after a successful accepted sync, but public sync must continue deleting only public points in `QDRANT_PUBLIC_COLLECTION`.
+- Qdrant internal sync diagnostics may include `scope: "internal"`, source name, source checksum, document/chunk counts, and issue count. They must not include chunk text, document body, provider endpoints, collection URLs, API keys, or raw provider responses.
 
 ### 4. Validation & Error Matrix
 
@@ -486,6 +489,7 @@ res.json({ invites: invites.map(serializeInvite) })
 - No reviewed/active docs -> sync run status `SKIPPED`, reason `no-reviewed-internal-documents`.
 - RAG sync not configured -> sync run status `SKIPPED`, reason `rag-sync-not-configured`.
 - External RAG sync non-OK -> sync run status `FAILED`, reason `http_status`, numeric `httpStatus` only.
+- External RAG returns `mode: "qdrant"` with `accepted: false` -> sync run status `FAILED`; `mode: "local-readonly"` with `accepted: false` -> sync run status `SKIPPED`.
 
 ### 5. Good/Base/Bad Cases
 
@@ -502,7 +506,7 @@ res.json({ invites: invites.map(serializeInvite) })
 - Run `npm.cmd run server:build` after route, type, or Prisma changes.
 - Run `npm.cmd run server:smoke`; it must assert knowledge admin routes reject missing admin token and return `database-not-configured` when a valid admin token exists without persistence.
 - Run `npm.cmd run assistant:service-modes-smoke`; public/rag/studio modes must not expose admin knowledge routes.
-- Run `npm.cmd run assistant:rag-smoke`; it must assert internal sync payload returns low-sensitive local-readonly diagnostics without external credentials.
+- Run `npm.cmd run assistant:rag-smoke`; it must assert internal sync payload returns low-sensitive local-readonly diagnostics without external credentials, and a local mock Qdrant path can accept internal sync, retrieve internal citations for internal scope, and avoid internal citations for public scope.
 - Run `npm.cmd run assistant:rag-sync-local` after changing sync planning or knowledge mapping.
 - Run `npm.cmd run lint`, `npm.cmd run build`, `npm.cmd run check:ui`, `git diff --check`, and sensitive scan before commit.
 

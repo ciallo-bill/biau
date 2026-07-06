@@ -160,6 +160,7 @@ export interface RagSyncResponse {
   ok: true
   mode: 'local-readonly' | 'postgres' | 'qdrant'
   accepted: boolean
+  scope?: AssistantScope
   health: RagHealthResponse
   diagnostics?: {
     sourceName?: string

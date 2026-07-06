@@ -168,3 +168,40 @@ Manual gate:
 - Production deployment must run the new migration before using the Knowledge area.
 - Real internal Qdrant/embedding sync still requires user approval and configured `ASSISTANT_RAG_API_BASE_URL` plus `RAG_SYNC_TOKEN`.
 - First real internal corpus still requires user-confirmed source and脱敏标准.
+
+## 2026-07-06 Qdrant internal corpus sync
+
+Completed the next RAG Orchestrator slice for the final internal knowledge path.
+
+Implemented:
+
+- `syncRagStore({ scope: "internal" })` now routes to Qdrant when `RAG_STORE_PROVIDER=qdrant` is selected and Qdrant config is available.
+- Added Qdrant internal sync support:
+  - normalize internal sync documents
+  - preserve paragraph boundaries for chunking
+  - chunk internal documents with stable `internal:<documentId>:chunk:<n>` ids
+  - generate embeddings through the existing embedding boundary
+  - upsert points only into `QDRANT_INTERNAL_COLLECTION`
+  - mark payloads as `visibility: "internal"` and `source: "internal-knowledge-documents"`
+  - delete stale internal points for that source after accepted sync
+- Public Qdrant sync remains scoped to `QDRANT_PUBLIC_COLLECTION` and public payloads.
+- `RagSyncResponse` now includes optional `scope` so sync diagnostics can clearly distinguish public/internal without exposing endpoints or secrets.
+- Internal API sync result classification now treats `mode: "qdrant"` plus `accepted: false` as `FAILED`, while `local-readonly` remains `SKIPPED`.
+- `assistant:rag-smoke` now includes a local in-memory Qdrant mock proving:
+  - internal sync can be accepted by Qdrant without live cloud calls
+  - internal retrieve returns internal citations for `scope: "internal"`
+  - public retrieve does not return internal citations
+- `docs/deployment.md` now clarifies that configured Qdrant writes `scope=internal` chunks into `QDRANT_INTERNAL_COLLECTION`; local/unconfigured sync remains readonly/diagnostic.
+- Backend quality spec now records the internal Qdrant sync contract and the required mock coverage.
+
+Validation:
+
+- `npm.cmd run server:build`
+- `npm.cmd run server:smoke`
+- `npm.cmd run assistant:rag-smoke`
+- `npm.cmd run assistant:service-modes-smoke`
+
+Manual gate:
+
+- Real production internal corpus sync still requires user-approved reviewed/active documents plus deployed Render env for `ASSISTANT_RAG_API_BASE_URL`, `RAG_SYNC_TOKEN`, `QDRANT_*`, and `EMBEDDING_*`.
+- No real Qdrant, embedding provider, model provider, or relay endpoint was called during local validation.

@@ -1,6 +1,26 @@
+import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { createServer as createTcpServer } from 'node:net'
 import { createApp } from '../src/app.js'
+import { env } from '../src/env.js'
 import type { RagHealthResponse, RagRetrieveResponse, RagSyncResponse } from '../src/types.js'
+
+interface RagEnvSnapshot {
+  ragStoreProvider: string
+  qdrantUrl: string
+  qdrantApiKey: string
+  qdrantPublicCollection: string
+  qdrantInternalCollection: string
+  embeddingBaseUrl: string
+  embeddingApiKey: string
+  embeddingModel: string
+  embeddingDimension: number
+}
+
+interface MockQdrantPoint {
+  id: string | number
+  vector?: number[]
+  payload?: Record<string, unknown>
+}
 
 function findAvailablePort(startPort: number) {
   return new Promise<number>((resolve, reject) => {
@@ -33,6 +53,152 @@ async function postJson<T>(url: string, body: unknown) {
     body: JSON.stringify(body),
   })
   return { response, payload: (await response.json()) as T }
+}
+
+function snapshotRagEnv(): RagEnvSnapshot {
+  return {
+    ragStoreProvider: env.ragStoreProvider,
+    qdrantUrl: env.qdrantUrl,
+    qdrantApiKey: env.qdrantApiKey,
+    qdrantPublicCollection: env.qdrantPublicCollection,
+    qdrantInternalCollection: env.qdrantInternalCollection,
+    embeddingBaseUrl: env.embeddingBaseUrl,
+    embeddingApiKey: env.embeddingApiKey,
+    embeddingModel: env.embeddingModel,
+    embeddingDimension: env.embeddingDimension,
+  }
+}
+
+function restoreRagEnv(snapshot: RagEnvSnapshot) {
+  env.ragStoreProvider = snapshot.ragStoreProvider
+  env.qdrantUrl = snapshot.qdrantUrl
+  env.qdrantApiKey = snapshot.qdrantApiKey
+  env.qdrantPublicCollection = snapshot.qdrantPublicCollection
+  env.qdrantInternalCollection = snapshot.qdrantInternalCollection
+  env.embeddingBaseUrl = snapshot.embeddingBaseUrl
+  env.embeddingApiKey = snapshot.embeddingApiKey
+  env.embeddingModel = snapshot.embeddingModel
+  env.embeddingDimension = snapshot.embeddingDimension
+}
+
+async function startMockQdrant() {
+  const collections = new Map<string, Map<string | number, MockQdrantPoint>>()
+  const port = await findAvailablePort(9477)
+  const server = createHttpServer(async (req, res) => {
+    try {
+      await handleMockQdrantRequest(req, res, collections)
+    } catch {
+      sendJson(res, 500, { error: 'mock-qdrant-error' })
+    }
+  })
+  await new Promise<void>((resolve) => server.listen(port, '127.0.0.1', () => resolve()))
+  return {
+    baseUrl: `http://127.0.0.1:${port}`,
+    close: () => new Promise<void>((resolve) => server.close(() => resolve())),
+    collections,
+  }
+}
+
+async function handleMockQdrantRequest(
+  req: IncomingMessage,
+  res: ServerResponse,
+  collections: Map<string, Map<string | number, MockQdrantPoint>>,
+) {
+  const url = new URL(req.url ?? '/', 'http://127.0.0.1')
+  const match = url.pathname.match(/^\/collections\/([^/]+)\/points(?:\/([^/]+))?$/)
+  if (!match) {
+    sendJson(res, 404, { error: 'not-found' })
+    return
+  }
+
+  const collection = decodeURIComponent(match[1])
+  const action = match[2] ?? ''
+  const points = getMockCollection(collections, collection)
+  const body = await readJsonBody(req)
+
+  if (req.method === 'PUT' && action === '') {
+    const incoming = isRecord(body) && Array.isArray(body.points) ? body.points : []
+    for (const point of incoming) {
+      if (!isRecord(point)) continue
+      const id = typeof point.id === 'string' || typeof point.id === 'number' ? point.id : ''
+      if (!id) continue
+      points.set(id, {
+        id,
+        vector: Array.isArray(point.vector) ? point.vector.filter((item): item is number => typeof item === 'number') : undefined,
+        payload: isRecord(point.payload) ? point.payload : undefined,
+      })
+    }
+    sendJson(res, 200, { result: { status: 'ok' } })
+    return
+  }
+
+  if (req.method === 'POST' && action === 'count') {
+    sendJson(res, 200, { result: { count: points.size } })
+    return
+  }
+
+  if (req.method === 'POST' && action === 'scroll') {
+    sendJson(res, 200, { result: { points: Array.from(points.values()), next_page_offset: null } })
+    return
+  }
+
+  if (req.method === 'POST' && action === 'delete') {
+    const ids = isRecord(body) && Array.isArray(body.points) ? body.points : []
+    for (const id of ids) {
+      if (typeof id === 'string' || typeof id === 'number') points.delete(id)
+    }
+    sendJson(res, 200, { result: { status: 'ok' } })
+    return
+  }
+
+  if (req.method === 'POST' && (action === 'search' || action === 'query')) {
+    sendJson(res, 200, {
+      result: Array.from(points.values()).map((point, index) => ({
+        id: point.id,
+        score: Number((0.92 - index * 0.01).toFixed(3)),
+        payload: point.payload,
+      })),
+    })
+    return
+  }
+
+  sendJson(res, 404, { error: 'not-found' })
+}
+
+function getMockCollection(collections: Map<string, Map<string | number, MockQdrantPoint>>, collection: string) {
+  const existing = collections.get(collection)
+  if (existing) return existing
+  const created = new Map<string | number, MockQdrantPoint>()
+  collections.set(collection, created)
+  return created
+}
+
+function readJsonBody(req: IncomingMessage) {
+  return new Promise<unknown>((resolve) => {
+    const chunks: Buffer[] = []
+    req.on('data', (chunk: Buffer) => chunks.push(chunk))
+    req.on('end', () => {
+      const raw = Buffer.concat(chunks).toString('utf8')
+      if (!raw) {
+        resolve(null)
+        return
+      }
+      try {
+        resolve(JSON.parse(raw) as unknown)
+      } catch {
+        resolve(null)
+      }
+    })
+  })
+}
+
+function sendJson(res: ServerResponse, status: number, payload: unknown) {
+  res.writeHead(status, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify(payload))
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }
 
 const port = await findAvailablePort(9377)
@@ -130,6 +296,74 @@ try {
     internalSyncPayload.diagnostics.chunkCount !== 2
   ) {
     throw new Error('rag internal sync payload should stay local-readonly with low-sensitive diagnostics')
+  }
+
+  const ragEnvSnapshot = snapshotRagEnv()
+  const mockQdrant = await startMockQdrant()
+  try {
+    env.ragStoreProvider = 'qdrant'
+    env.qdrantUrl = mockQdrant.baseUrl
+    env.qdrantApiKey = 'qdrant-smoke-key'
+    env.qdrantPublicCollection = 'biau_public_chunks_smoke'
+    env.qdrantInternalCollection = 'biau_internal_chunks_smoke'
+    env.embeddingBaseUrl = ''
+    env.embeddingApiKey = ''
+    env.embeddingModel = 'deterministic-local'
+    env.embeddingDimension = 48
+
+    const { response: qdrantSyncResponse, payload: qdrantSyncPayload } = await postJson<RagSyncResponse>(`${base}/rag/v1/sync`, {
+      scope: 'internal',
+      documents: [
+        {
+          id: 'internal-doc-smoke',
+          title: 'Internal smoke document',
+          summary: 'Internal scope only.',
+          body: 'Internal smoke document body for Qdrant sync.\n\nSecond paragraph verifies chunk creation.',
+          tags: ['internal-smoke'],
+          status: 'REVIEWED',
+          sourceType: 'manual',
+          updatedAt: '2026-07-06T00:00:00.000Z',
+        },
+      ],
+    })
+    if (!qdrantSyncResponse.ok) throw new Error(`rag qdrant internal sync failed: ${qdrantSyncResponse.status}`)
+    if (
+      qdrantSyncPayload.mode !== 'qdrant' ||
+      qdrantSyncPayload.scope !== 'internal' ||
+      qdrantSyncPayload.accepted !== true ||
+      qdrantSyncPayload.diagnostics?.sourceName !== 'internal-knowledge-documents' ||
+      qdrantSyncPayload.diagnostics.documentCount !== 1 ||
+      qdrantSyncPayload.diagnostics.chunkCount !== 2
+    ) {
+      throw new Error('rag qdrant internal sync payload is invalid')
+    }
+
+    const { response: qdrantRetrieveResponse, payload: qdrantRetrievePayload } = await postJson<RagRetrieveResponse>(`${base}/rag/v1/retrieve`, {
+      query: 'Internal smoke document',
+      scope: 'internal',
+      limit: 2,
+    })
+    if (!qdrantRetrieveResponse.ok) throw new Error(`rag qdrant internal retrieve failed: ${qdrantRetrieveResponse.status}`)
+    if (
+      qdrantRetrievePayload.meta.store !== 'qdrant' ||
+      qdrantRetrievePayload.meta.retrievalMode !== 'agentic-hybrid-qdrant' ||
+      !qdrantRetrievePayload.citations.some((citation) => citation.id === 'internal-doc-smoke' && citation.visibility === 'internal')
+    ) {
+      throw new Error('rag qdrant internal retrieve should return internal citation')
+    }
+
+    const { response: publicRetrieveResponse, payload: publicRetrievePayload } = await postJson<RagRetrieveResponse>(`${base}/rag/v1/retrieve`, {
+      query: 'Internal smoke document',
+      scope: 'public',
+      limit: 2,
+    })
+    if (!publicRetrieveResponse.ok) throw new Error(`rag qdrant public retrieve failed: ${publicRetrieveResponse.status}`)
+    if (publicRetrievePayload.citations.some((citation) => citation.visibility === 'internal')) {
+      throw new Error('rag qdrant public retrieve must not return internal citations')
+    }
+  } finally {
+    restoreRagEnv(ragEnvSnapshot)
+    await mockQdrant.close()
   }
 
   console.log('Assistant RAG orchestrator smoke passed')

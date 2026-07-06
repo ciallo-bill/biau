@@ -1076,11 +1076,15 @@ async function syncInternalKnowledgeDocuments(documents: ReturnType<typeof build
     }
     const accepted = isPlainRecord(payload) && payload.accepted === true
     const mode = isPlainRecord(payload) && typeof payload.mode === 'string' ? payload.mode : 'external-rag'
+    const scope = isPlainRecord(payload) && typeof payload.scope === 'string' ? payload.scope : 'internal'
+    const diagnostics = isPlainRecord(payload) && isPlainRecord(payload.diagnostics) ? payload.diagnostics : {}
+    const payloadIssueCount = typeof diagnostics.issueCount === 'number' && Number.isFinite(diagnostics.issueCount) ? diagnostics.issueCount : 0
+    const issueCount = accepted ? payloadIssueCount : Math.max(1, payloadIssueCount)
     return {
       accepted,
-      status: accepted ? ('COMPLETED' as const) : ('SKIPPED' as const),
-      issueCount: accepted ? 0 : 1,
-      diagnostic: { ...diagnosticBase, mode, accepted },
+      status: accepted ? ('COMPLETED' as const) : mode === 'local-readonly' ? ('SKIPPED' as const) : ('FAILED' as const),
+      issueCount,
+      diagnostic: { ...diagnosticBase, mode, scope, accepted, issueCount },
     }
   } catch (error) {
     return {

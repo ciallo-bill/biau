@@ -1,7 +1,13 @@
 import { publicKnowledgeV2, retrieveKnowledge } from './knowledge.js'
 import { createLocalVectorStore, rerankChunksWithVector } from './ragAdapters.js'
 import { getPostgresRagHealth, isPostgresRagStoreConfigured, retrievePostgresRagContext, syncPostgresRagStore } from './ragPostgresStore.js'
-import { getQdrantRagHealth, isQdrantRagStoreSelected, retrieveQdrantRagContext, syncQdrantRagStore } from './ragQdrantStore.js'
+import {
+  getQdrantRagHealth,
+  isQdrantRagStoreSelected,
+  retrieveQdrantRagContext,
+  syncQdrantInternalRagStore,
+  syncQdrantRagStore,
+} from './ragQdrantStore.js'
 import type { RagHealthResponse, RagRetrievePayload, RagRetrieveResponse, RagSyncPayload, RagSyncResponse } from './types.js'
 
 const SERVICE_NAME = 'biau-rag-orchestrator'
@@ -69,7 +75,13 @@ export async function retrieveRagContext(
 }
 
 export async function syncRagStore(payload: RagSyncPayload = {}): Promise<RagSyncResponse> {
-  if (payload.scope === 'internal') return syncInternalRagPayload(payload)
+  if (payload.scope === 'internal') {
+    if (isQdrantRagStoreSelected()) {
+      const syncResult = await syncQdrantInternalRagStore(payload)
+      if (syncResult) return syncResult
+    }
+    return syncInternalRagPayload(payload)
+  }
 
   if (isQdrantRagStoreSelected()) {
     const syncResult = await syncQdrantRagStore()
@@ -84,6 +96,7 @@ export async function syncRagStore(payload: RagSyncPayload = {}): Promise<RagSyn
   return {
     ok: true,
     mode: 'local-readonly',
+    scope: 'public',
     accepted: false,
     health: await getRagOrchestratorHealth(),
   }
@@ -94,6 +107,7 @@ async function syncInternalRagPayload(payload: RagSyncPayload): Promise<RagSyncR
   return {
     ok: true,
     mode: 'local-readonly',
+    scope: 'internal',
     accepted: false,
     health: await getRagOrchestratorHealth(),
     diagnostics: {
