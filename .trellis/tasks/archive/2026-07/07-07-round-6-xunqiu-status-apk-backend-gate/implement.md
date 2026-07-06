@@ -8,7 +8,7 @@
 4. [x] Choose the smallest public-safe improvement based on evidence.
 5. [x] Implement and run focused validation.
 6. [x] Update task notes and Round 6 manual gates.
-7. [ ] Commit and push `blog-semi`.
+7. [x] Commit and push `blog-semi`.
 
 ## Validation Candidates
 
