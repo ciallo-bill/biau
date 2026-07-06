@@ -20,7 +20,7 @@ Inspect the game/Playlab workspace and improve public-safe main-site checks for 
 - [x] 已确认主站当前 Playlab/Game 展示/status/synthetic 语义。
 - [x] 完成一个 public-safe、可本地验证的 Playlab/Game gate 或展示改进。
 - [x] 相关验证通过，并记录不能自动处理的人工 gate。
-- [ ] 提交并推送 `blog-semi`；关联仓库只有在符合仓库规则且 diff 安全时才提交/推送。
+- [x] 提交并推送 `blog-semi`；关联仓库只有在符合仓库规则且 diff 安全时才提交/推送。
 
 ## Notes
 
