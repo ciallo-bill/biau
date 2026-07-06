@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { StudioDraftPreview } from '../components/StudioDraftPreview'
 import { blogColumnMeta, blogColumnOrder, type BlogColumn } from '../data/blog'
 import { projects } from '../data/portfolio'
@@ -277,7 +277,19 @@ function draftToForm(draft: StudioDraft): DraftFormState {
   }
 }
 
+function normalizeDraftLookupTarget(value: string | null) {
+  const trimmed = value?.trim() ?? ''
+  if (!trimmed || trimmed.length > 120 || !/^[a-z0-9_-]+$/iu.test(trimmed)) return ''
+  return trimmed
+}
+
+function isAgenticWorkspaceDraft(draft: Pick<StudioDraft, 'aiAssistance'> | null) {
+  return draft?.aiAssistance === 'agentic-workspace'
+}
+
 export function StudioPage() {
+  const [searchParams] = useSearchParams()
+  const draftLinkTarget = normalizeDraftLookupTarget(searchParams.get('draft'))
   const [adminToken, setAdminToken] = useState(() => readStoredStudioToken())
   const [draftToken, setDraftToken] = useState(() => readStoredStudioToken())
   const [health, setHealth] = useState<StudioHealth | null>(null)
@@ -325,6 +337,8 @@ export function StudioPage() {
   const previewProjectIds = useMemo(() => splitList(draftForm.projectIdsText), [draftForm.projectIdsText])
   const pageReviewPlan = useMemo(() => getPageReviewPlan(draftForm), [draftForm])
   const previewDate = selectedDraft?.publishedAt?.slice(0, 10) || selectedDraft?.updatedAt?.slice(0, 10) || today()
+  const displayStatusText =
+    statusText || (draftLinkTarget && !adminToken ? '请先保存 Studio token，保存后会自动定位助手创建的草稿。' : '')
 
   const saveToken = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -387,17 +401,34 @@ export function StudioPage() {
         requestStudioApi('/ai-daily/issues', token),
         requestStudioApi('/publish-exports', token),
       ])
-      if (draftResult.ok) setDrafts(normalizeStudioDrafts(draftResult.payload))
+      let nextStatusText = 'Studio 数据已刷新。'
+      if (draftResult.ok) {
+        const nextDrafts = normalizeStudioDrafts(draftResult.payload)
+        setDrafts(nextDrafts)
+        if (draftLinkTarget) {
+          const matchedDraft = nextDrafts.find((draft) => draft.id === draftLinkTarget || draft.slug === draftLinkTarget)
+          if (matchedDraft) {
+            setSelectedDraftId(matchedDraft.id)
+            setDraftForm(draftToForm(matchedDraft))
+            nextStatusText = `已定位到助手创建的草稿：${matchedDraft.title}。仍需人工审核后才能发布。`
+          } else {
+            nextStatusText = `没有找到助手链接中的草稿：${draftLinkTarget}。请确认 token 连接的是同一个 Studio 数据库，或刷新草稿箱。`
+          }
+        }
+      } else {
+        setDrafts([])
+        if (draftLinkTarget) nextStatusText = '草稿列表加载失败，暂时无法定位助手创建的草稿。'
+      }
       if (sourceResult.ok) setSources(normalizeStudioSources(sourceResult.payload))
       if (issueResult.ok) setIssues(normalizeStudioIssues(issueResult.payload))
       if (publishExportResult.ok) setPublishExports(normalizeStudioPublishExports(publishExportResult.payload))
-      setStatusText('Studio 数据已刷新。')
+      setStatusText(nextStatusText)
     } catch {
       setStatusText('无法连接 Studio API。')
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [draftLinkTarget])
 
   useEffect(() => {
     if (adminToken) void loadStudio(adminToken)
@@ -704,7 +735,7 @@ export function StudioPage() {
           <span className="assistant-chip">{health?.database ? '数据库在线' : '数据库未确认'}</span>
           <span className="assistant-chip">{health?.publishMode || 'static-export'}</span>
         </div>
-        {statusText && <p className="assistant-status-text">{statusText}</p>}
+        {displayStatusText && <p className="assistant-status-text">{displayStatusText}</p>}
       </section>
 
       <section className="studio-grid">
@@ -727,7 +758,10 @@ export function StudioPage() {
                 className={`studio-draft-item ${draft.id === selectedDraftId ? 'is-active' : ''}`}
                 onClick={() => selectDraft(draft)}
               >
-                <strong>{draft.title}</strong>
+                <span className="studio-draft-item__title">
+                  <strong>{draft.title}</strong>
+                  {isAgenticWorkspaceDraft(draft) && <span className="studio-agentic-pill">Agentic Workspace</span>}
+                </span>
                 <span>{draft.slug}</span>
                 <em>
                   {blogColumnMeta[draft.column as BlogColumn]?.titleZh ?? draft.column} · {studioDraftStatuses[draft.status]}
@@ -745,7 +779,12 @@ export function StudioPage() {
                 <p className="assistant-panel__eyebrow">BLOG EDITOR</p>
                 <h2>{selectedDraft ? '编辑草稿' : '新建草稿'}</h2>
               </div>
-              {selectedDraft && <span className="studio-status-pill">{studioDraftStatuses[selectedDraft.status]}</span>}
+              {selectedDraft && (
+                <span className="studio-editor-statuses">
+                  <span className="studio-status-pill">{studioDraftStatuses[selectedDraft.status]}</span>
+                  {isAgenticWorkspaceDraft(selectedDraft) && <span className="studio-agentic-pill">Agentic Workspace</span>}
+                </span>
+              )}
             </div>
 
             <div className="studio-template-strip">

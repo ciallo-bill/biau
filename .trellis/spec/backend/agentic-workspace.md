@@ -45,7 +45,7 @@
   - `grounding`
   - `fallbackReason`
 - Tool traces may contain ids, labels, permission class, status, duration, counts, short summaries, and coarse error classes only.
-- Tool traces may include safe artifacts such as `{ kind: "studio-draft", id, slug, title, column, status: "review-needed", visibility: "hidden", reviewRequired: true, href: "/studio" }`. They must not include draft body text, Prisma payloads, review checklist internals, admin tokens, database roles, or API URLs.
+- Tool traces may include safe artifacts such as `{ kind: "studio-draft", id, slug, title, column, status: "review-needed", visibility: "hidden", reviewRequired: true, href: "/studio?draft=<id>" }`. Legacy persisted artifacts may keep `href: "/studio"`, but new created-draft artifacts should deep-link by draft id. Artifact links must stay same-site Studio routes and must not include draft body text, Prisma payloads, review checklist internals, admin tokens, database roles, API URLs, or bearer tokens.
 - Tool traces and metadata must not contain API keys, base URLs, database URLs, sync tokens, bearer tokens, invite codes, raw prompts, raw provider responses, raw retrieved document bodies, stack traces, or private dashboards.
 - Model-driven planning may be used for real internal chat when a member model channel is configured. Smoke/eval tests must use `plannerMode: "mock"` or local deterministic paths and must not probe real providers.
 

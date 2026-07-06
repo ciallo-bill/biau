@@ -3141,6 +3141,14 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   overflow-wrap: anywhere;
 }
 
+.assistant-tool-hint {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
 .assistant-tool-artifact:hover {
   color: color-mix(in oklch, var(--green) 86%, var(--ink));
   border-color: color-mix(in oklch, var(--green) 34%, transparent);
@@ -3423,6 +3431,18 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   font-size: 13px;
 }
 
+.studio-draft-item__title,
+.studio-editor-statuses {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.studio-draft-item__title strong {
+  min-width: 0;
+}
+
 .studio-draft-item span,
 .studio-draft-item em,
 .studio-review-item span,
@@ -3433,6 +3453,25 @@ html.harbor-intro-active .app.page-home .muxing-flow-grain {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.studio-draft-item .studio-agentic-pill,
+.studio-agentic-pill {
+  width: fit-content;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-8, 8px);
+  color: color-mix(in oklch, var(--blue) 76%, var(--ink));
+  background: color-mix(in oklch, var(--blue) 9%, transparent);
+  border: 1px solid color-mix(in oklch, var(--blue) 24%, transparent);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
   overflow-wrap: anywhere;
 }
 

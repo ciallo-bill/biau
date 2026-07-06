@@ -86,7 +86,7 @@ export interface AssistantStudioDraftArtifact {
   status: 'review-needed'
   visibility: 'hidden'
   reviewRequired: true
-  href: '/studio'
+  href: '/studio' | `/studio?draft=${string}`
 }
 
 export type AssistantAgentToolArtifact = AssistantStudioDraftArtifact
@@ -506,6 +506,8 @@ function normalizeAssistantAgentToolArtifacts(value: unknown): AssistantAgentToo
 function normalizeAssistantAgentToolArtifact(value: unknown): AssistantAgentToolArtifact | null {
   if (!isRecord(value)) return null
   const { kind, id, slug, title, column, status, visibility, reviewRequired, href } = value
+  const safeHref =
+    typeof id === 'string' && typeof slug === 'string' ? normalizeStudioDraftArtifactHref(href, id, slug) : null
   if (
     kind !== 'studio-draft' ||
     typeof id !== 'string' ||
@@ -515,7 +517,7 @@ function normalizeAssistantAgentToolArtifact(value: unknown): AssistantAgentTool
     status !== 'review-needed' ||
     visibility !== 'hidden' ||
     reviewRequired !== true ||
-    href !== '/studio'
+    !safeHref
   ) {
     return null
   }
@@ -528,8 +530,23 @@ function normalizeAssistantAgentToolArtifact(value: unknown): AssistantAgentTool
     status,
     visibility,
     reviewRequired,
-    href,
+    href: safeHref,
   }
+}
+
+function normalizeStudioDraftArtifactHref(
+  value: unknown,
+  id: string,
+  slug: string,
+): AssistantStudioDraftArtifact['href'] | null {
+  if (value === '/studio') return '/studio'
+  if (typeof value !== 'string' || !value.startsWith('/studio?')) return null
+
+  const params = new URLSearchParams(value.slice('/studio?'.length))
+  const draft = params.get('draft')
+  if (!draft || draft.length > 120 || !/^[a-z0-9_-]+$/iu.test(draft)) return null
+  if (draft !== id && draft !== slug) return null
+  return `/studio?draft=${encodeURIComponent(draft)}`
 }
 
 function normalizeAssistantAgentGuardrails(value: unknown): AssistantAgentGuardrails | undefined {

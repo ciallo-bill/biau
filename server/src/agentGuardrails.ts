@@ -46,7 +46,7 @@ function sanitizeToolArtifact(value: AgentToolArtifact): AgentToolArtifact | nul
     value.status !== 'review-needed' ||
     value.visibility !== 'hidden' ||
     value.reviewRequired !== true ||
-    value.href !== '/studio'
+    !isSafeStudioDraftHref(value.href, value.id, value.slug)
   ) {
     return null
   }
@@ -59,8 +59,23 @@ function sanitizeToolArtifact(value: AgentToolArtifact): AgentToolArtifact | nul
     status: 'review-needed',
     visibility: 'hidden',
     reviewRequired: true,
-    href: '/studio',
+    href: normalizeStudioDraftHref(value.href),
   }
+}
+
+function isSafeStudioDraftHref(value: string, id: string, slug: string) {
+  if (value === '/studio') return true
+  if (!value.startsWith('/studio?')) return false
+  const params = new URLSearchParams(value.slice('/studio?'.length))
+  const draft = params.get('draft')
+  return Boolean(draft && isSafeIdentifier(draft, 120) && (draft === id || draft === slug))
+}
+
+function normalizeStudioDraftHref(value: AgentToolArtifact['href']) {
+  if (value === '/studio') return '/studio'
+  const params = new URLSearchParams(value.slice('/studio?'.length))
+  const draft = params.get('draft') ?? ''
+  return `/studio?draft=${encodeURIComponent(draft)}` as AgentToolArtifact['href']
 }
 
 export function summarizeGuardrails(input: {

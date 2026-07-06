@@ -113,7 +113,7 @@ export interface AgentStudioDraftArtifact {
   status: 'review-needed'
   visibility: 'hidden'
   reviewRequired: true
-  href: '/studio'
+  href: '/studio' | `/studio?draft=${string}`
 }
 
 export type AgentToolArtifact = AgentStudioDraftArtifact

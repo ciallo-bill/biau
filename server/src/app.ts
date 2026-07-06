@@ -1397,6 +1397,7 @@ function sanitizeAgentToolArtifact(value: unknown): SanitizedAgentToolArtifact |
   const slug = typeof value.slug === 'string' ? value.slug : ''
   const title = readBoundedString(value.title, 120)
   const column = readBoundedString(value.column, 40)
+  const href = sanitizeStudioDraftArtifactHref(value.href, id, slug)
   if (
     !/^[a-z0-9_-]+$/iu.test(id) ||
     !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(slug) ||
@@ -1407,7 +1408,7 @@ function sanitizeAgentToolArtifact(value: unknown): SanitizedAgentToolArtifact |
     value.status !== 'review-needed' ||
     value.visibility !== 'hidden' ||
     value.reviewRequired !== true ||
-    value.href !== '/studio'
+    !href
   ) {
     return null
   }
@@ -1420,8 +1421,23 @@ function sanitizeAgentToolArtifact(value: unknown): SanitizedAgentToolArtifact |
     status: 'review-needed',
     visibility: 'hidden',
     reviewRequired: true,
-    href: '/studio',
+    href,
   }
+}
+
+function sanitizeStudioDraftArtifactHref(
+  value: unknown,
+  id: string,
+  slug: string,
+): SanitizedAgentToolArtifact['href'] | null {
+  if (value === '/studio') return '/studio'
+  if (typeof value !== 'string' || !value.startsWith('/studio?')) return null
+
+  const params = new URLSearchParams(value.slice('/studio?'.length))
+  const draft = params.get('draft')
+  if (!draft || draft.length > 120 || !/^[a-z0-9_-]+$/iu.test(draft)) return null
+  if (draft !== id && draft !== slug) return null
+  return `/studio?draft=${encodeURIComponent(draft)}`
 }
 
 function sanitizeAgentGuardrails(value: unknown): NonNullable<ChatResponse['meta']>['guardrails'] {

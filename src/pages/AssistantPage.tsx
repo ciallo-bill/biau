@@ -13,6 +13,7 @@ import {
   searchPublicKnowledge,
   type AssistantKnowledgeItem,
   type AssistantAnswerMetaSummary,
+  type AssistantAgentToolTrace,
   type AssistantMemberProfile,
   type AssistantMessage,
   type AssistantSessionPreview,
@@ -86,6 +87,26 @@ function formatPermission(permission: string) {
   if (permission === 'admin-write') return '管理写入'
   if (permission === 'external-live') return '外部 live'
   return permission
+}
+
+function formatToolStatus(status: string) {
+  if (status === 'completed') return '已完成'
+  if (status === 'failed') return '失败'
+  if (status === 'blocked') return '已拦截'
+  if (status === 'skipped') return '已跳过'
+  if (status === 'selected') return '已选择'
+  return status
+}
+
+function getToolTraceHint(tool: AssistantAgentToolTrace) {
+  if (tool.id !== 'studio.draft') return ''
+  if (tool.errorClass === 'not_configured') return 'Studio 数据库还没配置；本次只保留草稿计划，等服务变量和数据库就绪后再重试。'
+  if (tool.errorClass === 'policy_blocked') return '请求里疑似包含密钥、密码、连接串或私有地址，已停止写入 Studio。'
+  if (tool.errorClass === 'tool_error') return '写入 Studio 时失败，助手已降级为计划模式；可以稍后重试或去 Studio 手动创建。'
+  if (tool.status === 'completed' && (!tool.artifacts || tool.artifacts.length === 0)) {
+    return '这次只生成草稿计划，没有写入 Studio 数据库。'
+  }
+  return ''
 }
 
 function formatGuardrailStatus(status?: string) {
@@ -882,11 +903,12 @@ export function AssistantPage() {
             <ul>
               {tools.map((tool) => (
                 <li key={tool.id}>
-                  {tool.label} · {formatPermission(tool.permission)} · {tool.status}
+                  {tool.label} · {formatPermission(tool.permission)} · {formatToolStatus(tool.status)}
                   {tool.itemCount !== undefined ? ` · ${tool.itemCount}` : ''}
+                  {getToolTraceHint(tool) && <p className="assistant-tool-hint">{getToolTraceHint(tool)}</p>}
                   {tool.artifacts?.map((artifact) => (
                     <Link key={`${tool.id}-${artifact.id}`} to={artifact.href} className="assistant-tool-artifact">
-                      草稿已创建：{artifact.title} · {artifact.status} · {artifact.visibility}
+                      草稿已创建：{artifact.title} · 待审核 · 暂不公开 · 打开 Studio
                     </Link>
                   ))}
                 </li>

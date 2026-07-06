@@ -5,7 +5,8 @@ import { createApp } from '../src/app.js'
 import { env } from '../src/env.js'
 import { generateAnswer, planAssistantAnswer } from '../src/model.js'
 import { runInternalAgent } from '../src/agentOrchestrator.js'
-import { buildAgentStudioDraft } from '../src/agentStudioDrafts.js'
+import { sanitizeToolTrace } from '../src/agentGuardrails.js'
+import { buildAgentStudioDraft, buildStudioDraftArtifact } from '../src/agentStudioDrafts.js'
 
 function findAvailablePort(startPort: number) {
   return new Promise<number>((resolve, reject) => {
@@ -239,6 +240,40 @@ try {
     draftPlan.data.column !== 'project-notes'
   ) {
     throw new Error('studio draft builder should create review-needed hidden project draft data without live database access')
+  }
+
+  const studioDraftArtifact = buildStudioDraftArtifact({
+    id: 'studio-draft-smoke',
+    slug: 'legal-rag-project-notes',
+    title: 'Legal RAG 项目详情草稿',
+    column: 'project-notes',
+  })
+  if (studioDraftArtifact.href !== '/studio?draft=studio-draft-smoke') {
+    throw new Error('studio draft artifact should deep-link to the created draft id')
+  }
+  const sanitizedDraftTrace = sanitizeToolTrace({
+    id: 'studio.draft',
+    label: 'Studio Draft',
+    permission: 'draft-write',
+    status: 'completed',
+    durationMs: 1,
+    summary: '已创建 Studio 草稿。',
+    artifacts: [studioDraftArtifact],
+  })
+  if (sanitizedDraftTrace.artifacts?.[0]?.href !== studioDraftArtifact.href) {
+    throw new Error('studio draft artifact sanitizer should keep matching safe deep links')
+  }
+  const sanitizedMismatchedDraftTrace = sanitizeToolTrace({
+    id: 'studio.draft',
+    label: 'Studio Draft',
+    permission: 'draft-write',
+    status: 'completed',
+    durationMs: 1,
+    summary: '已创建 Studio 草稿。',
+    artifacts: [{ ...studioDraftArtifact, href: '/studio?draft=other-draft' }],
+  })
+  if (sanitizedMismatchedDraftTrace.artifacts) {
+    throw new Error('studio draft artifact sanitizer should reject mismatched draft deep links')
   }
 
   const sensitiveDraftPlan = buildAgentStudioDraft({

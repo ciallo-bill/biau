@@ -131,7 +131,7 @@ export function buildStudioDraftArtifact(input: {
     status: 'review-needed',
     visibility: 'hidden',
     reviewRequired: true,
-    href: '/studio',
+    href: `/studio?draft=${encodeURIComponent(input.id)}`,
   }
 }
 
