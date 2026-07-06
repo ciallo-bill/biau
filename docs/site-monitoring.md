@@ -77,7 +77,7 @@ npm.cmd run reliability:check
 npm.cmd run site:monitor
 ```
 
-`reliability:check` 是跨项目可靠性总入口，会顺序运行主站、Legal RAG、ERP、Xunqiu、Pet 的 synthetic 检查，再生成 `public/status/site-status.json` 和 `public/status/reliability-suite.json`。默认会继续执行后续步骤并写出套件报告；需要让 CI 在故障时失败时使用：
+`reliability:check` 是跨项目可靠性总入口，会顺序运行主站、Legal RAG、ERP、Xunqiu、Pet、BIAU Playlab 的 synthetic 检查，再生成 `public/status/site-status.json` 和 `public/status/reliability-suite.json`。默认会继续执行后续步骤并写出套件报告；需要让 CI 在故障时失败时使用：
 
 ```powershell
 npm.cmd run reliability:check -- --strict
@@ -87,7 +87,7 @@ npm.cmd run reliability:check -- --skip site-monitor
 
 - `--strict`：任一步骤失败或报告出现失败状态时，命令最终返回非 0。
 - `--timeout`：传给每个 synthetic / status / monitor 脚本的请求超时时间，单位毫秒。
-- `--skip`：跳过某个步骤，支持多次传入或逗号分隔，例如 `--skip site-monitor,pet`。
+- `--skip`：跳过某个步骤，支持多次传入或逗号分隔，例如 `--skip site-monitor,pet,playlab`。
 - `public/status/reliability-suite.json` 只保存低敏摘要，不保存环境变量、API base URL、token、原始 stdout/stderr 或外部平台后台链接。
 
 主站 synthetic 默认只检查公开页面、sitemap、robots 和同域
