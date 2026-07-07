@@ -19,7 +19,8 @@
   "pr_url": null,
   "subtasks": [],
   "children": [
-    "07-07-round-15-status-generated-json-drift-guard"
+    "07-07-round-15-status-generated-json-drift-guard",
+    "07-07-round-15-project-visual-text-density-guard"
   ],
   "parent": null,
   "relatedFiles": [],

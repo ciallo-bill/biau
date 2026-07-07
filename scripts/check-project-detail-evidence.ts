@@ -19,6 +19,8 @@ interface ProjectEvidenceSummary {
 const MIN_DETAIL_SECTIONS = 5
 const MIN_BODY_VISUALS = 2
 const MIN_SECTION_DETAIL_CHARS = 60
+const MIN_VISUAL_ALT_CHARS = 16
+const MIN_VISUAL_CAPTION_CHARS = 30
 const MIN_ASSET_WIDTH = 320
 const MIN_ASSET_HEIGHT = 240
 const MIN_ASSET_AREA = 120_000
@@ -165,6 +167,12 @@ function checkVisual(projectId: string, visual: ProjectVisualBlock) {
   }
   if (!visual.alt?.trim()) fail(projectId, `visual ${visual.id} image is missing alt text`)
   if (!visual.caption?.trim()) fail(projectId, `visual ${visual.id} image is missing a public-safe caption`)
+  if (visual.alt?.trim() && visual.alt.trim().length < MIN_VISUAL_ALT_CHARS) {
+    fail(projectId, `visual ${visual.id} image alt is too terse for a visitor-readable case page`)
+  }
+  if (visual.caption?.trim() && visual.caption.trim().length < MIN_VISUAL_CAPTION_CHARS) {
+    fail(projectId, `visual ${visual.id} image caption is too terse for a visitor-readable case page`)
+  }
   if (visual.type === 'screenshot' && !visual.sourceUrl?.trim()) {
     fail(projectId, `visual ${visual.id} screenshot is missing sourceUrl evidence`)
   }
