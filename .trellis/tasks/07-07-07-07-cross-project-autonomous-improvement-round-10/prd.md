@@ -14,14 +14,26 @@ Continue autonomous local improvements for BIAU Port and related projects, prior
 
 ## Acceptance Criteria
 
-- [ ] At least one child task is completed, verified, committed locally, and archived.
-- [ ] Manual gates are recorded in task notes.
-- [ ] No secrets, production credentials, private URLs, model relay endpoints, or unapproved APK links are committed.
-- [ ] Finished child tasks are archived before the parent is archived.
+- [x] At least one child task is completed, verified, committed locally, and archived.
+- [x] Manual gates are recorded in task notes.
+- [x] No secrets, production credentials, private URLs, model relay endpoints, or unapproved APK links are committed.
+- [x] Finished child tasks are archived before the parent is archived.
 
 ## Initial Task Map
 
 - `status-detail-sitemap`: make `/status/:projectId` detail pages discoverable through sitemap generation and synthetic sitemap checks.
+- `assistant-knowledge-v2-verify-gate`: make assistant knowledge graph quality checks part of the normal verification path.
+
+## Results
+
+- Completed and archived `07-07-07-07-round-10-status-detail-sitemap-coverage`.
+  - Sitemap generation now includes all `/status/:projectId` detail pages.
+  - Main-site synthetic checks and site monitor checks now verify status detail discoverability.
+  - Local route-only synthetic checks can skip the assistant API gate with `--skip-assistant-api`.
+- Completed and archived `07-07-07-07-round-10-assistant-knowledge-v2-verify-gate`.
+  - `npm.cmd run verify` now includes the assistant knowledge graph quality gate.
+  - Assistant quality and deployment docs now describe the deterministic check.
+  - Backend/frontend quality specs and agent workflow notes were updated so future sessions keep the gate.
 
 ## Manual Gates
 
@@ -30,21 +42,3 @@ Continue autonomous local improvements for BIAU Port and related projects, prior
 - Live model prompts, provider diagnostics, production assistant checks, and AI Daily model-assisted generation remain opt-in real tasks only.
 - Legal RAG / ERP / Xunqiu credentialed checks require approved low-privilege demo credentials or production tokens.
 - Pet/Xunqiu APK/AAB signing, checksum publication, and public download approval remain release gates.
-
-## Goal
-
-Continue autonomous local improvements for BIAU Port and related projects, prioritizing public discoverability, status reliability, Studio/AI Daily workflow quality, assistant usability, and project-detail trust evidence while recording cloud, credential, live model, and release gates as manual follow-ups.
-
-## Requirements
-
-- TBD
-
-## Acceptance Criteria
-
-- [ ] TBD
-
-## Notes
-
-- Keep `prd.md` focused on requirements, constraints, and acceptance criteria.
-- Lightweight tasks can remain PRD-only.
-- For complex tasks, add `design.md` for technical design and `implement.md` for execution planning before `task.py start`.
