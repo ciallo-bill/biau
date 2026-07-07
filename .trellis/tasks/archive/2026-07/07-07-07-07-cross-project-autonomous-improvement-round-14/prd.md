@@ -15,10 +15,10 @@ Continue local-verifiable improvements across BIAU Port main site and related pr
 
 ## Acceptance Criteria
 
-- [ ] At least one child task is completed, verified, committed locally, and archived.
-- [ ] Manual gates found during this round are recorded in this PRD before archiving.
-- [ ] No secrets, production credentials, private URLs, model relay endpoints, or unapproved APK links are committed.
-- [ ] Finished child tasks are archived before the parent is archived.
+- [x] At least one child task is completed, verified, committed locally, and archived.
+- [x] Manual gates found during this round are recorded in this PRD before archiving.
+- [x] No secrets, production credentials, private URLs, model relay endpoints, or unapproved APK links are committed.
+- [x] Finished child tasks are archived before the parent is archived.
 
 ## Initial Task Map
 
@@ -29,7 +29,7 @@ Continue local-verifiable improvements across BIAU Port main site and related pr
 
 ## Manual Gates
 
-- GitHub SSH host key verification still blocks pushing local commits.
+- No new manual gates were introduced in this round.
 - Cloudflare, Render, Aiven/Supabase, Qdrant, Prometheus/Grafana/ARMS, Umami/Plausible, Search Console, and scheduled monitors remain platform setup tasks.
 - Live model prompts, provider diagnostics, production assistant checks, and AI Daily model-assisted generation remain opt-in real tasks only.
 - Legal RAG / ERP / Xunqiu credentialed checks require approved low-privilege demo credentials or production tokens.
