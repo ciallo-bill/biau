@@ -21,10 +21,10 @@ Continue the long-running BIAU Port improvement goal with local-verifiable work 
 
 ## Acceptance Criteria
 
-- [ ] At least one child task is completed, verified, committed locally, and archived.
-- [ ] Manual gates found during this round are recorded in this PRD before archiving.
-- [ ] No secrets, production credentials, private URLs, model relay endpoints, or unapproved APK links are committed.
-- [ ] Finished child tasks are archived before the parent is archived.
+- [x] At least one child task is completed, verified, committed locally, and archived.
+- [x] Manual gates found during this round are recorded in this PRD before archiving.
+- [x] No secrets, production credentials, private URLs, model relay endpoints, or unapproved APK links are committed.
+- [x] Finished child tasks are archived before the parent is archived.
 
 ## Initial Task Map
 
@@ -35,6 +35,8 @@ Continue the long-running BIAU Port improvement goal with local-verifiable work 
 ## Manual Gates
 
 - Round 13 child task `project-detail-asset-quality-gate` found no new manual gates.
+- Round 13 child task `status-manual-gate-ledger-sync` found no new manual gates.
+- Round 13 child task `assistant-studio-artifact-link-check` found no new manual gates.
 - GitHub SSH host key verification still blocks pushing local commits.
 - Cloudflare, Render, Aiven/Supabase, Qdrant, Prometheus/Grafana/ARMS, Umami/Plausible, Search Console, and scheduled monitors remain platform setup tasks.
 - Live model prompts, provider diagnostics, production assistant checks, and AI Daily model-assisted generation remain opt-in real tasks only.
