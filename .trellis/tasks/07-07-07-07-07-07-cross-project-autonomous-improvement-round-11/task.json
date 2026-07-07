@@ -19,7 +19,8 @@
   "pr_url": null,
   "subtasks": [],
   "children": [
-    "07-07-07-07-round-11-project-detail-evidence-gate"
+    "07-07-07-07-round-11-project-detail-evidence-gate",
+    "07-07-07-07-round-11-assistant-rag-offline-verify-gate"
   ],
   "parent": null,
   "relatedFiles": [],

@@ -65,10 +65,15 @@ ASSISTANT_MODEL_PROVIDER=glm-compatible
 
 ```text
 npm run assistant:kg-check
+npm run assistant:eval
+npm run assistant:rag-sync-local
+npm run assistant:service-modes-smoke
+npm run assistant:rag-smoke
 ```
 
-这个检查只使用本地公开数据，不会调用真实模型或中转站。
-`npm run verify` 已经包含这一步；单独运行 `assistant:kg-check` 适合在只改公开助手知识结构或检索 baseline 时快速确认。
+这些检查只使用本地公开数据、本地 Express app、假 token 和 mock Qdrant，不会调用真实模型、中转站、生产 RAG Orchestrator 或外部向量库。其中 `assistant:eval` 会报告 `modelCalls=0`，用于确认公开助手检索意图、citation、拒答和敏感输出边界；`assistant:rag-sync-local` 只验证本地 knowledge V2 到 provider-neutral store 的同步计划；`assistant:service-modes-smoke` 验证 public/internal/rag/studio 服务边界；`assistant:rag-smoke` 验证本地/mock RAG Orchestrator contract。
+
+`npm run verify` 已经包含这些离线门禁；单独运行上述命令适合在只改公开助手知识结构、检索 baseline、RAG contract 或三服务边界时快速确认。真实 Qdrant/embedding/reranker/model 同步和生产 Render 检查仍是人工批准后的单独任务。
 
 外部 RAG Orchestrator 是最终形态的一部分，由单独的 Render 服务承载。Cloudflare Pages Functions 或公开助手 API 只保存 Orchestrator endpoint 和服务端 token，不直接连接 Qdrant、Supabase、模型中转或 embedding provider：
 

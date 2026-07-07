@@ -18,7 +18,13 @@ For broad confidence before handoff, run:
 npm.cmd run verify
 ```
 
-`verify` runs assistant knowledge generation, assistant V2 knowledge graph checks, assistant metadata checks, Prisma validation, lint, server build, smoke tests, Cloudflare function smoke, frontend build, blog check, Studio/AI Daily local smoke, project detail evidence checks, status contract checks, preview startup, and UI checks.
+`verify` runs assistant knowledge generation, assistant V2 knowledge graph checks, offline assistant RAG eval, local RAG sync planning, assistant metadata checks, Prisma validation, lint, server build, smoke tests, assistant service-mode isolation, local/mock RAG orchestrator smoke, Cloudflare function smoke, frontend build, blog check, Studio/AI Daily local smoke, project detail evidence checks, status contract checks, preview startup, and UI checks.
+
+The assistant/RAG checks included in `verify` are deterministic local gates:
+`assistant:eval` reports `modelCalls=0`, `assistant:rag-sync-local` reads the
+generated local knowledge file, `assistant:service-modes-smoke` starts local
+services with fake tokens, and `assistant:rag-smoke` uses the local app plus a
+mock Qdrant server. They are not live model/provider diagnostics.
 
 ## Smoke Test Contract
 
