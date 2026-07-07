@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs'
-import { join } from 'node:path'
+import { extname, join } from 'node:path'
+import sharp from 'sharp'
 import {
   projects,
   type Project,
@@ -18,6 +19,9 @@ interface ProjectEvidenceSummary {
 const MIN_DETAIL_SECTIONS = 5
 const MIN_BODY_VISUALS = 2
 const MIN_SECTION_DETAIL_CHARS = 60
+const MIN_ASSET_WIDTH = 320
+const MIN_ASSET_HEIGHT = 240
+const MIN_ASSET_AREA = 120_000
 const REQUIRED_DETAIL_GROUPS: ProjectDetailContentKey[] = [
   'overview',
   'workflow',
@@ -41,6 +45,12 @@ const SENSITIVE_SOURCE_PATTERNS = [
 const issues: string[] = []
 const summaries: ProjectEvidenceSummary[] = []
 const globalVisualIds = new Map<string, string>()
+const assetQualityChecks: Array<{
+  projectId: string
+  context: string
+  image: string
+  publicPath: string
+}> = []
 
 function fail(projectId: string, message: string) {
   issues.push(`${projectId}: ${message}`)
@@ -83,7 +93,11 @@ function checkAsset(projectId: string, context: string, image: string | undefine
   }
 
   const publicPath = join(process.cwd(), 'public', image.replace(/^\//u, ''))
-  if (!existsSync(publicPath)) fail(projectId, `${context} references a missing asset: ${image}`)
+  if (!existsSync(publicPath)) {
+    fail(projectId, `${context} references a missing asset: ${image}`)
+    return
+  }
+  assetQualityChecks.push({ projectId, context, image, publicPath })
 }
 
 function checkLink(projectId: string, link: ProjectLink, context: string) {
@@ -156,7 +170,54 @@ function checkVisual(projectId: string, visual: ProjectVisualBlock) {
   }
 
   const publicPath = join(process.cwd(), 'public', visual.image.replace(/^\//u, ''))
-  if (!existsSync(publicPath)) fail(projectId, `visual ${visual.id} references a missing asset: ${visual.image}`)
+  if (!existsSync(publicPath)) {
+    fail(projectId, `visual ${visual.id} references a missing asset: ${visual.image}`)
+    return
+  }
+  assetQualityChecks.push({ projectId, context: `visual ${visual.id}`, image: visual.image, publicPath })
+}
+
+function isRasterNeedingWebpSidecar(image: string) {
+  const extension = extname(image).toLowerCase()
+  return extension === '.png' || extension === '.jpg' || extension === '.jpeg'
+}
+
+function webpSidecarPath(publicPath: string) {
+  return publicPath.replace(/\.[^.\\/]+$/u, '.webp')
+}
+
+async function checkAssetQuality() {
+  const metadataCache = new Map<string, Awaited<ReturnType<typeof sharp.prototype.metadata>>>()
+
+  for (const check of assetQualityChecks) {
+    let metadata = metadataCache.get(check.publicPath)
+    if (!metadata) {
+      try {
+        metadata = await sharp(check.publicPath).metadata()
+        metadataCache.set(check.publicPath, metadata)
+      } catch {
+        fail(check.projectId, `${check.context} asset is not parseable by the image pipeline: ${check.image}`)
+        continue
+      }
+    }
+
+    const width = metadata.width ?? 0
+    const height = metadata.height ?? 0
+    if (width <= 0 || height <= 0) {
+      fail(check.projectId, `${check.context} asset is missing image dimensions: ${check.image}`)
+      continue
+    }
+    if (width < MIN_ASSET_WIDTH || height < MIN_ASSET_HEIGHT || width * height < MIN_ASSET_AREA) {
+      fail(
+        check.projectId,
+        `${check.context} asset is too small for a visitor-readable case page: ${check.image} (${width}x${height})`,
+      )
+    }
+
+    if (isRasterNeedingWebpSidecar(check.image) && !existsSync(webpSidecarPath(check.publicPath))) {
+      fail(check.projectId, `${check.context} raster asset is missing a matching WebP sidecar: ${check.image}`)
+    }
+  }
 }
 
 for (const project of projects) {
@@ -211,6 +272,8 @@ for (const project of projects) {
 
   for (const visual of visuals) checkVisual(project.id, visual)
 }
+
+await checkAssetQuality()
 
 if (issues.length > 0) {
   console.error('Project detail evidence check failed:')

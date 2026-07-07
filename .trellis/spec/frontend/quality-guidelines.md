@@ -115,6 +115,7 @@ Project detail pages should include both runtime evidence and structural explana
 - all standard case-study groups should be present: `overview`, `workflow`, `architecture`, `quality`, `limitations`, and `roadmap`;
 - body visuals should use unique ids and should not collapse to repeated copies of the hero image;
 - hero images, visual images, visual source links, project links, section links, and assistant-facing project facts must stay public-safe and free of local paths, private IPs, secret-like query strings, or non-HTTPS external URLs;
+- hero and body visual image files must be parseable by the local image pipeline, large enough for visitor-readable case-study pages, and raster assets such as PNG/JPEG should keep same-name WebP sidecars;
 - each section needs enough body text or bullet detail to read as a case-study note, not a bare heading.
 
 `npm.cmd run project-details:check` enforces this composition. When a project
